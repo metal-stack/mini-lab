@@ -1,0 +1,24 @@
+---
+metal_set_resource_limits: true
+
+metal_api_image_name: registry.fi-ts.io/metal/metal-api
+metal_api_image_tag: latest
+
+metalctl_image_name: registry.fi-ts.io/metal/metalctl
+metalctl_image_tag: latest
+
+metal_console_image_name: registry.fi-ts.io/metal/metal-console
+metal_console_image_tag: latest
+
+metal_api_base_path: "/metal/"
+
+metal_api_replicas: 3
+metal_console_replicas: 3
+
+metal_api_ipam_postgres_backup:
+  access_key: "{{ lookup('env', 'BLOB_ACCESS_KEY') }}"
+  secret_key: "{{ lookup('env', 'BLOB_SECRET_KEY') }}"
+
+metal_api_ingress: {}
+
+mgmt_services: {}

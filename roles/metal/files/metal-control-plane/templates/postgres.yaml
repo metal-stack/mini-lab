@@ -1,0 +1,148 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: null
+  creationTimestamp: null
+  labels:
+    app: {{ template "postgres.fullname" . }}
+  name: {{ template "postgres.fullname" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+        app: {{ template "postgres.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "postgres.fullname" . }}
+    spec:
+      containers:
+      - image: {{ .Values.images.postgres.image }}:{{ .Values.images.postgres.tag }}
+        name: postgres
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_DB
+              name: postgres-env
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_USER
+              name: postgres-env
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_PASSWORD
+              name: postgres-env
+        - name: PGDATA
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_DATA
+              name: postgres-env
+        volumeMounts:
+        - name: {{ template "postgres-data-volume.fullname" . }}
+          mountPath: /var/lib/postgresql/data/
+{{- if .Values.set_resource_limits }}
+        resources:
+{{ toYaml .Values.resources.postgres | indent 10 }}
+{{- end }}
+      restartPolicy: Always
+      volumes:
+      - name: {{ template "postgres-data-volume.fullname" . }}
+        persistentVolumeClaim:
+          claimName: {{ template "postgres-data-volume.fullname" . }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    service: {{ template "postgres-data-volume.fullname" . }}
+  name: {{ template "postgres-data-volume.fullname" . }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: null
+  creationTimestamp: null
+  labels:
+    app: {{ template "postgres.fullname" . }}
+  name: {{ template "postgres.fullname" . }}
+spec:
+  ports:
+  - name: "{{ .Values.ports.postgres }}"
+    port: {{ .Values.ports.postgres }}
+    targetPort: 5432
+  selector:
+    app: {{ template "postgres.fullname" . }}
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-env
+data:
+  POSTGRES_DB: ipam
+  POSTGRES_USER: ipam
+  POSTGRES_PASSWORD: metal
+  POSTGRES_DATA: "/var/lib/postgresql/data/pgdata"
+{{- if not (and (eq .Values.postgres.backup.s3.access_key "") (eq .Values.postgres.backup.s3.secret_key "")) }}
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: postgresql-backup
+spec:
+  schedule: "*/10 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: postgresql-backup
+            image: registry.fi-ts.io/metal/postgresql-backup:latest
+            command:
+              - /backup.sh
+            env:
+            - name: PGHOST
+              value: {{ template "postgres.fullname" . }}
+            - name: PGPORT
+              value: "5432"
+            - name: PGDATABASE
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_DB
+                  name: postgres-env
+            - name: PGPASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_PASSWORD
+                  name: postgres-env
+            - name: PGUSER
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_USER
+                  name: postgres-env
+            - name: MC_FOLDER
+              value: {{ .Values.stage }}
+            - name: MC_ACCESS_KEY
+              value: {{ .Values.postgres.backup.s3.access_key }}
+            - name: MC_SECRET_KEY
+              value: {{ .Values.postgres.backup.s3.secret_key }}
+{{- end }}

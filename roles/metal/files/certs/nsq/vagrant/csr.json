@@ -1,0 +1,21 @@
+{
+  "CN": "api.metal-pod.dev",
+  "hosts": [
+    "metal-control-plane-nsqd",
+    "metal-pod.dev",
+    "*.metal-pod.dev"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 4096
+  },
+  "names": [
+    {
+      "C":  "DE",
+      "L":  "Muenchen",
+      "O":  "FI-TS",
+      "OU": "DevOps",
+      "ST": "Bayern"
+    }
+  ]
+}

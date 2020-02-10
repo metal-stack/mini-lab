@@ -1,0 +1,6 @@
+---
+- name: dhcpd restart
+  service:
+    name: dhcpd
+    enabled: true
+    state: restarted

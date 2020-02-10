@@ -1,0 +1,22 @@
+---
+- name: deploy control-plane
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  pre_tasks:
+    - name: Create metal namespace
+      k8s_fits:
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ k8s_metal_namespace }}"
+            labels:
+              name: "{{ k8s_metal_namespace }}"
+  roles:
+    - name: ingress-controller
+      tags: ingress-controller
+    - name: rethinkdb
+      tags: rethinkdb
+    - name: metal
+      tags: metal

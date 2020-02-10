@@ -1,0 +1,41 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: control-plane-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+{{- if .Values.ingress.tls.enabled }}
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+{{ else }}
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+{{- end }}
+  {{- with .Values.ingress.annotations }}
+{{ toYaml . | indent 4 }}
+  {{- end }}
+spec:
+{{- if .Values.ingress.tls.enabled }}
+  tls:
+    - hosts:
+      - api.{{ .Values.ingress_public_dns }}
+      secretName: control-plane-ingress-tls
+{{- end }}
+  rules:
+  - host: api.{{ .Values.ingress_public_dns }}
+    http:
+      paths:
+      - path: {{ .Values.metal_api.base_path }}
+        backend:
+          serviceName: "{{ template "metal-api.fullname" . }}"
+          servicePort: {{ .Values.ports.metal_api }}
+{{- if .Values.dev_setup }}
+  - host: swagger.{{ .Values.ingress_public_dns }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: "{{ template "swagger-ui.fullname" . }}"
+          servicePort: {{ .Values.ports.swagger_ui }}
+{{- end }}

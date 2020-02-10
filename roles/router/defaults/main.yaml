@@ -1,0 +1,6 @@
+---
+set_control_plane_acls: false
+enable_mgmt_vrf: true
+enable_ntp_in_mgmt_vrf: true
+enable_static_route_leak: false
+ntp_server: "time.cloudflare.com"

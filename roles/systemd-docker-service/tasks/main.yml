@@ -1,0 +1,20 @@
+---
+- name: template service {{ systemd_service_name }}
+  template:
+    src: service.j2
+    dest: /etc/systemd/system/{{ systemd_service_name }}.service
+  register: result
+
+- name: start service {{ systemd_service_name }}
+  systemd:
+    name: "{{ systemd_service_name }}"
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+  when: result is changed
+
+- name: ensure service is started
+  systemd:
+    name: "{{ systemd_service_name }}"
+    state: started
+    enabled: yes

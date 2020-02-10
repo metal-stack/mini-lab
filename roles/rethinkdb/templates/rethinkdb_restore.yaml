@@ -1,0 +1,21 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rethinkdb-backup-restore
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: rethinkdb-backup-restore
+        image: registry.fi-ts.io/metal/rethinkdb-backup:latest
+        command:
+        - /restore.sh
+        - --force
+        env:
+        - name: RETHINKDB_ADDR
+          value: rethinkdb-rethinkdb-proxy:28015
+        - name: BACKUP_URL
+          value: ""

@@ -1,0 +1,29 @@
+---
+masterdata_api_hmac: change-me
+
+# TODO: needs to point to a lightweight dex deployed in the cluster
+masterdata_api_tenants:
+- meta:
+    id: fits
+    kind: Tenant
+    apiversion: v1
+    version: 0
+  name: FI-TS
+  iam_config:
+    issuer_config:
+      url: ""
+      client_id: "auth-go-cli"
+    idm_config:
+      idm_type: "UX"
+    group_config:
+      namespace_max_length: 20
+  description: FI-TS tenant, which is provider
+
+masterdata_api_projects:
+- meta:
+    id: 00000000-0000-0000-0000-000000000001
+    kind: Project
+    apiversion: v1
+    version: 0
+  name: gardener-seeds
+  description: Gardener Seeds Project

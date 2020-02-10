@@ -1,0 +1,74 @@
+---
+- name: deploy pixiecore service
+  include_role:
+    name: systemd-docker-service
+  vars:
+    systemd_service_name: pixiecore
+    systemd_docker_image_name: "{{ pixiecore_image_name }}"
+    systemd_docker_image_tag: "{{ pixiecore_image_tag }}"
+    systemd_docker_cpu_period: 50000
+    systemd_docker_cpu_quota: 10000
+    systemd_docker_memory: 256m
+    systemd_service_after: docker.service
+    systemd_service_requires: docker.service
+    # Because Pixiecore needs to listen for DHCP traffic,
+    # it has to run with access to the host's networking stack.
+    # Both Rkt and Docker do this with the --net=host commandline flag.
+    # https://github.com/google/netboot/tree/master/pixiecore
+    systemd_docker_network: host
+    # With the flag --dhcp-no-bind Pixiecore does not bind to the DHCP port and only listens for Pixie-Requests
+    # This enables to use an existing DHCP server
+    systemd_docker_command: ["api", "http://localhost:4242", "--debug", "--dhcp-no-bind"]
+
+- name: deploy metal-core service
+  include_role:
+    name: systemd-docker-service
+  vars:
+    systemd_service_name: metal-core
+    systemd_docker_image_name: "{{ metal_core_image_name }}"
+    systemd_docker_image_tag: "{{ metal_core_image_tag }}"
+    systemd_docker_cpu_period: 50000
+    systemd_docker_cpu_quota: 10000
+    systemd_docker_memory: 256m
+    systemd_service_after: docker.service
+    systemd_service_requires: docker.service
+    # metal-core needs to figure out the switch ports, this is only possible from host network
+    systemd_docker_network: host
+    systemd_docker_volumes:
+      - /etc/network/:/etc/network
+      - /etc/frr/:/etc/frr
+      - /var/run/dbus:/var/run/dbus
+      - /run/systemd/private:/run/systemd/private
+    systemd_docker_cap_add:
+      - sys_admin
+    systemd_service_environment:
+      TZ: "{{ timezone }}"
+      METAL_CORE_CIDR: "{{ metal_core_cidr }}"
+      METAL_CORE_LOOPBACK_IP: "{{ lo }}"
+      METAL_CORE_PARTITION_ID: "{{ partition_id }}"
+      METAL_CORE_RACK_ID: "{{ partition_rack_id }}"
+      METAL_CORE_BIND_ADDRESS: 0.0.0.0
+      METAL_CORE_PORT: "{{ metal_core_port }}"
+      METAL_CORE_MACHINE_TOPIC: "{{ partition_id }}-machine"
+      METAL_CORE_SWITCH_TOPIC: "{{ partition_id }}-switch"
+      METAL_CORE_METAL_API_IP: "{{ api_addr }}"
+      METAL_CORE_METAL_API_PORT: "{{ api_port }}"
+      METAL_CORE_METAL_API_PROTOCOL: "{{ api_protocol }}"
+      METAL_CORE_METAL_API_BASEPATH: "{{ api_basepath }}"
+      METAL_CORE_HMAC_KEY: "{{ metal_core_hmac_key }}"
+      # The nsqd is running on another machine. The port is exposed to the vagrant host.
+      # Access is possible via the vagrant bridge ip.
+      METAL_CORE_MQ_ADDRESS: "{{ api_nsq_lookupd }}"
+      METAL_CORE_MQ_LOGLEVEL: "{{ metal_core_nsq_loglevel }}"
+      METAL_CORE_LOG_LEVEL: "{{ metal_core_log_level }}"
+      METAL_CORE_ASN: "{{ asn }}"
+      METAL_CORE_RECONFIGURE_SWITCH: "{{ reconfigure_switch }}"
+      METAL_CORE_RECONFIGURE_SWITCH_INTERVAL: "{{ reconfigure_switch_interval }}"
+      METAL_CORE_MANAGEMENT_GATEWAY: "{{ mgmt_gateway }}"
+      METAL_CORE_CHANGE_BOOT_ORDER: "{{ metal_core_change_boot_order }}"
+
+- name: wait for metal-core to listen on port
+  wait_for:
+    port: 4242
+    timeout: 300
+    msg: "metal-core did not come up"

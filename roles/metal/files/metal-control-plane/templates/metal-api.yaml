@@ -1,0 +1,361 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app: {{ template "metal-api.fullname" . }}
+  name: {{ template "metal-api.fullname" . }}
+type: Opaque
+stringData:
+  view_key: {{ .Values.metal_api.view_key }}
+  edit_key: {{ .Values.metal_api.edit_key }}
+  admin_key: {{ .Values.metal_api.admin_key }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ template "metal-api.fullname" . }}
+  name: {{ template "metal-api.fullname" . }}
+spec:
+  replicas: {{ .Values.metal_api.replicas }}
+  selector:
+    matchLabels:
+        app: {{ template "metal-api.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "metal-api.fullname" . }}
+    spec:
+      restartPolicy: Always
+      # it's better to disable the service links as the default args do not work properly otherwise:
+      enableServiceLinks: False
+      containers:
+      - env:
+        - name: DEBUG
+          value: "1"
+        - name: METAL_API_BIND_ADDR
+          value: 0.0.0.0
+        - name: METAL_API_BASE_PATH
+          value: {{ .Values.metal_api.base_path }}
+        - name: ZAP_ENCODING
+          value: logfmt
+        - name: ZAP_LEVEL
+          value: debug
+        - name: METAL_API_DB_ADDR
+          value: rethinkdb-rethinkdb-proxy:{{ .Values.ports.rethinkdb }}
+        - name: METAL_API_LOG_LEVEL
+          value: debug
+        - name: METAL_API_DEX_ADDR
+          value: {{ .Values.metal_api.dex_address }}
+        - name: METAL_API_HMAC_VIEW_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "metal-api.fullname" . }}
+              key: view_key
+        - name: METAL_API_HMAC_EDIT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "metal-api.fullname" . }}
+              key: edit_key
+        - name: METAL_API_HMAC_ADMIN_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "metal-api.fullname" . }}
+              key: admin_key
+        - name: METAL_API_IPAM_DB_ADDR
+          value: {{ template "postgres.fullname" . }}
+        - name: METAL_API_IPAM_DB_PORT
+          value: "{{ .Values.ports.postgres }}"
+        - name: METAL_API_IPAM_DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_DB
+              name: postgres-env
+        - name: METAL_API_IPAM_DB_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_PASSWORD
+              name: postgres-env
+        - name: METAL_API_IPAM_DB_USER
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_USER
+              name: postgres-env
+        - name: METAL_API_PROVIDER_TENANT
+          value: "{{ .Values.provider_tenant }}"
+        - name: METAL_API_NSQD_TCP_ADDR
+          value: api.{{ .Values.ingress_public_dns }}:4150
+        - name: METAL_API_NSQD_HTTP_ENDPOINT
+          value: {{ template "nsqd.fullname" . }}:4151
+        - name: METAL_API_NSQD_CA_CERT_FILE
+          value: /certs/nsq/ca_cert.pem
+        - name: METAL_API_NSQD_CLIENT_CERT_FILE
+          value: /certs/nsq/client_cert.pem
+        - name: METAL_API_MASTERDATA_HMAC
+          value: "{{ .Values.masterdata_api.hmac }}"
+        - name: METAL_API_MASTERDATA_ADDR
+          value: masterdata-api:8443
+        - name: METAL_API_MASTERDATA_CERTPATH
+          value: /certs/masterdata-api/server.pem
+        image: {{ .Values.images.metal_api.image }}:{{ .Values.images.metal_api.tag }}
+        imagePullPolicy: Always
+        name: metal-api
+        ports:
+        - containerPort: 8080
+        - containerPort: 2112
+{{- if .Values.set_resource_limits }}
+        resources:
+{{ toYaml .Values.resources.metal_api | indent 10 }}
+{{- end }}
+        volumeMounts:
+        - name: {{ template "nsqd.fullname" . }}
+          mountPath: /certs/nsq/
+          readOnly: true
+        - name: masterdata-api-tls
+          mountPath: /certs/masterdata-api/
+          readOnly: true
+      volumes:
+      - name: {{ template "nsqd.fullname" . }}
+        secret:
+          secretName: {{ template "nsqd.fullname" . }}
+      - name: masterdata-api-tls
+        secret:
+          secretName: masterdata-api-tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ template "metal-api.fullname" . }}
+  name: {{ template "metal-api.fullname" . }}
+spec:
+  ports:
+  - name: "{{ .Values.ports.metal_api }}"
+    port: {{ .Values.ports.metal_api }}
+    targetPort: 8080
+  - name: "{{ .Values.ports.metal_api_metrics }}"
+    port: {{ .Values.ports.metal_api_metrics }}
+    targetPort: 2112
+  selector:
+    app: {{ template "metal-api.fullname" . }}
+status:
+  loadBalancer: {}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "metal-api.fullname" . }}-initdb
+  labels:
+    app: {{ template "metal-api.fullname" . }}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+spec:
+  template:
+    metadata:
+      name: {{ template "metal-api.fullname" . }}-initdb
+      labels:
+        app: {{ template "metal-api.fullname" . }}
+    spec:
+      restartPolicy: Never
+      enableServiceLinks: False
+      containers:
+      - env:
+        - name: DEBUG
+          value: "1"
+        - name: ZAP_ENCODING
+          value: logfmt
+        - name: ZAP_LEVEL
+          value: debug
+        - name: METAL_API_DB_ADDR
+          value: rethinkdb-rethinkdb-proxy:{{ .Values.ports.rethinkdb }}
+        - name: METAL_API_LOG_LEVEL
+          value: debug
+        image: {{ .Values.images.metal_api.image }}:{{ .Values.images.metal_api.tag }}
+        name: metal-api-initdb
+        command: ["/metal-api"]
+        args: ["initdb"]
+        resources: {}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "metal-api.fullname" . }}-masterdata
+  labels:
+    app: {{ template "metal-api.fullname" . }}
+data:
+  image.yaml: |
+    {{ .Values.metal_api.images | nindent 4 }}
+  size.yaml: |
+    {{ .Values.metal_api.sizes | nindent 4 }}
+  partition.yaml: |
+    {{ .Values.metal_api.partitions | nindent 4 }}
+  network.yaml: |
+    {{ .Values.metal_api.networks | nindent 4 }}
+  ip.yaml: |
+    {{ .Values.metal_api.ips | nindent 4 }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "metal-api.fullname" . }}-createmasterdata-update
+  labels:
+    app: {{ template "metal-api.fullname" . }}
+  annotations:
+    "helm.sh/hook": post-upgrade
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: {{ template "metal-api.fullname" . }}-createmasterdata-update
+      labels:
+        app: {{ template "metal-api.fullname" . }}
+    spec:
+      restartPolicy: Never
+      containers:
+      - image: {{ .Values.images.metalctl.image }}:{{ .Values.images.metalctl.tag }}
+        imagePullPolicy: Always
+        name: metal-api-createmasterdata
+        env:
+        - name: METALCTL_URL
+          value: http://{{ template "metal-api.fullname" . }}.metal-control-plane.svc.cluster.local:{{ .Values.ports.metal_api }}{{ .Values.metal_api.base_path }}
+        - name: METALCTL_HMAC
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "metal-api.fullname" . }}
+              key: admin_key
+        command:
+          - sh
+          - -c
+          - |
+              set -exu
+              /metalctl image apply -f /masterdata/image.yaml
+              /metalctl partition apply -f /masterdata/partition.yaml
+              /metalctl size apply -f /masterdata/size.yaml
+              /metalctl network apply -f /masterdata/network.yaml
+              /metalctl network ip apply -f /masterdata/ip.yaml
+        resources: {}
+        volumeMounts:
+        - name: masterdata
+          mountPath: /masterdata
+      volumes:
+        - name: masterdata
+          configMap:
+            name: {{ template "metal-api.fullname" . }}-masterdata
+            items:
+            - key: image.yaml
+              path: image.yaml
+            - key: size.yaml
+              path: size.yaml
+            - key: partition.yaml
+              path: partition.yaml
+            - key: network.yaml
+              path: network.yaml
+            - key: ip.yaml
+              path: ip.yaml
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "metal-api.fullname" . }}-createmasterdata-initial
+  labels:
+    app: {{ template "metal-api.fullname" . }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: {{ template "metal-api.fullname" . }}-createmasterdata-initial
+      labels:
+        app: {{ template "metal-api.fullname" . }}
+    spec:
+      restartPolicy: Never
+      containers:
+      - image: {{ .Values.images.metalctl.image }}:{{ .Values.images.metalctl.tag }}
+        imagePullPolicy: Always
+        name: metal-api-createmasterdata
+        env:
+        - name: METALCTL_URL
+          value: http://{{ template "metal-api.fullname" . }}.metal-control-plane.svc.cluster.local:{{ .Values.ports.metal_api }}{{ .Values.metal_api.base_path }}
+        - name: METALCTL_HMAC
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "metal-api.fullname" . }}
+              key: admin_key
+        command:
+          - sh
+          - -c
+          - |
+              set -exu
+              /metalctl image apply -f /masterdata/image.yaml
+              /metalctl partition apply -f /masterdata/partition.yaml
+              /metalctl size apply -f /masterdata/size.yaml
+              /metalctl network apply -f /masterdata/network.yaml
+              /metalctl network ip apply -f /masterdata/ip.yaml
+        resources: {}
+        volumeMounts:
+        - name: masterdata
+          mountPath: /masterdata
+      initContainers:
+      - name: wait-for-api
+        image: gempesaw/curl-jq
+        env:
+        - name: API_BASE_URL
+          value: {{ template "metal-api.fullname" . }}.metal-control-plane.svc.cluster.local:{{ .Values.ports.metal_api }}{{ .Values.metal_api.base_path }}
+        command:
+          - sh
+          - -c
+          - |
+              set -eu
+              until curl --output /dev/null --fail -s $API_BASE_URL/v1/health; do echo waiting for $API_BASE_URL; sleep 2; done
+        volumeMounts:
+      volumes:
+        - name: masterdata
+          configMap:
+            name: {{ template "metal-api.fullname" . }}-masterdata
+            items:
+            - key: image.yaml
+              path: image.yaml
+            - key: size.yaml
+              path: size.yaml
+            - key: partition.yaml
+              path: partition.yaml
+            - key: network.yaml
+              path: network.yaml
+            - key: ip.yaml
+              path: ip.yaml
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ template "metal-api.fullname" . }}-liveliness
+  labels:
+    app: {{ template "metal-api.fullname" . }}
+spec:
+  schedule: "*/1 * * * *"
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: trigger-liveliness-evaluation
+            image: gempesaw/curl-jq
+            env:
+            - name: API_BASE_URL
+              value: http://{{ template "metal-api.fullname" . }}:{{ .Values.ports.metal_api }}{{ .Values.metal_api.base_path }}
+            command:
+              - sh
+              - -c
+              - |
+                  set -exu
+                  curl -XPOST -H "accept: application/json" -H "Content-Type: application/json" -d "[ \"string\"]" --fail ${API_BASE_URL}v1/machine/liveliness
+            resources: {}

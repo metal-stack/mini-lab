@@ -1,0 +1,11 @@
+---
+systemd_service_environment: {}
+systemd_docker_network:
+systemd_docker_command:
+systemd_docker_volumes: []
+systemd_docker_cap_add: []
+systemd_docker_ports: []
+systemd_docker_host_to_ip_mapping: []
+systemd_service_restart_sec: 10
+systemd_service_timeout_start_sec: 10
+systemd_service_timeout_stop_sec: 10

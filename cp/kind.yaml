@@ -1,0 +1,23 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+networking:
+  apiServerPort: 8443
+  apiServerAddress: 0.0.0.0
+nodes:
+- role: control-plane
+  extraPortMappings:
+  - containerPort: 4443
+    hostPort: 4443
+    listenAddress: 192.168.121.1
+  - containerPort: 80
+    hostPort: 8080
+    listenAddress: 192.168.121.1
+  - containerPort: 4150
+    hostPort: 4150
+    listenAddress: 192.168.121.1
+  - containerPort: 4161
+    hostPort: 4161
+    listenAddress: 192.168.121.1
+  - containerPort: 10001
+    hostPort: 5222
+    listenAddress: 192.168.121.1

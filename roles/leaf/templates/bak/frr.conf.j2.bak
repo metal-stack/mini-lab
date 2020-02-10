@@ -1,0 +1,15 @@
+frr version 4.0+cl3u9
+frr defaults datacenter
+hostname leaf01
+username cumulus nopassword
+!
+service integrated-vtysh-config
+!
+log syslog informational
+!
+vrf mgmt
+ ip route 0.0.0.0/0 192.168.1.1
+ exit-vrf
+!
+line vty
+!

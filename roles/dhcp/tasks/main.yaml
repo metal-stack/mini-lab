@@ -1,0 +1,20 @@
+---
+- name: render dhcpd conf
+  template:
+    src: dhcpd.conf.j2
+    dest: /etc/dhcp/dhcpd.conf
+  when: dhcp_server_net is defined
+  notify: dhcpd restart
+
+- name: render isc config for
+  template:
+    src: isc-dhcp-server.j2
+    dest: /etc/default/isc-dhcp-server
+  when: dhcp_server_net is defined
+  notify: dhcpd restart
+
+- name: dhcpd enabled
+  service:
+    name: dhcpd
+    enabled: true
+  when: dhcp_server_net is defined

@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Docker System Prune
+
+[Timer]
+OnCalendar=0/1:00
+RandomizedDelaySec=300
+Persistent=false
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,96 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*.intf
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto eth0
+iface eth0
+    address 192.168.1.101/24
+    gateway 192.168.1.1
+    vrf mgmt
+
+auto swp1
+iface swp1
+
+auto swp2
+iface swp2
+
+auto swp3
+iface swp3
+
+auto swp4
+iface swp4
+
+auto swp5s0
+iface swp5s0
+    link-speed 25000
+
+auto swp5s1
+iface swp5s1
+    link-speed 25000
+
+auto swp5s2
+iface swp5s2
+    link-speed 25000
+
+auto swp5s3
+iface swp5s3
+    link-speed 25000
+
+auto swp6s0
+iface swp6s0
+    link-speed 25000
+
+auto swp6s1
+iface swp6s1
+    link-speed 25000
+
+auto swp6s2
+iface swp6s2
+    link-speed 25000
+
+auto swp6s3
+iface swp6s3
+    link-speed 25000
+
+auto swp7
+iface swp7
+    link-speed 40000
+
+auto swp8
+iface swp8
+    link-speed 40000
+
+auto swp9s0
+iface swp9s0
+    link-speed 25000
+
+auto swp9s1
+iface swp9s1
+    link-speed 25000
+
+auto swp9s2
+iface swp9s2
+    link-speed 25000
+
+auto swp9s3
+iface swp9s3
+    link-speed 25000
+
+auto swp32
+iface swp32
+
+auto bridge
+iface bridge
+    bridge-vids 101
+    bridge-vlan-aware yes
+
+auto mgmt
+iface mgmt
+    address 127.0.0.1/8
+    vrf-table auto

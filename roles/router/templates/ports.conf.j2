@@ -1,0 +1,17 @@
+# ports.conf --
+#
+# The Accton 7712 has:
+#
+#     32 QSFP28 ports numbered 1-32
+#     These ports are configurable as 100G, 50G, 40G or split into 4x25G,
+#     4x10G or 2x50G ports.
+#
+# If you make changes to this file, you must restart switchd for the
+# changes to take effect.
+
+# QSFP28 ports
+#
+# <port label 1-32> = [4x10G|4x25G|2x50G|40G|50G|100G]
+{% for key, value in ports|dictsort %}
+{{ key }}={{ value }}
+{% endfor %}

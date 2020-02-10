@@ -1,0 +1,51 @@
+[Unit]
+Description={{ systemd_service_name }} {{ systemd_docker_image_tag }}
+After={{ systemd_service_after }}
+Requires={{ systemd_service_requires }}
+
+[Service]
+ExecStartPre=-/usr/bin/docker pull {{ systemd_docker_image_name }}:{{ systemd_docker_image_tag }}
+ExecStartPre=-/usr/bin/docker rm --force --volumes %n
+ExecStart=/usr/bin/docker run --name=%n \
+{% for key, value in systemd_service_environment.items() %}
+    --env "{{ key }}={{ value }}" \
+{% endfor %}
+{% for volume in systemd_docker_volumes %}
+    --volume "{{ volume }}" \
+{% endfor %}
+{% for value in systemd_docker_cap_add %}
+    --cap-add {{ value }} \
+{% endfor %}
+{% for port_spec in systemd_docker_ports %}
+    --publish {{ port_spec.host_port }}:{{ port_spec.target_port }} \
+{% endfor %}
+{% for host_to_ip_mapping in systemd_docker_host_to_ip_mapping %}
+    --add-host {{ host_to_ip_mapping.host }}:{{ host_to_ip_mapping.ip }} \
+{% endfor %}
+{% if systemd_docker_cpus is defined %}
+    --cpus {{ systemd_docker_cpus }} \
+{% endif %}
+{% if systemd_docker_cpu_period is defined  %}
+    --cpu-period=50000 \
+{% endif %}
+{% if systemd_docker_cpu_quota is defined  %}
+    --cpu-quota=25000 \
+{% endif %}
+{% if systemd_docker_memory is defined  %}
+    --memory {{ systemd_docker_memory }} \
+{% endif %}
+{% if systemd_docker_network %}
+    --network {{ systemd_docker_network }} \
+{% endif %}
+    {{ systemd_docker_image_name }}:{{ systemd_docker_image_tag }} {% if systemd_docker_command %}{{ systemd_docker_command | join(" ") if systemd_docker_command is iterable else systemd_docker_command }}{% endif %}
+
+ExecStop=/usr/bin/docker stop %n
+ExecReload=/usr/bin/docker kill --signal=HUP %n
+Restart=always
+RestartSec={{ systemd_service_restart_sec }}
+StartLimitInterval=0
+TimeoutStartSec={{ systemd_service_timeout_start_sec }}s
+TimeoutStopSec={{ systemd_service_timeout_stop_sec }}s
+
+[Install]
+WantedBy=multi-user.target

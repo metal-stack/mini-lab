@@ -1,0 +1,20 @@
+---
+# can be overriden of course, these are the global defaults...
+metal_api_images:
+- id: firewall-2
+  name: Firewall 2
+  description: Firewall 2
+  url: https://images.metal-pod.io/firewall/2.0-ubuntu/20200207/img.tar.lz4
+  features:
+    - firewall
+- id: ubuntu-19.10
+  name: Ubuntu 19.10
+  description: Ubuntu 19.10
+  url: https://images.metal-pod.io/ubuntu/19.10/20200207/img.tar.lz4
+  features:
+    - machine
+
+metal_api_networks: []
+metal_api_ips: []
+metal_api_sizes: []
+metal_api_partitions: []

@@ -1,0 +1,47 @@
+---
+timezone: Europe/Berlin
+environment_name: vagrant
+
+partition_id: vagrant
+partition_rack_id: test-rack
+
+# The best practice recommendation is to set an MTU of 9,216 for the inter-switch links,
+# and an MTU of 9,000 for the server-facing ports, which don’t carry the VXLAN header.
+# See: EVPN in the Data center (D. Dutt, p.77)
+mtu:
+  vxlan: 9216
+  default: 9000
+
+nameservers:
+  - 192.168.121.1
+  - 1.1.1.1
+  - 1.0.0.1
+
+mgmt_gateway: 192.168.121.1
+
+# api_addr points to a domain name that in case of Vagrant contains the metal-api box IP.
+# This box IP is not known in advance and must be provided during runtime (e.g. via --extra-vars).
+api_addr: "{{ api_dns }}"
+api_port: 8080
+api_protocol: http
+api_basepath: /metal/
+api_nsq_lookupd: "{{ api_dns }}:4161"
+
+fluentd_logging: false
+fluentd_endpoint: "{{ api_addr }}:24224"
+
+metal_core_hmac_key: metal-edit
+metal_core_image_tag: feature-flag-for-boot-order
+metal_core_change_boot_order: false
+
+api_dns: api.192.168.121.1.xip.io
+public_dns: 192.168.121.1.xip.io
+
+k8s_metal_namespace: metal-control-plane
+
+control_planes:
+  vagrant-lab:
+    name: vagrant
+
+dev_setup: true
+reconfigure_switch: true

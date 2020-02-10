@@ -1,0 +1,62 @@
+---
+metal_set_resource_limits: false
+
+expose_rethinkdb_frontend: yes
+
+rethinkdb_resources: {}
+
+metal_api_replicas: 1
+metal_console_replicas: 1
+
+metal_api_view_key: metal-view
+metal_api_edit_key: metal-edit
+metal_api_admin_key: metal-admin
+# FIXME must be set to the next tag
+metal_api_image_tag: masterdata
+
+metal_api_url: http://api.{{ public_dns }}:8080/metal
+
+metal_api_ipam_postgres_backup: {}
+
+metal_api_partitions:
+  - id: vagrant
+    name: Vagrant Lab
+    description: The vagrant lab
+    bootconfig:
+      kernelurl: https://images.metal-pod.io/metal-kernel/mainline/metal-hammer-kernel
+      imageurl: http://images.metal-pod.io/metal-hammer/metal-hammer-initrd.img.lz4
+      commandline: console=ttyS0,115200n8 ip=dhcp carrier_timeout=10
+    privatenetworkprefixlength: 22
+
+metal_api_sizes:
+- id: v1-small-x86
+  name: v1-small-x86
+  description: The Tiny Virtual
+  constraints:
+  - type: cores
+    min: 1
+    max: 4
+  - type: memory
+    min: "{{ '500MB' | humanfriendly }}"
+    max: "{{ '4GB' | humanfriendly }}"
+  - type: storage
+    min: "{{ '1GB' | humanfriendly }}"
+    max: "{{ '10GB' | humanfriendly }}"
+
+metal_api_networks:
+- id: tenant-super-network-vagrant
+  name: "Project Super Network"
+  description: "Super network of all project networks"
+  nat: false
+  privatesuper: true
+  underlay: false
+  destinationprefixes: []
+  partitionid: "vagrant"
+  prefixes:
+  - 10.0.0.0/16
+
+# Metal-Lab expects there exists exactly one project.
+metal_api_projects:
+- name: "Vagrant project"
+  description: "Test project for vagrant"
+  tenant: devops
