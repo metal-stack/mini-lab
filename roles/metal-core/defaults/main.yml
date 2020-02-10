@@ -1,6 +1,6 @@
 ---
-pixiecore_image_name: registry.fi-ts.io/metal/pixiecore
-pixiecore_image_tag: fits
+pixiecore_image_name: metalstack/pixiecore
+pixiecore_image_tag: latest
 
 metal_core_image_name: registry.fi-ts.io/metal/metal-core
 metal_core_image_tag: latest
