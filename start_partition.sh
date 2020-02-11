@@ -12,4 +12,4 @@ LEAF02_SSH_CONFIG=$(vagrant ssh-config leaf02)
 export LEAF02_IP=$(echo "${LEAF02_SSH_CONFIG}" | grep HostName | cut -d" " -f4)
 export LEAF02_PK=$(echo "${LEAF02_SSH_CONFIG}" | grep IdentityFile | cut -d" " -f4)
 
-cat leaves/inventory.yaml.tpl | envsubst > leaves/inventory.yaml
+cat partition/inventory.yaml.tpl | envsubst > partition/inventory.yaml

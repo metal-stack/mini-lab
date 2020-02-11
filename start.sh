@@ -2,8 +2,9 @@
 
 set -e
 
-./start_leaves.sh
-./deploy_leaves.sh &
+./start_partition.sh
+sleep 30
+./deploy_partition.sh &
 ./start_cp.sh
 fg || true
 

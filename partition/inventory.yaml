@@ -1,9 +1,15 @@
 ---
+minilab:
+  hosts:
+    localhost:
+  children:
+    leaves:
+
 leaves:
   hosts:
     leaf01:
-      ansible_host: "${LEAF01_IP}"
-      ansible_ssh_private_key_file: "${LEAF01_PK}"
+      ansible_host: "192.168.121.133"
+      ansible_ssh_private_key_file: "/home/markus/metal-stack/mini-lab/.vagrant/machines/leaf01/libvirt/private_key"
       lo: 10.0.0.11
       asn: 4200000011
       metal_core_cidr: 10.0.1.1/24
@@ -12,8 +18,8 @@ leaves:
       dhcp_range_min: 10.0.1.2
       dhcp_range_max: 10.0.1.255
     leaf02:
-      ansible_host: "${LEAF02_IP}"
-      ansible_ssh_private_key_file: "${LEAF02_PK}"
+      ansible_host: "192.168.121.22"
+      ansible_ssh_private_key_file: "/home/markus/metal-stack/mini-lab/.vagrant/machines/leaf02/libvirt/private_key"
       lo: 10.0.0.12
       asn: 4200000012
       metal_core_cidr: 10.0.1.128/24

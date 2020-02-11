@@ -1,4 +1,11 @@
 ---
+- name: deploy partition
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+    - name: ansible-common
+
 - name: wait for leaves
   hosts: leaves
   gather_facts: false
@@ -17,9 +24,9 @@
   roles:
     - name: leaf
       tags: leaf
-    - name: docker-on-cumulus
+    - name: metal-roles/partition/roles/docker-on-cumulus
       tags: docker-on-cumulus
     - name: dhcp
       tags: dhcp
-    - name: metal-core
+    - name: metal-roles/partition/roles/metal-core
       tags: metal-core
