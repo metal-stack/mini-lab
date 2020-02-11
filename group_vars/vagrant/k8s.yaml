@@ -1,7 +1,0 @@
----
-master_nodes:
-  - api
-worker_nodes:
-  - api
-
-kubernetes_pods_on_master: true

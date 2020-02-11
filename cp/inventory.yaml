@@ -1,4 +1,4 @@
 ---
-vagrant:
+minilab:
   hosts:
     localhost:
