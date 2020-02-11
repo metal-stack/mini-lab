@@ -24,7 +24,6 @@ metal_api_sizes:
   - type: storage
     min: "{{ '1GB' | humanfriendly }}"
     max: "{{ '10GB' | humanfriendly }}"
-metal_api_images: []
 metal_api_partitions:
   - id: vagrant
     name: Vagrant Lab
