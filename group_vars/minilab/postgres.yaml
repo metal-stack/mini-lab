@@ -1,5 +1,0 @@
----
-postgres_storage_size: 200Mi
-postgres_backup_restore_sidecar_provider: local
-
-postgres_resources: {}

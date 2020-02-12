@@ -1,8 +1,0 @@
----
-rethinkdb_backup_restore_sidecar_provider: local
-
-rethinkdb_expose_frontend: yes
-rethinkdb_ingress_dns: rethinkdb.{{ metal_control_plane_ingress_dns }}
-
-rethinkdb_resources: {}
-rethinkdb_storage_size: 100Mi
