@@ -2,10 +2,8 @@
 
 set -e
 
-./start_partition.sh
-sleep 30
-./deploy_partition.sh &
-./start_cp.sh
+./start_partition.sh &
+./start_control-plane.sh
 fg || true
 
 vagrant up machine01 machine02
