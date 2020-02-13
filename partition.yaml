@@ -8,7 +8,7 @@
         path: /.ansible_vagrant_vm_rebooted
       register: result
 
-    - name: reboot in order to remap interfaces
+    - name: reboot the switches in order to remap interfaces
       reboot:
       when: not result.stat.exists | bool
 

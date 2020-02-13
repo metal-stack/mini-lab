@@ -2,8 +2,7 @@
 
 set -e
 
-./start_partition.sh &
-./start_control-plane.sh
-fg || true
+kind create cluster --config control-plane/kind.yaml --kubeconfig .kubeconfig || true
+vagrant up
 
-vagrant up machine01 machine02
+docker-compose up
