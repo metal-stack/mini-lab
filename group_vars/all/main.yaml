@@ -43,5 +43,4 @@ control_planes:
   vagrant-lab:
     name: vagrant
 
-dev_setup: true
 reconfigure_switch: true

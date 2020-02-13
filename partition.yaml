@@ -8,7 +8,6 @@
         path: /.ansible_vagrant_vm_rebooted
       register: result
 
-    # FIXME: make this conditional (when swp interfaces are there, you do not need a reboot anymore)
     - name: reboot the switches in order to remap interfaces
       reboot:
       when: not result.stat.exists | bool
