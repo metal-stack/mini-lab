@@ -14,7 +14,7 @@ api_addr: "{{ api_dns }}"
 api_port: 8080
 api_protocol: http
 api_basepath: /metal/
-api_nsq_lookupd: "{{ api_dns }}:4161"
+api_nsq_lookupd: "{{ public_dns }}:4161"
 
 control_planes:
   vagrant-lab:

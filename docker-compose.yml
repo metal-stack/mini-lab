@@ -1,0 +1,27 @@
+---
+version: '3.3'
+
+services:
+  control-plane:
+    image: metalstack/mini-lab
+    build:
+      context: .
+    volumes:
+       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
+       - /var/run/docker.sock:/var/run/docker.sock
+       - .:/mini-lab
+    network_mode: host
+    working_dir: /mini-lab
+    entrypoint: ./start_control-plane.sh
+  partition:
+    image: metalstack/mini-lab
+    build:
+      context: .
+    volumes:
+       - ${HOME}/.vagrant.d:/root/.vagrant.d
+       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
+       - /var/run/docker.sock:/var/run/docker.sock
+       - .:/mini-lab
+    network_mode: host
+    working_dir: /mini-lab
+    entrypoint: ./start_partition.sh

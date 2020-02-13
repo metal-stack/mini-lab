@@ -1,3 +1,4 @@
 .vagrant
 **/*.pyc
 .kubeconfig
+partition/dynamic_inventory.yaml

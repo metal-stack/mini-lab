@@ -6,3 +6,5 @@ kind create cluster --config control-plane/kind.yaml --kubeconfig .kubeconfig ||
 vagrant up
 
 docker-compose up
+
+vagrant up machine01 machine02
