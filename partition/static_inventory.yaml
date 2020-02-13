@@ -27,3 +27,7 @@ leaves:
     - name: swp1
     - name: swp2
     uplinks: []
+
+vagrant:
+  vars:
+    ansible_become: yes

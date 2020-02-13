@@ -1,20 +1,24 @@
 ---
-- name: deploy partition
-  hosts: localhost
-  connection: local
-  gather_facts: false
-  roles:
-    - name: ansible-common
-
 - name: deploy leaves
   hosts: leaves
-  become: true
   gather_facts: true
   pre_tasks:
+    - name: check if machine was already restarted
+      stat:
+        path: /.ansible_vagrant_vm_rebooted
+      register: result
+
     # FIXME: make this conditional (when swp interfaces are there, you do not need a reboot anymore)
     - name: reboot the switches in order to remap interfaces
       reboot:
+      when: not result.stat.exists | bool
+
+    - name: put marker file that machine was rebooted
+      file:
+        path: /.ansible_vagrant_vm_rebooted
+        state: touch
   roles:
+    - name: ansible-common
     - name: leaf
       tags: leaf
     - name: metal-roles/partition/roles/docker-on-cumulus
