@@ -12,5 +12,5 @@ fi
 
 ansible-playbook \
     -i partition/static_inventory.yaml \
-    -i partition/dynamic_inventory.sh \
+    -i ~/.ansible/roles/ansible-common/inventory/vagrant \
     partition.yaml

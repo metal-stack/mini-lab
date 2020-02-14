@@ -5,12 +5,10 @@ Small lab to start two leaf switches and the metal-api to try `metalctl` and the
 This requires:
 
 - vagrant >= 2.2.7 with vagrant-libvirt plugin >= 0.0.45 for running the switch and machine VMs
-- docker for using containerized `metalctl`
-- ansible
+- docker for using containerized `ansible` and `metalctl` and `helm`
 - kvm as hypervisor for the VMs
 - [ovmf](https://wiki.ubuntu.com/UEFI/OVMF) to have a uefi firmware for virtual machines
 - [kind](https://github.com/kubernetes-sigs/kind/releases) >= 0.7.0 to start the metal control-plane on a kubernetes cluster
-- [helm](https://github.com/helm/helm/releases) >= 3.0.3 to deploy the metal control-plane to this cluster
 
 Known limitations:
 
@@ -43,7 +41,7 @@ Try it out:
 > docker run -it \
     -e METALCTL_HMAC=metal-admin \
     -e METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal \
-    registry.fi-ts.io/metal/metalctl \
+    metalstack/mini-lab metalctl \
         machine ls
 
 ID                                          LAST EVENT   WHEN     AGE  HOSTNAME  PROJECT  SIZE          IMAGE  PARTITION
@@ -54,7 +52,7 @@ e0ab02d2-27cd-5a5e-8efc-080ba80cf258        PXE Booting  3s
 > docker run -it \
     -e METALCTL_HMAC=metal-admin \
     -e METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal \
-    registry.fi-ts.io/metal/metalctl \
+    metalstack/mini-lab metalctl \
         machine ls
 
 ID                                          LAST EVENT   WHEN     AGE  HOSTNAME  PROJECT  SIZE          IMAGE  PARTITION
@@ -65,7 +63,7 @@ e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Waiting      8s                   
 > docker run -it \
     -e METALCTL_HMAC=metal-admin \
     -e METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal \
-    registry.fi-ts.io/metal/metalctl \
+    metalstack/mini-lab metalctl \
         machine create \
         --description test \
         --name machine \
@@ -86,7 +84,7 @@ machine login:
 > docker run -it \
     -e METALCTL_HMAC=metal-admin \
     -e METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal \
-    registry.fi-ts.io/metal/metalctl \
+    metalstack/mini-lab metalctl \
         machine ls
 ID                                          LAST EVENT   WHEN   AGE     HOSTNAME  PROJECT                               SIZE          IMAGE         PARTITION
 e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Phoned Home  2s     21s     machine   00000000-0000-0000-0000-000000000000  v1-small-x86  Ubuntu 19.10  vagrant
@@ -96,7 +94,7 @@ e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Phoned Home  2s     21s     machin
 > docker run -it \
     -e METALCTL_HMAC=metal-admin \
     -e METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal \
-    registry.fi-ts.io/metal/metalctl \
+    metalstack/mini-lab metalctl \
         machine describe e0ab02d2-27cd-5a5e-8efc-080ba80cf258 | grep password \
 
 consolepassword: ...
