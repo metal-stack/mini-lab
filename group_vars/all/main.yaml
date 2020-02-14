@@ -31,7 +31,7 @@ fluentd_logging: false
 fluentd_endpoint: "{{ api_addr }}:24224"
 
 metal_core_hmac_key: metal-edit
-metal_core_image_tag: feature-flag-for-boot-order
+metal_core_image_tag: v0.3.0
 metal_core_change_boot_order: false
 
 api_dns: api.192.168.121.1.xip.io

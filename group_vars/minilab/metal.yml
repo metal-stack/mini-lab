@@ -3,8 +3,10 @@ metal_set_resource_limits: no
 metal_check_api_health_endpoint: http://api.192.168.121.1.xip.io:8080/metal/v1/health
 
 # FIXME must be set to the next tag
-metal_api_image_tag: masterdata
-metalctl_image_tag: masterdata
+metal_api_image_tag: v0.3.0
+metal_metalctl_image_tag: v0.3.0
+metal_masterdata_api_image_tag: v0.2.0
+metal_console_image_tag: v0.3.0
 
 metal_api_replicas: 1
 metal_api_view_key: metal-view

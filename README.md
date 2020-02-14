@@ -13,7 +13,7 @@ This requires:
 Known limitations:
 
 - to keep the demo small there is no EVPN
-- machine destroy does not work (virtual-bmc is buggy)
+- machine restart and destroy does not work becaues we can not change the boot order via IPMI in the lab easily (virtual-bmc could, but it's buggy)
 - login to the machines is only possible with virsh console
 
  ```bash
