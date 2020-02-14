@@ -1,27 +1,38 @@
 ---
-version: '3.3'
+version: '3.7'
 
 services:
   control-plane:
-    image: metalstack/mini-lab
-    build:
-      context: .
+    image: metalstack/metal-deployment-base:v0.0.1
     volumes:
-       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
-       - /var/run/docker.sock:/var/run/docker.sock
-       - .:/mini-lab
+      - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .:/mini-lab
+    environment:
+      - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
     network_mode: host
     working_dir: /mini-lab
     entrypoint: ./start_control-plane.sh
   partition:
-    image: metalstack/mini-lab
-    build:
-      context: .
+    image: metalstack/metal-deployment-base:v0.0.1
     volumes:
-       - ${HOME}/.vagrant.d:/root/.vagrant.d
-       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
-       - /var/run/docker.sock:/var/run/docker.sock
-       - .:/mini-lab
+      - ${HOME}/.vagrant.d:/root/.vagrant.d
+      - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .:/mini-lab
+    environment:
+      - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
+      - ANSIBLE_VAGRANT_USE_CACHE=1
+      - ANSIBLE_VAGRANT_CACHE_FILE=/mini-lab/.ansible_vagrant_cache
+      - ANSIBLE_VAGRANT_CACHE_MAX_AGE=0
     network_mode: host
     working_dir: /mini-lab
     entrypoint: ./start_partition.sh
+  client:
+    image: registry.fi-ts.io/metal/metalctl:v0.3.0
+    environment:
+      - METALCTL_HMAC=metal-admin
+      - METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal
+    network_mode: host
+    stdin_open: true
+    tty: true

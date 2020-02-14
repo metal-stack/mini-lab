@@ -27,44 +27,41 @@ usermod -G libvirt -a ${USER}
 # Install libvirt plugin for vagrant
 vagrant plugin install vagrant-libvirt
 
-# Install helm from https://github.com/helm/helm/releases
 # Install kind from https://github.com/kubernetes-sigs/kind/releases
 ```
 
 Try it out:
 
-```bash
-# Start kind with a metal-api instance as well as some vagrant VMs with two leaf switches and two machine skeletons.
-> ./start.sh
+Start kind with a metal-api instance as well as some vagrant VMs with two leaf switches and two machine skeletons.
 
-# Two machines in status `PXE booting` are visible with `metalctl machine ls`
-> docker run -it \
-    -e METALCTL_HMAC=metal-admin \
-    -e METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal \
-    metalstack/mini-lab metalctl \
-        machine ls
+```bash
+./start.sh
+```
+
+Two machines in status `PXE booting` are visible with `metalctl machine ls`
+
+```bash
+docker-compose exec client metalctl machine ls
 
 ID                                          LAST EVENT   WHEN     AGE  HOSTNAME  PROJECT  SIZE          IMAGE  PARTITION
 e0ab02d2-27cd-5a5e-8efc-080ba80cf258        PXE Booting  3s
 2294c949-88f6-5390-8154-fa53d93a3313        PXE Booting  5s
+```
 
-# Wait until the machines reach the waiting state
-> docker run -it \
-    -e METALCTL_HMAC=metal-admin \
-    -e METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal \
-    metalstack/mini-lab metalctl \
-        machine ls
+Wait until the machines reach the waiting state
+
+```bash
+docker-compose exec client metalctl machine ls
 
 ID                                          LAST EVENT   WHEN     AGE  HOSTNAME  PROJECT  SIZE          IMAGE  PARTITION
 e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Waiting      8s                               v1-small-x86         vagrant
 2294c949-88f6-5390-8154-fa53d93a3313        Waiting      8s                               v1-small-x86         vagrant
+```
 
-# Create a machine with `metalctl machine create`
-> docker run -it \
-    -e METALCTL_HMAC=metal-admin \
-    -e METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal \
-    metalstack/mini-lab metalctl \
-        machine create \
+Create a machine with `metalctl machine create`
+
+```bash
+docker-compose exec client metalctl machine create \
         --description test \
         --name machine \
         --hostname machine \
@@ -72,30 +69,31 @@ e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Waiting      8s                   
         --partition vagrant \
         --image ubuntu-19.10 \
         --size v1-small-x86
+```
 
-# See the installation process in action
-> virsh console metal_machine01/02
+See the installation process in action
+
+```bash
+virsh console metal_machine01/02
 ...
 Ubuntu 19.10 machine ttyS0
 
 machine login:
+```
 
-# One machine is now installed and has status "Phoned Home"
-> docker run -it \
-    -e METALCTL_HMAC=metal-admin \
-    -e METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal \
-    metalstack/mini-lab metalctl \
-        machine ls
+One machine is now installed and has status "Phoned Home"
+
+```bash
+docker-compose exec client metalctl machine ls
 ID                                          LAST EVENT   WHEN   AGE     HOSTNAME  PROJECT                               SIZE          IMAGE         PARTITION
 e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Phoned Home  2s     21s     machine   00000000-0000-0000-0000-000000000000  v1-small-x86  Ubuntu 19.10  vagrant
 2294c949-88f6-5390-8154-fa53d93a3313        Waiting      8s                                                             v1-small-x86                vagrant
+```
 
-# Login with user name metal and the console password from
-> docker run -it \
-    -e METALCTL_HMAC=metal-admin \
-    -e METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal \
-    metalstack/mini-lab metalctl \
-        machine describe e0ab02d2-27cd-5a5e-8efc-080ba80cf258 | grep password \
+Login with user name metal and the console password from
+
+```bash
+docker-compose exec client metalctl machine describe e0ab02d2-27cd-5a5e-8efc-080ba80cf258 | grep password
 
 consolepassword: ...
 ```

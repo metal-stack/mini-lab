@@ -1,4 +1,5 @@
 .vagrant
-**/*.pyc
 .kubeconfig
+.ansible_vagrant_cache
+**/*.pyc
 partition/dynamic_inventory.yaml
