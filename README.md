@@ -5,7 +5,7 @@ Small lab to start two leaf switches and the metal-api to try `metalctl` and the
 This requires:
 
 - vagrant >= 2.2.7 with vagrant-libvirt plugin >= 0.0.45 for running the switch and machine VMs
-- docker for using containerized `ansible` and `metalctl` and `helm`
+- docker and docker-compose for using containerized `ansible` and `metalctl` and `helm`
 - kvm as hypervisor for the VMs
 - [ovmf](https://wiki.ubuntu.com/UEFI/OVMF) to have a uefi firmware for virtual machines
 - [kind](https://github.com/kubernetes-sigs/kind/releases) >= 0.7.0 to start the metal control-plane on a kubernetes cluster
@@ -31,7 +31,7 @@ vagrant plugin install vagrant-libvirt
 # Install kind from https://github.com/kubernetes-sigs/kind/releases
 ```
 
-Try it out:
+## Try it out
 
 Start the mini-lab with a kind cluster, a metal-api instance as well as some vagrant VMs with two leaf switches and two machine skeletons.
 
