@@ -9,6 +9,7 @@ This requires:
 - kvm as hypervisor for the VMs
 - [ovmf](https://wiki.ubuntu.com/UEFI/OVMF) to have a uefi firmware for virtual machines
 - [kind](https://github.com/kubernetes-sigs/kind/releases) >= 0.7.0 to start the metal control-plane on a kubernetes cluster
+- (optional) haveged to have enough random entropy - only needed if the PXE process does not work
 
 Known limitations:
 
@@ -32,10 +33,10 @@ vagrant plugin install vagrant-libvirt
 
 Try it out:
 
-Start kind with a metal-api instance as well as some vagrant VMs with two leaf switches and two machine skeletons.
+Start the mini-lab with a kind cluster, a metal-api instance as well as some vagrant VMs with two leaf switches and two machine skeletons.
 
 ```bash
-./start.sh
+make up
 ```
 
 Two machines in status `PXE booting` are visible with `metalctl machine ls`
@@ -96,4 +97,10 @@ Login with user name metal and the console password from
 docker-compose run metalctl machine describe e0ab02d2-27cd-5a5e-8efc-080ba80cf258 | grep password
 
 consolepassword: ...
+```
+
+To remove the kind cluster and the vagrant boxes, run
+
+```bash
+make cleanup
 ```

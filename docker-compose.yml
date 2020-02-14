@@ -3,7 +3,7 @@ version: '3.7'
 
 services:
   control-plane:
-    image: metalstack/metal-deployment-base:v0.0.1
+    image: metalstack/metal-deployment-base:v0.0.2
     volumes:
       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
       - /var/run/docker.sock:/var/run/docker.sock
@@ -21,7 +21,7 @@ services:
           ansible-galaxy install --ignore-errors -r control-plane/requirements.yaml
           ansible-playbook -i control-plane/inventory.yaml control-plane.yaml
   partition:
-    image: metalstack/metal-deployment-base:v0.0.1
+    image: metalstack/metal-deployment-base:v0.0.2
     volumes:
       - ${HOME}/.vagrant.d:/root/.vagrant.d
       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock

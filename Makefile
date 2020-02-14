@@ -26,7 +26,7 @@ partition-deploy: partition-bake
 
 .PHONY: cleanup
 cleanup:
-	vagrant destroy -f --parallel
+	vagrant destroy -f --parallel || true
 	kind delete cluster
 	rm -f .kubeconfig
 	rm -f .ansible_vagrant_cache
