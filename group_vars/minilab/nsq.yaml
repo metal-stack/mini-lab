@@ -1,0 +1,9 @@
+---
+nsq_set_resource_limits: no
+
+nsq_log_level: debug
+
+nsq_tls_enabled: true
+nsq_certs_client_key: "{{ lookup('file', 'certs/nsq/client_cert-key.pem') }}"
+nsq_certs_client_cert: "{{  lookup('file', 'certs/nsq/client.pem') }}"
+nsq_certs_ca_cert: "{{ lookup('file', 'certs/nsq/ca_cert.pem') }}"

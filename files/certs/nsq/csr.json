@@ -1,0 +1,22 @@
+{
+  "CN": "api.metal-pod.dev",
+  "hosts": [
+    "nsqd",
+    "metal-pod.dev",
+    "*.metal-pod.dev",
+    "192.168.121.1.xip.io"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 4096
+  },
+  "names": [
+    {
+      "C":  "DE",
+      "L":  "Muenchen",
+      "O":  "FI-TS",
+      "OU": "DevOps",
+      "ST": "Bayern"
+    }
+  ]
+}

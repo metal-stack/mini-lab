@@ -1,0 +1,24 @@
+---
+metal_core_hmac_key: metal-edit
+metal_core_image_tag: v0.3.0
+metal_core_change_boot_order: false
+
+metal_core_nsqd_ca_cert: "{{ lookup('file', 'certs/nsq/ca_cert.pem') }}"
+metal_core_nsqd_client_cert: "{{ lookup('file', 'certs/nsq/client.pem') }}"
+
+mgmt_gateway: 192.168.121.1
+
+public_dns: 192.168.121.1.xip.io
+api_dns: "api.{{ public_dns }}"
+api_addr: "{{ api_dns }}"
+api_port: 8080
+api_protocol: http
+api_basepath: /metal/
+api_nsq_lookupd: "{{ public_dns }}:4161"
+
+control_planes:
+  vagrant-lab:
+    name: vagrant
+
+dev_setup: true
+reconfigure_switch: true

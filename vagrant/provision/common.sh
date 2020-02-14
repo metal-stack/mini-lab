@@ -54,5 +54,6 @@ if grep -q -i 'cumulus' /etc/lsb-release &> /dev/null; then
     fi
 fi
 echo "### DONE ###"
-echo "### Rebooting Device to Apply Remap..."
-nohup bash -c 'sleep 10; shutdown now -r "Rebooting to Remap Interfaces"' &
+# we do the restart from this script via Ansible to make deployment easier to implement and also a bit faster
+# echo "### Rebooting Device to Apply Remap..."
+# nohup bash -c 'sleep 10; shutdown now -r "Rebooting to Remap Interfaces"' &

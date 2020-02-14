@@ -1,0 +1,21 @@
+---
+- name: deploy control plane
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+    - name: ansible-common
+    - name: ingress-controller
+      tags: ingress-controller
+    - name: metal-roles/control-plane/roles/prepare
+      tags: prepare
+    - name: metal-roles/control-plane/roles/nsq
+      tags: nsq
+    - name: metal-roles/control-plane/roles/metal-db
+      tags: metal-db
+    - name: metal-roles/control-plane/roles/ipam-db
+      tags: ipam-db
+    - name: metal-roles/control-plane/roles/masterdata-db
+      tags: masterdata-db
+    - name: metal-roles/control-plane/roles/metal
+      tags: metal

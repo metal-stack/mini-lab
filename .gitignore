@@ -1,3 +1,5 @@
-leaves/inventory.yaml
 .vagrant
+.kubeconfig
+.ansible_vagrant_cache
 **/*.pyc
+partition/dynamic_inventory.yaml

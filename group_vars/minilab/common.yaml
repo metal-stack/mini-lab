@@ -1,0 +1,12 @@
+---
+metal_control_plane_provider_tenant: metal-stack
+metal_control_plane_host_provider: vagrant
+metal_control_plane_ingress_dns: 192.168.121.1.xip.io
+metal_control_plane_stage_name: test
+metal_control_plane_namespace: metal-control-plane
+
+helm_additional_params:
+  - '--debug'
+
+dex:
+  address: ""

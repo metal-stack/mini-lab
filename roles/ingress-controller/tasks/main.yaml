@@ -2,9 +2,9 @@
 # When encountering module failures like: AttributeError: 'NoneType' object has no attribute 'get'
 # This is how to resolve them: https://github.com/ansible/ansible/issues/47081#issuecomment-431194051
 - name: Apply mandatory nginx-ingress definition
-  k8s_fits:
+  k8s:
     definition: "{{ lookup('template', 'mandatory.yaml') }}"
 
 - name: Deploy nginx-ingress service
-  k8s_fits:
+  k8s:
     definition: "{{ lookup('template', 'service.yaml') }}"

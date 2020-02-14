@@ -1,0 +1,52 @@
+---
+version: '3.7'
+
+services:
+  control-plane:
+    image: metalstack/metal-deployment-base:v0.0.2
+    volumes:
+      - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .:/mini-lab
+    environment:
+      - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
+      - KUBECONFIG=/mini-lab/.kubeconfig
+      - K8S_AUTH_KUBECONFIG=/mini-lab/.kubeconfig
+    network_mode: host
+    working_dir: /mini-lab
+    entrypoint:
+      - /bin/bash
+      - -ce
+      - |
+          ansible-galaxy install --ignore-errors -r control-plane/requirements.yaml
+          ansible-playbook -i control-plane/inventory.yaml control-plane.yaml
+  partition:
+    image: metalstack/metal-deployment-base:v0.0.2
+    volumes:
+      - ${HOME}/.vagrant.d:/root/.vagrant.d
+      - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .:/mini-lab
+    environment:
+      - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
+      - ANSIBLE_VAGRANT_USE_CACHE=1
+      - ANSIBLE_VAGRANT_CACHE_FILE=/mini-lab/.ansible_vagrant_cache
+      - ANSIBLE_VAGRANT_CACHE_MAX_AGE=0
+    network_mode: host
+    working_dir: /mini-lab
+    entrypoint:
+      - /bin/bash
+      - -ce
+      - |
+          ansible-galaxy install -r control-plane/requirements.yaml --force
+          ansible-playbook \
+            -i partition/static_inventory.yaml \
+            -i ~/.ansible/roles/ansible-common/inventory/vagrant \
+            partition.yaml
+  metalctl:
+    image: registry.fi-ts.io/metal/metalctl:v0.3.0
+    environment:
+      - METALCTL_HMAC=metal-admin
+      - METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal
+    network_mode: host
+    command: --version

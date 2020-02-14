@@ -1,0 +1,7 @@
+---
+metal_db_backup_restore_sidecar_provider: local
+
+metal_db_expose_frontend: yes
+
+metal_db_resources: {}
+metal_db_storage_size: 100Mi
