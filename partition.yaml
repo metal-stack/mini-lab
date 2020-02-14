@@ -26,3 +26,5 @@
       tags: dhcp
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
+    - name: metal-roles/partition/roles/pixiecore
+      tags: pixiecore

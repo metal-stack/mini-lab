@@ -6,7 +6,7 @@ ENV VERSION_VAGRANT=2.2.7 \
     VERSION_STERN=1.11.0 \
     ANSIBLE_CONFIG=/mini-lab/ansible.cfg \
     ANSIBLE_VAGRANT_USE_CACHE=1 \
-    ANSIBLE_VAGRANT_CACHE_MAX_AGE=36000
+    ANSIBLE_VAGRANT_CACHE_MAX_AGE=0
 
 # vagrant is required for running the vagrant dynamic inventory script from within the container...
 ARG VAGRANT_PACKAGE_URL=https://releases.hashicorp.com/vagrant/${VERSION_VAGRANT}/vagrant_${VERSION_VAGRANT}_x86_64.deb
