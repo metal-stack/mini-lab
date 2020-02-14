@@ -28,11 +28,9 @@ services:
     network_mode: host
     working_dir: /mini-lab
     entrypoint: ./start_partition.sh
-  client:
+  metalctl:
     image: registry.fi-ts.io/metal/metalctl:v0.3.0
     environment:
       - METALCTL_HMAC=metal-admin
       - METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal
     network_mode: host
-    stdin_open: true
-    tty: true

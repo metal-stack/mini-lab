@@ -41,7 +41,7 @@ Start kind with a metal-api instance as well as some vagrant VMs with two leaf s
 Two machines in status `PXE booting` are visible with `metalctl machine ls`
 
 ```bash
-docker-compose exec client metalctl machine ls
+docker-compose run metalctl machine ls
 
 ID                                          LAST EVENT   WHEN     AGE  HOSTNAME  PROJECT  SIZE          IMAGE  PARTITION
 e0ab02d2-27cd-5a5e-8efc-080ba80cf258        PXE Booting  3s
@@ -51,7 +51,7 @@ e0ab02d2-27cd-5a5e-8efc-080ba80cf258        PXE Booting  3s
 Wait until the machines reach the waiting state
 
 ```bash
-docker-compose exec client metalctl machine ls
+docker-compose run metalctl machine ls
 
 ID                                          LAST EVENT   WHEN     AGE  HOSTNAME  PROJECT  SIZE          IMAGE  PARTITION
 e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Waiting      8s                               v1-small-x86         vagrant
@@ -61,7 +61,7 @@ e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Waiting      8s                   
 Create a machine with `metalctl machine create`
 
 ```bash
-docker-compose exec client metalctl machine create \
+docker-compose run metalctl machine create \
         --description test \
         --name machine \
         --hostname machine \
@@ -84,7 +84,7 @@ machine login:
 One machine is now installed and has status "Phoned Home"
 
 ```bash
-docker-compose exec client metalctl machine ls
+docker-compose run metalctl machine ls
 ID                                          LAST EVENT   WHEN   AGE     HOSTNAME  PROJECT                               SIZE          IMAGE         PARTITION
 e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Phoned Home  2s     21s     machine   00000000-0000-0000-0000-000000000000  v1-small-x86  Ubuntu 19.10  vagrant
 2294c949-88f6-5390-8154-fa53d93a3313        Waiting      8s                                                             v1-small-x86                vagrant
@@ -93,7 +93,7 @@ e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Phoned Home  2s     21s     machin
 Login with user name metal and the console password from
 
 ```bash
-docker-compose exec client metalctl machine describe e0ab02d2-27cd-5a5e-8efc-080ba80cf258 | grep password
+docker-compose run metalctl machine describe e0ab02d2-27cd-5a5e-8efc-080ba80cf258 | grep password
 
 consolepassword: ...
 ```
