@@ -1,7 +1,7 @@
 ---
-metal_api_image_tag: v0.4.1
+metal_api_image_tag: v0.4.2
 metal_metalctl_image_tag: v0.3.0
-metal_masterdata_api_image_tag: v0.3.0
+metal_masterdata_api_image_tag: v0.4.0
 metal_console_image_tag: v0.4.0
 
 metal_db_backup_restore_sidecar_image_tag: v0.4.0

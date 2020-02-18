@@ -8,6 +8,10 @@ services:
       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
       - /var/run/docker.sock:/var/run/docker.sock
       - .:/mini-lab
+      # for developing role dependencies
+      # TODO: make this a switch
+      # - ${HOME}/.ansible/roles/ansible-common:/root/.ansible/roles/ansible-common:ro
+      # - ${HOME}/.ansible/roles/metal-roles:/root/.ansible/roles/metal-roles:ro
     environment:
       - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
       - KUBECONFIG=/mini-lab/.kubeconfig
@@ -38,7 +42,7 @@ services:
       - /bin/bash
       - -ce
       - |
-          ansible-galaxy install -r control-plane/requirements.yaml --force
+          ansible-galaxy install --ignore-errors -r control-plane/requirements.yaml
           ansible-playbook \
             -i partition/static_inventory.yaml \
             -i ~/.ansible/roles/ansible-common/inventory/vagrant \

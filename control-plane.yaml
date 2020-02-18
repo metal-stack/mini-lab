@@ -5,6 +5,7 @@
   gather_facts: false
   roles:
     - name: ansible-common
+      tags: always
     - name: ingress-controller
       tags: ingress-controller
     - name: metal-roles/control-plane/roles/prepare
