@@ -3,8 +3,8 @@
   "hosts": [
     "localhost",
     "masterdata-api",
-    "masterdata-api.garden.svc",
-    "masterdata-api.garden.svc.cluster.local"
+    "masterdata-api.metal-control-plane.svc",
+    "masterdata-api.metal-control-plane.svc.cluster.local"
   ],
   "key": {
     "algo": "ecdsa",
