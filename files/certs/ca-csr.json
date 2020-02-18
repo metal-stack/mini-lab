@@ -1,0 +1,17 @@
+{
+  "CN": "mini-lab",
+  "hosts": [],
+  "key": {
+    "algo": "rsa",
+    "size": 4096
+  },
+  "names": [
+    {
+      "C":  "DE",
+      "L":  "Munich",
+      "O":  "Metal-Stack",
+      "OU": "DevOps",
+      "ST": "Bavaria"
+    }
+  ]
+}
