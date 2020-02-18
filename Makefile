@@ -28,5 +28,6 @@ partition: partition-bake
 cleanup:
 	vagrant destroy -f --parallel || true
 	kind delete cluster
+	docker-compose down
 	rm -f .kubeconfig
 	rm -f .ansible_vagrant_cache

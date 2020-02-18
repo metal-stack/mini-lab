@@ -31,6 +31,10 @@ services:
       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
       - /var/run/docker.sock:/var/run/docker.sock
       - .:/mini-lab
+      # for developing role dependencies
+      # TODO: make this a switch
+      # - ${HOME}/.ansible/roles/ansible-common:/root/.ansible/roles/ansible-common:ro
+      # - ${HOME}/.ansible/roles/metal-roles:/root/.ansible/roles/metal-roles:ro
     environment:
       - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
       - ANSIBLE_VAGRANT_USE_CACHE=1
