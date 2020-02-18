@@ -11,16 +11,16 @@ control-plane-bake:
 		--config control-plane/kind.yaml \
 		--kubeconfig .kubeconfig || true
 
-.PHONY: control-plane-deploy
-control-plane-deploy: control-plane-bake
+.PHONY: control-plane
+control-plane: control-plane-bake
 	docker-compose up control-plane
 
 .PHONY: partition-bake
 partition-bake:
 	vagrant up
 
-.PHONY: partition-deploy
-partition-deploy: partition-bake
+.PHONY: partition
+partition: partition-bake
 	docker-compose up partition
 	vagrant up machine01 machine02
 

@@ -1,0 +1,22 @@
+{
+  "CN": "masterdata-api",
+  "hosts": [
+    "localhost",
+    "masterdata-api",
+    "masterdata-api.garden.svc",
+    "masterdata-api.garden.svc.cluster.local"
+  ],
+  "key": {
+    "algo": "ecdsa",
+    "size": 256
+  },
+  "names": [
+    {
+      "C":  "DE",
+      "L":  "Munich",
+      "O":  "Metal-Stack",
+      "OU": "DevOps",
+      "ST": "Bavaria"
+    }
+  ]
+}

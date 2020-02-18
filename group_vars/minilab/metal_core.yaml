@@ -1,6 +1,5 @@
 ---
 metal_core_hmac_key: metal-edit
-metal_core_image_tag: v0.3.0
 metal_core_change_boot_order: false
 
 metal_core_nsqd_ca_cert: "{{ lookup('file', 'certs/nsq/ca_cert.pem') }}"
