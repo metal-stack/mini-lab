@@ -7,6 +7,3 @@ metal_control_plane_namespace: metal-control-plane
 
 helm_additional_params:
   - '--debug'
-
-dex:
-  address: ""
