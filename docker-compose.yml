@@ -47,7 +47,7 @@ services:
       - /bin/bash
       - -ce
       - |
-          ansible-galaxy install --ignore-errors -r control-plane/requirements.yaml
+          ansible-galaxy install --ignore-errors -r partition/requirements.yaml
           ansible-playbook \
             -i partition/static_inventory.yaml \
             -i ~/.ansible/roles/ansible-common/inventory/vagrant \
