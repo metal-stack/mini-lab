@@ -26,7 +26,7 @@ metal_api_partitions:
     description: The vagrant lab
     bootconfig:
       kernelurl: https://images.metal-pod.io/metal-kernel/mainline/metal-hammer-kernel
-      imageurl: http://images.metal-pod.io/metal-hammer/metal-hammer-initrd.img.lz4
+      imageurl: "{{ metal_hammer_image_url }}"
       commandline: console=ttyS0,115200n8 ip=dhcp carrier_timeout=10
     privatenetworkprefixlength: 22
 metal_api_networks:

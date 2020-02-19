@@ -1,9 +1,14 @@
 MAKEFLAGS += -j2
 
+.DEFAULT_GOAL := up
+
 .PHONY: up
 up: control-plane-bake partition-bake
 	docker-compose up
 	vagrant up machine01 machine02
+
+.PHONY: down
+down: cleanup
 
 .PHONY: control-plane-bake
 control-plane-bake:
