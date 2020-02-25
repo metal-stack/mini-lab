@@ -56,6 +56,10 @@ build-hammer-initrd: hammer-image
 	@rm -f metal-hammer.tar
 	md5sum metal-hammer-initrd.img.lz4 > metal-hammer-initrd.img.lz4.md5
 
+.PHONY: restart
+restart: cleanup
+	@make --no-print-directory up
+
 .PHONY: reboot-machine01
 reboot-machine01:
 	vagrant destroy -f machine01
