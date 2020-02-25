@@ -45,9 +45,12 @@ caddy:
 	@docker rm -f caddy > /dev/null 2>&1 || true
 	docker run -v $(shell pwd):/srv -p 2015:2015 --name caddy -d abiosoft/caddy
 
-.PHONY: build-hammer-initrd
-build-hammer-initrd:
+.PHONY: hammer-image
+hammer-image:
 	@docker build -t metal-hammer ../metal-hammer
+
+.PHONY: build-hammer-initrd
+build-hammer-initrd: hammer-image
 	@docker export $(shell docker create metal-hammer /dev/null) > metal-hammer.tar
 	@tar -xf metal-hammer.tar metal-hammer-initrd.img.lz4
 	@rm -f metal-hammer.tar
