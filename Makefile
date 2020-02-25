@@ -36,3 +36,19 @@ cleanup:
 	docker-compose down
 	rm -f .kubeconfig
 	rm -f .ansible_vagrant_cache
+
+.PHONY: dev
+dev: build-hammer-initrd caddy up
+
+.PHONY: caddy
+caddy:
+	@docker rm -f caddy > /dev/null 2>&1 || true
+	docker run -v $(shell pwd):/srv -p 2015:2015 --name caddy -d abiosoft/caddy
+
+.PHONY: build-hammer-initrd
+build-hammer-initrd:
+	@docker build -t metal-hammer ../metal-hammer
+	@docker export $(shell docker create metal-hammer /dev/null) > metal-hammer.tar
+	@tar -xf metal-hammer.tar metal-hammer-initrd.img.lz4
+	@rm -f metal-hammer.tar
+	@md5sum metal-hammer-initrd.img.lz4 > metal-hammer-initrd.img.lz4.md5

@@ -24,7 +24,7 @@ end
 device.ssh.insert_key = false
 end
   
-# Helper-Function to defice a Vagrant VM with a specific box, version and memory
+# Helper-Function to define a Vagrant VM with a specific box, version and memory
 def box(device:, hostname:, box:, box_version:, memory:)
     device.vm.hostname = hostname
     device.vm.box = box

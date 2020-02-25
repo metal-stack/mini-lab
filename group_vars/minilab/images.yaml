@@ -12,3 +12,5 @@ metal_core_image_tag: v0.4.0
 pixiecore_image_tag: 781e3f0a698bbc3ea960c1d288c6606522db05cd
 
 metal_hammer_image_url: http://images.metal-pod.io/metal-hammer/metal-hammer-initrd.img.lz4
+# Use the following image URL if developing metal-hammer locally by running "make dev"
+#metal_hammer_image_url: http://192.168.121.1:2015/metal-hammer-initrd.img.lz4
