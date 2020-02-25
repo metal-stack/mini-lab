@@ -20,6 +20,8 @@
     - name: ansible-common
     - name: leaf
       tags: leaf
+    - name: registry-certs
+      tags: registry-certs
     - name: metal-roles/partition/roles/docker-on-cumulus
       tags: docker-on-cumulus
     - name: dhcp

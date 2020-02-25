@@ -1,16 +1,26 @@
 ---
-metal_api_image_tag: v0.4.2
-metal_metalctl_image_tag: v0.3.0
-metal_masterdata_api_image_tag: v0.4.0
-metal_console_image_tag: v0.4.0
-
 metal_db_backup_restore_sidecar_image_tag: v0.5.1
 ipam_db_backup_restore_sidecar_image_tag: v0.5.1
 masterdata_db_backup_restore_sidecar_image_tag: v0.5.1
 
+metal_api_image_tag: v0.4.2
+# Use the following two properties in development mode, i.e. if started with "make dev"
+#metal_api_image_name: 192.168.121.1:5000/metalstack/metal-api
+#metal_api_image_tag: dev
+
+metal_metalctl_image_tag: v0.3.0
+#metal_metalctl_image_tag: 26-mep-3-implement-reinstall
+
+metal_masterdata_api_image_tag: v0.4.0
+metal_console_image_tag: v0.4.0
+
 metal_core_image_tag: v0.4.0
+# Use the following two properties in development mode, i.e. if started with "make dev"
+#metal_core_image_name: 192.168.121.1:5000/metalstack/metal-core
+#metal_core_image_tag: dev
+
 pixiecore_image_tag: 781e3f0a698bbc3ea960c1d288c6606522db05cd
 
 metal_hammer_image_url: http://images.metal-pod.io/metal-hammer/metal-hammer-initrd.img.lz4
-# Use the following image URL if developing metal-hammer locally by running "make dev"
+# Use the following metal-hammer image URL in development mode, i.e. if started with "make dev"
 #metal_hammer_image_url: http://192.168.121.1:2015/metal-hammer-initrd.img.lz4

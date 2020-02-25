@@ -12,6 +12,8 @@
       tags: prepare
     - name: metal-roles/control-plane/roles/nsq
       tags: nsq
+    - name: registry-certs
+      tags: registry-certs
     - name: metal-roles/control-plane/roles/metal-db
       tags: metal-db
     - name: metal-roles/control-plane/roles/ipam-db
