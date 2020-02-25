@@ -47,11 +47,21 @@ caddy:
 
 .PHONY: hammer-image
 hammer-image:
-	@docker build -t metal-hammer ../metal-hammer
+	docker build -t metal-hammer ../metal-hammer
 
 .PHONY: build-hammer-initrd
 build-hammer-initrd: hammer-image
-	@docker export $(shell docker create metal-hammer /dev/null) > metal-hammer.tar
-	@tar -xf metal-hammer.tar metal-hammer-initrd.img.lz4
+	docker export $(shell docker create metal-hammer /dev/null) > metal-hammer.tar
+	tar -xf metal-hammer.tar metal-hammer-initrd.img.lz4
 	@rm -f metal-hammer.tar
-	@md5sum metal-hammer-initrd.img.lz4 > metal-hammer-initrd.img.lz4.md5
+	md5sum metal-hammer-initrd.img.lz4 > metal-hammer-initrd.img.lz4.md5
+
+.PHONY: reboot-machine01
+reboot-machine01:
+	vagrant destroy -f machine01
+	vagrant up machine01
+
+.PHONY: reboot-machine02
+reboot-machine02:
+	vagrant destroy -f machine02
+	vagrant up machine02
