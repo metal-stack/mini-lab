@@ -77,7 +77,7 @@ restart-dev: caddy-down registry-down down
 
 .PHONY: compose-up-dev
 compose-up-dev: _fetch-metalctl-image-tag
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up
+	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 .PHONY: load-api-image
 load-api-image:
