@@ -25,9 +25,9 @@ vagrant-up:
 
 .PHONY: control-plane-bake
 control-plane-bake:
-	-kind create cluster \
+	kind create cluster \
 		--config control-plane/kind.yaml \
-		--kubeconfig .kubeconfig
+		--kubeconfig .kubeconfig || true
 
 .PHONY: control-plane
 control-plane: control-plane-bake
@@ -44,7 +44,7 @@ partition: partition-bake
 
 .PHONY: cleanup
 cleanup:
-	-vagrant destroy -f --parallel
+	vagrant destroy -f --parallel || true
 	kind delete cluster
 	docker-compose down
 	rm -f .kubeconfig
@@ -73,7 +73,7 @@ dev: build-hammer-initrd build-api-image registry build-core-image caddy restart
 restart-dev: cleanup bake load-api-image compose-up-dev vagrant-up
 
 .PHONY: down-dev
-restart-dev: caddy-down registry-down down
+down-dev: caddy-down registry-down down
 
 .PHONY: compose-up-dev
 compose-up-dev: _fetch-metalctl-image-tag
