@@ -71,7 +71,7 @@ restart-dev: caddy-down registry-down down
 
 .PHONY: _enable-dev
 _enable-dev: _fetch-metalctl-image-tag
-	@echo "EXTRA_VARS=-e @files/dev_images.yaml" >> .env
+	@echo "EXTRA_VARS='-e @files/dev_images.yaml'" >> .env
 	kind load docker-image metalstack/metal-api:dev
 
 .PHONY: registry-down
