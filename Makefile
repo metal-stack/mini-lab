@@ -67,7 +67,7 @@ _fetch-metalctl-image-tag:
 # ---- development targets -------------------------------------------------------------
  
 .PHONY: dev
-dev: cleanup caddy registry build-hammer-initrd build-api-image load-api-image build-core-image bake push-core-image compose-up-dev vagrant-up
+dev: cleanup caddy registry build-hammer-initrd build-api-image build-core-image push-core-image bake load-api-image compose-up-dev vagrant-up
 
 .PHONY: down-dev
 down-dev: caddy-down registry-down down
