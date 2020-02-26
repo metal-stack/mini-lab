@@ -13,14 +13,14 @@ down: cleanup
 bake: control-plane-bake partition-bake
 
 .PHONY: run
-run: compose-up vagrant-up
+run: compose-up machines-up
 
 .PHONY: compose-up
 compose-up: _fetch-metalctl-image-tag
 	docker-compose up
 
-.PHONY: vagrant-up
-vagrant-up:
+.PHONY: machines-up
+machines-up:
 	vagrant up machine01 machine02
 
 .PHONY: control-plane-bake
@@ -67,7 +67,7 @@ _fetch-metalctl-image-tag:
 # ---- development targets -------------------------------------------------------------
  
 .PHONY: dev
-dev: cleanup caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image partition-bake compose-up-dev vagrant-up
+dev: cleanup caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image partition-bake compose-up-dev machines-up
 
 .PHONY: down-dev
 down-dev: caddy-down registry-down down
