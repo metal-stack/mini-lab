@@ -134,13 +134,6 @@ and a Docker registry that holds the latter ones:
 make dev
 ```
 
-Restart a potentially running metal-stack development system without rebuilding images
-and without stopping the local Caddy and Docker registry containers:
-
-```shell script
-make restart-dev
-```
-
 Stop and cleanup a potentially running metal-stack development system
 as well as the local Caddy and Docker registry containers:
 
