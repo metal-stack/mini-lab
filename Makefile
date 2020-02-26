@@ -13,8 +13,14 @@ down: cleanup
 bake: control-plane-bake partition-bake
 
 .PHONY: run
-run: _fetch-metalctl-image-tag
+run: compose-up vagrant-up
+
+.PHONY: compose-up
+compose-up: _fetch-metalctl-image-tag
 	docker-compose up
+
+.PHONY: vagrant-up
+vagrant-up:
 	vagrant up machine01 machine02
 
 .PHONY: control-plane-bake
@@ -64,14 +70,17 @@ _fetch-metalctl-image-tag:
 dev: build-hammer-initrd build-api-image registry build-core-image caddy restart-dev
 
 .PHONY: restart-dev
-restart-dev: cleanup bake _enable-dev run
+restart-dev: cleanup bake load-api-image compose-up-dev vagrant-up
 
 .PHONY: down-dev
 restart-dev: caddy-down registry-down down
 
-.PHONY: _enable-dev
-_enable-dev: _fetch-metalctl-image-tag
-	@echo "EXTRA_VARS='-e @files/dev_images.yaml'" >> .env
+.PHONY: compose-up-dev
+compose-up-dev: _fetch-metalctl-image-tag
+	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up
+
+.PHONY: load-api-image
+load-api-image:
 	kind load docker-image metalstack/metal-api:dev
 
 .PHONY: registry-down

@@ -26,7 +26,6 @@ services:
           ansible-galaxy install --ignore-errors -r control-plane/requirements.yaml
           ansible-playbook \
             -i control-plane/inventory.yaml \
-            ${EXTRA_VARS} \
             control-plane.yaml
 
   partition:
@@ -56,8 +55,6 @@ services:
           ansible-playbook \
             -i partition/static_inventory.yaml \
             -i ~/.ansible/roles/ansible-common/inventory/vagrant \
-            -e extra_vars=${EXTRA_VARS} \
-            ${EXTRA_VARS} \
             partition.yaml
 
   metalctl:
