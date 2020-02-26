@@ -85,7 +85,7 @@ load-api-image:
 
 .PHONY: registry-down
 registry-down:
-	-@docker rm -f registry > /dev/null 2>&1
+	@docker rm -f registry > /dev/null 2>&1 || true
 
 .PHONY: registry
 registry: registry-down
@@ -106,7 +106,7 @@ push-core-image:
 
 .PHONY: caddy-down
 caddy-down:
-	-@docker rm -f caddy > /dev/null 2>&1
+	@docker rm -f caddy > /dev/null 2>&1 || true
 
 .PHONY: caddy
 caddy: caddy-down
