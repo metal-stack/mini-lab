@@ -1,5 +1,5 @@
 ---
-- when: extra_vars|length > 0
+- when: env is defined and env == "dev"
   block:
     - name: create registry cert directory
       file:
