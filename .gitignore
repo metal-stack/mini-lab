@@ -1,6 +1,9 @@
-.vagrant
-.kubeconfig
 .ansible_vagrant_cache
-**/*.pyc
-partition/dynamic_inventory.yaml
+.env
 .idea
+.kubeconfig
+.vagrant
+**/*.pyc
+ansible-common
+metal-hammer*
+partition/dynamic_inventory.yaml

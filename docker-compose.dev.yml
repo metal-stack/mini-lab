@@ -1,0 +1,26 @@
+---
+version: '3.7'
+
+services:
+  control-plane:
+    entrypoint:
+      - /bin/bash
+      - -ce
+      - |
+          ansible-galaxy install --ignore-errors -r control-plane/requirements.yaml
+          ansible-playbook \
+            -i control-plane/inventory.yaml \
+            -e @files/dev_images.yaml \
+            control-plane.yaml
+
+  partition:
+    entrypoint:
+      - /bin/bash
+      - -ce
+      - |
+          ansible-galaxy install --ignore-errors -r partition/requirements.yaml
+          ansible-playbook \
+            -i partition/static_inventory.yaml \
+            -i ~/.ansible/roles/ansible-common/inventory/vagrant \
+            -e @files/dev_images.yaml \
+            partition.yaml

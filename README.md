@@ -104,3 +104,8 @@ To remove the kind cluster and the vagrant boxes, run
 ```bash
 make cleanup
 ```
+
+## Development of metal-api, metal-hammer and metal-core
+
+To simplify developing changes for the `metal-api`, `metal-hammer` and `metal-core`, it is possible to use development artifacts from within the mini-lab.
+See the [dev instructions](DEV_INSTRUCTIONS.md) for more details.
