@@ -10,7 +10,6 @@ services:
           ansible-galaxy install --ignore-errors -r control-plane/requirements.yaml
           ansible-playbook \
             -i control-plane/inventory.yaml \
-            -e env=dev \
             -e @files/dev_images.yaml \
             control-plane.yaml
 
@@ -23,6 +22,5 @@ services:
           ansible-playbook \
             -i partition/static_inventory.yaml \
             -i ~/.ansible/roles/ansible-common/inventory/vagrant \
-            -e env=dev \
             -e @files/dev_images.yaml \
             partition.yaml

@@ -1,14 +1,12 @@
 ---
-- when: env is defined and env == "dev"
-  block:
-    - name: create registry cert directory
-      file:
-        path: /etc/docker/certs.d/192.168.121.1:5000
-        state: directory
+- name: create registry cert directory
+  file:
+    path: /etc/docker/certs.d/192.168.121.1:5000
+    state: directory
 
-    - name: copy registry certificate
-      copy:
-        dest: /etc/docker/certs.d/192.168.121.1:5000/ca.crt
-        content: "{{  lookup('file', 'certs/registry/ca.pem') }}"
-        mode: 0640
-      no_log: yes
+- name: copy registry certificate
+  copy:
+    dest: /etc/docker/certs.d/192.168.121.1:5000/ca.crt
+    content: "{{  lookup('file', 'certs/registry/ca.pem') }}"
+    mode: 0640
+  no_log: yes
