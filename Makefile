@@ -67,10 +67,7 @@ _fetch-metalctl-image-tag:
 # ---- development targets -------------------------------------------------------------
  
 .PHONY: dev
-dev: build-hammer-initrd build-api-image registry build-core-image caddy restart-dev
-
-.PHONY: restart-dev
-restart-dev: cleanup bake load-api-image compose-up-dev vagrant-up
+dev: cleanup caddy registry build-hammer-initrd build-api-image build-core-image push-core-image bake load-api-image compose-up-dev vagrant-up
 
 .PHONY: down-dev
 down-dev: caddy-down registry-down down
@@ -90,7 +87,6 @@ registry-down:
 .PHONY: registry
 registry: registry-down
 	docker run -p 5000:443 -v $(shell pwd)/files/certs/registry:/certs -e REGISTRY_HTTP_ADDR=0.0.0.0:443 -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/ca.pem -e REGISTRY_HTTP_TLS_KEY=/certs/ca-key.pem --name registry -d registry:2
-	@make --no-print-directory push-core-image
 
 .PHONY: build-api-image
 build-api-image:
