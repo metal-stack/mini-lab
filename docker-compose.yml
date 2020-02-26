@@ -24,7 +24,10 @@ services:
       - -ce
       - |
           ansible-galaxy install --ignore-errors -r control-plane/requirements.yaml
-          ansible-playbook -i control-plane/inventory.yaml control-plane.yaml
+          ansible-playbook \
+            -i control-plane/inventory.yaml \
+            ${EXTRA_VARS} \
+            control-plane.yaml
 
   partition:
     image: metalstack/metal-deployment-base:v0.0.2
@@ -53,10 +56,12 @@ services:
           ansible-playbook \
             -i partition/static_inventory.yaml \
             -i ~/.ansible/roles/ansible-common/inventory/vagrant \
+            -e extra_vars=${EXTRA_VARS} \
+            ${EXTRA_VARS} \
             partition.yaml
 
   metalctl:
-    image: registry.fi-ts.io/metal/metalctl:v0.3.0
+    image: registry.fi-ts.io/metal/metalctl:${METALCTL_IMAGE_TAG}
     environment:
       - METALCTL_HMAC=metal-admin
       - METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal

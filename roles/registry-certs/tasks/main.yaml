@@ -1,6 +1,5 @@
 ---
-#- when: dev is defined and dev
-- when: True
+- when: extra_vars|length > 0
   block:
     - name: create registry cert directory
       file:

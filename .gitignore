@@ -5,3 +5,4 @@
 partition/dynamic_inventory.yaml
 .idea
 metal-hammer*
+.env
