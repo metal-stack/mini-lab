@@ -19,9 +19,9 @@ git clone https://github.com/metal-stack/metal-api ../metal-api
 git clone https://github.com/metal-stack/metal-core ../metal-core
 ```
 
-## Start/Restart/Stop:
+## Start/Stop:
 
-Build `metal-hammer-initrd`, `metalstack/metal-api` and `metalstack/metal-core` images and start
+Build `metal-hammer-initrd`, `metalstack/metal-api` and `metalstack/metal-core` images and (re)start
 a minimal metal-stack system as well as a Caddy container that servers the former one
 and a Docker registry that holds the latter ones:
 
@@ -34,4 +34,18 @@ as well as the local Caddy and Docker registry containers:
 
 ```shell script
 make down-dev
+```
+
+## Exchange images at run-time:
+
+Reload metal-hammer-initrd:
+
+```shell script
+make bulid-hammer-initrd
+```
+
+Reload metal-api:
+
+```shell script
+make reload-api
 ```
