@@ -59,7 +59,22 @@ e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Waiting      8s                   
 2294c949-88f6-5390-8154-fa53d93a3313        Waiting      8s                               v1-small-x86         vagrant
 ```
 
-Create a machine with `metalctl machine create`
+Create a machine with
+
+```bash
+make machine
+```
+
+or the hard way with
+
+```bash
+docker-compose run metalctl network allocate \
+        --partition vagrant \
+        --project 00000000-0000-0000-0000-000000000000 \
+        --name vagrant
+```
+
+Lookup the network ID and run
 
 ```bash
 docker-compose run metalctl machine create \
@@ -69,7 +84,8 @@ docker-compose run metalctl machine create \
         --project 00000000-0000-0000-0000-000000000000 \
         --partition vagrant \
         --image ubuntu-19.10 \
-        --size v1-small-x86
+        --size v1-small-x86 \
+        --networks <network-ID>
 ```
 
 See the installation process in action
@@ -103,6 +119,16 @@ To remove the kind cluster and the vagrant boxes, run
 
 ```bash
 make cleanup
+```
+
+## Reinstall
+
+Reinstall a machine with
+
+```bash
+docker-compose run metalctl machine reinstall \
+        --image ubuntu-19.10 \
+        e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 ```
 
 ## Development of metal-api, metal-hammer and metal-core

@@ -60,6 +60,21 @@ reboot-machine02:
 	vagrant destroy -f machine02
 	vagrant up machine02
 
+.PHONY: machine
+machine:
+	$(eval outcome = $(shell docker-compose run metalctl network allocate --partition vagrant --project 00000000-0000-0000-0000-000000000000 --name vagrant))
+	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-19.10 --size v1-small-x86 --networks $(shell echo $(outcome) | grep id: | head -1 | cut -d' ' -f10)
+
+.PHONY: reinstall-machine01
+reinstall-machine01:
+	docker-compose run metalctl machine reinstall --image ubuntu-19.10 e0ab02d2-27cd-5a5e-8efc-080ba80cf258
+	@make --no-print-directory reboot-machine01
+
+.PHONY: reinstall-machine02
+reinstall-machine02:
+	docker-compose run metalctl machine reinstall --image ubuntu-19.10 2294c949-88f6-5390-8154-fa53d93a3313
+	@make --no-print-directory reboot-machine02
+
 .PHONY: _fetch-metalctl-image-tag
 _fetch-metalctl-image-tag:
 	@echo "METALCTL_IMAGE_TAG=$(shell cat group_vars/minilab/images.yaml | grep metal_metalctl_image_tag: | cut -d: -f2 | sed 's/ //g')" > .env
