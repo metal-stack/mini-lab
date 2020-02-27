@@ -119,6 +119,11 @@ reload-api: build-api-image load-api-image
 build-api-image:
 	docker build -t metalstack/metal-api:dev ../metal-api
 
+.PHONY: reload-core
+reload-core: build-core-image push-core-image
+	vagrant ssh -c "docker pull 192.168.121.1:5000/metalstack/metal-core:dev; systemctl restart metal-core" leaf01
+	vagrant ssh -c "docker pull 192.168.121.1:5000/metalstack/metal-core:dev; systemctl restart metal-core" leaf02
+
 .PHONY: build-core-image
 build-core-image:
 	docker build -t localhost:5000/metalstack/metal-core:dev ../metal-core

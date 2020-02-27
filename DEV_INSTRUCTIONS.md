@@ -49,3 +49,9 @@ Reload metal-api:
 ```bash
 make reload-api
 ```
+
+Reload metal-core:
+
+```bash
+make reload-core
+```
