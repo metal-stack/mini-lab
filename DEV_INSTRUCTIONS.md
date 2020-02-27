@@ -47,5 +47,5 @@ make bulid-hammer-initrd
 Reload metal-api:
 
 ```shell script
-make reload-api
+make restart-api
 ```
