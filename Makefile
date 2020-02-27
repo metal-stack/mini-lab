@@ -88,8 +88,8 @@ registry-down:
 registry: registry-down
 	docker run -p 5000:443 -v $(shell pwd)/files/certs/registry:/certs -e REGISTRY_HTTP_ADDR=0.0.0.0:443 -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/ca.pem -e REGISTRY_HTTP_TLS_KEY=/certs/ca-key.pem --name registry -d registry:2
 
-.PHONY: restart-api
-restart-api: build-api-image load-api-image
+.PHONY: reload-api
+reload-api: build-api-image load-api-image
 	kubectl --kubeconfig=.kubeconfig --namespace metal-control-plane delete pod $(shell kubectl --kubeconfig=.kubeconfig --namespace metal-control-plane get pod | grep metal-api | head -1|cut -d' ' -f1)
 
 .PHONY: build-api-image
