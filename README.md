@@ -121,7 +121,7 @@ To remove the kind cluster and the vagrant boxes, run
 make cleanup
 ```
 
-## Reinstall
+## Reinstall machine
 
 Reinstall a machine with
 
@@ -129,6 +129,14 @@ Reinstall a machine with
 docker-compose run metalctl machine reinstall \
         --image ubuntu-19.10 \
         e0ab02d2-27cd-5a5e-8efc-080ba80cf258
+```
+
+## Remove machine
+
+Remove a machine with
+
+```bash
+docker-compose run metalctl machine rm e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 ```
 
 ## Development of metal-api, metal-hammer and metal-core

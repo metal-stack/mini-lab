@@ -13,7 +13,7 @@ Thus you have to clone the following **metal-stack** repositories:
 
 ## Prerequisites:
 
-```shell script
+```bash
 git clone https://github.com/metal-stack/metal-hammer ../metal-hammer
 git clone https://github.com/metal-stack/metal-api ../metal-api
 git clone https://github.com/metal-stack/metal-core ../metal-core
@@ -25,14 +25,14 @@ Build `metal-hammer-initrd`, `metalstack/metal-api` and `metalstack/metal-core` 
 a minimal metal-stack system as well as a Caddy container that servers the former one
 and a Docker registry that holds the latter ones:
 
-```shell script
+```bash
 make dev
 ```
 
 Stop and cleanup a potentially running metal-stack development system
 as well as the local Caddy and Docker registry containers:
 
-```shell script
+```bash
 make down-dev
 ```
 
@@ -40,12 +40,12 @@ make down-dev
 
 Reload metal-hammer-initrd:
 
-```shell script
+```bash
 make bulid-hammer-initrd
 ```
 
 Reload metal-api:
 
-```shell script
+```bash
 make reload-api
 ```

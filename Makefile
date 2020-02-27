@@ -75,6 +75,14 @@ reinstall-machine02:
 	docker-compose run metalctl machine reinstall --image ubuntu-19.10 2294c949-88f6-5390-8154-fa53d93a3313
 	@make --no-print-directory reboot-machine02
 
+.PHONY: free-machine01
+free-machine01:
+	docker-compose run metalctl machine rm e0ab02d2-27cd-5a5e-8efc-080ba80cf258
+
+.PHONY: free-machine02
+free-machine02:
+	docker-compose run metalctl machine rm 2294c949-88f6-5390-8154-fa53d93a3313
+
 .PHONY: _fetch-metalctl-image-tag
 _fetch-metalctl-image-tag:
 	@echo "METALCTL_IMAGE_TAG=$(shell cat group_vars/minilab/images.yaml | grep metal_metalctl_image_tag: | cut -d: -f2 | sed 's/ //g')" > .env
