@@ -109,11 +109,6 @@ reload-api: build-api-image load-api-image
 build-api-image:
 	docker build -t metalstack/metal-api:dev ../metal-api
 
-.PHONY: reload-core
-reload-core: build-core-image push-core-image
-	vagrant ssh -c "docker pull 192.168.121.1:5000/metalstack/metal-core:dev; systemctl restart metal-core" leaf01
-	vagrant ssh -c "docker pull 192.168.121.1:5000/metalstack/metal-core:dev; systemctl restart metal-core" leaf02
-
 .PHONY: _ips
 _ips:
 	$(eval pattern = "([0-9a-f]{2}:){5}([0-9a-f]{2})")
@@ -123,8 +118,8 @@ _ips:
 	$(eval ipL1 = $(shell arp -i $(dev) | grep $(macL1) 2>/dev/null | cut -d' ' -f1))
 	$(eval ipL2 = $(shell arp -i $(dev) | grep $(macL2) 2>/dev/null | cut -d' ' -f1))
 
-.PHONY: reload-core-virsh
-reload-core-virsh: build-core-image push-core-image _ips
+.PHONY: reload-core
+reload-core: build-core-image push-core-image _ips
 	ssh -i .vagrant/machines/leaf01/libvirt/private_key vagrant@${ipL1} "sudo docker pull 192.168.121.1:5000/metalstack/metal-core:dev; sudo systemctl restart metal-core"
 	ssh -i .vagrant/machines/leaf02/libvirt/private_key vagrant@${ipL2} "sudo docker pull 192.168.121.1:5000/metalstack/metal-core:dev; sudo systemctl restart metal-core"
 
