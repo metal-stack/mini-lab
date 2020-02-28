@@ -1,7 +1,9 @@
 .DEFAULT_GOAL := up
 
 .PHONY: up
-up: bake run
+up: bake env
+	docker-compose up
+	vagrant up machine01 machine02
 
 .PHONY: restart
 restart: down up
@@ -11,17 +13,6 @@ down: cleanup
 
 .PHONY: bake
 bake: control-plane-bake partition-bake
-
-.PHONY: run
-run: compose-up machines-up
-
-.PHONY: compose-up
-compose-up: _fetch-metalctl-image-tag
-	docker-compose up
-
-.PHONY: machines-up
-machines-up:
-	vagrant up machine01 machine02
 
 .PHONY: control-plane-bake
 control-plane-bake:
@@ -43,7 +34,7 @@ partition: partition-bake
 	vagrant up machine01 machine02
 
 .PHONY: cleanup
-cleanup:
+cleanup: caddy-down registry-down
 	vagrant destroy -f --parallel || true
 	kind delete cluster
 	docker-compose down
@@ -62,42 +53,40 @@ reboot-machine02:
 
 .PHONY: machine
 machine:
-	$(eval outcome = $(shell docker-compose run metalctl network allocate --partition vagrant --project 00000000-0000-0000-0000-000000000000 --name vagrant))
-	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-19.10 --size v1-small-x86 --networks $(shell echo $(outcome) | grep id: | head -1 | cut -d' ' -f10)
+	$(eval alloc = $(shell docker-compose run metalctl network allocate --partition vagrant --project 00000000-0000-0000-0000-000000000000 --name vagrant))
+	$(eval ip = $(shell echo $(alloc) | grep id: | head -1 | cut -d' ' -f10))
+	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-19.10 --size v1-small-x86 --networks $(ip)
 
 .PHONY: reinstall-machine01
 reinstall-machine01:
 	docker-compose run metalctl machine reinstall --image ubuntu-19.10 e0ab02d2-27cd-5a5e-8efc-080ba80cf258
-	@make --no-print-directory reboot-machine01
+	@$(MAKE) --no-print-directory reboot-machine01
 
 .PHONY: reinstall-machine02
 reinstall-machine02:
 	docker-compose run metalctl machine reinstall --image ubuntu-19.10 2294c949-88f6-5390-8154-fa53d93a3313
-	@make --no-print-directory reboot-machine02
+	@$(MAKE) --no-print-directory reboot-machine02
 
-.PHONY: free-machine01
-free-machine01:
+.PHONY: delete-machine01
+delete-machine01:
 	docker-compose run metalctl machine rm e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 
-.PHONY: free-machine02
-free-machine02:
+.PHONY: delete-machine02
+delete-machine02:
 	docker-compose run metalctl machine rm 2294c949-88f6-5390-8154-fa53d93a3313
 
-.PHONY: _fetch-metalctl-image-tag
-_fetch-metalctl-image-tag:
-	@echo "METALCTL_IMAGE_TAG=$(shell cat group_vars/minilab/images.yaml | grep metal_metalctl_image_tag: | cut -d: -f2 | sed 's/ //g')" > .env
+.PHONY: env
+env:
+	$(eval tag = $(shell cat group_vars/minilab/images.yaml | grep metal_metalctl_image_tag: | cut -d: -f2 | sed 's/ //g'))
+	@echo "METALCTL_IMAGE_TAG=$(tag)" > .env
+	@virsh net-autostart vagrant-libvirt >/dev/null
 
 # ---- development targets -------------------------------------------------------------
  
 .PHONY: dev
-dev: cleanup caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image partition-bake compose-up-dev machines-up
-
-.PHONY: down-dev
-down-dev: caddy-down registry-down down
-
-.PHONY: compose-up-dev
-compose-up-dev: _fetch-metalctl-image-tag
+dev: cleanup caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image partition-bake env
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+	vagrant up machine01 machine02
 
 .PHONY: load-api-image
 load-api-image:
@@ -113,7 +102,8 @@ registry: registry-down
 
 .PHONY: reload-api
 reload-api: build-api-image load-api-image
-	kubectl --kubeconfig=.kubeconfig --namespace metal-control-plane delete pod $(shell kubectl --kubeconfig=.kubeconfig --namespace metal-control-plane get pod | grep metal-api | head -1|cut -d' ' -f1)
+	$(eval pod = $(shell kubectl --kubeconfig=.kubeconfig --namespace metal-control-plane get pod | grep metal-api | head -1|cut -d' ' -f1))
+	kubectl --kubeconfig=.kubeconfig --namespace metal-control-plane delete pod $(pod)
 
 .PHONY: build-api-image
 build-api-image:
@@ -123,6 +113,28 @@ build-api-image:
 reload-core: build-core-image push-core-image
 	vagrant ssh -c "docker pull 192.168.121.1:5000/metalstack/metal-core:dev; systemctl restart metal-core" leaf01
 	vagrant ssh -c "docker pull 192.168.121.1:5000/metalstack/metal-core:dev; systemctl restart metal-core" leaf02
+
+.PHONY: _ips
+_ips:
+	$(eval pattern = "([0-9a-f]{2}:){5}([0-9a-f]{2})")
+	$(eval macL1 = $(shell virsh domiflist metal_leaf01 | grep vagrant-libvirt | grep -o -E $(pattern)))
+	$(eval macL2 = $(shell virsh domiflist metal_leaf02 | grep vagrant-libvirt | grep -o -E $(pattern)))
+	$(eval dev = $(shell virsh net-info vagrant-libvirt | grep Bridge | cut -d' ' -f10 2>/dev/null))
+	$(eval ipL1 = $(shell arp -i $(dev) | grep $(macL1) 2>/dev/null | cut -d' ' -f1))
+	$(eval ipL2 = $(shell arp -i $(dev) | grep $(macL2) 2>/dev/null | cut -d' ' -f1))
+
+.PHONY: reload-core-virsh
+reload-core-virsh: build-core-image push-core-image _ips
+	ssh -i .vagrant/machines/leaf01/libvirt/private_key vagrant@${ipL1} "sudo docker pull 192.168.121.1:5000/metalstack/metal-core:dev; sudo systemctl restart metal-core"
+	ssh -i .vagrant/machines/leaf02/libvirt/private_key vagrant@${ipL2} "sudo docker pull 192.168.121.1:5000/metalstack/metal-core:dev; sudo systemctl restart metal-core"
+
+.PHONY: ssh-leaf01
+ssh-leaf01: _ips
+	ssh -i .vagrant/machines/leaf01/libvirt/private_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null vagrant@${ipL1} -t "sudo -i"
+
+.PHONY: ssh-leaf02
+ssh-leaf02: _ips
+	ssh -i .vagrant/machines/leaf01/libvirt/private_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null vagrant@${ipL2} -t "sudo -i"
 
 .PHONY: build-core-image
 build-core-image:

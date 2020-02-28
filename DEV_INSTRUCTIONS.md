@@ -33,7 +33,7 @@ Stop and cleanup a potentially running metal-stack development system
 as well as the local Caddy and Docker registry containers:
 
 ```bash
-make down-dev
+make down
 ```
 
 ## Exchange images at run-time:
