@@ -70,10 +70,12 @@ reinstall-machine02:
 .PHONY: delete-machine01
 delete-machine01:
 	docker-compose run metalctl machine rm e0ab02d2-27cd-5a5e-8efc-080ba80cf258
+	@$(MAKE) --no-print-directory reboot-machine01
 
 .PHONY: delete-machine02
 delete-machine02:
 	docker-compose run metalctl machine rm 2294c949-88f6-5390-8154-fa53d93a3313
+	@$(MAKE) --no-print-directory reboot-machine02
 
 .PHONY: env
 env:
@@ -129,7 +131,7 @@ ssh-leaf01: _ips
 
 .PHONY: ssh-leaf02
 ssh-leaf02: _ips
-	ssh -i .vagrant/machines/leaf01/libvirt/private_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null vagrant@${ipL2} -t "sudo -i"
+	ssh -i .vagrant/machines/leaf02/libvirt/private_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null vagrant@${ipL2} -t "sudo -i"
 
 .PHONY: build-core-image
 build-core-image:
