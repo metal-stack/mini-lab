@@ -51,6 +51,14 @@ reboot-machine02:
 	vagrant destroy -f machine02
 	vagrant up machine02
 
+.PHONY: password01
+password01:
+	docker-compose run metalctl machine describe e0ab02d2-27cd-5a5e-8efc-080ba80cf258 | grep consolepassword | cut -d: -f2
+
+.PHONY: password02
+password02:
+	docker-compose run metalctl machine describe 2294c949-88f6-5390-8154-fa53d93a3313 | grep consolepassword | cut -d: -f2
+
 .PHONY: machine
 machine:
 	$(eval alloc = $(shell docker-compose run metalctl network allocate --partition vagrant --project 00000000-0000-0000-0000-000000000000 --name vagrant))
@@ -59,12 +67,12 @@ machine:
 
 .PHONY: reinstall-machine01
 reinstall-machine01:
-	docker-compose run metalctl machine reinstall --image ubuntu-19.10 e0ab02d2-27cd-5a5e-8efc-080ba80cf258
+	docker-compose run metalctl machine reinstall --image ubuntu-19.04 e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 	@$(MAKE) --no-print-directory reboot-machine01
 
 .PHONY: reinstall-machine02
 reinstall-machine02:
-	docker-compose run metalctl machine reinstall --image ubuntu-19.10 2294c949-88f6-5390-8154-fa53d93a3313
+	docker-compose run metalctl machine reinstall --image ubuntu-19.04 2294c949-88f6-5390-8154-fa53d93a3313
 	@$(MAKE) --no-print-directory reboot-machine02
 
 .PHONY: delete-machine01
@@ -76,6 +84,10 @@ delete-machine01:
 delete-machine02:
 	docker-compose run metalctl machine rm 2294c949-88f6-5390-8154-fa53d93a3313
 	@$(MAKE) --no-print-directory reboot-machine02
+
+.PHONY: ls
+ls:
+	docker-compose run metalctl machine ls
 
 .PHONY: env
 env:
