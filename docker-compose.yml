@@ -58,7 +58,7 @@ services:
             partition.yaml
 
   metalctl:
-    image: registry.fi-ts.io/metal/metalctl:${METALCTL_IMAGE_TAG}
+    image: metalstack/metalctl:${METALCTL_IMAGE_TAG}
     environment:
       - METALCTL_HMAC=metal-admin
       - METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal

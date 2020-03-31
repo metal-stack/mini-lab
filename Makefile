@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := up
 
 .PHONY: up
-up: bake env
+up: cleanup bake env
 	docker-compose up
 	vagrant up machine01 machine02
 
@@ -67,12 +67,12 @@ machine:
 
 .PHONY: reinstall-machine01
 reinstall-machine01:
-	docker-compose run metalctl machine reinstall --image ubuntu-19.04 e0ab02d2-27cd-5a5e-8efc-080ba80cf258
+	docker-compose run metalctl machine reinstall --image ubuntu-20.04 e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 	@$(MAKE) --no-print-directory reboot-machine01
 
 .PHONY: reinstall-machine02
 reinstall-machine02:
-	docker-compose run metalctl machine reinstall --image ubuntu-19.04 2294c949-88f6-5390-8154-fa53d93a3313
+	docker-compose run metalctl machine reinstall --image ubuntu-20.04 2294c949-88f6-5390-8154-fa53d93a3313
 	@$(MAKE) --no-print-directory reboot-machine02
 
 .PHONY: delete-machine01
@@ -84,6 +84,16 @@ delete-machine01:
 delete-machine02:
 	docker-compose run metalctl machine rm 2294c949-88f6-5390-8154-fa53d93a3313
 	@$(MAKE) --no-print-directory reboot-machine02
+
+.PHONY: console-machine01
+console-machine01:
+	@echo "exit console with CTRL+5"
+	virsh console metal_machine01
+
+.PHONY: console-machine02
+console-machine02:
+	@echo "exit console with CTRL+5"
+	virsh console metal_machine02
 
 .PHONY: ls
 ls:

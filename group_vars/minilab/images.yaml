@@ -1,6 +1,6 @@
 ---
-metal_api_image_tag: v0.5.7
-metal_metalctl_image_tag: v0.3.0
+metal_api_image_tag: v0.6.1
+metal_metalctl_image_tag: v0.6.0
 metal_masterdata_api_image_tag: v0.5.0
 metal_console_image_tag: v0.4.0
 
@@ -8,7 +8,7 @@ metal_db_backup_restore_sidecar_image_tag: v0.5.1
 ipam_db_backup_restore_sidecar_image_tag: v0.5.1
 masterdata_db_backup_restore_sidecar_image_tag: v0.5.1
 
-metal_core_image_tag: v0.4.4
+metal_core_image_tag: v0.5.0
 pixiecore_image_tag: 781e3f0a698bbc3ea960c1d288c6606522db05cd
 
-metal_hammer_image_url: http://images.metal-pod.io/metal-hammer/metal-hammer-initrd.img.lz4
+metal_hammer_image_url: https://github.com/metal-stack/metal-hammer/releases/download/v0.5.2/metal-hammer-initrd.img.lz4
