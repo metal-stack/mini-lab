@@ -7,18 +7,49 @@ metal_api_images:
   url: http://images.metal-pod.io/metal-os/firewall/2.0-ubuntu/20200317/img.tar.lz4
   features:
     - firewall
-- id: ubuntu-19.10
+  classification: supported
+- id: ubuntu-19.10.20200317
   name: Ubuntu 19.10
   description: Ubuntu 19.10
   url: http://images.metal-pod.io/metal-os/ubuntu/19.10/20200317/img.tar.lz4
   features:
     - machine
+  classification: supported
+- id: ubuntu-19.10.20200322
+  name: Ubuntu 19.10
+  description: Ubuntu 19.10
+  url: http://images.metal-pod.io/metal-os/ubuntu/19.10/20200322/img.tar.lz4
+  features:
+    - machine
+  classification: supported
+- id: ubuntu-19.10.20200325
+  name: Ubuntu 19.10
+  description: Ubuntu 19.10
+  url: http://images.metal-pod.io/metal-os/ubuntu/19.10/20200325/img.tar.lz4
+  features:
+    - machine
+  classification: supported
+- id: ubuntu-19.10.20200329
+  name: Ubuntu 19.10
+  description: Ubuntu 19.10
+  url: http://images.metal-pod.io/metal-os/ubuntu/19.10/20200329/img.tar.lz4
+  features:
+    - machine
+  classification: supported
+- id: ubuntu-19.10.20200331
+  name: Ubuntu 19.10
+  description: Ubuntu 19.10
+  url: http://images.metal-pod.io/metal-os/ubuntu/19.10/20200331/img.tar.lz4
+  features:
+    - machine
+  classification: supported
 - id: ubuntu-20.04
   name: Ubuntu 20.04
   description: Ubuntu 20.04
   url: http://images.metal-pod.io/metal-os/ubuntu/20.04/20200317/img.tar.lz4
   features:
     - machine
+  classification: supported
 
 metal_api_networks: []
 metal_api_ips: []
