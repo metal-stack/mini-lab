@@ -21,3 +21,6 @@ nodes:
   - containerPort: 10001
     hostPort: 5222
     listenAddress: 192.168.121.1
+  - containerPort: 50051
+    hostPort: 50051
+    listenAddress: 192.168.121.1

@@ -41,7 +41,7 @@ make down
 Reload metal-hammer-initrd:
 
 ```bash
-make bulid-hammer-initrd
+make build-hammer-initrd
 ```
 
 Reload metal-api:

@@ -24,3 +24,9 @@ metal_api_networks: []
 metal_api_ips: []
 metal_api_sizes: []
 metal_api_partitions: []
+
+grpc_certs_server_key: "{{ lookup('file', 'certs/grpc/server-key.pem') }}"
+grpc_certs_server_cert: "{{  lookup('file', 'certs/grpc/server.pem') }}"
+grpc_certs_client_key: "{{ lookup('file', 'certs/grpc/client-key.pem') }}"
+grpc_certs_client_cert: "{{  lookup('file', 'certs/grpc/client.pem') }}"
+grpc_certs_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"

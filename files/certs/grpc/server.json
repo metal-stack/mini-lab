@@ -1,0 +1,19 @@
+{
+  "CN": "metal-api",
+  "hosts": [
+    "10.0.1.1"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 4096
+  },
+  "names": [
+    {
+      "C":  "DE",
+      "L":  "Munich",
+      "O":  "Metal-Stack",
+      "OU": "DevOps",
+      "ST": "Bavaria"
+    }
+  ]
+}

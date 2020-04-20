@@ -25,6 +25,8 @@
       tags: docker-on-cumulus
     - name: dhcp
       tags: dhcp
+    - name: metal-roles/partition/roles/grpc-proxy
+      tags: grpc-proxy
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
     - name: metal-roles/partition/roles/pixiecore
