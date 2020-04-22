@@ -1,6 +1,6 @@
-# Metal-Stack Mini-Lab
+# mini-lab
 
-Small lab to start two leaf switches and the metal-api to try `metalctl` and the creation of machines.
+Small lab to setup the `metal-stack` locally. Starts two leaf switches and the [metal-api](https://github.com/metal-stack/metal-api) to try [metalctl](https://github.com/metal-stack/metalctl) and the creation of machines.
 
 This requires:
 
