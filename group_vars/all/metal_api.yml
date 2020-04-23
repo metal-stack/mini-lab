@@ -23,7 +23,10 @@ metal_api_images:
 metal_api_networks: []
 metal_api_ips: []
 metal_api_sizes: []
-metal_api_partitions: []
+metal_api_partitions:
+  - id: vagrant
+    name: Vagrant
+    description: Metal Test environment in Vagrant
 
 grpc_certs_server_key: "{{ lookup('file', 'certs/grpc/server-key.pem') }}"
 grpc_certs_server_cert: "{{  lookup('file', 'certs/grpc/server.pem') }}"
