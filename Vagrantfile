@@ -24,7 +24,7 @@ Vagrant.configure("2") do |config|
     libvirt.nic_adapter_count = 130
   end
   config.vm.define "leaf02" do |device|
-    box device: device, hostname: "leaf02", box: "CumulusCommunity/cumulus-vx", box_version: "4.1.1", memory: 512
+    box device: device, hostname: "leaf02", box: "CumulusCommunity/cumulus-vx", box_version: "4.1.1", memory: 768
     cable device: device, iface: "swp1", mac: "44:38:39:00:00:04", port: "9003", remote_port: "8003" # -> lan1@machine01
     cable device: device, iface: "swp2", mac: "44:38:39:00:00:19", port: "9017", remote_port: "8017" # -> lan1@machine02
     device.vm.provision :shell , path: "./vagrant/provision/config_switch.sh"
@@ -32,7 +32,7 @@ Vagrant.configure("2") do |config|
     device.vm.provision :shell , path: "./vagrant/provision/common.sh"
   end
   config.vm.define "leaf01" do |device|
-    box device: device, hostname: "leaf01", box: "CumulusCommunity/cumulus-vx", box_version: "4.1.1", memory: 512
+    box device: device, hostname: "leaf01", box: "CumulusCommunity/cumulus-vx", box_version: "4.1.1", memory: 768
     cable device: device, iface: "swp1", mac: "44:38:39:00:00:1a", port: "9018", remote_port: "8018" # -> lan0@machine01
     cable device: device, iface: "swp2", mac: "44:38:39:00:00:18", port: "9016", remote_port: "8016" # -> lan0@machine02
     device.vm.provision :shell , path: "./vagrant/provision/config_switch.sh"
