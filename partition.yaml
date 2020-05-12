@@ -18,12 +18,12 @@
         state: touch
   roles:
     - name: ansible-common
-    - name: leaf
+    - name: metal-roles/partition/roles/leaf
       tags: leaf
     - name: registry-certs
     - name: metal-roles/partition/roles/docker-on-cumulus
       tags: docker-on-cumulus
-    - name: dhcp
+    - name: metal-roles/partition/roles/dhcp
       tags: dhcp
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
