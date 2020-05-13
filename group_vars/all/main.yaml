@@ -12,7 +12,7 @@ mtu:
   vxlan: 9216
   default: 9000
 
-router_nameservers:
+partition_nameservers:
   - 192.168.121.1
   - 1.1.1.1
   - 1.0.0.1
