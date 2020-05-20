@@ -4,4 +4,4 @@
   version: v0.5.2
 - src: https://github.com/metal-stack/metal-roles.git
   name: metal-roles
-  version: v0.1.8
+  version: v0.1.11
