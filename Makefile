@@ -1,7 +1,9 @@
 .DEFAULT_GOAL := up
 
+KUBECONFIG := $(shell pwd)/.kubeconfig
+
 .PHONY: up
-up: cleanup bake env
+up: bake env
 	docker-compose up
 	vagrant up machine01 machine02
 
@@ -18,7 +20,7 @@ bake: control-plane-bake partition-bake
 control-plane-bake:
 	kind create cluster \
 		--config control-plane/kind.yaml \
-		--kubeconfig .kubeconfig || true
+		--kubeconfig $(KUBECONFIG) || true
 
 .PHONY: control-plane
 control-plane: control-plane-bake
@@ -38,8 +40,15 @@ cleanup: caddy-down registry-down
 	vagrant destroy -f --parallel || true
 	kind delete cluster
 	docker-compose down
-	rm -f .kubeconfig
+	rm -f $(KUBECONFIG)
 	rm -f .ansible_vagrant_cache
+
+
+.PHONY: dev-env
+dev-env:
+	@echo "export METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal"
+	@echo "export METALCTL_HMAC=metal-admin"
+	@echo "export KUBECONFIG=$(KUBECONFIG)"
 
 .PHONY: reboot-machine01
 reboot-machine01:
@@ -106,7 +115,7 @@ env:
 	@virsh net-autostart vagrant-libvirt >/dev/null
 
 # ---- development targets -------------------------------------------------------------
- 
+
 .PHONY: dev
 dev: cleanup caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image partition-bake env
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
@@ -126,8 +135,8 @@ registry: registry-down
 
 .PHONY: reload-api
 reload-api: build-api-image load-api-image
-	$(eval pod = $(shell kubectl --kubeconfig=.kubeconfig --namespace metal-control-plane get pod | grep metal-api | head -1|cut -d' ' -f1))
-	kubectl --kubeconfig=.kubeconfig --namespace metal-control-plane delete pod $(pod)
+	$(eval pod = $(shell kubectl --kubeconfig=$(KUBECONFIG) --namespace metal-control-plane get pod | grep metal-api | head -1|cut -d' ' -f1))
+	kubectl --kubeconfig=$(KUBECONFIG) --namespace metal-control-plane delete pod $(pod)
 
 .PHONY: build-api-image
 build-api-image:
