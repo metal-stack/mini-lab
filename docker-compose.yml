@@ -3,7 +3,7 @@ version: '3.7'
 
 services:
   control-plane:
-    image: metalstack/metal-deployment-base:v0.0.4
+    image: metalstack/metal-deployment-base:v0.0.5
     container_name: deploy-control-plane
     volumes:
       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
@@ -29,7 +29,7 @@ services:
             control-plane.yaml
 
   partition:
-    image: metalstack/metal-deployment-base:v0.0.4
+    image: metalstack/metal-deployment-base:v0.0.5
     container_name: deploy-partition
     volumes:
       - ${HOME}/.vagrant.d:/root/.vagrant.d

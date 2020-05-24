@@ -4,11 +4,11 @@ Small lab to setup the `metal-stack` locally. Starts two leaf switches and the [
 
 This requires:
 
-- vagrant >= 2.2.7 with vagrant-libvirt plugin >= 0.0.45 for running the switch and machine VMs
+- vagrant == 2.2.9 with vagrant-libvirt plugin >= 0.1.2 for running the switch and machine VMs
 - docker and docker-compose for using containerized `ansible` and `metalctl` and `helm`
 - kvm as hypervisor for the VMs
 - [ovmf](https://wiki.ubuntu.com/UEFI/OVMF) to have a uefi firmware for virtual machines
-- [kind](https://github.com/kubernetes-sigs/kind/releases) >= 0.7.0 to start the metal control-plane on a kubernetes cluster
+- [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.8.1 to start the metal control-plane on a kubernetes cluster v1.18.2
 - (optional) haveged to have enough random entropy - only needed if the PXE process does not work
 
 Known limitations:
