@@ -6,6 +6,7 @@ metal_api_replicas: 1
 metal_api_view_key: metal-view
 metal_api_edit_key: metal-edit
 metal_api_admin_key: metal-admin
+
 metal_api_sizes:
 - id: v1-small-x86
   name: v1-small-x86
@@ -20,15 +21,17 @@ metal_api_sizes:
   - type: storage
     min: "{{ '1GB' | humanfriendly }}"
     max: "{{ '10GB' | humanfriendly }}"
+
 metal_api_partitions:
   - id: vagrant
     name: Vagrant Lab
     description: The vagrant lab
     bootconfig:
-      kernelurl: https://images.metal-pod.io/metal-kernel/mainline/metal-hammer-kernel
+      kernelurl: https://github.com/metal-stack/kernel/releases/download/5.4.42-25/metal-kernel
       imageurl: "{{ metal_hammer_image_url }}"
       commandline: console=ttyS0,115200n8 ip=dhcp carrier_timeout=10
     privatenetworkprefixlength: 22
+
 metal_api_networks:
 - id: tenant-super-network-vagrant
   name: "Project Super Network"
@@ -66,6 +69,7 @@ metal_masterdata_api_tenants:
     group_config:
       namespace_max_length: 20
   description: FI-TS tenant, which is provider
+
 metal_masterdata_api_projects:
 - meta:
     id: 00000000-0000-0000-0000-000000000001

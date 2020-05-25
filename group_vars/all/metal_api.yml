@@ -1,22 +1,16 @@
 ---
 # can be overriden of course, these are the global defaults...
 metal_api_images:
-- id: firewall-2
-  name: Firewall 2
-  description: Firewall 2
-  url: http://images.metal-pod.io/metal-os/firewall/2.0-ubuntu/20200317/img.tar.lz4
+- id: firewall-ubuntu-2.0.20200331
+  name: Firewall 2 Ubuntu 20200331
+  description: Firewall 2 Ubuntu 20200331
+  url: http://images.metal-pod.io/metal-os/firewall/2.0-ubuntu/20200331/img.tar.lz4
   features:
     - firewall
-- id: ubuntu-19.10
-  name: Ubuntu 19.10
-  description: Ubuntu 19.10
-  url: http://images.metal-pod.io/metal-os/ubuntu/19.10/20200317/img.tar.lz4
-  features:
-    - machine
-- id: ubuntu-20.04
-  name: Ubuntu 20.04
-  description: Ubuntu 20.04
-  url: http://images.metal-pod.io/metal-os/ubuntu/20.04/20200317/img.tar.lz4
+- id: ubuntu-19.10.20200331
+  name: Ubuntu 19.10 20200331
+  description: Ubuntu 19.10 20200331
+  url: http://images.metal-pod.io/metal-os/ubuntu/19.10/20200331/img.tar.lz4
   features:
     - machine
 
