@@ -226,7 +226,7 @@ spec:
             - --udp-services-configmap=$(POD_NAMESPACE)/udp-services
             - --publish-service=$(POD_NAMESPACE)/ingress-nginx
             - --annotations-prefix=nginx.ingress.kubernetes.io
-            # otherwise it will try 443 anyway...
+            - --http-port={{ ingress_http_port }}
             - --https-port={{ ingress_https_port }}
           securityContext:
             allowPrivilegeEscalation: true
