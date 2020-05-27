@@ -20,34 +20,13 @@ Known limitations:
  ```bash
 # Install vagrant
 wget https://releases.hashicorp.com/vagrant/2.2.7/vagrant_2.2.7_x86_64.deb
-apt-get install ./vagrant_2.2.7_x86_64.deb docker.io qemu-kvm virt-manager ovmf net-tools libvirt-dev
+apt-get install ./vagrant_2.2.7_x86_64.deb docker.io qemu-kvm virt-manager ovmf net-tools libvirt-dev bridge-utils
 
 # Ensure that your user is member of the group "libvirt"
 usermod -G libvirt -a ${USER}
 
 # Install libvirt plugin for vagrant
 vagrant plugin install vagrant-libvirt
-
-# Configure virtual network:
-echo "<network>
-    <name>vagrant-libvirt</name>
-    <forward mode='nat'>
-        <nat>
-            <port start='1024' end='65535'/>
-        </nat>
-    </forward>
-    <bridge name='virbr1' stp='on' delay='0'/>
-    <domain name='vagrant-libvirt'/>
-    <ip address='192.168.121.1' netmask='255.255.255.0'>
-        <dhcp>
-            <range start='192.168.121.128' end='192.168.121.254'/>
-        </dhcp>
-    </ip>
-</network>" > vagrant-libvirt.xml
-virsh net-define vagrant-libvirt.xml
-virsh net-autostart vagrant-libvirt
-virsh net-start vagrant-libvirt
-rm -f vagrant-libvirt.xml
 
 # Install kind from https://github.com/kubernetes-sigs/kind/releases
 ```

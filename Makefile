@@ -3,7 +3,7 @@
 KUBECONFIG := $(shell pwd)/.kubeconfig
 
 .PHONY: up
-up: bake env
+up: ensure-bridge bake env
 	docker-compose up
 	vagrant up machine01 machine02
 
@@ -12,6 +12,31 @@ restart: down up
 
 .PHONY: down
 down: cleanup
+
+.PHONY: ensure-bridge
+ensure-bridge:
+	@virsh net-info vagrant-libvirt >/dev/null 2>&1 || ( \
+	$(eval cnt = $(shell brctl show | grep virbr | wc -l)) \
+	echo "<network> \
+	    <name>vagrant-libvirt</name> \
+	    <forward mode='nat'> \
+	        <nat> \
+	            <port start='1024' end='65535'/> \
+	        </nat> \
+	    </forward> \
+	    <bridge name='virbr$(cnt)' stp='on' delay='0'/> \
+	    <domain name='vagrant-libvirt'/> \
+	    <ip address='192.168.121.1' netmask='255.255.255.0'> \
+	        <dhcp> \
+	            <range start='192.168.121.128' end='192.168.121.254'/> \
+	        </dhcp> \
+	    </ip> \
+	</network>" > vagrant-libvirt.xml && \
+	virsh net-define vagrant-libvirt.xml && \
+	virsh net-autostart vagrant-libvirt && \
+	virsh net-start vagrant-libvirt && \
+	rm -f vagrant-libvirt.xml \
+	)
 
 .PHONY: bake
 bake: control-plane-bake partition-bake
