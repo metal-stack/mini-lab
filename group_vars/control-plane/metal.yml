@@ -7,6 +7,20 @@ metal_api_view_key: metal-view
 metal_api_edit_key: metal-edit
 metal_api_admin_key: metal-admin
 
+metal_api_images:
+- id: firewall-ubuntu-2.0.20200331
+  name: Firewall 2 Ubuntu 20200331
+  description: Firewall 2 Ubuntu 20200331
+  url: http://images.metal-pod.io/metal-os/firewall/2.0-ubuntu/20200331/img.tar.lz4
+  features:
+    - firewall
+- id: ubuntu-19.10.20200331
+  name: Ubuntu 19.10 20200331
+  description: Ubuntu 19.10 20200331
+  url: http://images.metal-pod.io/metal-os/ubuntu/19.10/20200331/img.tar.lz4
+  features:
+    - machine
+
 metal_api_sizes:
 - id: v1-small-x86
   name: v1-small-x86
@@ -43,6 +57,8 @@ metal_api_networks:
   partitionid: "vagrant"
   prefixes:
   - 10.0.0.0/16
+
+metal_api_nsq_tls_enabled: false
 
 metal_masterdata_api_tls_ca: "{{ lookup('file', 'certs/ca.pem') }}"
 metal_masterdata_api_tls_cert: "{{ lookup('file', 'certs/masterdata-api/server.pem') }}"

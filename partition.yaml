@@ -25,6 +25,7 @@
       tags: docker-on-cumulus
     - name: metal-roles/partition/roles/dhcp
       tags: dhcp
+      when: "'leaf01' == inventory_hostname"
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
     - name: metal-roles/partition/roles/pixiecore
