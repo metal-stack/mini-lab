@@ -1,5 +1,5 @@
 ---
-timezone: Europe/Berlin
+partition_timezone: Europe/Berlin
 environment_name: vagrant
 
 partition_id: vagrant
@@ -12,23 +12,23 @@ mtu:
   vxlan: 9216
   default: 9000
 
-nameservers:
+partition_nameservers:
   - 192.168.121.1
   - 1.1.1.1
   - 1.0.0.1
 
 mgmt_gateway: 192.168.121.1
 
-# api_addr points to a domain name that in case of Vagrant contains the metal-api box IP.
+# partition_metal_api_addr points to a domain name that in case of Vagrant contains the metal-api box IP.
 # This box IP is not known in advance and must be provided during runtime (e.g. via --extra-vars).
-api_addr: "{{ api_dns }}"
-api_port: 8080
-api_protocol: http
-api_basepath: /metal/
-api_nsq_lookupd: "{{ api_dns }}:4161"
+partition_metal_api_addr: "{{ api_dns }}"
+partition_metal_api_port: 8080
+partition_metal_api_protocol: http
+partition_metal_api_basepath: /metal/
+metal_core_api_nsq_lookupd: "{{ api_dns }}:4161"
 
 fluentd_logging: false
-fluentd_endpoint: "{{ api_addr }}:24224"
+fluentd_endpoint: "{{ partition_metal_api_addr }}:24224"
 
 metal_core_hmac_key: metal-edit
 metal_core_change_boot_order: false
@@ -42,4 +42,4 @@ control_planes:
   vagrant-lab:
     name: vagrant
 
-reconfigure_switch: true
+metal_core_reconfigure_switch: true
