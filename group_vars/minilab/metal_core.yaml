@@ -10,15 +10,15 @@ mgmt_gateway: 192.168.121.1
 
 public_dns: 192.168.121.1.xip.io
 api_dns: "api.{{ public_dns }}"
-api_addr: "{{ api_dns }}"
-api_port: 8080
-api_protocol: http
-api_basepath: /metal/
-api_nsq_lookupd: "{{ public_dns }}:4161"
+partition_metal_api_addr: "{{ api_dns }}"
+partition_metal_api_port: 8080
+partition_metal_api_protocol: http
+partition_metal_api_basepath: /metal/
+metal_core_api_nsq_lookupd: "{{ public_dns }}:4161"
 
 control_planes:
   vagrant-lab:
     name: vagrant
 
 dev_setup: true
-reconfigure_switch: true
+metal_core_reconfigure_switch: true

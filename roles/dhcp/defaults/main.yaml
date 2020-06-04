@@ -1,4 +1,0 @@
----
-dhcp_public_dns_servers_fallback:
-  - 1.1.1.1
-  - 8.8.8.8
