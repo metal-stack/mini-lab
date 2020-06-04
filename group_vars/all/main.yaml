@@ -25,7 +25,7 @@ partition_metal_api_addr: "{{ api_dns }}"
 partition_metal_api_port: 8080
 partition_metal_api_protocol: http
 partition_metal_api_basepath: /metal/
-api_nsq_lookupd: "{{ api_dns }}:4161"
+metal_core_api_nsq_lookupd: "{{ api_dns }}:4161"
 
 fluentd_logging: false
 fluentd_endpoint: "{{ partition_metal_api_addr }}:24224"
@@ -42,4 +42,4 @@ control_planes:
   vagrant-lab:
     name: vagrant
 
-reconfigure_switch: true
+metal_core_reconfigure_switch: true
