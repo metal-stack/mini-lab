@@ -26,7 +26,7 @@ services:
           ansible-galaxy install --ignore-errors -r requirements.yaml
           ansible-playbook \
             -i inventories/control-plane.yaml \
-            control-plane.yaml
+            deploy_control_plane.yaml
 
   partition:
     image: metalstack/metal-deployment-base:v0.0.5
@@ -55,7 +55,7 @@ services:
           ansible-playbook \
             -i inventories/partition-static.yaml \
             -i ~/.ansible/roles/ansible-common/inventory/vagrant \
-            partition.yaml
+            deploy_partition.yaml
 
   metalctl:
     image: metalstack/metalctl:${METALCTL_IMAGE_TAG}

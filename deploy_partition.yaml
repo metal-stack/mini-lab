@@ -1,5 +1,20 @@
 ---
-- name: deploy leaves
+- name: pre-deployment checks
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: get vagrant version
+      command: vagrant --version
+      register: result
+
+    - name: check vagrant version
+      fail:
+        msg: "Vagrant version of the host system does not match vagrant version in the deployment image"
+      when:
+        - result.stdout.split(' ')[1] != (lookup('file', playbook_dir + '/.vagrant/bundler/global.sol') | from_json).vagrant_version
+
+- name: deploy docker
   hosts: leaves
   gather_facts: true
   pre_tasks:
@@ -17,15 +32,23 @@
         path: /.ansible_vagrant_vm_rebooted
         state: touch
   roles:
-    - name: ansible-common
     - name: metal-roles/partition/roles/leaf
       tags: leaf
     - name: registry-certs
     - name: metal-roles/partition/roles/docker-on-cumulus
       tags: docker-on-cumulus
+
+- name: deploy dhcp server
+  hosts: leaf01
+  roles:
     - name: metal-roles/partition/roles/dhcp
       tags: dhcp
-      when: "'leaf01' == inventory_hostname"
+
+- name: deploy partition
+  hosts: leaves
+  roles:
+    - name: ansible-common
+      tags: always
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
     - name: metal-roles/partition/roles/pixiecore

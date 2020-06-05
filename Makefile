@@ -4,8 +4,7 @@ KUBECONFIG := $(shell pwd)/.kubeconfig
 
 .PHONY: up
 up: bake env
-	docker-compose up
-	vagrant up machine01 machine02
+	docker-compose up --remove-orphans --force-recreate control-plane partition && vagrant up machine01 machine02
 
 .PHONY: restart
 restart: down up
@@ -24,7 +23,7 @@ control-plane-bake:
 
 .PHONY: control-plane
 control-plane: control-plane-bake
-	docker-compose up control-plane
+	docker-compose up --remove-orphans --force-recreate control-plane
 
 .PHONY: partition-bake
 partition-bake:
@@ -32,8 +31,7 @@ partition-bake:
 
 .PHONY: partition
 partition: partition-bake
-	docker-compose up partition
-	vagrant up machine01 machine02
+	docker-compose up --abort-on-container-exit --remove-orphans --force-recreate partition && vagrant up machine01 machine02
 
 .PHONY: cleanup
 cleanup: caddy-down registry-down
