@@ -110,7 +110,7 @@ ls:
 
 .PHONY: env
 env:
-	$(eval tag = $(shell cat group_vars/minilab/images.yaml | grep metal_metalctl_image_tag: | cut -d: -f2 | sed 's/ //g'))
+	$(eval tag = $(shell cat group_vars/control-plane/images.yaml | grep metal_metalctl_image_tag: | cut -d: -f2 | sed 's/ //g'))
 	@echo "METALCTL_IMAGE_TAG=$(tag)" > .env
 	@virsh net-autostart vagrant-libvirt >/dev/null
 

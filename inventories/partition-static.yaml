@@ -1,4 +1,7 @@
 ---
+# this is the static part of the partition inventory
+# the connection details for leaf vms are provided dynamically
+# by the vagrant inventory plugin
 partition:
   hosts:
     localhost:

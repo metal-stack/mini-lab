@@ -23,9 +23,9 @@ services:
       - /bin/bash
       - -ce
       - |
-          ansible-galaxy install --ignore-errors -r control-plane/requirements.yaml
+          ansible-galaxy install --ignore-errors -r requirements.yaml
           ansible-playbook \
-            -i control-plane/inventory.yaml \
+            -i inventories/control-plane.yaml \
             control-plane.yaml
 
   partition:
@@ -51,9 +51,9 @@ services:
       - /bin/bash
       - -ce
       - |
-          ansible-galaxy install --ignore-errors -r partition/requirements.yaml
+          ansible-galaxy install --ignore-errors -r requirements.yaml
           ansible-playbook \
-            -i partition/static_inventory.yaml \
+            -i inventories/partition-static.yaml \
             -i ~/.ansible/roles/ansible-common/inventory/vagrant \
             partition.yaml
 
