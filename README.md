@@ -25,17 +25,6 @@ Small lab to setup the `metal-stack` locally. Starts two leaf switches and the [
 - the lab creates a virtual network 192.168.121.0/24 on your host machine, this hopefully does not overlap with other networks you have
 - (optional) haveged to have enough random entropy - only needed if the PXE process does not work
 
-The following ports are getting used:
-
-| Port | Bind Address  | Description                        |
-|:----:|:-------------:|:---------------------------------- |
-| 8443 | 0.0.0.0       | kube-apiserver of the kind cluster |
-| 4443 | 192.168.121.1 | HTTPS ingress                      |
-| 4150 | 192.168.121.1 | nsqd                               |
-| 4161 | 192.168.121.1 | nsq-lookupd                        |
-| 5222 | 192.168.121.1 | metal-console                      |
-| 8080 | 192.168.121.1 | HTTP ingress                       |
-
 Here is some code that should help you setting up most of the requirements:
 
  ```bash
@@ -51,6 +40,17 @@ vagrant plugin install vagrant-libvirt
 
 # Install kind from https://github.com/kubernetes-sigs/kind/releases
 ```
+
+The following ports are getting used:
+
+| Port | Bind Address  | Description                        |
+|:----:|:-------------:|:---------------------------------- |
+| 8443 | 0.0.0.0       | kube-apiserver of the kind cluster |
+| 4443 | 192.168.121.1 | HTTPS ingress                      |
+| 4150 | 192.168.121.1 | nsqd                               |
+| 4161 | 192.168.121.1 | nsq-lookupd                        |
+| 5222 | 192.168.121.1 | metal-console                      |
+| 8080 | 192.168.121.1 | HTTP ingress                       |
 
 ## Known Limitations
 
