@@ -2,6 +2,17 @@
 
 Small lab to setup the `metal-stack` locally. Starts two leaf switches and the [metal-api](https://github.com/metal-stack/metal-api) to try [metalctl](https://github.com/metal-stack/metalctl) and the creation of machines.
 
+<!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+
+- [Requirements](#requirements)
+- [Known Limitations](#known-limitations)
+- [Try it out](#try-it-out)
+	- [Reinstall machine](#reinstall-machine)
+	- [Remove machine](#remove-machine)
+- [Development of metal-api, metal-hammer and metal-core](#development-of-metal-api-metal-hammer-and-metal-core)
+
+<!-- /TOC -->
+
 ## Requirements
 
 - Linux
@@ -137,7 +148,7 @@ To remove the kind cluster and the vagrant boxes, run
 make cleanup
 ```
 
-## Reinstall machine
+### Reinstall machine
 
 Reinstall a machine with
 
@@ -147,7 +158,7 @@ docker-compose run metalctl machine reinstall \
         e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 ```
 
-## Remove machine
+### Remove machine
 
 Remove a machine with
 
