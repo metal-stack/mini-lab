@@ -2,26 +2,24 @@
 
 Small lab to setup the `metal-stack` locally. Starts two leaf switches and the [metal-api](https://github.com/metal-stack/metal-api) to try [metalctl](https://github.com/metal-stack/metalctl) and the creation of machines.
 
-This requires:
+## Requirements
 
+- Linux
 - vagrant == 2.2.9 with vagrant-libvirt plugin >= 0.1.2 for running the switch and machine VMs
 - docker and docker-compose for using containerized `ansible` and `metalctl` and `helm`
 - kvm as hypervisor for the VMs
 - [ovmf](https://wiki.ubuntu.com/UEFI/OVMF) to have a uefi firmware for virtual machines
 - [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.8.1 to start the metal control-plane on a kubernetes cluster v1.18.2
-- the following ports need to be free on your host machine
+- the following ports have to be free on your host machine
   - 4443 (HTTPS ingress, actually unused)
   - 4150 (nsqd)
   - 4161 (nsq-lookupd)
   - 5222 (metal-console)
   - 8080 (HTTP ingress)
+- the lab creates a virtual network 192.168.121.0/24 on your host machine, this hopefully does not overlap with other networks you have
 - (optional) haveged to have enough random entropy - only needed if the PXE process does not work
 
-Known limitations:
-
-- to keep the demo small there is no EVPN
-- machine restart and destroy does not work becaues we can not change the boot order via IPMI in the lab easily (virtual-bmc could, but it's buggy)
-- login to the machines is only possible with virsh console
+Here is some code that should help you setting up most of the requirements:
 
  ```bash
 # Install vagrant
@@ -36,6 +34,12 @@ vagrant plugin install vagrant-libvirt
 
 # Install kind from https://github.com/kubernetes-sigs/kind/releases
 ```
+
+## Known Limitations
+
+- to keep the demo small there is no EVPN
+- machine restart and destroy does not work because we cannot change the boot order via IPMI in the lab easily (virtual-bmc could, but it's buggy)
+- login to the machines is only possible with virsh console
 
 ## Try it out
 
