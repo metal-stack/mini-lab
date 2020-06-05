@@ -1,7 +1,7 @@
 ---
 - src: https://github.com/metal-stack/ansible-common.git
   name: ansible-common
-  version: retry-service-start
+  version: v0.5.3
 - src: https://github.com/metal-stack/metal-roles.git
   name: metal-roles
-  version: further-refactoring
+  version: v0.2.0
