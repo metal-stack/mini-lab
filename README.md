@@ -1,6 +1,8 @@
 # mini-lab
 
-Small lab to setup the `metal-stack` locally. Starts two leaf switches and the [metal-api](https://github.com/metal-stack/metal-api) to try [metalctl](https://github.com/metal-stack/metalctl) and the creation of machines.
+The mini-lab is a small, virtual setup to locally run the metal-stack. It deploys a partition containing two leaf switches and the metal control plane. With [metalctl](https://github.com/metal-stack/metalctl) you will be able to try out machine allocation.
+
+This project can also be used as a template for writing your own metal-stack deployment.
 
 <!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
