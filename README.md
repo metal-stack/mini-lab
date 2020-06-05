@@ -19,8 +19,8 @@ Known limitations:
 
  ```bash
 # Install vagrant
-wget https://releases.hashicorp.com/vagrant/2.2.7/vagrant_2.2.7_x86_64.deb
-apt-get install ./vagrant_2.2.7_x86_64.deb docker.io qemu-kvm virt-manager ovmf net-tools libvirt-dev
+wget https://releases.hashicorp.com/vagrant/2.2.9/vagrant_2.2.9_x86_64.deb
+apt-get install ./vagrant_2.2.9_x86_64.deb docker.io qemu-kvm virt-manager ovmf net-tools libvirt-dev
 
 # Ensure that your user is member of the group "libvirt"
 usermod -G libvirt -a ${USER}
@@ -36,7 +36,7 @@ vagrant plugin install vagrant-libvirt
 Start the mini-lab with a kind cluster, a metal-api instance as well as some vagrant VMs with two leaf switches and two machine skeletons.
 
 ```bash
-make up
+make
 ```
 
 Two machines in status `PXE booting` are visible with `metalctl machine ls`
