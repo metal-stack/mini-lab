@@ -5,19 +5,25 @@ Small lab to setup the `metal-stack` locally. Starts two leaf switches and the [
 ## Requirements
 
 - Linux
-- vagrant == 2.2.9 with vagrant-libvirt plugin >= 0.1.2 for running the switch and machine VMs
-- docker and docker-compose for using containerized `ansible` and `metalctl` and `helm`
+- Vagrant == 2.2.9 with vagrant-libvirt plugin >= 0.1.2 (for running the switch and machine VMs)
+- docker >= 18.09 (for using our deployment base image)
+- docker-compose >= 1.25.4 (for ease-of-use and parallelizing control plane and partition deployment)
 - kvm as hypervisor for the VMs
 - [ovmf](https://wiki.ubuntu.com/UEFI/OVMF) to have a uefi firmware for virtual machines
-- [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.8.1 to start the metal control-plane on a kubernetes cluster v1.18.2
-- the following ports have to be free on your host machine
-  - 4443 (HTTPS ingress, actually unused)
-  - 4150 (nsqd)
-  - 4161 (nsq-lookupd)
-  - 5222 (metal-console)
-  - 8080 (HTTP ingress)
+- [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.8.1 (for hosting the metal control plane on a kubernetes cluster v1.18.2)
 - the lab creates a virtual network 192.168.121.0/24 on your host machine, this hopefully does not overlap with other networks you have
 - (optional) haveged to have enough random entropy - only needed if the PXE process does not work
+
+The following ports are getting used:
+
+| Port | Bind Address  | Description                        |
+|:----:|:-------------:|:---------------------------------- |
+| 8443 | 0.0.0.0       | kube-apiserver of the kind cluster |
+| 4443 | 192.168.121.1 | HTTPS ingress                      |
+| 4150 | 192.168.121.1 | nsqd                               |
+| 4161 | 192.168.121.1 | nsq-lookupd                        |
+| 5222 | 192.168.121.1 | metal-console                      |
+| 8080 | 192.168.121.1 | HTTP ingress                       |
 
 Here is some code that should help you setting up most of the requirements:
 
