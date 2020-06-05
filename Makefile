@@ -31,7 +31,7 @@ partition-bake:
 
 .PHONY: partition
 partition: partition-bake
-	docker-compose up --abort-on-container-exit --remove-orphans --force-recreate partition && vagrant up machine01 machine02
+	docker-compose up --remove-orphans --force-recreate partition && vagrant up machine01 machine02
 
 .PHONY: cleanup
 cleanup: caddy-down registry-down
