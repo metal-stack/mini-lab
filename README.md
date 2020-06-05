@@ -1,8 +1,8 @@
 # mini-lab
 
-The mini-lab is a small, virtual setup to locally run the metal-stack. It deploys a partition containing two leaf switches and the metal control plane. With [metalctl](https://github.com/metal-stack/metalctl) you will be able to try out machine allocation.
+The mini-lab is a small, virtual setup to locally run the metal-stack. It deploys the metal control plane and a partition with two simulated leaf switches. The lab can be used for trying out metal-stack, demonstration purposes or development.
 
-This project can also be used as a template for writing your own metal-stack deployment.
+This project can also be used as a template for writing your own metal-stack deployments.
 
 <!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
@@ -19,11 +19,11 @@ This project can also be used as a template for writing your own metal-stack dep
 
 - Linux
 - Vagrant == 2.2.9 with vagrant-libvirt plugin >= 0.1.2 (for running the switch and machine VMs)
-- docker >= 18.09 (for using our deployment base image)
-- docker-compose >= 1.25.4 (for ease-of-use and parallelizing control plane and partition deployment)
 - kvm as hypervisor for the VMs
-- [ovmf](https://wiki.ubuntu.com/UEFI/OVMF) to have a uefi firmware for virtual machines
+- docker >= 18.09 (for using kind and our deployment base image)
+- docker-compose >= 1.25.4 (for ease of use and for parallelizing control plane and partition deployment)
 - [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.8.1 (for hosting the metal control plane on a kubernetes cluster v1.18.2)
+- [ovmf](https://wiki.ubuntu.com/UEFI/OVMF) to have a uefi firmware for virtual machines
 - the lab creates a virtual network 192.168.121.0/24 on your host machine, this hopefully does not overlap with other networks you have
 - (optional) haveged to have enough random entropy - only needed if the PXE process does not work
 
