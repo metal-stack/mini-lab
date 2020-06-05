@@ -9,6 +9,12 @@ This requires:
 - kvm as hypervisor for the VMs
 - [ovmf](https://wiki.ubuntu.com/UEFI/OVMF) to have a uefi firmware for virtual machines
 - [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.8.1 to start the metal control-plane on a kubernetes cluster v1.18.2
+- the following ports need to be free on your host machine
+  - 4443 (HTTPS ingress, actually unused)
+  - 4150 (nsqd)
+  - 4161 (nsq-lookupd)
+  - 5222 (metal-console)
+  - 8080 (HTTP ingress)
 - (optional) haveged to have enough random entropy - only needed if the PXE process does not work
 
 Known limitations:
