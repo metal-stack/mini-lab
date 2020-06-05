@@ -18,10 +18,10 @@ This project can also be used as a template for writing your own metal-stack dep
 ## Requirements
 
 - Linux
-- Vagrant == 2.2.9 with vagrant-libvirt plugin >= 0.1.2 (for running the switch and machine VMs)
+- [Vagrant](https://www.vagrantup.com/) == 2.2.9 with vagrant-libvirt plugin >= 0.1.2 (for running the switch and machine VMs)
 - kvm as hypervisor for the VMs
-- docker >= 18.09 (for using kind and our deployment base image)
-- docker-compose >= 1.25.4 (for ease of use and for parallelizing control plane and partition deployment)
+- [docker](https://www.docker.com/) >= 18.09 (for using kind and our deployment base image)
+- [docker-compose](https://docs.docker.com/compose/) >= 1.25.4 (for ease of use and for parallelizing control plane and partition deployment)
 - [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.8.1 (for hosting the metal control plane on a kubernetes cluster v1.18.2)
 - [ovmf](https://wiki.ubuntu.com/UEFI/OVMF) to have a uefi firmware for virtual machines
 - the lab creates a virtual network 192.168.121.0/24 on your host machine, this hopefully does not overlap with other networks you have
@@ -43,7 +43,7 @@ vagrant plugin install vagrant-libvirt
 # Install kind from https://github.com/kubernetes-sigs/kind/releases
 ```
 
-The following ports are getting used:
+The following ports are getting used statically:
 
 | Port | Bind Address  | Description                        |
 |:----:|:-------------:|:---------------------------------- |
