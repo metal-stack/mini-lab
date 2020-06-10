@@ -2,16 +2,19 @@
 
 The mini-lab is a small, virtual setup to locally run the metal-stack. It deploys the metal control plane and a partition with two simulated leaf switches. The lab can be used for trying out metal-stack, demonstration purposes or development.
 
+![overview components](docs/overview.png)
+
 This project can also be used as a template for writing your own metal-stack deployments.
 
 <!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
-- [Requirements](#requirements)
-- [Known Limitations](#known-limitations)
-- [Try it out](#try-it-out)
-	- [Reinstall machine](#reinstall-machine)
-	- [Remove machine](#remove-machine)
-- [Development of metal-api, metal-hammer and metal-core](#development-of-metal-api-metal-hammer-and-metal-core)
+- [mini-lab](#mini-lab)
+  - [Requirements](#requirements)
+  - [Known Limitations](#known-limitations)
+  - [Try it out](#try-it-out)
+    - [Reinstall machine](#reinstall-machine)
+    - [Remove machine](#remove-machine)
+  - [Development of metal-api, metal-hammer and metal-core](#development-of-metal-api-metal-hammer-and-metal-core)
 
 <!-- /TOC -->
 
@@ -25,7 +28,7 @@ This project can also be used as a template for writing your own metal-stack dep
 - [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.8.1 (for hosting the metal control plane on a kubernetes cluster v1.18.2)
 - [ovmf](https://wiki.ubuntu.com/UEFI/OVMF) to have a uefi firmware for virtual machines
 - the lab creates a virtual network 192.168.121.0/24 on your host machine, this hopefully does not overlap with other networks you have
-- (optional) haveged to have enough random entropy - only needed if the PXE process does not work
+- (recommend) haveged to have enough random entropy - only needed if the PXE process does not work
 
 Here is some code that should help you setting up most of the requirements:
 
