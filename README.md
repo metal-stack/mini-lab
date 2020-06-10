@@ -28,14 +28,14 @@ This project can also be used as a template for writing your own metal-stack dep
 - [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.8.1 (for hosting the metal control plane on a kubernetes cluster v1.18.2)
 - [ovmf](https://wiki.ubuntu.com/UEFI/OVMF) to have a uefi firmware for virtual machines
 - the lab creates a virtual network 192.168.121.0/24 on your host machine, this hopefully does not overlap with other networks you have
-- (recommend) haveged to have enough random entropy - only needed if the PXE process does not work
+- (recommended) haveged to have enough random entropy (only needed if the PXE process does not work)
 
 Here is some code that should help you setting up most of the requirements:
 
  ```bash
 # Install vagrant
 wget https://releases.hashicorp.com/vagrant/2.2.9/vagrant_2.2.9_x86_64.deb
-apt-get install ./vagrant_2.2.9_x86_64.deb docker.io qemu-kvm virt-manager ovmf net-tools libvirt-dev
+apt-get install ./vagrant_2.2.9_x86_64.deb docker.io qemu-kvm virt-manager ovmf net-tools libvirt-dev haveged
 
 # Ensure that your user is member of the group "libvirt"
 usermod -G libvirt -a ${USER}
