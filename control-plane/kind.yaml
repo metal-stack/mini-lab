@@ -9,7 +9,7 @@ nodes:
   - containerPort: 4443
     hostPort: 4443
     listenAddress: 192.168.121.1
-  - containerPort: 80
+  - containerPort: 8000
     hostPort: 8080
     listenAddress: 192.168.121.1
   - containerPort: 4150

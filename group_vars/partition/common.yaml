@@ -1,0 +1,11 @@
+---
+metal_partition_timezone: Europe/Berlin
+metal_partition_id: vagrant
+
+metal_partition_metal_api_protocol: http
+metal_partition_metal_api_addr: api.192.168.121.1.xip.io
+metal_partition_metal_api_port: 8080
+metal_partition_metal_api_basepath: /metal/
+metal_partition_metal_api_hmac_edit_key: metal-edit
+
+metal_partition_mgmt_gateway: 192.168.121.1
