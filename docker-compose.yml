@@ -61,6 +61,6 @@ services:
     image: metalstack/metalctl:${METALCTL_IMAGE_TAG}
     environment:
       - METALCTL_HMAC=metal-admin
-      - METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal
+      - METALCTL_URL=http://api.0.0.0.0.xip.io:8080/metal
     network_mode: host
     command: --version

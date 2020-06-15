@@ -46,6 +46,22 @@
 
 - name: deploy metal-core and pixiecore
   hosts: leaves
+  pre_tasks:
+    - name: add docker registry to hosts
+      lineinfile:
+        path: /etc/hosts
+        regexp: '{{ item.regex }}'
+        line: '{{ item.ip }} {{ item.name }}'
+        owner: root
+        group: root
+        mode: 0644
+      with_items:
+        - name: 0.0.0.0.xip.io
+          ip: "{{ metal_partition_mgmt_gateway }}"
+          regex: "{{ '0.0.0.0.xip.io' | regex_escape() }}"
+        - name: api.0.0.0.0.xip.io
+          ip: "{{ metal_partition_mgmt_gateway }}"
+          regex: "{{ 'api.0.0.0.0.xip.io' | regex_escape() }}"
   roles:
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core

@@ -1,6 +1,6 @@
 ---
 metal_set_resource_limits: no
-metal_check_api_health_endpoint: http://api.192.168.121.1.xip.io:8080/metal/v1/health
+metal_check_api_health_endpoint: http://api.0.0.0.0.xip.io:8080/metal/v1/health
 
 metal_api_replicas: 1
 metal_api_view_key: metal-view

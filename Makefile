@@ -17,9 +17,12 @@ bake: control-plane-bake partition-bake
 
 .PHONY: control-plane-bake
 control-plane-bake:
-	kind create cluster \
-		--config control-plane/kind.yaml \
-		--kubeconfig $(KUBECONFIG) || true
+	@if ! which kind > /dev/null; then echo "kind needs to be installed"; exit 1; fi
+	@if ! kind get clusters | grep metal-control-plane > /dev/null; then \
+		kind create cluster \
+		  --name metal-control-plane \
+			--config control-plane/kind.yaml \
+			--kubeconfig $(KUBECONFIG); fi
 
 .PHONY: control-plane
 control-plane: control-plane-bake
@@ -36,15 +39,14 @@ partition: partition-bake
 .PHONY: cleanup
 cleanup: caddy-down registry-down
 	vagrant destroy -f --parallel || true
-	kind delete cluster
+	kind delete cluster --name metal-control-plane
 	docker-compose down
 	rm -f $(KUBECONFIG)
 	rm -f .ansible_vagrant_cache
 
-
 .PHONY: dev-env
 dev-env:
-	@echo "export METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal"
+	@echo "export METALCTL_URL=http://api.0.0.0.0.xip.io:8080/metal"
 	@echo "export METALCTL_HMAC=metal-admin"
 	@echo "export KUBECONFIG=$(KUBECONFIG)"
 
