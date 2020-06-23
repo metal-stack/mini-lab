@@ -4,4 +4,4 @@
   version: v0.5.3
 - src: https://github.com/metal-stack/metal-roles.git
   name: metal-roles
-  version: consider-hosts-file-resolution
+  version: v0.2.1
