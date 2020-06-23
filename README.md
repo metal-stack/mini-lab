@@ -103,18 +103,15 @@ Create a machine with
 make machine
 ```
 
-or the hard way with
+or __as alternative__ the hard way with
 
 ```bash
 docker-compose run metalctl network allocate \
         --partition vagrant \
         --project 00000000-0000-0000-0000-000000000000 \
         --name vagrant
-```
 
-Lookup the network ID and run
-
-```bash
+# Lookup the network ID and run
 docker-compose run metalctl machine create \
         --description test \
         --name machine \
@@ -129,7 +126,7 @@ docker-compose run metalctl machine create \
 See the installation process in action
 
 ```bash
-virsh console metal_machine01/02
+virsh console metalmachine01/02
 ...
 Ubuntu 19.10 machine ttyS0
 
