@@ -33,12 +33,18 @@ This project can also be used as a template for writing your own metal-stack dep
 Here is some code that should help you setting up most of the requirements:
 
  ```bash
-# Install vagrant
+# Install Docker
+curl -fsSL https://get.docker.com | sh
+# if you want to be on the safe side, follow the original installation
+# instructions at https://docs.docker.com/engine/install/ubuntu/
+
+# Install vagrant and other stuff
 wget https://releases.hashicorp.com/vagrant/2.2.9/vagrant_2.2.9_x86_64.deb
-apt-get install ./vagrant_2.2.9_x86_64.deb docker.io qemu-kvm virt-manager ovmf net-tools libvirt-dev haveged
+sudo apt-get install ./vagrant_2.2.9_x86_64.deb qemu-kvm virt-manager ovmf net-tools libvirt-dev haveged
 
 # Ensure that your user is member of the group "libvirt"
-usermod -G libvirt -a ${USER}
+# possibly you need to login again in order to make this change take effect
+sudo usermod -G libvirt -a ${USER}
 
 # Install libvirt plugin for vagrant
 vagrant plugin install vagrant-libvirt
@@ -48,14 +54,14 @@ vagrant plugin install vagrant-libvirt
 
 The following ports are getting used statically:
 
-| Port | Bind Address  | Description                        |
-|:----:|:-------------:|:---------------------------------- |
-| 8443 | 0.0.0.0       | kube-apiserver of the kind cluster |
-| 4443 | 192.168.121.1 | HTTPS ingress                      |
-| 4150 | 192.168.121.1 | nsqd                               |
-| 4161 | 192.168.121.1 | nsq-lookupd                        |
-| 5222 | 192.168.121.1 | metal-console                      |
-| 8080 | 192.168.121.1 | HTTP ingress                       |
+| Port | Bind Address | Description                        |
+|:----:|:------------ |:---------------------------------- |
+| 8443 |   0.0.0.0    | kube-apiserver of the kind cluster |
+| 4443 |   0.0.0.0    | HTTPS ingress                      |
+| 4150 |   0.0.0.0    | nsqd                               |
+| 4161 |   0.0.0.0    | nsq-lookupd                        |
+| 5222 |   0.0.0.0    | metal-console                      |
+| 8080 |   0.0.0.0    | HTTP ingress                       |
 
 ## Known Limitations
 
@@ -97,18 +103,15 @@ Create a machine with
 make machine
 ```
 
-or the hard way with
+or __as alternative__ the hard way with
 
 ```bash
 docker-compose run metalctl network allocate \
         --partition vagrant \
         --project 00000000-0000-0000-0000-000000000000 \
         --name vagrant
-```
 
-Lookup the network ID and run
-
-```bash
+# Lookup the network ID and run
 docker-compose run metalctl machine create \
         --description test \
         --name machine \
@@ -123,7 +126,7 @@ docker-compose run metalctl machine create \
 See the installation process in action
 
 ```bash
-virsh console metal_machine01/02
+virsh console metalmachine01/02
 ...
 Ubuntu 19.10 machine ttyS0
 
