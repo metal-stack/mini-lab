@@ -123,7 +123,7 @@ dev: cleanup caddy registry build-hammer-initrd build-api-image build-core-image
 
 .PHONY: load-api-image
 load-api-image:
-	kind load docker-image metalstack/metal-api:dev
+	kind --name metal-control-plane load docker-image metalstack/metal-api:dev
 
 .PHONY: registry-down
 registry-down:
