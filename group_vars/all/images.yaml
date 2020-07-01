@@ -1,8 +1,2 @@
 ---
-# release versions are read from external YAML files, which is achieved by
-# using the setup_yaml module (https://github.com/metal-stack/ansible-common)
-setup_yaml:
-  - url: https://raw.githubusercontent.com/metal-stack/releases/v0.1.0/release.yaml
-    meta_var: metal_stack_release
-    # the metal_stack_release variable is provided through role defaults in
-    # https://github.com/metal-stack/metal-roles
+metal_stack_release_version: v0.1.0
