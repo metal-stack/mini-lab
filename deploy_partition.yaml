@@ -63,6 +63,8 @@
           ip: "{{ metal_partition_mgmt_gateway }}"
           regex: "{{ 'api.0.0.0.0.xip.io' | regex_escape() }}"
   roles:
+    - name: ansible-common
+      tags: always
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
     - name: metal-roles/partition/roles/pixiecore
