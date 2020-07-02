@@ -41,7 +41,7 @@ metal_api_partitions:
     name: Vagrant Lab
     description: The vagrant lab
     bootconfig:
-      kernelurl: https://github.com/metal-stack/kernel/releases/download/5.4.42-25/metal-kernel
+      kernelurl: "{{ metal_kernel_url }}"
       imageurl: "{{ metal_hammer_image_url }}"
       commandline: console=ttyS0,115200n8 ip=dhcp carrier_timeout=10
     privatenetworkprefixlength: 22
