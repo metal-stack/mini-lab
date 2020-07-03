@@ -20,9 +20,13 @@ This project can also be used as a template for writing your own metal-stack dep
 
 ## Requirements
 
-- Linux
+- Linux machine with hardware virtualization support
 - [Vagrant](https://www.vagrantup.com/) == 2.2.9 with vagrant-libvirt plugin >= 0.1.2 (for running the switch and machine VMs)
 - kvm as hypervisor for the VMs
+  - Ubuntu 20.04:
+
+        sudo apt install -y qemu qemu-kvm libvirt-daemon bridge-utils virtinst libvirt-dev
+
 - [docker](https://www.docker.com/) >= 18.09 (for using kind and our deployment base image)
 - [docker-compose](https://docs.docker.com/compose/) >= 1.25.4 (for ease of use and for parallelizing control plane and partition deployment)
 - [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.8.1 (for hosting the metal control plane on a kubernetes cluster v1.18.2)
