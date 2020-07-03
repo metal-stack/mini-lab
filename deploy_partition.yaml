@@ -10,9 +10,9 @@
 
     - name: check vagrant version
       fail:
-        msg: "Vagrant version of the host system does not match vagrant version in the deployment image"
+        msg: "Vagrant version of the host system ({{ lookup('file', playbook_dir + '/.vagrant_version_host_system') }}) does not match vagrant version in the deployment image ({{ result.stdout.split(' ')[1] }})"
       when:
-        - result.stdout.split(' ')[1] != (lookup('file', playbook_dir + '/.vagrant/bundler/global.sol') | from_json).vagrant_version
+        - result.stdout.split(' ')[1] != lookup('file', playbook_dir + '/.vagrant_version_host_system')
 
 - name: deploy leaves and docker
   hosts: leaves
