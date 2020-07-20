@@ -3,7 +3,7 @@ version: '3.7'
 
 services:
   control-plane:
-    image: metalstack/metal-deployment-base:v0.0.4
+    image: metalstack/metal-deployment-base:v0.0.5
     container_name: deploy-control-plane
     volumes:
       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
@@ -23,13 +23,13 @@ services:
       - /bin/bash
       - -ce
       - |
-          ansible-galaxy install --ignore-errors -r control-plane/requirements.yaml
+          ansible-galaxy install --ignore-errors -r requirements.yaml
           ansible-playbook \
-            -i control-plane/inventory.yaml \
-            control-plane.yaml
+            -i inventories/control-plane.yaml \
+            deploy_control_plane.yaml
 
   partition:
-    image: metalstack/metal-deployment-base:v0.0.4
+    image: metalstack/metal-deployment-base:v0.0.5
     container_name: deploy-partition
     volumes:
       - ${HOME}/.vagrant.d:/root/.vagrant.d
@@ -51,16 +51,16 @@ services:
       - /bin/bash
       - -ce
       - |
-          ansible-galaxy install --ignore-errors -r partition/requirements.yaml
+          ansible-galaxy install --ignore-errors -r requirements.yaml
           ansible-playbook \
-            -i partition/static_inventory.yaml \
+            -i inventories/partition-static.yaml \
             -i ~/.ansible/roles/ansible-common/inventory/vagrant \
-            partition.yaml
+            deploy_partition.yaml
 
   metalctl:
     image: metalstack/metalctl:${METALCTL_IMAGE_TAG}
     environment:
       - METALCTL_HMAC=metal-admin
-      - METALCTL_URL=http://api.192.168.121.1.xip.io:8080/metal
+      - METALCTL_URL=http://api.0.0.0.0.xip.io:8080/metal
     network_mode: host
     command: --version

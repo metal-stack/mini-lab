@@ -8,19 +8,19 @@ nodes:
   extraPortMappings:
   - containerPort: 4443
     hostPort: 4443
-    listenAddress: 192.168.121.1
-  - containerPort: 80
+    listenAddress: 0.0.0.0
+  - containerPort: 8080
     hostPort: 8080
-    listenAddress: 192.168.121.1
+    listenAddress: 0.0.0.0
   - containerPort: 4150
     hostPort: 4150
-    listenAddress: 192.168.121.1
+    listenAddress: 0.0.0.0
   - containerPort: 4161
     hostPort: 4161
-    listenAddress: 192.168.121.1
+    listenAddress: 0.0.0.0
   - containerPort: 10001
     hostPort: 5222
-    listenAddress: 192.168.121.1
+    listenAddress: 0.0.0.0
   - containerPort: 50051
     hostPort: 50051
-    listenAddress: 192.168.121.1
+    listenAddress: 0.0.0.0

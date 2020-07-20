@@ -1,29 +1,50 @@
-# Metal-Stack Mini-Lab
+# mini-lab
 
-Small lab to start two leaf switches and the metal-api to try `metalctl` and the creation of machines.
+The mini-lab is a small, virtual setup to locally run the metal-stack. It deploys the metal control plane and a partition with two simulated leaf switches. The lab can be used for trying out metal-stack, demonstration purposes or development.
 
-This requires:
+![overview components](docs/overview.png)
 
-- vagrant >= 2.2.7 with vagrant-libvirt plugin >= 0.0.45 for running the switch and machine VMs
-- docker and docker-compose for using containerized `ansible` and `metalctl` and `helm`
+This project can also be used as a template for writing your own metal-stack deployments.
+
+<!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+
+- [mini-lab](#mini-lab)
+  - [Requirements](#requirements)
+  - [Known Limitations](#known-limitations)
+  - [Try it out](#try-it-out)
+    - [Reinstall machine](#reinstall-machine)
+    - [Remove machine](#remove-machine)
+  - [Development of metal-api, metal-hammer and metal-core](#development-of-metal-api-metal-hammer-and-metal-core)
+
+<!-- /TOC -->
+
+## Requirements
+
+- Linux
+- [Vagrant](https://www.vagrantup.com/) == 2.2.9 with vagrant-libvirt plugin >= 0.1.2 (for running the switch and machine VMs)
 - kvm as hypervisor for the VMs
+- [docker](https://www.docker.com/) >= 18.09 (for using kind and our deployment base image)
+- [docker-compose](https://docs.docker.com/compose/) >= 1.25.4 (for ease of use and for parallelizing control plane and partition deployment)
+- [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.8.1 (for hosting the metal control plane on a kubernetes cluster v1.18.2)
 - [ovmf](https://wiki.ubuntu.com/UEFI/OVMF) to have a uefi firmware for virtual machines
-- [kind](https://github.com/kubernetes-sigs/kind/releases) >= 0.7.0 to start the metal control-plane on a kubernetes cluster
-- (optional) haveged to have enough random entropy - only needed if the PXE process does not work
+- the lab creates a virtual network 192.168.121.0/24 on your host machine, this hopefully does not overlap with other networks you have
+- (recommended) haveged to have enough random entropy (only needed if the PXE process does not work)
 
-Known limitations:
-
-- to keep the demo small there is no EVPN
-- machine restart and destroy does not work becaues we can not change the boot order via IPMI in the lab easily (virtual-bmc could, but it's buggy)
-- login to the machines is only possible with virsh console
+Here is some code that should help you setting up most of the requirements:
 
  ```bash
-# Install vagrant
-wget https://releases.hashicorp.com/vagrant/2.2.7/vagrant_2.2.7_x86_64.deb
-apt-get install ./vagrant_2.2.7_x86_64.deb docker.io qemu-kvm virt-manager ovmf net-tools libvirt-dev
+# Install Docker
+curl -fsSL https://get.docker.com | sh
+# if you want to be on the safe side, follow the original installation
+# instructions at https://docs.docker.com/engine/install/ubuntu/
+
+# Install vagrant and other stuff
+wget https://releases.hashicorp.com/vagrant/2.2.9/vagrant_2.2.9_x86_64.deb
+sudo apt-get install ./vagrant_2.2.9_x86_64.deb qemu-kvm virt-manager ovmf net-tools libvirt-dev haveged
 
 # Ensure that your user is member of the group "libvirt"
-usermod -G libvirt -a ${USER}
+# possibly you need to login again in order to make this change take effect
+sudo usermod -G libvirt -a ${USER}
 
 # Install libvirt plugin for vagrant
 vagrant plugin install vagrant-libvirt
@@ -31,12 +52,29 @@ vagrant plugin install vagrant-libvirt
 # Install kind from https://github.com/kubernetes-sigs/kind/releases
 ```
 
+The following ports are getting used statically:
+
+| Port | Bind Address | Description                        |
+|:----:|:------------ |:---------------------------------- |
+| 8443 |   0.0.0.0    | kube-apiserver of the kind cluster |
+| 4443 |   0.0.0.0    | HTTPS ingress                      |
+| 4150 |   0.0.0.0    | nsqd                               |
+| 4161 |   0.0.0.0    | nsq-lookupd                        |
+| 5222 |   0.0.0.0    | metal-console                      |
+| 8080 |   0.0.0.0    | HTTP ingress                       |
+
+## Known Limitations
+
+- to keep the demo small there is no EVPN
+- machine restart and destroy does not work because we cannot change the boot order via IPMI in the lab easily (virtual-bmc could, but it's buggy)
+- login to the machines is only possible with virsh console
+
 ## Try it out
 
 Start the mini-lab with a kind cluster, a metal-api instance as well as some vagrant VMs with two leaf switches and two machine skeletons.
 
 ```bash
-make up
+make
 ```
 
 Two machines in status `PXE booting` are visible with `metalctl machine ls`
@@ -65,18 +103,15 @@ Create a machine with
 make machine
 ```
 
-or the hard way with
+or __as alternative__ the hard way with
 
 ```bash
 docker-compose run metalctl network allocate \
         --partition vagrant \
         --project 00000000-0000-0000-0000-000000000000 \
         --name vagrant
-```
 
-Lookup the network ID and run
-
-```bash
+# Lookup the network ID and run
 docker-compose run metalctl machine create \
         --description test \
         --name machine \
@@ -91,7 +126,7 @@ docker-compose run metalctl machine create \
 See the installation process in action
 
 ```bash
-virsh console metal_machine01/02
+virsh console metalmachine01/02
 ...
 Ubuntu 19.10 machine ttyS0
 
@@ -121,7 +156,7 @@ To remove the kind cluster and the vagrant boxes, run
 make cleanup
 ```
 
-## Reinstall machine
+### Reinstall machine
 
 Reinstall a machine with
 
@@ -131,7 +166,7 @@ docker-compose run metalctl machine reinstall \
         e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 ```
 
-## Remove machine
+### Remove machine
 
 Remove a machine with
 

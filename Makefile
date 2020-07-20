@@ -1,9 +1,10 @@
 .DEFAULT_GOAL := up
 
+KUBECONFIG := $(shell pwd)/.kubeconfig
+
 .PHONY: up
-up: cleanup bake env
-	docker-compose up
-	vagrant up machine01 machine02
+up: bake env
+	docker-compose up --remove-orphans --force-recreate control-plane partition && vagrant up machine01 machine02
 
 .PHONY: restart
 restart: down up
@@ -16,13 +17,16 @@ bake: control-plane-bake partition-bake
 
 .PHONY: control-plane-bake
 control-plane-bake:
-	kind create cluster \
-		--config control-plane/kind.yaml \
-		--kubeconfig .kubeconfig || true
+	@if ! which kind > /dev/null; then echo "kind needs to be installed"; exit 1; fi
+	@if ! kind get clusters | grep metal-control-plane > /dev/null; then \
+		kind create cluster \
+		  --name metal-control-plane \
+			--config control-plane/kind.yaml \
+			--kubeconfig $(KUBECONFIG); fi
 
 .PHONY: control-plane
 control-plane: control-plane-bake
-	docker-compose up control-plane
+	docker-compose up --remove-orphans --force-recreate control-plane
 
 .PHONY: partition-bake
 partition-bake:
@@ -30,16 +34,21 @@ partition-bake:
 
 .PHONY: partition
 partition: partition-bake
-	docker-compose up partition
-	vagrant up machine01 machine02
+	docker-compose up --remove-orphans --force-recreate partition && vagrant up machine01 machine02
 
 .PHONY: cleanup
 cleanup: caddy-down registry-down
 	vagrant destroy -f --parallel || true
-	kind delete cluster
+	kind delete cluster --name metal-control-plane
 	docker-compose down
-	rm -f .kubeconfig
+	rm -f $(KUBECONFIG)
 	rm -f .ansible_vagrant_cache
+
+.PHONY: dev-env
+dev-env:
+	@echo "export METALCTL_URL=http://api.0.0.0.0.xip.io:8080/metal"
+	@echo "export METALCTL_HMAC=metal-admin"
+	@echo "export KUBECONFIG=$(KUBECONFIG)"
 
 .PHONY: reboot-machine01
 reboot-machine01:
@@ -67,12 +76,12 @@ machine:
 
 .PHONY: reinstall-machine01
 reinstall-machine01:
-	docker-compose run metalctl machine reinstall --image ubuntu-20.04 e0ab02d2-27cd-5a5e-8efc-080ba80cf258
+	docker-compose run metalctl machine reinstall --image ubuntu-19.10 e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 	@$(MAKE) --no-print-directory reboot-machine01
 
 .PHONY: reinstall-machine02
 reinstall-machine02:
-	docker-compose run metalctl machine reinstall --image ubuntu-20.04 2294c949-88f6-5390-8154-fa53d93a3313
+	docker-compose run metalctl machine reinstall --image ubuntu-19.10 2294c949-88f6-5390-8154-fa53d93a3313
 	@$(MAKE) --no-print-directory reboot-machine02
 
 .PHONY: delete-machine01
@@ -88,12 +97,12 @@ delete-machine02:
 .PHONY: console-machine01
 console-machine01:
 	@echo "exit console with CTRL+5"
-	virsh console metal_machine01
+	virsh console metalmachine01
 
 .PHONY: console-machine02
 console-machine02:
 	@echo "exit console with CTRL+5"
-	virsh console metal_machine02
+	virsh console metalmachine02
 
 .PHONY: ls
 ls:
@@ -101,12 +110,12 @@ ls:
 
 .PHONY: env
 env:
-	$(eval tag = $(shell cat group_vars/minilab/images.yaml | grep metal_metalctl_image_tag: | cut -d: -f2 | sed 's/ //g'))
+	$(eval tag = $(shell cat group_vars/control-plane/images.yaml | grep metal_metalctl_image_tag: | cut -d: -f2 | sed 's/ //g'))
 	@echo "METALCTL_IMAGE_TAG=$(tag)" > .env
 	@virsh net-autostart vagrant-libvirt >/dev/null
 
 # ---- development targets -------------------------------------------------------------
- 
+
 .PHONY: dev
 dev: cleanup caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image partition-bake env
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
@@ -114,7 +123,7 @@ dev: cleanup caddy registry build-hammer-initrd build-api-image build-core-image
 
 .PHONY: load-api-image
 load-api-image:
-	kind load docker-image metalstack/metal-api:dev
+	kind --name metal-control-plane load docker-image metalstack/metal-api:dev
 
 .PHONY: registry-down
 registry-down:
@@ -126,8 +135,8 @@ registry: registry-down
 
 .PHONY: reload-api
 reload-api: build-api-image load-api-image
-	$(eval pod = $(shell kubectl --kubeconfig=.kubeconfig --namespace metal-control-plane get pod | grep metal-api | head -1|cut -d' ' -f1))
-	kubectl --kubeconfig=.kubeconfig --namespace metal-control-plane delete pod $(pod)
+	$(eval pod = $(shell kubectl --kubeconfig=$(KUBECONFIG) --namespace metal-control-plane get pod | grep metal-api | head -1|cut -d' ' -f1))
+	kubectl --kubeconfig=$(KUBECONFIG) --namespace metal-control-plane delete pod $(pod)
 
 .PHONY: build-api-image
 build-api-image:
@@ -136,8 +145,8 @@ build-api-image:
 .PHONY: _ips
 _ips:
 	$(eval pattern = "([0-9a-f]{2}:){5}([0-9a-f]{2})")
-	$(eval macL1 = $(shell virsh domiflist metal_leaf01 | grep vagrant-libvirt | grep -o -E $(pattern)))
-	$(eval macL2 = $(shell virsh domiflist metal_leaf02 | grep vagrant-libvirt | grep -o -E $(pattern)))
+	$(eval macL1 = $(shell virsh domiflist metalleaf01 | grep vagrant-libvirt | grep -o -E $(pattern)))
+	$(eval macL2 = $(shell virsh domiflist metalleaf02 | grep vagrant-libvirt | grep -o -E $(pattern)))
 	$(eval dev = $(shell virsh net-info vagrant-libvirt | grep Bridge | cut -d' ' -f10 2>/dev/null))
 	$(eval ipL1 = $(shell arp -i $(dev) | grep $(macL1) 2>/dev/null | cut -d' ' -f1))
 	$(eval ipL2 = $(shell arp -i $(dev) | grep $(macL2) 2>/dev/null | cut -d' ' -f1))
