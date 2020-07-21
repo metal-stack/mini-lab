@@ -30,6 +30,9 @@ control-plane: control-plane-bake
 
 .PHONY: partition-bake
 partition-bake:
+ifeq (,$(wildcard ./.vagrant_version_host_system))
+	@vagrant version | grep "Installed Version" | cut -d: -f 2 | tr -d '[:space:]' > .vagrant_version_host_system
+endif
 	vagrant up
 
 .PHONY: partition
@@ -42,6 +45,7 @@ cleanup: caddy-down registry-down
 	kind delete cluster --name metal-control-plane
 	docker-compose down
 	rm -f $(KUBECONFIG)
+	rm -f .vagrant_version_host_system
 	rm -f .ansible_vagrant_cache
 
 .PHONY: dev-env
@@ -110,8 +114,7 @@ ls:
 
 .PHONY: env
 env:
-	$(eval tag = $(shell cat group_vars/control-plane/images.yaml | grep metal_metalctl_image_tag: | cut -d: -f2 | sed 's/ //g'))
-	@echo "METALCTL_IMAGE_TAG=$(tag)" > .env
+	@echo "METALCTL_IMAGE_TAG=v0.7.8" > .env
 	@virsh net-autostart vagrant-libvirt >/dev/null
 
 # ---- development targets -------------------------------------------------------------

@@ -10,9 +10,9 @@
 
     - name: check vagrant version
       fail:
-        msg: "Vagrant version of the host system does not match vagrant version in the deployment image"
+        msg: "Vagrant version of the host system ({{ lookup('file', playbook_dir + '/.vagrant_version_host_system') }}) does not match vagrant version in the deployment image ({{ result.stdout.split(' ')[1] }})"
       when:
-        - result.stdout.split(' ')[1] != (lookup('file', playbook_dir + '/.vagrant/bundler/global.sol') | from_json).vagrant_version
+        - result.stdout.split(' ')[1] != lookup('file', playbook_dir + '/.vagrant_version_host_system')
 
 - name: deploy leaves and docker
   hosts: leaves
@@ -46,6 +46,10 @@
 
 - name: deploy metal-core and pixiecore
   hosts: leaves
+  vars:
+    setup_yaml:
+      - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
+        meta_var: metal_stack_release
   pre_tasks:
     - name: add docker registry to hosts
       lineinfile:
@@ -63,6 +67,8 @@
           ip: "{{ metal_partition_mgmt_gateway }}"
           regex: "{{ 'api.0.0.0.0.xip.io' | regex_escape() }}"
   roles:
+    - name: ansible-common
+      tags: always
     - name: metal-roles/partition/roles/grpc-proxy
       tags: grpc-proxy
     - name: metal-roles/partition/roles/metal-core
