@@ -120,7 +120,7 @@ env:
 # ---- development targets -------------------------------------------------------------
 
 .PHONY: dev
-dev: cleanup caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image partition-bake env
+dev: caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image partition-bake env
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 	vagrant up machine01 machine02
 
@@ -147,12 +147,8 @@ build-api-image:
 
 .PHONY: _ips
 _ips:
-	$(eval pattern = "([0-9a-f]{2}:){5}([0-9a-f]{2})")
-	$(eval macL1 = $(shell virsh domiflist metalleaf01 | grep vagrant-libvirt | grep -o -E $(pattern)))
-	$(eval macL2 = $(shell virsh domiflist metalleaf02 | grep vagrant-libvirt | grep -o -E $(pattern)))
-	$(eval dev = $(shell virsh net-info vagrant-libvirt | grep Bridge | cut -d' ' -f10 2>/dev/null))
-	$(eval ipL1 = $(shell arp -i $(dev) | grep $(macL1) 2>/dev/null | cut -d' ' -f1))
-	$(eval ipL2 = $(shell arp -i $(dev) | grep $(macL2) 2>/dev/null | cut -d' ' -f1))
+	$(eval ipL1 = $(shell python3 -c 'import pickle; print(pickle.load(open(".ansible_vagrant_cache", "rb"))["meta_vars"]["leaf01"]["ansible_host"])'))
+	$(eval ipL2 = $(shell python3 -c 'import pickle; print(pickle.load(open(".ansible_vagrant_cache", "rb"))["meta_vars"]["leaf02"]["ansible_host"])'))
 
 .PHONY: reload-core
 reload-core: build-core-image push-core-image _ips
