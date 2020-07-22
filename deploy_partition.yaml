@@ -66,6 +66,9 @@
         - name: api.0.0.0.0.xip.io
           ip: "{{ metal_partition_mgmt_gateway }}"
           regex: "{{ 'api.0.0.0.0.xip.io' | regex_escape() }}"
+        - name: nsqd
+          ip: "{{ metal_partition_mgmt_gateway }}"
+          regex: "{{ 'nsqd' | regex_escape() }}"
   roles:
     - name: ansible-common
       tags: always

@@ -7,6 +7,8 @@ metal_api_view_key: metal-view
 metal_api_edit_key: metal-edit
 metal_api_admin_key: metal-admin
 
+metal_api_nsq_tcp_address: nsqd:4150
+
 metal_api_images:
 - id: firewall-ubuntu-2.0.20200331
   name: Firewall 2 Ubuntu 20200331
