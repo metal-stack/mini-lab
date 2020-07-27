@@ -3,7 +3,7 @@
 KUBECONFIG := $(shell pwd)/.kubeconfig
 
 .PHONY: up
-up: bake env
+up: bake
 	docker-compose up --remove-orphans --force-recreate control-plane partition && vagrant up machine01 machine02
 
 .PHONY: restart
@@ -65,36 +65,36 @@ reboot-machine02:
 	vagrant up machine02
 
 .PHONY: password01
-password01:
+password01: env
 	docker-compose run metalctl machine describe e0ab02d2-27cd-5a5e-8efc-080ba80cf258 | grep consolepassword | cut -d: -f2
 
 .PHONY: password02
-password02:
+password02: env
 	docker-compose run metalctl machine describe 2294c949-88f6-5390-8154-fa53d93a3313 | grep consolepassword | cut -d: -f2
 
 .PHONY: machine
-machine:
+machine: env
 	$(eval alloc = $(shell docker-compose run metalctl network allocate --partition vagrant --project 00000000-0000-0000-0000-000000000000 --name vagrant))
 	$(eval ip = $(shell echo $(alloc) | grep id: | head -1 | cut -d' ' -f10))
 	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-19.10 --size v1-small-x86 --networks $(ip)
 
 .PHONY: reinstall-machine01
-reinstall-machine01:
+reinstall-machine01: env
 	docker-compose run metalctl machine reinstall --image ubuntu-19.10 e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 	@$(MAKE) --no-print-directory reboot-machine01
 
 .PHONY: reinstall-machine02
-reinstall-machine02:
+reinstall-machine02: env
 	docker-compose run metalctl machine reinstall --image ubuntu-19.10 2294c949-88f6-5390-8154-fa53d93a3313
 	@$(MAKE) --no-print-directory reboot-machine02
 
 .PHONY: delete-machine01
-delete-machine01:
+delete-machine01: env
 	docker-compose run metalctl machine rm e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 	@$(MAKE) --no-print-directory reboot-machine01
 
 .PHONY: delete-machine02
-delete-machine02:
+delete-machine02: env
 	docker-compose run metalctl machine rm 2294c949-88f6-5390-8154-fa53d93a3313
 	@$(MAKE) --no-print-directory reboot-machine02
 
@@ -109,18 +109,17 @@ console-machine02:
 	virsh console metalmachine02
 
 .PHONY: ls
-ls:
+ls: env
 	docker-compose run metalctl machine ls
 
 .PHONY: env
 env:
 	@echo "METALCTL_IMAGE_TAG=v0.7.8" > .env
-	@virsh net-autostart vagrant-libvirt >/dev/null
 
 # ---- development targets -------------------------------------------------------------
 
 .PHONY: dev
-dev: caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image partition-bake env
+dev: caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image partition-bake
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 	vagrant up machine01 machine02
 
