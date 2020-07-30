@@ -130,7 +130,7 @@ docker-compose run metalctl machine create \
 See the installation process in action
 
 ```bash
-virsh console metalmachine01/02
+make console-machine01/02
 ...
 Ubuntu 20.04 machine ttyS0
 
