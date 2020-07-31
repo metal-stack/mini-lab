@@ -1,16 +1,13 @@
-name: Integration tests
+name: Integration tests for PR
 
 on:
-  push:
-    branches:
-      - master
-  pull_request:
+  pull_requests:
     branches:
       - master
 
 jobs:
   test:
-    name: Integration tests
+    name: Integration tests for PR
     runs-on: self-hosted
     steps:
     - name: Checkout
