@@ -1,7 +1,7 @@
 name: Integration tests for PR
 
 on:
-  pull_requests:
+  pull_request:
     branches:
       - master
 
