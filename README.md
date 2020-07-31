@@ -122,7 +122,7 @@ docker-compose run metalctl machine create \
         --hostname machine \
         --project 00000000-0000-0000-0000-000000000000 \
         --partition vagrant \
-        --image ubuntu-19.10 \
+        --image ubuntu-20.04 \
         --size v1-small-x86 \
         --networks <network-ID>
 ```
@@ -130,9 +130,9 @@ docker-compose run metalctl machine create \
 See the installation process in action
 
 ```bash
-virsh console metalmachine01/02
+make console-machine01/02
 ...
-Ubuntu 19.10 machine ttyS0
+Ubuntu 20.04 machine ttyS0
 
 machine login:
 ```
@@ -142,7 +142,7 @@ One machine is now installed and has status "Phoned Home"
 ```bash
 docker-compose run metalctl machine ls
 ID                                          LAST EVENT   WHEN   AGE     HOSTNAME  PROJECT                               SIZE          IMAGE         PARTITION
-e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Phoned Home  2s     21s     machine   00000000-0000-0000-0000-000000000000  v1-small-x86  Ubuntu 19.10  vagrant
+e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Phoned Home  2s     21s     machine   00000000-0000-0000-0000-000000000000  v1-small-x86  Ubuntu 20.04  vagrant
 2294c949-88f6-5390-8154-fa53d93a3313        Waiting      8s                                                             v1-small-x86                vagrant
 ```
 
@@ -166,7 +166,7 @@ Reinstall a machine with
 
 ```bash
 docker-compose run metalctl machine reinstall \
-        --image ubuntu-19.10 \
+        --image ubuntu-20.04 \
         e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 ```
 
