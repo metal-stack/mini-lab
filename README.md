@@ -60,7 +60,7 @@ The following ports are getting used statically:
 
 | Port | Bind Address | Description                        |
 |:----:|:------------ |:---------------------------------- |
-| 8443 |   0.0.0.0    | kube-apiserver of the kind cluster |
+| 6443 |   0.0.0.0    | kube-apiserver of the kind cluster |
 | 4443 |   0.0.0.0    | HTTPS ingress                      |
 | 4150 |   0.0.0.0    | nsqd                               |
 | 4161 |   0.0.0.0    | nsq-lookupd                        |
