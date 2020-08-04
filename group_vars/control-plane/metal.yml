@@ -59,6 +59,29 @@ metal_api_networks:
   partitionid: "vagrant"
   prefixes:
   - 10.0.0.0/16
+- id: internet-vagrant-lab
+  name: "Virtual Internet Network"
+  description: "Virtual Internet Network for vagrant-lab"
+  nat: true
+  privatesuper: false
+  underlay: false
+  destinationprefixes:
+    - 0.0.0.0/0
+  partitionid: "vagrant"
+  vrf: 104009
+  prefixes:
+  - 185.24.0.0/16
+  - 185.27.0.0/16
+- id: underlay-vagrant-lab
+  name: "Underlay Network"
+  description: "Underlay Network for vagrant-lab"
+  nat: false
+  privatesuper: false
+  underlay: true
+  destinationprefixes: []
+  partitionid: "vagrant"
+  prefixes:
+  - 10.1.0.0/24
 
 metal_api_nsq_tls_enabled: false
 

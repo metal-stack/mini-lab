@@ -1,0 +1,21 @@
+---
+- name: deploy interfaces addition
+  template:
+    src: internet.intf.j2
+    dest: /etc/network/interfaces.d/internet.intf
+
+- name: reload interfaces
+  command: ifreload -av
+
+- name: place customized frr template file for mini-lab
+  copy:
+    src: frr.tpl
+    dest: /etc/frr/frr.tpl
+
+- name: set envs for metal-core
+  set_fact:
+    metal_core_frr_tpl_file: "/etc/frr/frr.tpl"
+    metal_core_additional_bridge_ports:
+      - vniInternet
+    metal_core_additional_bridge_vids:
+      - 4009

@@ -72,6 +72,8 @@
   roles:
     - name: ansible-common
       tags: always
+    - name: mini-lab-internet
+      tags: mini-lab-internet
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
     - name: metal-roles/partition/roles/pixiecore
