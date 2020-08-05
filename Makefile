@@ -40,10 +40,12 @@ partition: partition-bake
 	docker-compose up --remove-orphans --force-recreate partition && vagrant up machine01 machine02
 
 .PHONY: cleanup
-cleanup: caddy-down registry-down
+cleanup: caddy-down registry-down _ips
 	vagrant destroy -f --parallel || true
 	kind delete cluster --name metal-control-plane
 	docker-compose down
+	@echo "removing route to virtual internet network over leaf01"
+	$(shell sudo ip r d $(staticR) || true)
 	rm -f $(KUBECONFIG)
 	rm -f .vagrant_version_host_system
 	rm -f .ansible_vagrant_cache
@@ -79,11 +81,13 @@ machine:
 	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-20.04 --size v1-small-x86 --networks $(id)
 
 .PHONY: firewall
-firewall:
+firewall: _ips
 	$(eval alloc = $(shell docker-compose run metalctl network allocate --partition vagrant --project 00000000-0000-0000-0000-000000000000 --name vagrant))
 	$(eval private_id = $(shell echo $(alloc) | grep id: | head -1 | cut -d' ' -f10))
 	#$(eval private_id = $(shell docker-compose run metalctl network list -o yaml | yq r - '(name==vagrant).id'))
 	docker-compose run metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image firewall-ubuntu-2.0 --size v1-small-x86 --networks internet-vagrant-lab,$(private_id)
+	@echo "adding route to virtual internet network over leaf01"
+	$(shell sudo ip r a $(staticR) || true)
 
 .PHONY: reinstall-machine01
 reinstall-machine01:
@@ -160,6 +164,7 @@ _ips:
 	$(eval dev = $(shell virsh net-info vagrant-libvirt | grep Bridge | cut -d' ' -f10 2>/dev/null))
 	$(eval ipL1 = $(shell arp -i $(dev) | grep $(macL1) 2>/dev/null | cut -d' ' -f1))
 	$(eval ipL2 = $(shell arp -i $(dev) | grep $(macL2) 2>/dev/null | cut -d' ' -f1))
+	$(eval staticR = "100.255.254.0/24 via $(ipL1) dev $(dev)")
 
 .PHONY: reload-core
 reload-core: build-core-image push-core-image _ips

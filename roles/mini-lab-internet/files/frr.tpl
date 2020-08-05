@@ -143,7 +143,7 @@ router bgp {{ $ASN }} vrf vrfInternet
  exit-address-family
 !
 vrf mgmt
- ip route 185.0.0.0/8 vrfInternet nexthop-vrf vrfInternet
+ ip route 100.255.254.0/24 vrfInternet nexthop-vrf vrfInternet
 exit-vrf
 !
 line vty

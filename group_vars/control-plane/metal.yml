@@ -70,8 +70,7 @@ metal_api_networks:
   partitionid: "vagrant"
   vrf: 104009
   prefixes:
-  - 185.24.0.0/16
-  - 185.27.0.0/16
+  - 100.255.254.0/24
 - id: underlay-vagrant-lab
   name: "Underlay Network"
   description: "Underlay Network for vagrant-lab"
