@@ -129,7 +129,7 @@ ls:
 .PHONY: env
 env:
 	./env.sh
-	@virsh net-autostart vagrant-libvirt >/dev/null
+	@virsh net-autostart vagrant-libvirt >/dev/null || true
 
 # ---- development targets -------------------------------------------------------------
 
