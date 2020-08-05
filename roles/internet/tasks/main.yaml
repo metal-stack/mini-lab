@@ -1,6 +1,4 @@
 ---
-
-
 - name: place customized frr template file for mini-lab
   copy:
     src: frr.tpl
