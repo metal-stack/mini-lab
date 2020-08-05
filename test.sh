@@ -16,9 +16,9 @@ do
     waiting=$(docker-compose run metalctl machine ls | grep Waiting | wc -l)
 done
 
-echo "Create machines"
+echo "Create machine and firewall"
 make machine
-make machine
+make firewall
 
 echo "Waiting for machines to get to Phoned Home state"
 phoned=$(docker-compose run metalctl machine ls | grep Phoned | wc -l)
