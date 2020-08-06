@@ -5,6 +5,7 @@ services:
   control-plane:
     image: metalstack/metal-deployment-base:v0.0.5
     container_name: deploy-control-plane
+    user: ${CURRENT_USER}
     volumes:
       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
       - /var/run/docker.sock:/var/run/docker.sock
@@ -31,6 +32,7 @@ services:
   partition:
     image: metalstack/metal-deployment-base:v0.0.5
     container_name: deploy-partition
+    user: ${CURRENT_USER}
     volumes:
       - ${HOME}/.vagrant.d:/root/.vagrant.d
       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock

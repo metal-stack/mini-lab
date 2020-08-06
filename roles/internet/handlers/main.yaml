@@ -12,6 +12,7 @@
 
 - name: reload interfaces
   command: ifreload -av
+  failed_when: false
 
 - name: restart frr
   systemd:
