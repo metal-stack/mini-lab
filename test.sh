@@ -2,9 +2,6 @@
 
 set -e
 
-echo "user: $(id -u) group: $(id -g)"
-exit
-
 export TMPDIR=/var/tmp/
 echo "Starting mini-lab"
 make up
