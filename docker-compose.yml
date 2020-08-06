@@ -56,7 +56,6 @@ services:
             -i inventories/partition-static.yaml \
             -i ~/.ansible/roles/ansible-common/inventory/vagrant \
             deploy_partition.yaml
-          chown "${CURRENT_USER}" -R .
 
   metalctl:
     image: metalstack/metalctl:${METALCTL_IMAGE_TAG}
