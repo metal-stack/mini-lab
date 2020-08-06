@@ -3,6 +3,10 @@
 set -e
 
 export TMPDIR=/var/tmp/
+
+echo "Cleanup artifacts of previous runs"
+make cleanup
+
 echo "Starting mini-lab"
 make up
 
@@ -15,6 +19,7 @@ do
     sleep 5
     waiting=$(docker-compose run metalctl machine ls | grep Waiting | wc -l)
 done
+echo "$waiting/$minWaiting machines are waiting"
 
 echo "Create machine and firewall"
 make machine
@@ -29,6 +34,7 @@ do
     sleep 5
     phoned=$(docker-compose run metalctl machine ls | grep Phoned | wc -l)
 done
+echo "$phoned/$minPhoned machines have phoned home"
 
 echo "successfully started mini-lab"
-make down
+make cleanup
