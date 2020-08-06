@@ -4,4 +4,4 @@
   version: v0.5.4
 - src: https://github.com/metal-stack/metal-roles.git
   name: metal-roles
-  version: alloc-grpc
+  version: v0.3.0
