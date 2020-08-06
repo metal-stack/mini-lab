@@ -2,9 +2,6 @@
 
 set -e
 
-env
-exit
-
 export TMPDIR=/var/tmp/
 echo "Starting mini-lab"
 make up
