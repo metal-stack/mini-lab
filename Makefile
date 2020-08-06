@@ -26,7 +26,7 @@ control-plane-bake:
 
 .PHONY: control-plane
 control-plane: control-plane-bake
-	CURRENT_USER="$(shell id -u):$(shell id -g)" docker-compose up --remove-orphans --force-recreate control-plane
+	docker-compose up --remove-orphans --force-recreate control-plane
 
 .PHONY: partition-bake
 partition-bake:

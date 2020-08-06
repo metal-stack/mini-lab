@@ -5,7 +5,6 @@ services:
   control-plane:
     image: metalstack/metal-deployment-base:v0.0.5
     container_name: deploy-control-plane
-    user: ${CURRENT_USER}
     volumes:
       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
       - /var/run/docker.sock:/var/run/docker.sock
@@ -32,9 +31,8 @@ services:
   partition:
     image: metalstack/metal-deployment-base:v0.0.5
     container_name: deploy-partition
-    user: ${CURRENT_USER}
     volumes:
-      - ${HOME}/.vagrant.d:/root/.vagrant.d
+      - ${HOME}/.vagrant.d:/.vagrant.d
       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
       - /var/run/docker.sock:/var/run/docker.sock
       - .:/mini-lab
@@ -58,6 +56,7 @@ services:
             -i inventories/partition-static.yaml \
             -i ./ansible-common/inventory/vagrant \
             deploy_partition.yaml
+          chown "${CURRENT_USER}" -R .
 
   metalctl:
     image: metalstack/metalctl:${METALCTL_IMAGE_TAG}
