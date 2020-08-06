@@ -4,7 +4,7 @@ KUBECONFIG := $(shell pwd)/.kubeconfig
 
 .PHONY: up
 up: bake env
-	CURRENT_USER="$(shell id -u):$(shell id -g)" docker-compose up --remove-orphans --force-recreate control-plane partition && vagrant up machine01 machine02
+	docker-compose up --remove-orphans --force-recreate control-plane partition && vagrant up machine01 machine02
 
 .PHONY: restart
 restart: down up
@@ -37,7 +37,7 @@ endif
 
 .PHONY: partition
 partition: partition-bake
-	CURRENT_USER="$(shell id -u):$(shell id -g)" docker-compose up --remove-orphans --force-recreate partition && vagrant up machine01 machine02
+	docker-compose up --remove-orphans --force-recreate partition && vagrant up machine01 machine02
 	@echo "adding route to virtual internet network 100.255.254.0/24 over leaf01"
 	$(shell sudo ip r a "$(staticR)" || true)
 
@@ -135,7 +135,7 @@ env:
 
 .PHONY: dev
 dev: cleanup caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image partition-bake env
-	CURRENT_USER="$(shell id -u):$(shell id -g)" docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 	vagrant up machine01 machine02
 
 .PHONY: load-api-image
