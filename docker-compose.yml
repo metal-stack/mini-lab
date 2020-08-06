@@ -32,7 +32,7 @@ services:
     image: metalstack/metal-deployment-base:v0.0.5
     container_name: deploy-partition
     volumes:
-      - ${HOME}/.vagrant.d:/.vagrant.d
+      - ${HOME}/.vagrant.d:/root/.vagrant.d
       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
       - /var/run/docker.sock:/var/run/docker.sock
       - .:/mini-lab
@@ -51,10 +51,10 @@ services:
       - /bin/bash
       - -ce
       - |
-          ansible-galaxy install --roles-path . --ignore-errors -r requirements.yaml
+          ansible-galaxy install --ignore-errors -r requirements.yaml
           ansible-playbook \
             -i inventories/partition-static.yaml \
-            -i ./ansible-common/inventory/vagrant \
+            -i ~/.ansible/roles/ansible-common/inventory/vagrant \
             deploy_partition.yaml
           chown "${CURRENT_USER}" -R .
 
