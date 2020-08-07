@@ -143,6 +143,7 @@ router bgp {{ $ASN }} vrf vrfInternet
  exit-address-family
 !
 vrf mgmt
+ ip route 10.0.1.0/24 {{ .Loopback }} nexthop-vrf default
  ip route 100.255.254.0/24 vrfInternet nexthop-vrf vrfInternet
 exit-vrf
 !
