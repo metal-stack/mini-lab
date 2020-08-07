@@ -38,7 +38,10 @@ endif
 .PHONY: partition
 partition: partition-bake
 	docker-compose up --remove-orphans --force-recreate partition && vagrant up machine01 machine02
-	@echo "add this route to communicate with the virtual internet network 100.255.254.0/24 over leaf01"
+
+.PHONY: route
+route: _ips
+	@echo "add this route to communicate with the virtual internet network 100.255.254.0/24 over leaf01 and leaf02"
 	@echo "sudo ip r a $(staticR)"
 
 .PHONY: cleanup
@@ -46,7 +49,6 @@ cleanup: caddy-down registry-down _ips
 	vagrant destroy -f --parallel || true
 	kind delete cluster --name metal-control-plane
 	docker-compose down
-	@echo "removing route to virtual internet network over leaf01"
 	rm -f $(KUBECONFIG)
 	rm -f .vagrant_version_host_system
 	rm -f .ansible_vagrant_cache
@@ -77,13 +79,10 @@ password02:
 
 .PHONY: _privatenet
 _privatenet:
-	echo "privatenet: $(privatenet)"
 	$(eval privatenet = $(shell docker-compose run metalctl network list -o yaml | yq r - '(name==vagrant).id'))
-	echo "privatenet: $(privatenet)"
-ifeq (,$(privatenet))
+ifeq ($(privatenet),)
 	$(eval alloc = $(shell docker-compose run metalctl network allocate --partition vagrant --project 00000000-0000-0000-0000-000000000000 --name vagrant))
 	$(eval privatenet = $(shell echo $(alloc) | grep id: | head -1 | cut -d' ' -f10))
-	echo "privatenet: $(privatenet)"
 endif
 
 .PHONY: machine

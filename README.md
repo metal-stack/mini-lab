@@ -71,7 +71,7 @@ The following ports are getting used statically:
 
 - to keep the demo small there is no EVPN
 - machine restart and destroy does not work because we cannot change the boot order via IPMI in the lab easily (virtual-bmc could, but it's buggy)
-- login to the machines is only possible with virsh console
+- login to the machines is possible with virsh console, login to the firewall is possible with SSH from your local machine
 
 ## Try it out
 
@@ -101,13 +101,14 @@ e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Waiting      8s                   
 2294c949-88f6-5390-8154-fa53d93a3313        Waiting      8s                               v1-small-x86         vagrant
 ```
 
-Create a machine with
+Create a machine/firewall with
 
 ```bash
 make machine
+make firewall
 ```
 
-or __as alternative__ the hard way with
+__Alternatively__ you may want to issue the `metalctl` commands by your own:
 
 ```bash
 docker-compose run metalctl network allocate \
@@ -115,7 +116,7 @@ docker-compose run metalctl network allocate \
         --project 00000000-0000-0000-0000-000000000000 \
         --name vagrant
 
-# Lookup the network ID and run
+# Lookup the network ID and create a machine
 docker-compose run metalctl machine create \
         --description test \
         --name machine \
@@ -125,6 +126,17 @@ docker-compose run metalctl machine create \
         --image ubuntu-20.04 \
         --size v1-small-x86 \
         --networks <network-ID>
+
+# Create a firewall that is also connected to the virtual internet-vagrant-lab network
+docker-compose run metalctl machine create \
+        --description fw \
+        --name fw \
+        --hostname fw \
+        --project 00000000-0000-0000-0000-000000000000 \
+        --partition vagrant \
+        --image firewall-ubuntu-2.0 \
+        --size v1-small-x86 \
+        --networks internet-vagrant-lab,$(privatenet)
 ```
 
 See the installation process in action
@@ -137,13 +149,13 @@ Ubuntu 20.04 machine ttyS0
 machine login:
 ```
 
-One machine is now installed and has status "Phoned Home"
+Two machines are now installed and have status "Phoned Home"
 
 ```bash
 docker-compose run metalctl machine ls
-ID                                          LAST EVENT   WHEN   AGE     HOSTNAME  PROJECT                               SIZE          IMAGE         PARTITION
-e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Phoned Home  2s     21s     machine   00000000-0000-0000-0000-000000000000  v1-small-x86  Ubuntu 20.04  vagrant
-2294c949-88f6-5390-8154-fa53d93a3313        Waiting      8s                                                             v1-small-x86                vagrant
+ID                                          LAST EVENT   WHEN   AGE     HOSTNAME  PROJECT                               SIZE          IMAGE                             PARTITION
+e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Phoned Home  2s     21s     machine   00000000-0000-0000-0000-000000000000  v1-small-x86  Ubuntu 20.04 20200331             vagrant
+2294c949-88f6-5390-8154-fa53d93a3313        Phoned Home  8s     18s     fw        00000000-0000-0000-0000-000000000000  v1-small-x86  Firewall 2 Ubuntu 20200730        vagrant
 ```
 
 Login with user name metal and the console password from
@@ -152,6 +164,17 @@ Login with user name metal and the console password from
 docker-compose run metalctl machine describe e0ab02d2-27cd-5a5e-8efc-080ba80cf258 | grep password
 
 consolepassword: ...
+```
+
+If you want to access the firewall with SSH or have internet connectivity from the firewall and machine, you'll need to have a static route configured that points to the vagrant boxes of the leaf switches:
+
+```bash
+make route # shows you the route needed to access the network internet-vagrant-lab
+add this route to communicate with the virtual internet network 100.255.254.0/24 over leaf01 and leaf02
+sudo ip r a 100.255.254.0/24 nexthop via 192.168.121.120 dev virbr0 nexthop via 192.168.121.132 dev virbr0
+
+# Connect to the firewall
+ssh metal@100.255.254.1
 ```
 
 To remove the kind cluster and the vagrant boxes, run
