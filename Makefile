@@ -41,7 +41,7 @@ partition: partition-bake
 
 .PHONY: route
 route: _ips
-	@echo "add this route to communicate with the virtual internet network 100.255.254.0/24 over leaf01 and leaf02"
+	@echo "# add this route to communicate with the virtual internet network 100.255.254.0/24 over leaf01 and leaf02"
 	@echo "sudo ip r a $(staticR)"
 
 .PHONY: cleanup
