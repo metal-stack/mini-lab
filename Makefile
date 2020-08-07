@@ -79,19 +79,15 @@ password02:
 
 .PHONY: _privatenet
 _privatenet:
-	$(eval privatenet = $(shell docker-compose run metalctl network list -o yaml | yq r - '(name==vagrant).id'))
-ifeq ($(privatenet),)
-	$(eval alloc = $(shell docker-compose run metalctl network allocate --partition vagrant --project 00000000-0000-0000-0000-000000000000 --name vagrant))
-	$(eval privatenet = $(shell echo $(alloc) | grep id: | head -1 | cut -d' ' -f10))
-endif
+	docker-compose run metalctl network list --name user-private-network | grep user-private-network || docker-compose run metalctl network allocate --partition vagrant --project 00000000-0000-0000-0000-000000000000 --name user-private-network
 
 .PHONY: machine
 machine: _privatenet
-	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-20.04 --size v1-small-x86 --networks $(privatenet)
+	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-20.04 --size v1-small-x86 --networks $(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: firewall
 firewall: _ips _privatenet
-	docker-compose run metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image firewall-ubuntu-2.0 --size v1-small-x86 --networks internet-vagrant-lab,$(privatenet)
+	docker-compose run metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image firewall-ubuntu-2.0 --size v1-small-x86 --networks internet-vagrant-lab,$(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: reinstall-machine01
 reinstall-machine01:
