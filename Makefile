@@ -45,7 +45,7 @@ route: _ips
 	@echo "sudo ip r a $(staticR)"
 
 .PHONY: cleanup
-cleanup: caddy-down registry-down _ips
+cleanup: caddy-down registry-down
 	vagrant destroy -f --parallel || true
 	kind delete cluster --name metal-control-plane
 	docker-compose down
@@ -126,7 +126,7 @@ ls:
 .PHONY: env
 env:
 	./env.sh
-	@virsh net-autostart vagrant-libvirt >/dev/null || true
+	@virsh net-autostart vagrant-libvirt >/dev/null
 
 # ---- development targets -------------------------------------------------------------
 
