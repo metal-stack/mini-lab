@@ -3,7 +3,7 @@
 KUBECONFIG := $(shell pwd)/.kubeconfig
 
 .PHONY: up
-up: bake
+up: bake env
 	docker-compose up --remove-orphans --force-recreate control-plane partition && vagrant up machine01 machine02
 
 .PHONY: restart
