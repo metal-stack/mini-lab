@@ -44,8 +44,15 @@ do
 done
 echo "$phoned/$minPhoned machines have phoned home"
 
+sleep 5
+
+echo "Adding route to leaf01"
+sudo ip r d 100.255.254.0/24
+$(make route) || true
+
 echo "Check if SSH login to firewall works"
 ssh metal@100.255.254.1 -C exit
 
 echo "Successfully started mini-lab"
 make cleanup
+sudo ip r d 100.255.254.0/24

@@ -41,7 +41,6 @@ partition: partition-bake
 
 .PHONY: route
 route: _ips
-	@echo "# add this route to communicate with the virtual internet network 100.255.254.0/24 over leaf01 and leaf02"
 	@echo "sudo ip r a $(staticR)"
 
 .PHONY: cleanup
@@ -157,6 +156,7 @@ build-api-image:
 
 .PHONY: _ips
 _ips:
+	$(eval dev = $(shell virsh net-info vagrant-libvirt | grep Bridge | cut -d' ' -f10 2>/dev/null))
 	$(eval ipL1 = $(shell python3 -c 'import pickle; print(pickle.load(open(".ansible_vagrant_cache", "rb"))["meta_vars"]["leaf01"]["ansible_host"])'))
 	$(eval ipL2 = $(shell python3 -c 'import pickle; print(pickle.load(open(".ansible_vagrant_cache", "rb"))["meta_vars"]["leaf02"]["ansible_host"])'))
 	$(eval staticR = "100.255.254.0/24 nexthop via $(ipL1) dev $(dev) nexthop via $(ipL2) dev $(dev)")
