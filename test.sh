@@ -44,5 +44,8 @@ do
 done
 echo "$phoned/$minPhoned machines have phoned home"
 
-echo "successfully started mini-lab"
+echo "Check if SSH login to firewall works"
+ssh metal@100.255.254.1 -C exit
+
+echo "Successfully started mini-lab"
 make cleanup
