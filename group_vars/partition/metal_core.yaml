@@ -1,4 +1,5 @@
 ---
+metal_core_image_tag: v0.5.3
 metal_core_change_boot_order: false
 
 metal_core_nsq_tls_enabled: false
@@ -9,3 +10,8 @@ metal_core_nsq_lookupd_addr: "0.0.0.0.xip.io:4161"
 metal_core_log_level: debug
 
 metal_core_consider_hosts_file_resolution: true
+
+metal_core_grpc_address: "{{ metal_partition_mgmt_gateway }}:50051"
+metal_core_grpc_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
+metal_core_grpc_client_cert: "{{ lookup('file', 'certs/grpc/client.pem') }}"
+metal_core_grpc_client_key: "{{ lookup('file', 'certs/grpc/client-key.pem') }}"

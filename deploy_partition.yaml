@@ -72,6 +72,8 @@
   roles:
     - name: ansible-common
       tags: always
+    - name: internet
+      tags: internet
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
     - name: metal-roles/partition/roles/pixiecore

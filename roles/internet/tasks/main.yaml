@@ -1,0 +1,14 @@
+---
+- name: place customized frr template file for mini-lab
+  copy:
+    src: frr.tpl
+    dest: /etc/frr/frr.tpl
+  notify: adjust interfaces
+
+- name: set envs for metal-core
+  set_fact:
+    metal_core_frr_tpl_file: "/etc/frr/frr.tpl"
+    metal_core_additional_bridge_ports:
+      - vniInternet
+    metal_core_additional_bridge_vids:
+      - 4009

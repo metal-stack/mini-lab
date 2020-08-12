@@ -10,16 +10,16 @@ metal_api_admin_key: metal-admin
 metal_api_nsq_tcp_address: nsqd:4150
 
 metal_api_images:
-- id: firewall-ubuntu-2.0.20200730
-  name: Firewall 2 Ubuntu 20200730
-  description: Firewall 2 Ubuntu 20200730
-  url: http://images.metal-stack.io/metal-os/master/firewall/2.0-ubuntu/20200730/img.tar.lz4
+- id: firewall-ubuntu-2.0.20200806
+  name: Firewall 2 Ubuntu 20200806
+  description: Firewall 2 Ubuntu 20200806
+  url: http://images.metal-stack.io/metal-os/master/firewall/2.0-ubuntu/20200806/img.tar.lz4
   features:
     - firewall
 - id: ubuntu-20.04.20200331
   name: Ubuntu 20.04 20200331
   description: Ubuntu 20.04 20200331
-  url: http://images.metal-stack.io/metal-os/master/ubuntu/20.04/20200730/img.tar.lz4
+  url: http://images.metal-stack.io/metal-os/master/ubuntu/20.04/20200806/img.tar.lz4
   features:
     - machine
 
@@ -59,6 +59,28 @@ metal_api_networks:
   partitionid: "vagrant"
   prefixes:
   - 10.0.0.0/16
+- id: internet-vagrant-lab
+  name: "Virtual Internet Network"
+  description: "Virtual Internet Network for vagrant-lab"
+  nat: true
+  privatesuper: false
+  underlay: false
+  destinationprefixes:
+    - 0.0.0.0/0
+  partitionid: "vagrant"
+  vrf: 104009
+  prefixes:
+  - 100.255.254.0/24
+- id: underlay-vagrant-lab
+  name: "Underlay Network"
+  description: "Underlay Network for vagrant-lab"
+  nat: false
+  privatesuper: false
+  underlay: true
+  destinationprefixes: []
+  partitionid: "vagrant"
+  prefixes:
+  - 10.1.0.0/24
 
 metal_api_nsq_tls_enabled: false
 
@@ -98,3 +120,9 @@ metal_masterdata_api_projects:
   description: Gardener Seeds Project
 
 metal_console_replicas: 1
+
+metal_api_grpc_certs_server_key: "{{ lookup('file', 'certs/grpc/server-key.pem') }}"
+metal_api_grpc_certs_server_cert: "{{  lookup('file', 'certs/grpc/server.pem') }}"
+metal_api_grpc_certs_client_key: "{{ lookup('file', 'certs/grpc/client-key.pem') }}"
+metal_api_grpc_certs_client_cert: "{{  lookup('file', 'certs/grpc/client.pem') }}"
+metal_api_grpc_certs_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"

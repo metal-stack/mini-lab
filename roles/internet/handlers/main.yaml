@@ -1,0 +1,20 @@
+---
+# Hint: this must happen at the end of the partition deploy playbook
+#       otherwise metal-core will fail like this and the route leak does not work:
+#       Aug 05 06:12:52 vagrant-leaf01 docker[11806]: 2020-08-05T06:12:52.384Z        error        event/reconfigureSwitch.go:41        reconfiguration failed        {"app": "metal-core", "error": "could not build switcher config: no vlan mapping could be determined for vxlan interface vniInternet", "errorVerbose": "no vlan mapping could be determined for vxlan interface vniInternet\ncould not build switcher config\ngithub.com/metal-stack/metal-core/internal/event.(*eventHandler).reconfigureSwitch\n\t/work/internal/event/reconfigureSwitch.go:65\ngithub.com/metal-stack/metal-core/internal/event.(*eventHandler).ReconfigureSwitch\n\t/work/internal/event/reconfigureSwitch.go:28\nruntime.goexit\n\t/usr/local/go/src/runtime/asm_amd64.s:1357"}
+- name: adjust interfaces
+  template:
+    src: internet.intf.j2
+    dest: /etc/network/interfaces.d/internet.intf
+  notify:
+  - reload interfaces
+  - restart frr
+
+- name: reload interfaces
+  command: ifreload -av
+  failed_when: false
+
+- name: restart frr
+  systemd:
+    name: frr
+    state: restarted

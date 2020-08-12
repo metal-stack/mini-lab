@@ -39,6 +39,10 @@ endif
 partition: partition-bake
 	docker-compose up --remove-orphans --force-recreate partition && vagrant up machine01 machine02
 
+.PHONY: route
+route: _ips
+	@echo "sudo ip r a $(staticR)"
+
 .PHONY: cleanup
 cleanup: caddy-down registry-down
 	vagrant destroy -f --parallel || true
@@ -65,36 +69,42 @@ reboot-machine02:
 	vagrant up machine02
 
 .PHONY: password01
-password01:
+password01: env
 	docker-compose run metalctl machine describe e0ab02d2-27cd-5a5e-8efc-080ba80cf258 | grep consolepassword | cut -d: -f2
 
 .PHONY: password02
-password02:
+password02: env
 	docker-compose run metalctl machine describe 2294c949-88f6-5390-8154-fa53d93a3313 | grep consolepassword | cut -d: -f2
 
+.PHONY: _privatenet
+_privatenet:
+	docker-compose run metalctl network list --name user-private-network | grep user-private-network || docker-compose run metalctl network allocate --partition vagrant --project 00000000-0000-0000-0000-000000000000 --name user-private-network
+
 .PHONY: machine
-machine:
-	$(eval alloc = $(shell docker-compose run metalctl network allocate --partition vagrant --project 00000000-0000-0000-0000-000000000000 --name vagrant))
-	$(eval ip = $(shell echo $(alloc) | grep id: | head -1 | cut -d' ' -f10))
-	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-20.04 --size v1-small-x86 --networks $(ip)
+machine: _privatenet
+	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-20.04 --size v1-small-x86 --networks $(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}')
+
+.PHONY: firewall
+firewall: _ips _privatenet
+	docker-compose run metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image firewall-ubuntu-2.0 --size v1-small-x86 --networks internet-vagrant-lab,$(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: reinstall-machine01
-reinstall-machine01:
+reinstall-machine01: env
 	docker-compose run metalctl machine reinstall --image ubuntu-20.04 e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 	@$(MAKE) --no-print-directory reboot-machine01
 
 .PHONY: reinstall-machine02
-reinstall-machine02:
+reinstall-machine02: env
 	docker-compose run metalctl machine reinstall --image ubuntu-20.04 2294c949-88f6-5390-8154-fa53d93a3313
 	@$(MAKE) --no-print-directory reboot-machine02
 
 .PHONY: delete-machine01
-delete-machine01:
+delete-machine01: env
 	docker-compose run metalctl machine rm e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 	@$(MAKE) --no-print-directory reboot-machine01
 
 .PHONY: delete-machine02
-delete-machine02:
+delete-machine02: env
 	docker-compose run metalctl machine rm 2294c949-88f6-5390-8154-fa53d93a3313
 	@$(MAKE) --no-print-directory reboot-machine02
 
@@ -109,18 +119,17 @@ console-machine02:
 	virsh console metalmachine02
 
 .PHONY: ls
-ls:
+ls: env
 	docker-compose run metalctl machine ls
 
 .PHONY: env
 env:
 	./env.sh
-	@virsh net-autostart vagrant-libvirt >/dev/null
 
 # ---- development targets -------------------------------------------------------------
 
 .PHONY: dev
-dev: cleanup caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image partition-bake env
+dev: caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image partition-bake
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 	vagrant up machine01 machine02
 
@@ -147,12 +156,10 @@ build-api-image:
 
 .PHONY: _ips
 _ips:
-	$(eval pattern = "([0-9a-f]{2}:){5}([0-9a-f]{2})")
-	$(eval macL1 = $(shell virsh domiflist metalleaf01 | grep vagrant-libvirt | grep -o -E $(pattern)))
-	$(eval macL2 = $(shell virsh domiflist metalleaf02 | grep vagrant-libvirt | grep -o -E $(pattern)))
 	$(eval dev = $(shell virsh net-info vagrant-libvirt | grep Bridge | cut -d' ' -f10 2>/dev/null))
-	$(eval ipL1 = $(shell arp -i $(dev) | grep $(macL1) 2>/dev/null | cut -d' ' -f1))
-	$(eval ipL2 = $(shell arp -i $(dev) | grep $(macL2) 2>/dev/null | cut -d' ' -f1))
+	$(eval ipL1 = $(shell python3 -c 'import pickle; print(pickle.load(open(".ansible_vagrant_cache", "rb"))["meta_vars"]["leaf01"]["ansible_host"])'))
+	$(eval ipL2 = $(shell python3 -c 'import pickle; print(pickle.load(open(".ansible_vagrant_cache", "rb"))["meta_vars"]["leaf02"]["ansible_host"])'))
+	$(eval staticR = "100.255.254.0/24 nexthop via $(ipL1) dev $(dev) nexthop via $(ipL2) dev $(dev)")
 
 .PHONY: reload-core
 reload-core: build-core-image push-core-image _ips

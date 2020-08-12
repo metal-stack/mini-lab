@@ -62,5 +62,7 @@ services:
     environment:
       - METALCTL_HMAC=metal-admin
       - METALCTL_URL=http://api.0.0.0.0.xip.io:8080/metal
+    volumes:
+      - ${HOME}/.ssh:/root/.ssh:ro
     network_mode: host
     command: --version
