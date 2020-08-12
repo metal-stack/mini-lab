@@ -44,7 +44,7 @@ do
 done
 echo "$phoned/$minPhoned machines have phoned home"
 
-sleep 5
+sleep 10
 
 echo "Adding route to leaf01"
 sudo ip r d 100.255.254.0/24 || true
