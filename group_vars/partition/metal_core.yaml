@@ -1,5 +1,4 @@
 ---
-metal_core_image_tag: v0.5.3
 metal_core_change_boot_order: false
 
 metal_core_nsq_tls_enabled: false
