@@ -147,8 +147,7 @@ registry: registry-down
 
 .PHONY: reload-api
 reload-api: build-api-image load-api-image
-	$(eval pod = $(shell kubectl --kubeconfig=$(KUBECONFIG) --namespace metal-control-plane get pod | grep metal-api | head -1|cut -d' ' -f1))
-	kubectl --kubeconfig=$(KUBECONFIG) --namespace metal-control-plane delete pod $(pod)
+	kubectl --kubeconfig=$(KUBECONFIG) --namespace metal-control-plane delete pod -l app=metal-api
 
 .PHONY: build-api-image
 build-api-image:
