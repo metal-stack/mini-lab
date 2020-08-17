@@ -8,3 +8,4 @@
 ansible-common
 metal-hammer*
 partition/dynamic_inventory.yaml
+requirements.yaml
