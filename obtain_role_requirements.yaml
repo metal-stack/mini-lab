@@ -1,0 +1,23 @@
+---
+- name: provide requirements.yaml
+  hosts: control-plane
+  connection: local
+  gather_facts: false
+  vars:
+    release_vector_url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
+  tasks:
+    - name: download release vector
+      uri:
+        url: "{{ release_vector_url }}"
+        return_content: yes
+      register: release_vector
+
+    - name: write requirements.yaml from release vector
+      copy:
+        dest: "{{ playbook_dir }}/requirements.yaml"
+        content: |
+          {% for role_name, role_params in (release_vector.content | from_yaml).get('ansible-roles').items() %}
+          - src: {{ role_params.get('repository') }}
+            name: {{ role_name }}
+            version: {{ role_params.get('version') }}
+          {% endfor %}
