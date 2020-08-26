@@ -70,11 +70,11 @@ reboot-machine02:
 
 .PHONY: password01
 password01: env
-	docker-compose run metalctl machine describe e0ab02d2-27cd-5a5e-8efc-080ba80cf258 | grep consolepassword | cut -d: -f2
+	docker-compose run metalctl machine ls --id e0ab02d2-27cd-5a5e-8efc-080ba80cf258 -o template --template "{{ .allocation.console_password }}"
 
 .PHONY: password02
 password02: env
-	docker-compose run metalctl machine describe 2294c949-88f6-5390-8154-fa53d93a3313 | grep consolepassword | cut -d: -f2
+	docker-compose run metalctl machine ls --id 2294c949-88f6-5390-8154-fa53d93a3313 -o template --template "{{ .allocation.console_password }}"
 
 .PHONY: _privatenet
 _privatenet:
