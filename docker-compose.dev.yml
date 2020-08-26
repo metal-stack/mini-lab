@@ -7,6 +7,9 @@ services:
       - /bin/bash
       - -ce
       - |
+          ansible-playbook \
+            -i inventories/control-plane.yaml \
+            obtain_role_requirements.yaml
           ansible-galaxy install --ignore-errors -r requirements.yaml
           ansible-playbook \
             -i inventories/control-plane.yaml \
@@ -18,6 +21,9 @@ services:
       - /bin/bash
       - -ce
       - |
+          ansible-playbook \
+            -i inventories/control-plane.yaml \
+            obtain_role_requirements.yaml
           ansible-galaxy install --ignore-errors -r requirements.yaml
           ansible-playbook \
             -i inventories/partition-static.yaml \
