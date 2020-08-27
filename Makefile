@@ -187,7 +187,7 @@ caddy-down:
 
 .PHONY: caddy
 caddy: caddy-down
-	docker run -v $(shell pwd):/srv -p 2015:2015 --name caddy -d abiosoft/caddy
+	docker run -v $(shell pwd):/srv -p 20015:2015 --name caddy -d abiosoft/caddy
 
 .PHONY: build-hammer-image
 build-hammer-image:

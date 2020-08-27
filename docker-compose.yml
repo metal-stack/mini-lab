@@ -19,6 +19,10 @@ services:
       - K8S_AUTH_KUBECONFIG=/mini-lab/.kubeconfig
     network_mode: host
     working_dir: /mini-lab
+    dns:
+      - 192.168.121.1
+      - 1.1.1.1
+      - 1.0.0.1
     entrypoint:
       - /bin/bash
       - -ce
@@ -50,6 +54,10 @@ services:
       - ANSIBLE_VAGRANT_CACHE_MAX_AGE=0
     network_mode: host
     working_dir: /mini-lab
+    dns:
+      - 192.168.121.1
+      - 1.1.1.1
+      - 1.0.0.1
     entrypoint:
       - /bin/bash
       - -ce
@@ -71,4 +79,8 @@ services:
     volumes:
       - ${HOME}/.ssh:/root/.ssh:ro
     network_mode: host
+    dns:
+      - 192.168.121.1
+      - 1.1.1.1
+      - 1.0.0.1
     command: --version
