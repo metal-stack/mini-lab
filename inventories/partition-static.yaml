@@ -33,6 +33,8 @@ leaves:
     uplinks: []
     dhcp_server_ip: 10.0.1.1
 
+    ansible_python_interpreter: /usr/bin/python
+
     # The best practice recommendation is to set an MTU of 9,216 for the inter-switch links,
     # and an MTU of 9,000 for the server-facing ports, which don’t carry the VXLAN header.
     # See: EVPN in the Data center (D. Dutt, p.77)
