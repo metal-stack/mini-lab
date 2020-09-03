@@ -25,7 +25,7 @@ control-plane-bake:
 			--kubeconfig $(KUBECONFIG); fi
 
 .PHONY: control-plane
-control-plane: control-plane-bake
+control-plane: control-plane-bake env
 	docker-compose up --remove-orphans --force-recreate control-plane
 
 .PHONY: partition-bake
@@ -77,7 +77,7 @@ password02: env
 	docker-compose run metalctl machine ls --id 2294c949-88f6-5390-8154-fa53d93a3313 -o template --template "{{ .allocation.console_password }}"
 
 .PHONY: _privatenet
-_privatenet:
+_privatenet: env
 	docker-compose run metalctl network list --name user-private-network | grep user-private-network || docker-compose run metalctl network allocate --partition vagrant --project 00000000-0000-0000-0000-000000000000 --name user-private-network
 
 .PHONY: machine
