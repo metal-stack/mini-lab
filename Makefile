@@ -199,3 +199,13 @@ build-hammer-initrd: build-hammer-image
 	tar -xf metal-hammer.tar metal-hammer-initrd.img.lz4
 	@rm -f metal-hammer.tar
 	md5sum metal-hammer-initrd.img.lz4 > metal-hammer-initrd.img.lz4.md5
+
+.PHONY: integration
+integration: env
+	docker run --rm -it \
+		-v $(PWD):/mini-lab \
+		-w /mini-lab \
+		-e METAL_ANSIBLE_INVENTORY_CONFIG=/root/.ansible/roles/metal-ansible-modules/inventory/metal_config.example.yaml \
+		--env-file .env \
+		--network host \
+		metalstack/metal-deployment-base:v0.0.6 /mini-lab/integration.sh

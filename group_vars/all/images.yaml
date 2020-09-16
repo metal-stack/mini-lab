@@ -1,2 +1,4 @@
 ---
-metal_stack_release_version: v0.1.5
+metal_stack_release_version: develop
+
+metal_ansible_modules_version: master
