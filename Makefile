@@ -158,7 +158,7 @@ _ips:
 	$(eval dev = $(shell virsh net-info vagrant-libvirt | grep Bridge | cut -d' ' -f10 2>/dev/null))
 	$(eval ipL1 = $(shell python3 -c 'import pickle; print(pickle.load(open(".ansible_vagrant_cache", "rb"))["meta_vars"]["leaf01"]["ansible_host"])'))
 	$(eval ipL2 = $(shell python3 -c 'import pickle; print(pickle.load(open(".ansible_vagrant_cache", "rb"))["meta_vars"]["leaf02"]["ansible_host"])'))
-	$(eval staticR = "100.255.254.0/24 nexthop via $(ipL1) dev $(dev) nexthop via $(ipL2) dev $(dev)")
+	$(eval staticR = "100.255.254.0/24 nexthop via $(ipL1) dev $(dev)")
 
 .PHONY: reload-core
 reload-core: build-core-image push-core-image _ips
