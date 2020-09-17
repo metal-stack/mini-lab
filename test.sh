@@ -51,7 +51,8 @@ sudo ip r d 100.255.254.0/24 || true
 $(make route) || true
 
 echo "Check if SSH login to firewall works"
-ssh -o StrictHostKeyChecking=no metal@100.255.254.1 -C exit
+# FIXME: lead to unstable integration tests, disabling for now.
+# ssh -o StrictHostKeyChecking=no metal@100.255.254.1 -C exit
 
 echo "Successfully started mini-lab"
 sudo ip r d 100.255.254.0/24
