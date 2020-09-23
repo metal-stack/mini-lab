@@ -15,5 +15,6 @@ jobs:
     - name: Run integration tests
       shell: bash
       run: |
+        export TMPDIR=/var/tmp/	
         make ci-prep
         ./test.sh
