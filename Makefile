@@ -199,16 +199,3 @@ build-hammer-initrd: build-hammer-image
 	tar -xf metal-hammer.tar metal-hammer-initrd.img.lz4
 	@rm -f metal-hammer.tar
 	md5sum metal-hammer-initrd.img.lz4 > metal-hammer-initrd.img.lz4.md5
-
-.PHONY: ci-prep
-ci-prep:
-	echo "Cleanup artifacts of previous runs"
-	$(MAKE) cleanup
-	# cleanup does not work 100% on the CI-runner - use virsh commands directly
-	for i in metalleaf01 metalleaf02 metalmachine01 metalmachine02; do \
-	    virsh destroy $i || true; \
-	    virsh undefine $i || true; \
-	    virsh vol-delete --pool default "$i-sda.qcow2" || true; \
-	    virsh vol-delete --pool default "$i.img" || true; \
-	done
-	sudo ip r d 100.255.254.0/24 || true
