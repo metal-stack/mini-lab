@@ -7,7 +7,7 @@ make up
 echo "Waiting for machines to get to waiting state"
 waiting=$(docker-compose run metalctl machine ls | grep Waiting | wc -l)
 minWaiting=2
-attempts=0
+declare -i attempts=0
 until [ "$waiting" -ge $minWaiting ]
 do
     if [ "$attempts" -ge 60 ]; then
@@ -17,7 +17,7 @@ do
     echo "$waiting/$minWaiting machines are waiting"
     sleep 5
     waiting=$(docker-compose run metalctl machine ls | grep Waiting | wc -l)
-    attempts+=1
+    attempts=$attempts+1
 done
 echo "$waiting/$minWaiting machines are waiting"
 
@@ -28,7 +28,7 @@ make firewall
 echo "Waiting for machines to get to Phoned Home state"
 phoned=$(docker-compose run metalctl machine ls | grep Phoned | wc -l)
 minPhoned=2
-attempts=0
+declare -i attempts=0
 until [ "$phoned" -ge $minPhoned ]
 do
     if [ "$attempts" -ge 60 ]; then
