@@ -33,10 +33,9 @@ echo "$phoned/$minPhoned machines have phoned home"
 sleep 10
 
 echo "Adding route to leaf01"
-make route
+$(make route)
 
-# FIXME: is still flaky somehow. :(
-# echo "Check if SSH login to firewall works"
-# ssh -o StrictHostKeyChecking=no metal@100.255.254.1 -C exit
+echo "Check if SSH login to firewall works"
+ssh -o StrictHostKeyChecking=no metal@100.255.254.1 -C exit
 
 echo "Successfully started mini-lab"
