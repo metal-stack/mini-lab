@@ -18,9 +18,6 @@ nodes:
   - containerPort: 4161
     hostPort: 4161
     listenAddress: 0.0.0.0
-  - containerPort: 10001
-    hostPort: 5222
-    listenAddress: 0.0.0.0
   - containerPort: 50051
     hostPort: 50051
     listenAddress: 0.0.0.0
