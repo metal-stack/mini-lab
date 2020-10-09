@@ -45,8 +45,8 @@ route: _ips
 
 .PHONY: fwrules
 fwrules: _ips
-	@echo "sudo iptables -I LIBVIRT_FWO -s 100.255.254.0/24 -i $(dev) -j ACCEPT"
-	@echo "sudo iptables -I LIBVIRT_FWI -d 100.255.254.0/24 -o $(dev) -j ACCEPT"
+	@echo "sudo iptables -I LIBVIRT_FWO -s 100.255.254.0/24 -i $(dev) -j ACCEPT;"
+	@echo "sudo iptables -I LIBVIRT_FWI -d 100.255.254.0/24 -o $(dev) -j ACCEPT;"
 	@echo "sudo iptables -t nat -A LIBVIRT_PRT -s 100.255.254.0/24 ! -d 100.255.254.0/24 -j MASQUERADE"
 
 .PHONY: cleanup
