@@ -64,7 +64,6 @@ The following ports are getting used statically:
 | 4443 |   0.0.0.0    | HTTPS ingress                      |
 | 4150 |   0.0.0.0    | nsqd                               |
 | 4161 |   0.0.0.0    | nsq-lookupd                        |
-| 5222 |   0.0.0.0    | metal-console                      |
 | 8080 |   0.0.0.0    | HTTP ingress                       |
 
 ## Known Limitations
