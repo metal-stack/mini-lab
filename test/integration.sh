@@ -44,8 +44,11 @@ echo "$phoned/$minPhoned machines have phoned home"
 
 sleep 10
 
-echo "Adding route to leaf01"
-$(make route)
+echo "Adding route to leaf01 and leaf02"
+eval $(make route)
+
+echo "Adding iptables forwarding rules for libvirt networking"
+eval $(make fwrules)
 
 echo "Check if SSH login to firewall works"
 # FIXME: Again this is unstable in CI integration tests 
