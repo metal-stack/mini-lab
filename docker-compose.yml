@@ -40,7 +40,7 @@ services:
     image: metalstack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
     container_name: deploy-partition
     volumes:
-      - ${HOME}/.vagrant.d:/root/.vagrant.d
+      - ${VAGRANT_HOME:-~/.vagrant.d}:/root/.vagrant.d
       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
       - /var/run/docker.sock:/var/run/docker.sock
       - .:/mini-lab
