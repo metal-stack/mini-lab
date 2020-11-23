@@ -3,7 +3,7 @@ version: '3.7'
 
 services:
   control-plane:
-    image: metalstack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
+    image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
     container_name: deploy-control-plane
     volumes:
       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
@@ -37,7 +37,7 @@ services:
             deploy_control_plane.yaml
 
   partition:
-    image: metalstack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
+    image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
     container_name: deploy-partition
     volumes:
       - ${VAGRANT_HOME:-~/.vagrant.d}:/root/.vagrant.d
@@ -74,7 +74,7 @@ services:
             deploy_partition.yaml
 
   metalctl:
-    image: metalstack/metalctl:${METALCTL_IMAGE_TAG}
+    image: ghcr.io/metal-stack/metalctl:${METALCTL_IMAGE_TAG}
     environment:
       - METALCTL_HMAC=metal-admin
       - METALCTL_URL=http://api.0.0.0.0.xip.io:8080/metal
