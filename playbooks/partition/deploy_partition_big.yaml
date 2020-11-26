@@ -1,0 +1,26 @@
+---
+- name: pre-deployment checks
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: get vagrant version
+      command: vagrant --version
+      register: result
+
+    - name: check vagrant version
+      fail:
+        msg: "Vagrant version of the host system ({{ lookup('file', '/mini-lab/.vagrant_version_host_system') }}) does not match vagrant version in the deployment image ({{ result.stdout.split(' ')[1] }})"
+      when:
+        - result.stdout.split(' ')[1] != lookup('file', '/mini-lab/.vagrant_version_host_system')
+
+- name: deploy lmanagement servers
+  hosts: mgmtservers
+  gather_facts: true
+  roles:
+    - name: metal-roles/partition/management-server
+      tags: mgmt-server
+    - name: metal-roles/partition/image-cache
+      tags: image-cache
+    - name: metal-roles/partition/ztp
+      tags: ztp

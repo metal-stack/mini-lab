@@ -1,6 +1,16 @@
 .DEFAULT_GOAL := up
+.EXPORT_ALL_VARIABLES:
 
 KUBECONFIG := $(shell pwd)/.kubeconfig
+MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),mini)
+
+ifeq ($(MINI_LAB_FLAVOR),big)
+VAGRANT_VAGRANTFILE=Vagrantfile.big
+DOCKER_COMPOSE_OVERRIDE=-f docker-compose.big.yml
+else
+VAGRANT_VAGRANTFILE=Vagrantfile
+DOCKER_COMPOSE_OVERRIDE=
+endif
 
 .PHONY: up
 up: bake env
@@ -35,7 +45,7 @@ partition-bake:
 
 .PHONY: partition
 partition: partition-bake
-	docker-compose up --remove-orphans --force-recreate partition && vagrant up machine01 machine02
+	docker-compose -f docker-compose.yml $(DOCKER_COMPOSE_OVERRIDE) up --remove-orphans --force-recreate partition && vagrant up machine01 machine02
 
 .PHONY: route
 route: _ips
