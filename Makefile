@@ -45,7 +45,11 @@ partition-bake:
 
 .PHONY: partition
 partition: partition-bake
+<<<<<<< HEAD
 	docker-compose up --remove-orphans --force-recreate partition && vagrant up machine01 machine02 machine03
+=======
+	docker-compose -f docker-compose.yml $(DOCKER_COMPOSE_OVERRIDE) up --remove-orphans --force-recreate partition && vagrant up machine01 machine02
+>>>>>>> Add big flavor to the mini-lab. :)
 
 .PHONY: route
 route: _ips
