@@ -14,6 +14,7 @@ services:
       # - ${HOME}/.ansible/roles/ansible-common:/root/.ansible/roles/ansible-common:ro
       # - ${HOME}/.ansible/roles/metal-roles:/root/.ansible/roles/metal-roles:ro
       # - ${HOME}/.ansible/roles/metal-ansible-modules:/root/.ansible/roles/metal-ansible-modules:ro
+      # - ${HOME}/git/github.com/metal-stack/helm-charts:/helm-charts:ro
     environment:
       - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
       - KUBECONFIG=/mini-lab/.kubeconfig

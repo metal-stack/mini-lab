@@ -30,9 +30,7 @@ control-plane: control-plane-bake env
 
 .PHONY: partition-bake
 partition-bake:
-ifeq (,$(wildcard ./.vagrant_version_host_system))
 	@vagrant version | grep "Installed Version" | cut -d: -f 2 | tr -d '[:space:]' > .vagrant_version_host_system
-endif
 	vagrant up
 
 .PHONY: partition

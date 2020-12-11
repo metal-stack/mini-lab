@@ -2,6 +2,8 @@
 metal_set_resource_limits: no
 metal_check_api_health_endpoint: http://api.0.0.0.0.xip.io:8080/metal/v1/health
 
+# metal_helm_chart_local_path: /helm-charts/charts/metal-control-plane
+
 metal_api_replicas: 1
 metal_api_view_key: metal-view
 metal_api_edit_key: metal-edit
@@ -13,13 +15,13 @@ metal_api_images:
 - id: firewall-ubuntu-2.0.20201126
   name: Firewall 2 Ubuntu 20201126
   description: Firewall 2 Ubuntu 20201126
-  url: http://images.metal-stack.io/metal-os/master/firewall/2.0-ubuntu/20201126/img.tar.lz4
+  url: https://images.metal-stack.io/metal-os/master/firewall/2.0-ubuntu/20201126/img.tar.lz4
   features:
     - firewall
 - id: ubuntu-20.04.20201126
   name: Ubuntu 20.04 20201126
   description: Ubuntu 20.04 20201126
-  url: http://images.metal-stack.io/metal-os/master/ubuntu/20.04/20201126/img.tar.lz4
+  url: https://images.metal-stack.io/metal-os/master/ubuntu/20.04/20201126/img.tar.lz4
   features:
     - machine
 
