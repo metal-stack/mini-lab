@@ -4,17 +4,21 @@
 KUBECONFIG := $(shell pwd)/.kubeconfig
 MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),mini)
 
+# Default values
+VAGRANT_VAGRANTFILE=Vagrantfile
+DOCKER_COMPOSE_OVERRIDE=
+VAGRANT_MACHINES=machine01 machine02
+
 ifeq ($(MINI_LAB_FLAVOR),big)
 VAGRANT_VAGRANTFILE=Vagrantfile.big
 DOCKER_COMPOSE_OVERRIDE=-f docker-compose.big.yml
-else
-VAGRANT_VAGRANTFILE=Vagrantfile
-DOCKER_COMPOSE_OVERRIDE=
+ifeq ($(MINI_LAB_FLAVOR),3-machines)
+VAGRANT_MACHINES=machine01 machine02 machine03
 endif
 
 .PHONY: up
 up: bake env
-	docker-compose up --remove-orphans --force-recreate control-plane partition && vagrant up machine01 machine02 machine03
+	docker-compose up --remove-orphans --force-recreate control-plane partition && vagrant up $(VAGRANT_MACHINES)
 
 .PHONY: restart
 restart: down up
@@ -45,11 +49,7 @@ partition-bake:
 
 .PHONY: partition
 partition: partition-bake
-<<<<<<< HEAD
-	docker-compose up --remove-orphans --force-recreate partition && vagrant up machine01 machine02 machine03
-=======
-	docker-compose -f docker-compose.yml $(DOCKER_COMPOSE_OVERRIDE) up --remove-orphans --force-recreate partition && vagrant up machine01 machine02
->>>>>>> Add big flavor to the mini-lab. :)
+	docker-compose -f docker-compose.yml $(DOCKER_COMPOSE_OVERRIDE) up --remove-orphans --force-recreate partition && vagrant up $(VAGRANT_MACHINES)
 
 .PHONY: route
 route: _ips
@@ -112,7 +112,7 @@ _privatenet: env
 
 .PHONY: machine
 machine: _privatenet
-	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-cloud-init-20.04 --size v1-small-x86 --networks $(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}') --id=2294c949-88f6-5390-8154-fa53d93a3313
+	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-cloud-init-20.04 --size v1-small-x86 --networks $(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: firewall
 firewall: _ips _privatenet
