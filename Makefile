@@ -14,7 +14,7 @@ endif
 
 .PHONY: up
 up: bake env
-	docker-compose up --remove-orphans --force-recreate control-plane partition && vagrant up machine01 machine02
+	docker-compose up --remove-orphans --force-recreate control-plane partition && vagrant up machine01 machine02 machine03
 
 .PHONY: restart
 restart: down up
@@ -45,7 +45,7 @@ partition-bake:
 
 .PHONY: partition
 partition: partition-bake
-	docker-compose -f docker-compose.yml $(DOCKER_COMPOSE_OVERRIDE) up --remove-orphans --force-recreate partition && vagrant up machine01 machine02
+	docker-compose up --remove-orphans --force-recreate partition && vagrant up machine01 machine02 machine03
 
 .PHONY: route
 route: _ips
@@ -90,13 +90,17 @@ password01: env
 password02: env
 	docker-compose run metalctl machine ls --id 2294c949-88f6-5390-8154-fa53d93a3313 -o template --template "{{ .allocation.console_password }}"
 
+.PHONY: password03
+password03: env
+	docker-compose run metalctl machine ls --id 2294c949-88f6-5390-8154-fa53d93a3314 -o template --template "{{ .allocation.console_password }}"
+
 .PHONY: _privatenet
 _privatenet: env
 	docker-compose run metalctl network list --name user-private-network | grep user-private-network || docker-compose run metalctl network allocate --partition vagrant --project 00000000-0000-0000-0000-000000000000 --name user-private-network
 
 .PHONY: machine
 machine: _privatenet
-	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-20.04 --size v1-small-x86 --networks $(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-cloud-init-20.04 --size v1-small-x86 --networks $(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: firewall
 firewall: _ips _privatenet

@@ -28,9 +28,11 @@ leaves:
     ports:
       1: 100G
       2: 100G
+      3: 100G
     interfaces:
     - name: swp1
     - name: swp2
+    - name: swp3
     uplinks: []
     dhcp_server_ip: 10.0.1.1
 

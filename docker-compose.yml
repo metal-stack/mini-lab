@@ -3,7 +3,7 @@ version: '3.7'
 
 services:
   control-plane:
-    image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
+    image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}-vagrant
     container_name: deploy-control-plane
     volumes:
       - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
@@ -41,7 +41,7 @@ services:
             playbooks/control-plane/deploy_control_plane.yaml
 
   partition:
-    image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
+    image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}-vagrant
     container_name: deploy-partition
     volumes:
       - ${VAGRANT_HOME:-~/.vagrant.d}:/root/.vagrant.d

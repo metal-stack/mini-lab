@@ -27,6 +27,7 @@ Vagrant.configure("2") do |config|
     box device: device, hostname: "leaf02", box: "CumulusCommunity/cumulus-vx", box_version: "3.7.13", memory: 512
     cable device: device, iface: "swp1", mac: "44:38:39:00:00:04", port: "9003", remote_port: "8003" # -> lan1@machine01
     cable device: device, iface: "swp2", mac: "44:38:39:00:00:19", port: "9017", remote_port: "8017" # -> lan1@machine02
+    cable device: device, iface: "swp3", mac: "44:38:39:00:00:21", port: "9019", remote_port: "8019" # -> lan1@machine03
     device.vm.provision :shell , path: "./vagrant/provision/config_switch.sh"
     device.vm.provision :shell , path: "./vagrant/provision/udev_leaf02.sh"
     device.vm.provision :shell , path: "./vagrant/provision/common.sh"
@@ -35,6 +36,7 @@ Vagrant.configure("2") do |config|
     box device: device, hostname: "leaf01", box: "CumulusCommunity/cumulus-vx", box_version: "3.7.13", memory: 512
     cable device: device, iface: "swp1", mac: "44:38:39:00:00:1a", port: "9018", remote_port: "8018" # -> lan0@machine01
     cable device: device, iface: "swp2", mac: "44:38:39:00:00:18", port: "9016", remote_port: "8016" # -> lan0@machine02
+    cable device: device, iface: "swp3", mac: "44:38:39:00:00:20", port: "9015", remote_port: "8015" # -> lan0@machine03
     device.vm.provision :shell , path: "./vagrant/provision/config_switch.sh"
     device.vm.provision :shell , path: "./vagrant/provision/udev_leaf01.sh"
     device.vm.provision :shell , path: "./vagrant/provision/common.sh"
@@ -48,5 +50,10 @@ Vagrant.configure("2") do |config|
     pxe device: device, hostname: "machine02", memory: 1536, uuid: "2294c949-88f6-5390-8154-fa53d93a3313"
     cable device: device, iface: "lan0", mac: "00:04:00:22:21:02", port: "8016", remote_port: "9016" # -> swp2@leaf01
     cable device: device, iface: "lan1", mac: "00:04:00:22:22:02", port: "8017", remote_port: "9017" # -> swp2@leaf02
+  end
+  config.vm.define "machine03", autostart: false do |device|
+    pxe device: device, hostname: "machine03", memory: 1536, uuid: "2294c949-88f6-5390-8154-fa53d93a3314"
+    cable device: device, iface: "lan0", mac: "00:04:00:23:21:02", port: "8015", remote_port: "9015" # -> swp3@leaf01
+    cable device: device, iface: "lan1", mac: "00:04:00:23:22:02", port: "8019", remote_port: "9019" # -> swp3@leaf02
   end
 end
