@@ -85,6 +85,11 @@ reboot-machine02:
 	vagrant destroy -f machine02
 	vagrant up machine02
 
+.PHONY: reboot-machine03
+reboot-machine03:
+	vagrant destroy -f machine03
+	vagrant up machine03
+
 .PHONY: password01
 password01: env
 	docker-compose run metalctl machine ls --id e0ab02d2-27cd-5a5e-8efc-080ba80cf258 -o template --template "{{ .allocation.console_password }}"
@@ -103,11 +108,11 @@ _privatenet: env
 
 .PHONY: machine
 machine: _privatenet
-	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-cloud-init-20.04 --size v1-small-x86 --networks $(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-cloud-init-20.04 --size v1-small-x86 --networks $(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}') --id=2294c949-88f6-5390-8154-fa53d93a3313
 
 .PHONY: firewall
 firewall: _ips _privatenet
-	docker-compose run metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image firewall-ubuntu-2.0 --size v1-small-x86 --networks internet-vagrant-lab,$(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	docker-compose run metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image firewall-ubuntu-2.0 --size v1-small-x86 --networks internet-vagrant-lab,$(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}') --id=e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 
 .PHONY: reinstall-machine01
 reinstall-machine01: env
@@ -128,6 +133,11 @@ delete-machine01: env
 delete-machine02: env
 	docker-compose run metalctl machine rm 2294c949-88f6-5390-8154-fa53d93a3313
 	@$(MAKE) --no-print-directory reboot-machine02
+
+.PHONY: delete-machine03
+delete-machine03: env
+	docker-compose run metalctl machine rm 2294c949-88f6-5390-8154-fa53d93a3314
+	@$(MAKE) --no-print-directory reboot-machine03
 
 .PHONY: console-machine01
 console-machine01:

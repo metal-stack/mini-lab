@@ -18,17 +18,10 @@ metal_api_images:
   url: https://images.metal-stack.io/metal-os/master/firewall/2.0-ubuntu/20201126/img.tar.lz4
   features:
     - firewall
-<<<<<<< HEAD
-- id: ubuntu-20.04.20201126
-  name: Ubuntu 20.04 20201126
-  description: Ubuntu 20.04 20201126
-  url: https://images.metal-stack.io/metal-os/master/ubuntu/20.04/20201126/img.tar.lz4
-=======
 - id: ubuntu-cloud-init-20.04
   name: Ubuntu 20.04 cloud-init
   description: Ubuntu 20.04 with cloud-init support
   url: http://images.metal-stack.io/metal-os/pull_requests/62-cloud-init-support/ubuntu/20.04/20201107/img.tar.lz4
->>>>>>> run 3 machines
   features:
     - machine
 
