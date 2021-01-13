@@ -112,7 +112,7 @@ _privatenet: env
 
 .PHONY: machine
 machine: _privatenet
-	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-cloud-init-20.04 --size v1-small-x86 --networks $(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-cloud-init-20.04 --size v1-small-x86 --networks $(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}') --id=2294c949-88f6-5390-8154-fa53d93a3313
 
 .PHONY: firewall
 firewall: _ips _privatenet
