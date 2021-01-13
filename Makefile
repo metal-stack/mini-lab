@@ -30,9 +30,7 @@ control-plane: control-plane-bake env
 
 .PHONY: partition-bake
 partition-bake:
-ifeq (,$(wildcard ./.vagrant_version_host_system))
 	@vagrant version | grep "Installed Version" | cut -d: -f 2 | tr -d '[:space:]' > .vagrant_version_host_system
-endif
 	vagrant up
 
 .PHONY: partition
@@ -46,8 +44,11 @@ route: _ips
 .PHONY: fwrules
 fwrules: _ips
 	@echo "sudo -- iptables -I LIBVIRT_FWO -s 100.255.254.0/24 -i $(dev) -j ACCEPT;"
+	@echo "sudo -- iptables -I LIBVIRT_FWO -s 10.0.1.0/24 -i $(dev) -j ACCEPT;"
 	@echo "sudo -- iptables -I LIBVIRT_FWI -d 100.255.254.0/24 -o $(dev) -j ACCEPT;"
+	@echo "sudo -- iptables -I LIBVIRT_FWI -d 10.0.1.0/24 -o $(dev) -j ACCEPT;"
 	@echo "sudo -- iptables -t nat -I LIBVIRT_PRT -s 100.255.254.0/24 ! -d 100.255.254.0/24 -j MASQUERADE"
+	@echo "sudo -- iptables -t nat -I LIBVIRT_PRT -s 10.0.1.0/24 ! -d 10.0.1.0/24 -j MASQUERADE"
 
 .PHONY: cleanup
 cleanup: caddy-down registry-down
