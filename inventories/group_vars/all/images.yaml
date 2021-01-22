@@ -1,3 +1,2 @@
 ---
-# FIXME: has to be pinned to next metal-stack version before next release
-metal_stack_release_version: develop
+metal_stack_release_version: v0.5.0
