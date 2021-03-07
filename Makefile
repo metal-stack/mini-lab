@@ -162,7 +162,7 @@ env:
 .PHONY: dev
 dev: caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image partition-bake
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
-	vagrant up machine01 machine02
+	vagrant up machine01 machine02 machine03
 
 .PHONY: load-api-image
 load-api-image:
