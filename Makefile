@@ -49,7 +49,7 @@ partition: partition-bake
 
 .PHONY: route
 route: _ips
-	@echo "sudo ip r a $(staticR)"
+	eval "sudo ip r a ${staticR}"
 
 .PHONY: fwrules
 fwrules: _ips
