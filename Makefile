@@ -71,9 +71,9 @@ cleanup: caddy-down registry-down
 
 .PHONY: dev-env
 dev-env:
-	@echo "export METALCTL_URL=http://api.0.0.0.0.xip.io:8080/metal"
-	@echo "export METALCTL_HMAC=metal-admin"
-	@echo "export KUBECONFIG=$(KUBECONFIG)"
+	eval "export METALCTL_URL=http://api.0.0.0.0.xip.io:8080/metal"
+	eval "export METALCTL_HMAC=metal-admin"
+	eval "export KUBECONFIG=$(KUBECONFIG)"
 
 .PHONY: reboot-machine01
 reboot-machine01:
