@@ -1,4 +1,3 @@
 ---
+# TODO: pin to fixed version before next release
 metal_stack_release_version: develop
-
-metal_roles_version: pull-secrets
