@@ -1,0 +1,4 @@
+---
+metal_registry_auth_enabled: "{{ lookup('env', 'CI') | default(false, true) | bool }}"
+metal_registry_auth_user: "{{ lookup('env', 'DOCKER_HUB_USER') | default('', true) }}"
+metal_registry_auth_password: "{{ lookup('env', 'DOCKER_HUB_TOKEN') | default('', true) }}"

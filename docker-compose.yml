@@ -19,6 +19,9 @@ services:
       - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
       - KUBECONFIG=/mini-lab/.kubeconfig
       - K8S_AUTH_KUBECONFIG=/mini-lab/.kubeconfig
+      - CI=${CI}
+      - DOCKER_HUB_USER=${DOCKER_HUB_USER}
+      - DOCKER_HUB_TOKEN=${DOCKER_HUB_TOKEN}
     network_mode: host
     working_dir: /mini-lab
     dns:
@@ -55,6 +58,9 @@ services:
       - ANSIBLE_VAGRANT_USE_CACHE=1
       - ANSIBLE_VAGRANT_CACHE_FILE=/mini-lab/.ansible_vagrant_cache
       - ANSIBLE_VAGRANT_CACHE_MAX_AGE=0
+      - CI=${CI}
+      - DOCKER_HUB_USER=${DOCKER_HUB_USER}
+      - DOCKER_HUB_TOKEN=${DOCKER_HUB_TOKEN}
     network_mode: host
     working_dir: /mini-lab
     dns:
