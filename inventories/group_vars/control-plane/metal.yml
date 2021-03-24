@@ -97,20 +97,13 @@ metal_masterdata_api_port: 8445
 
 metal_masterdata_api_tenants:
 - meta:
-    id: fits
+    id: metal-stack
     kind: Tenant
     apiversion: v1
     version: 0
-  name: FI-TS
+  name: metal-stack
   iam_config:
-    issuer_config:
-      url: ""
-      client_id: "auth-go-cli"
-    idm_config:
-      idm_type: "UX"
-    group_config:
-      namespace_max_length: 20
-  description: FI-TS tenant, which is provider
+  description: metal-stack tenant, which is provider
 
 metal_masterdata_api_projects:
 - meta:
@@ -118,8 +111,8 @@ metal_masterdata_api_projects:
     kind: Project
     apiversion: v1
     version: 0
-  name: gardener-seeds
-  description: Gardener Seeds Project
+  name: sample-project
+  description: Sample project with static id
 
 metal_console_replicas: 1
 
