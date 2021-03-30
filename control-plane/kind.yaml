@@ -1,9 +1,5 @@
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
-containerdConfigPatches:
-- |-
-  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:5000"]
-    endpoint = ["http://kind-registry:5000"]
 networking:
   apiServerPort: 6443
   apiServerAddress: 0.0.0.0
