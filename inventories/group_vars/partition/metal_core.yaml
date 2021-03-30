@@ -11,6 +11,6 @@ metal_core_log_level: debug
 metal_core_consider_hosts_file_resolution: true
 
 metal_core_grpc_address: "{{ metal_partition_mgmt_gateway }}:50051"
-metal_core_grpc_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
-metal_core_grpc_client_cert: "{{ lookup('file', 'certs/grpc/client.pem') }}"
-metal_core_grpc_client_key: "{{ lookup('file', 'certs/grpc/client-key.pem') }}"
+metal_core_grpc_ca_cert: "{{ lookup('file', '/mini-lab/files/certs/ca.pem') }}"
+metal_core_grpc_client_cert: "{{ lookup('file', '/mini-lab/files/certs/grpc/client.pem') }}"
+metal_core_grpc_client_key: "{{ lookup('file', '/mini-lab/files/certs/grpc/client-key.pem') }}"

@@ -86,11 +86,11 @@ metal_api_networks:
 
 metal_api_nsq_tls_enabled: false
 
-metal_masterdata_api_tls_ca: "{{ lookup('file', 'certs/ca.pem') }}"
-metal_masterdata_api_tls_cert: "{{ lookup('file', 'certs/masterdata-api/server.pem') }}"
-metal_masterdata_api_tls_cert_key: "{{ lookup('file', 'certs/masterdata-api/server-key.pem') }}"
-metal_masterdata_api_tls_client_cert: "{{ lookup('file', 'certs/masterdata-api/client.pem') }}"
-metal_masterdata_api_tls_client_key: "{{ lookup('file', 'certs/masterdata-api/client-key.pem') }}"
+metal_masterdata_api_tls_ca: "{{ lookup('file', '/mini-lab/files/certs/ca.pem') }}"
+metal_masterdata_api_tls_cert: "{{ lookup('file', '/mini-lab/files/certs/masterdata-api/server.pem') }}"
+metal_masterdata_api_tls_cert_key: "{{ lookup('file', '/mini-lab/files/certs/masterdata-api/server-key.pem') }}"
+metal_masterdata_api_tls_client_cert: "{{ lookup('file', '/mini-lab/files/certs/masterdata-api/client.pem') }}"
+metal_masterdata_api_tls_client_key: "{{ lookup('file', '/mini-lab/files/certs/masterdata-api/client-key.pem') }}"
 
 # for metal-api development with kube-fwd
 metal_masterdata_api_port: 8445
@@ -116,8 +116,8 @@ metal_masterdata_api_projects:
 
 metal_console_replicas: 1
 
-metal_api_grpc_certs_server_key: "{{ lookup('file', 'certs/grpc/server-key.pem') }}"
-metal_api_grpc_certs_server_cert: "{{  lookup('file', 'certs/grpc/server.pem') }}"
-metal_api_grpc_certs_client_key: "{{ lookup('file', 'certs/grpc/client-key.pem') }}"
-metal_api_grpc_certs_client_cert: "{{  lookup('file', 'certs/grpc/client.pem') }}"
-metal_api_grpc_certs_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
+metal_api_grpc_certs_server_key: "{{ lookup('file', '/mini-lab/files/certs/grpc/server-key.pem') }}"
+metal_api_grpc_certs_server_cert: "{{  lookup('file', '/mini-lab/files/certs/grpc/server.pem') }}"
+metal_api_grpc_certs_client_key: "{{ lookup('file', '/mini-lab/files/certs/grpc/client-key.pem') }}"
+metal_api_grpc_certs_client_cert: "{{  lookup('file', '/mini-lab/files/certs/grpc/client.pem') }}"
+metal_api_grpc_certs_ca_cert: "{{ lookup('file', '/mini-lab/files/certs/ca.pem') }}"

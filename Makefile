@@ -13,8 +13,6 @@ ifeq ($(MINI_LAB_FLAVOR),big)
 VAGRANT_VAGRANTFILE=Vagrantfile.big
 DOCKER_COMPOSE_OVERRIDE=-f docker-compose.big.yml
 else ifeq ($(MINI_LAB_FLAVOR),3-machines)
-VAGRANT_VAGRANTFILE=Vagrantfile.3-machines
-DOCKER_COMPOSE_OVERRIDE=docker-compose.3-machines.yml
 VAGRANT_MACHINES=machine01 machine02 machine03
 endif
 
