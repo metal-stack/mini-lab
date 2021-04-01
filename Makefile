@@ -9,10 +9,7 @@ VAGRANT_VAGRANTFILE=Vagrantfile
 DOCKER_COMPOSE_OVERRIDE=
 VAGRANT_MACHINES=machine01 machine02
 
-ifeq ($(MINI_LAB_FLAVOR),big)
-VAGRANT_VAGRANTFILE=Vagrantfile.big
-DOCKER_COMPOSE_OVERRIDE=-f docker-compose.big.yml
-else ifeq ($(MINI_LAB_FLAVOR),3-machines)
+ifeq ($(MINI_LAB_FLAVOR),cluster-api)
 VAGRANT_MACHINES=machine01 machine02 machine03
 endif
 

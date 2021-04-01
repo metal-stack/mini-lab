@@ -8,7 +8,6 @@ partition:
       ansible_python_interpreter: "{{ ansible_playbook_python }}"
   children:
     leaves:
-    mgmtservers:
 
 leaves:
   hosts:
@@ -44,61 +43,6 @@ leaves:
     mtu:
       vxlan: 9216
       default: 9000
-
-mgmtservers:
-  hosts:
-    mgmtserver01:
-      spine_facing_iface_ip: 10.1.253.13
-      firewall_facing_iface_ip: "{{ hostvars['mgmtfw01'].ips.mgmt_srv }}"
-      switch_mgmt_ip: 10.1.253.13
-      firewall_ip: "{{ hostvars['mgmtfw01'].ips.edgerouter.mgmt_srv_eth0 }}"
-      asn: 4200000001
-      dhcp_subnets: "{{ dhcp_subnets_server01 + dhcp_subnets_common }}"
-      dhcp_subnets_server01:
-        -
-          comment: "tenant server IPMI at r01mgmtleaf01"
-          network: 10.1.1.0
-          netmask: 255.255.255.0
-          range:
-            begin: 10.1.1.10
-            end: 10.1.1.128
-          options:
-            - 'option routers 10.1.1.1;'
-        -
-          comment: "tenant server IPMI at r01mgmtleaf11"
-          network: 10.1.2.0
-          netmask: 255.255.255.0
-          range:
-            begin: 10.1.2.10
-            end: 10.1.2.128
-          options:
-            - 'option routers 10.1.2.1;'
-    mgmtserver02:
-      spine_facing_iface_ip: 10.1.253.29
-      firewall_facing_iface_ip: "{{ hostvars['mgmtfw02'].ips.mgmt_srv }}"
-      switch_mgmt_ip: 10.1.253.29
-      firewall_ip: "{{ hostvars['mgmtfw02'].ips.edgerouter.mgmt_srv_eth0 }}"
-      asn: 4200000002
-      dhcp_subnets: "{{ dhcp_subnets_server02 + dhcp_subnets_common }}"
-      dhcp_subnets_server02:
-        -
-          comment: "tenant server IPMI at r01mgmtleaf01"
-          network: 10.1.1.0
-          netmask: 255.255.255.0
-          range:
-            begin: 10.1.1.129
-            end: 10.1.1.254
-          options:
-            - 'option routers 10.1.1.1;'
-        -
-          comment: "tenant server IPMI at r01mgmtleaf11"
-          network: 10.1.2.0
-          netmask: 255.255.255.0
-          range:
-            begin: 10.1.2.129
-            end: 10.1.2.254
-          options:
-            - 'option routers 10.1.2.1;'
 
 vagrant:
   vars:

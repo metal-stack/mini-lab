@@ -202,19 +202,15 @@ docker-compose run metalctl machine rm e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 
 ## Flavors
 
-It is also possible to start up a more sophisticated version of a partition's switch plane, which is closer to a real-world deployment scenario. This includes
+There's few versions of mini-lab environment that you can run. We call them flavors. There's 2 flavors at the moment:
 
-- management-servers
-- management-spines
-- management-leaves
-- spines
-- exits
-- leaves
+- `default` -- runs 2 machines.
+- `cluster-api` -- runs 3 machines. Usefull for testing Control plane and worker node deployment with [Cluster API provider](https://github.com/metal-stack/cluster-api-provider-metalstack).
 
-In order to start up, you can define the flavor as follows:
+In order to start specific flavor, you can define the flavor as follows:
 
 ```bash
-export MINI_LAB_FLAVOR=big
+export MINI_LAB_FLAVOR=cluster-api
 make
 ```
 
