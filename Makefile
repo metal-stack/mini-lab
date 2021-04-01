@@ -2,15 +2,20 @@
 .EXPORT_ALL_VARIABLES:
 
 KUBECONFIG := $(shell pwd)/.kubeconfig
-MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),mini)
+MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),default)
 
 # Default values
 VAGRANT_VAGRANTFILE=Vagrantfile
 DOCKER_COMPOSE_OVERRIDE=
-VAGRANT_MACHINES=machine01 machine02
 
-ifeq ($(MINI_LAB_FLAVOR),cluster-api)
+ifeq ($(MINI_LAB_FLAVOR),default)
+VAGRANT_MACHINES=machine01 machine02
+MACHINE_OS=ubuntu-20.04
+else ifeq ($(MINI_LAB_FLAVOR),cluster-api)
 VAGRANT_MACHINES=machine01 machine02 machine03
+MACHINE_OS=ubuntu-cloud-init-20.04
+else
+$(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
 
 .PHONY: up
@@ -109,7 +114,7 @@ _privatenet: env
 
 .PHONY: machine
 machine: _privatenet
-	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-cloud-init-20.04 --size v1-small-x86 --networks $(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image $(MACHINE_OS) --size v1-small-x86 --networks $(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: firewall
 firewall: _ips _privatenet
