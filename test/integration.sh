@@ -21,9 +21,9 @@ do
 done
 echo "$waiting/$minWaiting machines are waiting"
 
-echo "Create machine and firewall"
-make machine
+echo "Create firewall and machine"
 make firewall
+make machine
 
 echo "Waiting for machines to get to Phoned Home state"
 phoned=$(docker-compose run metalctl machine ls | grep Phoned | wc -l)
@@ -51,7 +51,7 @@ echo "Adding iptables forwarding rules for libvirt networking"
 make fwrules
 
 echo "Check if SSH login to firewall works"
-# FIXME: Again this is unstable in CI integration tests 
+# FIXME: Again this is unstable in CI integration tests
 # ssh -o StrictHostKeyChecking=no metal@100.255.254.1 -C exit
 
 echo "Successfully started mini-lab"

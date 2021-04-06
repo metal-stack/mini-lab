@@ -103,8 +103,8 @@ e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Waiting      8s                   
 Create a machine/firewall with
 
 ```bash
-make machine
 make firewall
+make machine
 ```
 
 __Alternatively__ you may want to issue the `metalctl` commands by your own:
