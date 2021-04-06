@@ -168,11 +168,8 @@ consolepassword: ...
 If you want to access the firewall with SSH or have internet connectivity from the firewall and machine, you'll need to have a static route configured that points to the vagrant boxes of the leaf switches:
 
 ```bash
-# Show you the route needed to access the network internet-vagrant-lab
+# Add the route to the network internet-vagrant-lab 100.255.254.0/24 via leaf01 and leaf02, whose IPs are dynamically allocated. Make sure there's no old route before execution.
 make route
-
-# The output of `make route` loos like the following command, which adds the routes to communicate with the virtual internet network 100.255.254.0/24 over leaf01 and leaf02. These routes change every time you do a brand new `make`. If you already have `100.255.254.0/24` in the output of the command `ip route`, delete that with the command `sudo ip route delete 100.255.254.0/24` before executing the output of `make route`.
-sudo ip r a 100.255.254.0/24 nexthop via 192.168.121.120 dev virbr0 nexthop via 192.168.121.132 dev virbr0
 
 # Connect to the firewall
 ssh metal@100.255.254.1
