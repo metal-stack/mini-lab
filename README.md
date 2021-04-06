@@ -200,6 +200,20 @@ Remove a machine with
 docker-compose run metalctl machine rm e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 ```
 
+## Flavors
+
+There's few versions of mini-lab environment that you can run. We call them flavors. There's 2 flavors at the moment:
+
+- `default` -- runs 2 machines.
+- `cluster-api` -- runs 3 machines. Usefull for testing Control plane and worker node deployment with [Cluster API provider](https://github.com/metal-stack/cluster-api-provider-metalstack).
+
+In order to start specific flavor, you can define the flavor as follows:
+
+```bash
+export MINI_LAB_FLAVOR=cluster-api
+make
+```
+
 ## Development of metal-api, metal-hammer and metal-core
 
 To simplify developing changes for the `metal-api`, `metal-hammer` and `metal-core`, it is possible to use development artifacts from within the mini-lab.
