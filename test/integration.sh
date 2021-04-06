@@ -31,7 +31,7 @@ minPhoned=2
 declare -i attempts=0
 until [ "$phoned" -ge $minPhoned ]
 do
-    if [ "$attempts" -ge 60 ]; then
+    if [ "$attempts" -ge 120 ]; then
         echo "not enough machines phoned home - timeout reached"
         exit 1
     fi
