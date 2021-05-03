@@ -21,7 +21,7 @@ metal_api_images:
 - id: ubuntu-20.04.20210316
   name: Ubuntu 20.04 20210316
   description: Ubuntu 20.04 20210316
-  url: https://images.metal-stack.io/metal-os/master/ubuntu/20.04/20210316/img.tar.lz4
+  url: https://storage.googleapis.com/images.metal-pod.io/metal-os/pull_requests/85-mep-8/ubuntu/20.04/20210427/img.tar.lz4
   features:
     - machine
 - id: ubuntu-cloud-init-20.04
@@ -89,6 +89,159 @@ metal_api_networks:
   partitionid: "vagrant"
   prefixes:
   - 10.1.0.0/24
+
+metal_api_filesystemlayouts:
+- id: default
+  description: "default layout"
+  constraints:
+    sizes:
+      - v1-small-x86
+    images:
+      debian: "*"
+      ubuntu: "*"
+  filesystems:
+    - path: "/boot/efi"
+      device: "/dev/sda1"
+      format: "vfat"
+      createoptions:
+      - "-F 32"
+      label: "efi"
+    - path: "/"
+      device: "/dev/sda2"
+      format: "ext4"
+      label: "root"
+    - path: "/var/lib"
+      device: "/dev/sda3"
+      format: "ext4"
+      label: "varlib"
+    - path: "/tmp"
+      device: "tmpfs"
+      format: "tmpfs"
+      mountoptions: ["defaults","noatime","nosuid","nodev","noexec","mode=1777","size=512M"]
+  disks:
+    - device: "/dev/sda"
+      wipeonreinstall: true
+      partitions:
+        - number: 1
+          label: "efi"
+          size: 500
+          gpttype: "ef00"
+        - number: 2
+          label: "root"
+          size: 5000
+          gpttype: "8300"
+        - number: 3
+          label: "varlib"
+          size: 0 # to end of partition
+          gpttype: "8300"
+- id: raid
+  description: "raid layout"
+  constraints:
+    sizes:
+      - v1-small-x86
+    images: {}
+  filesystems:
+    - path: "/boot/efi"
+      device: "/dev/sda1"
+      format: "vfat"
+      createoptions:
+        - "-F 32"
+      label: "efi"
+    - path: "/"
+      device: "/dev/sda2"
+      format: "ext4"
+      label: "root"
+    - path: "/var/lib"
+      device: "/dev/md1"
+      format: "ext4"
+      label: "varlib"
+    - path: "/tmp"
+      device: "tmpfs"
+      format: "tmpfs"
+      mountoptions: ["defaults","noatime","nosuid","nodev","noexec","mode=1777","size=512M"]
+  raid:
+    - arrayname: "/dev/md1"
+      level: 1
+      devices:
+        - "/dev/sda3"
+        - "/dev/sda4"
+      createoptions: ["--metadata", "1.0"]
+  disks:
+    - device: "/dev/sda"
+      wipeonreinstall: true
+      partitions:
+        - number: 1
+          label: "efi"
+          size: 500
+          gpttype: "ef00"
+        - number: 2
+          label: "root"
+          size: 5000
+          gpttype: "8300"
+        - number: 3
+          label: "raid1"
+          size: 200
+          gpttype: "fd00"
+        - number: 4
+          label: "raid2"
+          size: 200
+          gpttype: "fd00"
+- id: lvm
+  description: "lvm layout"
+  constraints:
+    sizes:
+      - v1-small-x86
+    images: {}
+  filesystems:
+    - path: "/boot/efi"
+      device: "/dev/sda1"
+      format: "vfat"
+      createoptions:
+        - "-F 32"
+      label: "efi"
+    - path: "/"
+      device: "/dev/sda2"
+      format: "ext4"
+      label: "root"
+    - path: "/var/lib"
+      device: "/dev/vg00/varlib"
+      format: "ext4"
+      label: "varlib"
+    - path: "/tmp"
+      device: "tmpfs"
+      format: "tmpfs"
+      mountoptions: ["defaults","noatime","nosuid","nodev","noexec","mode=1777","size=512M"]
+  volumegroups:
+    - name: "vg00"
+      devices:
+        - "/dev/sda3"
+        - "/dev/sda4"
+  logicalvolumes:
+    - name: "varlib"
+      volumegroup: "vg00"
+      size: 200
+      lvmtype: "striped"
+  disks:
+    - device: "/dev/sda"
+      wipeonreinstall: true
+      partitions:
+        - number: 1
+          label: "efi"
+          size: 500
+          gpttype: "ef00"
+        - number: 2
+          label: "root"
+          size: 5000
+          gpttype: "8300"
+        - number: 3
+          label: "vg1"
+          size: 200
+          gpttype: "8e00"
+        - number: 4
+          label: "vg2"
+          size: 200
+          gpttype: "8e00"
+
 
 metal_api_nsq_tls_enabled: false
 
