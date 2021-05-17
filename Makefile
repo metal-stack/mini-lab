@@ -8,12 +8,11 @@ MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),default)
 VAGRANT_VAGRANTFILE=Vagrantfile
 DOCKER_COMPOSE_OVERRIDE=
 
+MACHINE_OS=ubuntu-20.04
 ifeq ($(MINI_LAB_FLAVOR),default)
 VAGRANT_MACHINES=machine01 machine02
-MACHINE_OS=ubuntu-20.04
 else ifeq ($(MINI_LAB_FLAVOR),cluster-api)
 VAGRANT_MACHINES=machine01 machine02 machine03
-MACHINE_OS=ubuntu-cloud-init-20.04
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif

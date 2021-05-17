@@ -42,17 +42,17 @@ Vagrant.configure("2") do |config|
     device.vm.provision :shell , path: "./vagrant/provision/common.sh"
   end
   config.vm.define "machine01", autostart: false do |device|
-    pxe device: device, hostname: "machine01", memory: 1300, uuid: "e0ab02d2-27cd-5a5e-8efc-080ba80cf258"
+    pxe device: device, hostname: "machine01", memory: 1500, uuid: "e0ab02d2-27cd-5a5e-8efc-080ba80cf258"
     cable device: device, iface: "lan0", mac: "00:04:00:11:11:01", port: "8018", remote_port: "9018" # -> swp1@leaf01
     cable device: device, iface: "lan1", mac: "00:04:00:11:12:01", port: "8003", remote_port: "9003" # -> swp1@leaf02
   end
   config.vm.define "machine02", autostart: false do |device|
-    pxe device: device, hostname: "machine02", memory: 1300, uuid: "2294c949-88f6-5390-8154-fa53d93a3313"
+    pxe device: device, hostname: "machine02", memory: 1500, uuid: "2294c949-88f6-5390-8154-fa53d93a3313"
     cable device: device, iface: "lan0", mac: "00:04:00:22:21:02", port: "8016", remote_port: "9016" # -> swp2@leaf01
     cable device: device, iface: "lan1", mac: "00:04:00:22:22:02", port: "8017", remote_port: "9017" # -> swp2@leaf02
   end
   config.vm.define "machine03", autostart: false do |device|
-    pxe device: device, hostname: "machine03", memory: 1300, uuid: "2294c949-88f6-5390-8154-fa53d93a3314"
+    pxe device: device, hostname: "machine03", memory: 1500, uuid: "2294c949-88f6-5390-8154-fa53d93a3314"
     cable device: device, iface: "lan0", mac: "00:04:00:23:21:02", port: "8015", remote_port: "9015" # -> swp3@leaf01
     cable device: device, iface: "lan1", mac: "00:04:00:23:22:02", port: "8019", remote_port: "9019" # -> swp3@leaf02
   end
