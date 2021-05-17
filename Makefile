@@ -1,10 +1,25 @@
 .DEFAULT_GOAL := up
+.EXPORT_ALL_VARIABLES:
 
 KUBECONFIG := $(shell pwd)/.kubeconfig
+MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),default)
+
+# Default values
+VAGRANT_VAGRANTFILE=Vagrantfile
+DOCKER_COMPOSE_OVERRIDE=
+
+MACHINE_OS=ubuntu-20.04
+ifeq ($(MINI_LAB_FLAVOR),default)
+VAGRANT_MACHINES=machine01 machine02
+else ifeq ($(MINI_LAB_FLAVOR),cluster-api)
+VAGRANT_MACHINES=machine01 machine02 machine03
+else
+$(error Unknown flavor $(MINI_LAB_FLAVOR))
+endif
 
 .PHONY: up
 up: bake env
-	docker-compose up --remove-orphans --force-recreate control-plane partition && vagrant up machine01 machine02
+	docker-compose up --remove-orphans --force-recreate control-plane partition && vagrant up $(VAGRANT_MACHINES)
 
 .PHONY: restart
 restart: down up
@@ -35,17 +50,20 @@ partition-bake:
 
 .PHONY: partition
 partition: partition-bake
-	docker-compose up --remove-orphans --force-recreate partition && vagrant up machine01 machine02
+	docker-compose -f docker-compose.yml $(DOCKER_COMPOSE_OVERRIDE) up --remove-orphans --force-recreate partition && vagrant up $(VAGRANT_MACHINES)
 
 .PHONY: route
 route: _ips
-	@echo "sudo ip r a $(staticR)"
+	eval "sudo ip r a ${staticR}"
 
 .PHONY: fwrules
 fwrules: _ips
-	@echo "sudo -- iptables -I LIBVIRT_FWO -s 100.255.254.0/24 -i $(dev) -j ACCEPT;"
-	@echo "sudo -- iptables -I LIBVIRT_FWI -d 100.255.254.0/24 -o $(dev) -j ACCEPT;"
-	@echo "sudo -- iptables -t nat -I LIBVIRT_PRT -s 100.255.254.0/24 ! -d 100.255.254.0/24 -j MASQUERADE"
+	eval "sudo -- iptables -I LIBVIRT_FWO -s 100.255.254.0/24 -i $(dev) -j ACCEPT;"
+	eval "sudo -- iptables -I LIBVIRT_FWO -s 10.0.1.0/24 -i $(dev) -j ACCEPT;"
+	eval "sudo -- iptables -I LIBVIRT_FWI -d 100.255.254.0/24 -o $(dev) -j ACCEPT;"
+	eval "sudo -- iptables -I LIBVIRT_FWI -d 10.0.1.0/24 -o $(dev) -j ACCEPT;"
+	eval "sudo -- iptables -t nat -I LIBVIRT_PRT -s 100.255.254.0/24 ! -d 100.255.254.0/24 -j MASQUERADE"
+	eval "sudo -- iptables -t nat -I LIBVIRT_PRT -s 10.0.1.0/24 ! -d 10.0.1.0/24 -j MASQUERADE"
 
 .PHONY: cleanup
 cleanup: caddy-down registry-down
@@ -72,6 +90,11 @@ reboot-machine02:
 	vagrant destroy -f machine02
 	vagrant up machine02
 
+.PHONY: reboot-machine03
+reboot-machine03:
+	vagrant destroy -f machine03
+	vagrant up machine03
+
 .PHONY: password01
 password01: env
 	docker-compose run metalctl machine ls --id e0ab02d2-27cd-5a5e-8efc-080ba80cf258 -o template --template "{{ .allocation.console_password }}"
@@ -80,13 +103,17 @@ password01: env
 password02: env
 	docker-compose run metalctl machine ls --id 2294c949-88f6-5390-8154-fa53d93a3313 -o template --template "{{ .allocation.console_password }}"
 
+.PHONY: password03
+password03: env
+	docker-compose run metalctl machine ls --id 2294c949-88f6-5390-8154-fa53d93a3314 -o template --template "{{ .allocation.console_password }}"
+
 .PHONY: _privatenet
 _privatenet: env
 	docker-compose run metalctl network list --name user-private-network | grep user-private-network || docker-compose run metalctl network allocate --partition vagrant --project 00000000-0000-0000-0000-000000000000 --name user-private-network
 
 .PHONY: machine
 machine: _privatenet
-	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image ubuntu-20.04 --size v1-small-x86 --networks $(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	docker-compose run metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition vagrant --image $(MACHINE_OS) --size v1-small-x86 --networks $(shell docker-compose run metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: firewall
 firewall: _ips _privatenet
@@ -112,6 +139,11 @@ delete-machine02: env
 	docker-compose run metalctl machine rm 2294c949-88f6-5390-8154-fa53d93a3313
 	@$(MAKE) --no-print-directory reboot-machine02
 
+.PHONY: delete-machine03
+delete-machine03: env
+	docker-compose run metalctl machine rm 2294c949-88f6-5390-8154-fa53d93a3314
+	@$(MAKE) --no-print-directory reboot-machine03
+
 .PHONY: console-machine01
 console-machine01:
 	@echo "exit console with CTRL+5"
@@ -135,7 +167,7 @@ env:
 .PHONY: dev
 dev: caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image partition-bake
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
-	vagrant up machine01 machine02
+	vagrant up $(VAGRANT_MACHINES)
 
 .PHONY: load-api-image
 load-api-image:
