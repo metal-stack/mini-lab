@@ -171,7 +171,7 @@ dev: caddy registry build-hammer-initrd build-api-image build-core-image push-co
 
 .PHONY: load-api-image
 load-api-image:
-	kind --name metal-control-plane load docker-image metalstack/metal-api:dev
+	kind --name metal-control-plane load docker-image ghcr.io/metal-stack/metal-api:dev
 
 .PHONY: registry-down
 registry-down:
@@ -187,7 +187,7 @@ reload-api: build-api-image load-api-image
 
 .PHONY: build-api-image
 build-api-image:
-	docker build -t metalstack/metal-api:dev ../metal-api
+	docker build -t ghcr.io/metal-stack/metal-api:dev ../metal-api
 
 .PHONY: _ips
 _ips:
