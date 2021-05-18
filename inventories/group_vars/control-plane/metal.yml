@@ -12,22 +12,16 @@ metal_api_admin_key: metal-admin
 metal_api_nsq_tcp_address: nsqd:4150
 
 metal_api_images:
-- id: firewall-ubuntu-2.0.20210316
-  name: Firewall 2 Ubuntu 20210316
-  description: Firewall 2 Ubuntu 20210316
-  url: https://images.metal-stack.io/metal-os/master/firewall/2.0-ubuntu/20210316/img.tar.lz4
+- id: firewall-ubuntu-2.0.20210517
+  name: Firewall 2 Ubuntu 20210517
+  description: Firewall 2 Ubuntu 20210517
+  url: https://images.metal-stack.io/metal-os/master/firewall/2.0-ubuntu/20210517/img.tar.lz4
   features:
     - firewall
-- id: ubuntu-20.04.20210316
-  name: Ubuntu 20.04 20210316
-  description: Ubuntu 20.04 20210316
-  url: https://storage.googleapis.com/images.metal-pod.io/metal-os/pull_requests/85-mep-8/ubuntu/20.04/20210427/img.tar.lz4
-  features:
-    - machine
-- id: ubuntu-cloud-init-20.04
-  name: Ubuntu 20.04 cloud-init
-  description: Ubuntu 20.04 with cloud-init support
-  url: http://images.metal-stack.io/metal-os/pull_requests/62-cloud-init-support/ubuntu/20.04/20201107/img.tar.lz4
+- id: ubuntu-20.04.20210517
+  name: Ubuntu 20.04 20210517
+  description: Ubuntu 20.04 20210517
+  url: https://images.metal-stack.io/metal-os/master/ubuntu/20.04/20210517/img.tar.lz4
   features:
     - machine
 
