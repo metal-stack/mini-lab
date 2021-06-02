@@ -18,10 +18,10 @@ metal_api_images:
   url: https://images.metal-stack.io/metal-os/master/firewall/2.0-ubuntu/20210517/img.tar.lz4
   features:
     - firewall
-- id: ubuntu-20.04.20210517
-  name: Ubuntu 20.04 20210517
-  description: Ubuntu 20.04 20210517
-  url: https://images.metal-stack.io/metal-os/master/ubuntu/20.04/20210517/img.tar.lz4
+- id: ubuntu-20.04.20210520
+  name: Ubuntu 20.04 20210520
+  description: Ubuntu 20.04 20210520
+  url: https://images.metal-stack.io/metal-os/master/ubuntu/20.04/20210520/img.tar.lz4
   features:
     - machine
 
