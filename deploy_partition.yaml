@@ -60,12 +60,12 @@
         group: root
         mode: 0644
       with_items:
-        - name: 0.0.0.0.xip.io
+        - name: 0.0.0.0.nip.io
           ip: "{{ metal_partition_mgmt_gateway }}"
-          regex: "{{ '0.0.0.0.xip.io' | regex_escape() }}"
-        - name: api.0.0.0.0.xip.io
+          regex: "{{ '0.0.0.0.nip.io' | regex_escape() }}"
+        - name: api.0.0.0.0.nip.io
           ip: "{{ metal_partition_mgmt_gateway }}"
-          regex: "{{ 'api.0.0.0.0.xip.io' | regex_escape() }}"
+          regex: "{{ 'api.0.0.0.0.nip.io' | regex_escape() }}"
         - name: nsqd
           ip: "{{ metal_partition_mgmt_gateway }}"
           regex: "{{ 'nsqd' | regex_escape() }}"
