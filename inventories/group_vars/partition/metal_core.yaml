@@ -4,7 +4,7 @@ metal_core_change_boot_order: false
 metal_core_nsq_tls_enabled: false
 
 metal_core_rack_id: test-rack
-metal_core_nsq_lookupd_addr: "0.0.0.0.xip.io:4161"
+metal_core_nsq_lookupd_addr: "0.0.0.0.nip.io:4161"
 
 metal_core_log_level: debug
 
