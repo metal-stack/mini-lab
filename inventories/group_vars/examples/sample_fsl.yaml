@@ -1,0 +1,348 @@
+---
+fsl:
+  # up to this patch version of the images the legacy fsl will be used
+  legacy_image_patch_version: "20210801"
+  # from this patch version of the images the new fsl will be used
+  new_image_patch_version: "20210519"
+
+# All Sizes are in MiB
+
+# Filesystemlayouts
+# ID                      DESCRIPTION             FILESYSTEMS                     SIZES           IMAGES
+# default-legacy          old default layout      /          /dev/sda2            c1-large-x86    centos<= 7.0.20210801
+#                                                 /tmp       tmpfs                c1-xlarge-x86   debian<= 10.0.20210801
+#                                                 /boot/efi  /dev/sda1                            ubuntu<= 20.04.20210801
+#                                                 /var/lib   /dev/sda3
+metal_api_filesystemlayouts:
+- id: default-legacy
+  description: "old default layout"
+  constraints:
+    sizes:
+      - c1-xlarge-x86
+    images:
+      debian: "<= 10.0.{{ fsl.legacy_image_patch_version }}"
+      ubuntu: "<= 20.04.{{ fsl.legacy_image_patch_version }}"
+      centos: "<= 7.0.{{ fsl.legacy_image_patch_version }}"
+  filesystems:
+    - path: "/boot/efi"
+      device: "/dev/sda1"
+      format: "vfat"
+      createoptions:
+      - "-F 32"
+      label: "efi"
+    - path: "/"
+      device: "/dev/sda2"
+      format: "ext4"
+      label: "root"
+    - path: "/var/lib"
+      device: "/dev/sda3"
+      format: "ext4"
+      label: "varlib"
+    - path: "/tmp"
+      device: "tmpfs"
+      format: "tmpfs"
+      mountoptions: ["defaults","noatime","nosuid","nodev","noexec","mode=1777","size=512M"]
+  disks:
+    - device: "/dev/sda"
+      wipeonreinstall: true
+      partitions:
+        - number: 1
+          label: "efi"
+          size: 500
+          gpttype: "ef00"
+        - number: 2
+          label: "root"
+          size: 5000
+          gpttype: "8300"
+        - number: 3
+          label: "varlib"
+          size: 0 # to end of partition
+          gpttype: "8300"
+
+# default                 default layout        / -> /dev/sda2                  s1-large-x86    ubuntu>= 20.04.20210519
+#                                               /tmp -> tmpfs                                   centos>= 7.0.20210519
+#                                               /boot/efi -> /dev/sda1                          debian>= 10.0.20210519
+#                                               /var/lib -> /dev/csi-lvm/varlib
+- id: default
+  description: "default layout, not yet enabled"
+  constraints:
+    sizes:
+      - s1-large-x86
+    images:
+        debian: ">= 10.0.{{ fsl.new_image_patch_version }}"
+        ubuntu: ">= 20.04.{{ fsl.new_image_patch_version }}"
+        centos: ">= 7.0.{{ fsl.new_image_patch_version }}"
+  filesystems:
+    - path: "/boot/efi"
+      device: "/dev/sda1"
+      format: "vfat"
+      createoptions:
+        - "-F 32"
+      label: "efi"
+    - path: "/"
+      device: "/dev/sda2"
+      format: "ext4"
+      label: "root"
+    - path: "/var/lib"
+      device: "/dev/csi-lvm/varlib"
+      format: "ext4"
+      label: "varlib"
+    - path: "/tmp"
+      device: "tmpfs"
+      format: "tmpfs"
+      mountoptions: ["defaults","noatime","nosuid","nodev","noexec","mode=1777","size=512M"]
+  volumegroups:
+    - name: "csi-lvm"
+      devices:
+        - "/dev/nvme0n1"
+        - "/dev/nvme1n1"
+  logicalvolumes:
+    - name: "varlib"
+      volumegroup: "csi-lvm"
+      size: 100000
+      lvmtype: "raid1"
+  disks:
+    - device: "/dev/sda"
+      wipeonreinstall: true
+      partitions:
+        - number: 1
+          label: "efi"
+          size: 500
+          gpttype: "ef00"
+        - number: 2
+          label: "root"
+          size: 5000
+          gpttype: "8300"
+    - device: "/dev/nvme0n1"
+      wipeonreinstall: false
+    - device: "/dev/nvme1n1"
+      wipeonreinstall: false
+
+# ID                      DESCRIPTION             FILESYSTEMS                     SIZES           IMAGES
+# s3-default-legacy       s3 default layout       /          /dev/sde2            s2-xlarge-x86   debian<= 10.0.20210801
+#                                                 /tmp       tmpfs                                ubuntu<= 20.04.20210801
+#                                                 /boot/efi  /dev/sde1
+#                                                 /var/lib   /dev/sde3
+- id: s3-default-legacy
+  description: "s3 default layout"
+  constraints:
+    sizes:
+      - s2-xlarge-x86
+    images:
+      debian: "<= 10.0.{{ fsl.legacy_image_patch_version }}"
+      ubuntu: "<= 20.04.{{ fsl.legacy_image_patch_version }}"
+  filesystems:
+    - path: "/boot/efi"
+      device: "/dev/sde1"
+      format: "vfat"
+      createoptions:
+      - "-F 32"
+      label: "efi"
+    - path: "/"
+      device: "/dev/sde2"
+      format: "ext4"
+      label: "root"
+    - path: "/var/lib"
+      device: "/dev/sde3"
+      format: "ext4"
+      label: "varlib"
+    - path: "/tmp"
+      device: "tmpfs"
+      format: "tmpfs"
+      mountoptions: ["defaults","noatime","nosuid","nodev","noexec","mode=1777","size=512M"]
+  disks:
+    - device: "/dev/sde"
+      wipeonreinstall: true
+      partitions:
+        - number: 1
+          label: "efi"
+          size: 500
+          gpttype: "ef00"
+        - number: 2
+          label: "root"
+          size: 5000
+          gpttype: "8300"
+        - number: 3
+          label: "varlib"
+          size: 0 # to end of partition
+          gpttype: "8300"
+# ID                      DESCRIPTION             FILESYSTEMS                     SIZES           IMAGES
+# raid                    raid layout legacy      /          /dev/md1             s3-large-x86    centos<= 7.0.20210801
+#                                                 /tmp       tmpfs
+#                                                 /boot/efi  /dev/md0
+#                                                 /var/lib   /dev/md2
+- id: raid
+  description: "raid layout"
+  constraints:
+    sizes:
+      - s3-large-x86
+    images:
+      centos: "<= 7.0.{{ fsl.legacy_image_patch_version }}"
+  filesystems:
+    - path: "/boot/efi"
+      device: "/dev/md0"
+      format: "vfat"
+      createoptions:
+        - "-F 32"
+      label: "efi"
+    - path: "/"
+      device: "/dev/md1"
+      format: "ext4"
+      label: "root"
+    - path: "/var/lib"
+      device: "/dev/md2"
+      format: "ext4"
+      label: "varlib"
+    - path: "/tmp"
+      device: "tmpfs"
+      format: "tmpfs"
+      mountoptions: ["defaults","noatime","nosuid","nodev","noexec","mode=1777","size=512M"]
+  raid:
+    - arrayname: "/dev/md0"
+      level: 1
+      devices:
+        - "/dev/sda1"
+        - "/dev/sdb1"
+      createoptions: ["--metadata", "1.0"]
+    - arrayname: "/dev/md1"
+      level: 1
+      devices:
+        - "/dev/sda2"
+        - "/dev/sdb2"
+      createoptions: ["--metadata", "1.0"]
+    - arrayname: "/dev/md2"
+      level: 1
+      devices:
+        - "/dev/sda3"
+        - "/dev/sdb3"
+      createoptions: ["--metadata", "1.0"]
+  disks:
+    - device: "/dev/sda"
+      wipeonreinstall: true
+      partitions:
+        - number: 1
+          label: "efi"
+          size: 500
+          gpttype: "ef00"
+        - number: 2
+          label: "root"
+          size: 5000
+          gpttype: "8300"
+        - number: 3
+          label: "varlib"
+          size: 0
+          gpttype: "fd00"
+    - device: "/dev/sdb"
+      wipeonreinstall: true
+      partitions:
+        - number: 1
+          label: "efi"
+          size: 500
+          gpttype: "ef00"
+        - number: 2
+          label: "root"
+          size: 5000
+          gpttype: "8300"
+        - number: 3
+          label: "varlib"
+          size: 0
+          gpttype: "fd00"
+# ID                      DESCRIPTION             FILESYSTEMS                     SIZES           IMAGES
+# medium-firewall         n1 firewall             /          /dev/sda2            n1-medium-x86   firewall<= 2.0.20210801
+#                                                 /var       /dev/sda3                            firewall-ubuntu<= 2.0.20210801
+#                                                 /tmp       tmpfs
+#                                                 /boot/efi  /dev/sda1
+- id: medium-firewall
+  description: "n1 firewall"
+  constraints:
+    sizes:
+      - n1-medium-x86
+    images:
+      firewall: "<= 2.0.{{ fsl.legacy_image_patch_version }}"
+      firewall-ubuntu: "<= 2.0.{{ fsl.legacy_image_patch_version }}"
+  filesystems:
+    - path: "/boot/efi"
+      device: "/dev/sda1"
+      format: "vfat"
+      createoptions:
+      - "-F 32"
+      label: "efi"
+    - path: "/"
+      device: "/dev/sda2"
+      format: "ext4"
+      label: "root"
+    - path: "/var"
+      device: "/dev/sda3"
+      format: "ext4"
+      label: "var"
+    - path: "/tmp"
+      device: "tmpfs"
+      format: "tmpfs"
+      mountoptions: ["defaults","noatime","nosuid","nodev","noexec","mode=1777","size=512M"]
+  disks:
+    - device: "/dev/sda"
+      wipeonreinstall: true
+      partitions:
+        - number: 1
+          label: "efi"
+          size: 500
+          gpttype: "ef00"
+        - number: 2
+          label: "root"
+          size: 5000
+          gpttype: "8300"
+        - number: 3
+          label: "var"
+          size: 0 # to end of partition
+          gpttype: "8300"
+# ID                      DESCRIPTION             FILESYSTEMS                     SIZES           IMAGES
+# default-firewall        for firewalls not on n1 /          /dev/sda2            c1-large-x86    firewall<= 2.0.20210801
+#                                                 /var       /dev/nvme0n1p1       c1-xlarge-x86   firewall-ubuntu<= 2.0.20210801
+#                                                 /tmp       tmpfs                s1-large-x86
+#                                                 /boot/efi  /dev/sda1
+- id: default-firewall
+  description: "for firewalls not on n1"
+  constraints:
+    sizes:
+      - c1-xlarge-x86
+    images:
+      firewall: "<= 2.0.{{ fsl.legacy_image_patch_version }}"
+      firewall-ubuntu: "<= 2.0.{{ fsl.legacy_image_patch_version }}"
+  filesystems:
+    - path: "/boot/efi"
+      device: "/dev/sda1"
+      format: "vfat"
+      createoptions:
+      - "-F 32"
+      label: "efi"
+    - path: "/"
+      device: "/dev/sda2"
+      format: "ext4"
+      label: "root"
+    - path: "/var"
+      device: "/dev/nvme0n1p1"
+      format: "ext4"
+      label: "var"
+    - path: "/tmp"
+      device: "tmpfs"
+      format: "tmpfs"
+      mountoptions: ["defaults","noatime","nosuid","nodev","noexec","mode=1777","size=512M"]
+  disks:
+    - device: "/dev/sda"
+      wipeonreinstall: true
+      partitions:
+        - number: 1
+          label: "efi"
+          size: 500
+          gpttype: "ef00"
+        - number: 2
+          label: "root"
+          size: 5000
+          gpttype: "8300"
+    - device: "/dev/nvme0n1"
+      wipeonreinstall: true
+      partitions:
+        - number: 1
+          label: "var"
+          size: 500000
+          gpttype: "8300"
