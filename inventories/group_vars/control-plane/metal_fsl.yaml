@@ -1,5 +1,4 @@
 ---
-
 metal_api_filesystemlayouts:
 - id: default
   description: "default layout"
@@ -9,6 +8,7 @@ metal_api_filesystemlayouts:
     images:
       debian: "*"
       ubuntu: "*"
+      firewall-ubuntu: "*"
   filesystems:
     - path: "/boot/efi"
       device: "/dev/sda1"
