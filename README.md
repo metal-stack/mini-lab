@@ -37,7 +37,7 @@ This project can also be used as a template for writing your own metal-stack dep
 Here is some code that should help you setting up most of the requirements:
 
  ```bash
-# Install  Docker
+# Install Docker
 curl -fsSL https://get.docker.com | sh
 # if you want to be on the safe side, follow the original installation
 # instructions at https://docs.docker.com/engine/install/ubuntu/
