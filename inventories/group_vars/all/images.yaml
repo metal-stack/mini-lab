@@ -1,16 +1,16 @@
 ---
-metal_stack_release_version: v0.6.6
+metal_stack_release_version: develop
 
-metal_api_image_tag: pr-mep-8
-metal_metalctl_image_tag: pr-mep-8
-metal_core_image_tag: pr-mep-8
-metal_hammer_image_url: https://storage.googleapis.com/images.metal-pod.io/metal-hammer/pull-requests/50-mep-8/metal-hammer-initrd.img.lz4
+# metal_api_image_tag: pr-mep-8
+# metal_metalctl_image_tag: pr-mep-8
+# metal_core_image_tag: pr-mep-8
+# metal_hammer_image_url: https://storage.googleapis.com/images.metal-pod.io/metal-hammer/pull-requests/50-mep-8/metal-hammer-initrd.img.lz4
 
 # ansible roles
-metal_roles_version: mep-8
+# metal_roles_version: mep-8
 # metal_extensions_roles_version: add-admission-controller-mapping
 # metal_ansible_modules_version: fix-allocation-uuid-update-request
 
 # helm charts
-metal_helm_chart_version: 0.3.5
-metal_helm_chart_repo: https://helm.metal-stack.io/pull_requests/mep-8
+# metal_helm_chart_version: 0.3.5
+# metal_helm_chart_repo: https://helm.metal-stack.io/pull_requests/mep-8
