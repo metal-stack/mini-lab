@@ -38,7 +38,7 @@ metal_api_filesystemlayouts:
           gpttype: "ef00"
         - number: 2
           label: "root"
-          size: 5000
+          size: 4500
           gpttype: "8300"
         - number: 3
           label: "varlib"
