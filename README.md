@@ -25,7 +25,8 @@ This project can also be used as a template for writing your own metal-stack dep
 - kvm as hypervisor for the VMs
   - Ubuntu 20.04:
 
-        sudo apt install -y qemu qemu-kvm libvirt-daemon bridge-utils virtinst libvirt-dev
+        sudo apt update
+        sudo apt install -y qemu qemu-kvm libvirt-daemon bridge-utils virtinst libvirt-dev git curl build-essential wget
 
 - [docker](https://www.docker.com/) >= 18.09 (for using kind and our deployment base image)
 - [docker-compose](https://docs.docker.com/compose/) >= 1.25.4 (for ease of use and for parallelizing control plane and partition deployment)
@@ -43,17 +44,24 @@ curl -fsSL https://get.docker.com | sh
 # instructions at https://docs.docker.com/engine/install/ubuntu/
 
 # Install vagrant and other stuff
-wget https://releases.hashicorp.com/vagrant/2.2.9/vagrant_2.2.9_x86_64.deb
-sudo apt-get install ./vagrant_2.2.9_x86_64.deb qemu-kvm virt-manager ovmf net-tools libvirt-dev haveged
+wget https://releases.hashicorp.com/vagrant/2.2.14/vagrant_2.2.14_x86_64.deb
+sudo apt-get install ./vagrant_2.2.14_x86_64.deb qemu-kvm virt-manager ovmf net-tools libvirt-dev haveged
 
-# Ensure that your user is member of the group "libvirt"
-# possibly you need to login again in order to make this change take effect
-sudo usermod -G libvirt -a ${USER}
+# Ensure that your user is member of the group "libvirt" and "docker"
+# you need to login again in order to make this change take effect
+sudo usermod -G libvirt,docker -a ${USER}
 
 # Install libvirt plugin for vagrant
 vagrant plugin install vagrant-libvirt
 
-# Install kind from https://github.com/kubernetes-sigs/kind/releases
+# Install kind (kubernetes in docker), for more details see https://kind.sigs.k8s.io/docs/user/quick-start/#installation
+curl -Lo ./kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
+chmod +x ./kind
+sudo mv ./kind /usr/local/bin/kind
+
+# Install docker-compose, for more details see https://docs.docker.com/compose/install/
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
 ```
 
 The following ports are getting used statically:
@@ -77,6 +85,8 @@ The following ports are getting used statically:
 Start the mini-lab with a kind cluster, a metal-api instance as well as some vagrant VMs with two leaf switches and two machine skeletons.
 
 ```bash
+git clone https://github.com/metal-stack/mini-lab.git
+cd mini-lab
 make
 ```
 
