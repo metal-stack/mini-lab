@@ -71,6 +71,7 @@ services:
       - /bin/bash
       - -ce
       - |
+          apt-get install --yes sshpass
           ansible-playbook \
             -i inventories/control-plane.yaml \
             obtain_role_requirements.yaml

@@ -1,0 +1,46 @@
+name: mini-lab
+
+mgmt:
+  network: bridge
+
+topology:
+  kinds:
+    cvx:
+      image: networkop/cx:4.4.0
+      binds:
+        - provision:/provision
+      cmd: bash -c "./provision/config_switch.sh && ./provision/common.sh"
+
+  nodes:
+    leaf1:
+      kind: cvx
+      mgmt_ipv4: 172.17.0.4
+    leaf2:
+      kind: cvx
+      mgmt_ipv4: 172.17.0.5
+    frr:
+      kind: linux
+      image: frrouting/frr:v7.5.1
+
+  links:
+    - endpoints: ["leaf1:swp1", "frr:eth1"]
+    - endpoints: ["leaf2:swp1", "frr:eth2"]
+
+#topology:
+#  kinds:
+#    linux:
+#      image: docker.io/panubo/sshd:1.4.0
+#      publish:
+#        - tcp/22
+#      binds:
+#        - /home/grigoriy/.ssh/id_rsa.pub:/root/.ssh/authorized_keys
+#        - /home/grigoriy/Projects/containerlab/keys/:/etc/ssh/keys
+#        - /home/grigoriy/Projects/containerlab/data/:/data/
+#      env:
+#        SSH_ENABLE_ROOT: true
+#      cmd: bash -c "apk add python3 && /usr/sbin/sshd -D -e -f /etc/ssh/sshd_config"
+#  nodes:
+#    n1:
+#      kind: linux
+#    n2:
+#      kind: linux

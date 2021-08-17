@@ -5,6 +5,7 @@
 .kubeconfig
 .vagrant
 **/*.pyc
+clab-mini-lab
 ansible-common
 metal-hammer*
 partition/dynamic_inventory.yaml

@@ -12,6 +12,9 @@ partition:
 leaves:
   hosts:
     leaf01:
+      ansible_host: 172.17.0.4
+      ansible_user: root
+      ansible_ssh_pass: root
       lo: 10.0.0.11
       asn: 4200000011
       metal_core_cidr: 10.0.1.1/24
@@ -20,18 +23,17 @@ leaves:
       dhcp_range_min: 10.0.1.2
       dhcp_range_max: 10.0.1.255
     leaf02:
+      ansible_host: 172.17.0.5
+      ansible_user: root
+      ansible_ssh_pass: root
       lo: 10.0.0.12
       asn: 4200000012
       metal_core_cidr: 10.0.1.128/24
   vars:
     ports:
       1: 100G
-      2: 100G
-      3: 100G
     interfaces:
     - name: swp1
-    - name: swp2
-    - name: swp3
     uplinks: []
     dhcp_server_ip: 10.0.1.1
 

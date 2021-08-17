@@ -8,6 +8,7 @@ MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),default)
 VAGRANT_VAGRANTFILE=Vagrantfile
 DOCKER_COMPOSE_OVERRIDE=
 
+# TODO: Adapt machine flavors to containerlab
 MACHINE_OS=ubuntu-20.04
 ifeq ($(MINI_LAB_FLAVOR),default)
 VAGRANT_MACHINES=machine01 machine02
@@ -18,8 +19,8 @@ $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
 
 .PHONY: up
-up: bake env
-	docker-compose up --remove-orphans --force-recreate control-plane partition && vagrant up $(VAGRANT_MACHINES)
+up: bake env lab
+	docker-compose up --remove-orphans --force-recreate control-plane partition
 
 .PHONY: restart
 restart: down up
@@ -28,7 +29,7 @@ restart: down up
 down: cleanup
 
 .PHONY: bake
-bake: control-plane-bake partition-bake
+bake: control-plane-bake
 
 .PHONY: control-plane-bake
 control-plane-bake:
@@ -43,14 +44,13 @@ control-plane-bake:
 control-plane: control-plane-bake env
 	docker-compose up --remove-orphans --force-recreate control-plane
 
-.PHONY: partition-bake
-partition-bake:
-	@vagrant version | grep "Installed Version" | cut -d: -f 2 | tr -d '[:space:]' > .vagrant_version_host_system
-	vagrant up
-
 .PHONY: partition
-partition: partition-bake
-	docker-compose -f docker-compose.yml $(DOCKER_COMPOSE_OVERRIDE) up --remove-orphans --force-recreate partition && vagrant up $(VAGRANT_MACHINES)
+partition: lab
+	docker-compose -f docker-compose.yml $(DOCKER_COMPOSE_OVERRIDE) up --remove-orphans --force-recreate partition
+
+.PHONY: lab
+lab:
+	sudo containerlab deploy --topo mini-lab.clab.yaml
 
 .PHONY: route
 route: _ips
@@ -67,12 +67,11 @@ fwrules: _ips
 
 .PHONY: cleanup
 cleanup: caddy-down registry-down
-	vagrant destroy -f --parallel || true
 	kind delete cluster --name metal-control-plane
 	docker-compose down
 	rm -f $(KUBECONFIG)
-	rm -f .vagrant_version_host_system
 	rm -f .ansible_vagrant_cache
+	sudo containerlab destroy --topo mini-lab.clab.yaml
 
 .PHONY: dev-env
 dev-env:
@@ -165,7 +164,7 @@ env:
 # ---- development targets -------------------------------------------------------------
 
 .PHONY: dev
-dev: caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image partition-bake
+dev: caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 	vagrant up $(VAGRANT_MACHINES)
 
