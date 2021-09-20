@@ -25,7 +25,7 @@ services:
     network_mode: host
     working_dir: /mini-lab
     dns:
-      - 192.168.121.1
+      - 172.17.0.1
       - 1.1.1.1
       - 1.0.0.1
     entrypoint:
@@ -64,7 +64,7 @@ services:
     network_mode: host
     working_dir: /mini-lab
     dns:
-      - 192.168.121.1
+      - 172.17.0.1
       - 1.1.1.1
       - 1.0.0.1
     entrypoint:
@@ -90,7 +90,7 @@ services:
       - ${HOME}/.ssh:/root/.ssh:ro
     network_mode: host
     dns:
-      - 192.168.121.1
+      - 172.17.0.1
       - 1.1.1.1
       - 1.0.0.1
     command: --version

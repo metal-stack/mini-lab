@@ -12,7 +12,7 @@ debug bgp zebra
 !
 vrf vrfInternet
  vni 104009
- ip route 0.0.0.0/0 192.168.121.1 nexthop-vrf mgmt
+ ip route 0.0.0.0/0 172.17.0.1 nexthop-vrf mgmt
 exit-vrf
 {{- range $vrf, $t := .Ports.Vrfs }}
 !

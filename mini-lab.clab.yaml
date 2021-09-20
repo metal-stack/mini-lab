@@ -6,7 +6,9 @@ mgmt:
 topology:
   kinds:
     cvx:
-      image: networkop/cx:4.4.0
+      image: networkop/cx:3.7.0
+      kernel: docker.io/grigoriymikh/kernel:4.1.0
+      sandbox: grigoriymikh/sandbox:latest
       binds:
         - provision:/provision
       cmd: bash -c "./provision/config_switch.sh && ./provision/common.sh"

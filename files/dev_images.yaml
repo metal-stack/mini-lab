@@ -1,6 +1,6 @@
 ---
 # Do not change these values
 metal_api_image_tag: dev
-metal_core_image_name: 192.168.121.1:5000/metalstack/metal-core
+metal_core_image_name: 172.17.0.1:5000/metalstack/metal-core
 metal_core_image_tag: dev
-metal_hammer_image_url: http://192.168.121.1:20015/metal-hammer-initrd.img.lz4
+metal_hammer_image_url: http://172.17.0.1:20015/metal-hammer-initrd.img.lz4

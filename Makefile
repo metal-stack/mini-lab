@@ -197,8 +197,8 @@ _ips:
 
 .PHONY: reload-core
 reload-core: build-core-image push-core-image _ips
-	ssh -i .vagrant/machines/leaf01/libvirt/private_key vagrant@${ipL1} "sudo docker pull 192.168.121.1:5000/metalstack/metal-core:dev; sudo systemctl restart metal-core"
-	ssh -i .vagrant/machines/leaf02/libvirt/private_key vagrant@${ipL2} "sudo docker pull 192.168.121.1:5000/metalstack/metal-core:dev; sudo systemctl restart metal-core"
+	ssh -i .vagrant/machines/leaf01/libvirt/private_key vagrant@${ipL1} "sudo docker pull 172.17.0.1:5000/metalstack/metal-core:dev; sudo systemctl restart metal-core"
+	ssh -i .vagrant/machines/leaf02/libvirt/private_key vagrant@${ipL2} "sudo docker pull 172.17.0.1:5000/metalstack/metal-core:dev; sudo systemctl restart metal-core"
 
 .PHONY: ssh-leaf01
 ssh-leaf01: _ips
