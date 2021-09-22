@@ -10,7 +10,7 @@
       tags: docker-on-cumulus
 
 - name: deploy dhcp server
-  hosts: leaf01
+  hosts: clab-mini-lab-leaf1
   roles:
     - name: metal-roles/partition/roles/dhcp
       tags: dhcp

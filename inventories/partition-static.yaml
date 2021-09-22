@@ -11,8 +11,7 @@ partition:
 
 leaves:
   hosts:
-    leaf01:
-      ansible_host: 172.17.0.3
+    clab-mini-lab-leaf1:
       ansible_user: root
       ansible_ssh_pass: root
       lo: 10.0.0.11
@@ -22,8 +21,7 @@ leaves:
       dhcp_netmask: 255.255.255.0
       dhcp_range_min: 10.0.1.2
       dhcp_range_max: 10.0.1.255
-    leaf02:
-      ansible_host: 172.17.0.5
+    clab-mini-lab-leaf2:
       ansible_user: root
       ansible_ssh_pass: root
       lo: 10.0.0.12

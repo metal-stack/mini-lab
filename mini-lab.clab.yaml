@@ -20,13 +20,15 @@ topology:
     leaf2:
       kind: cvx
       mgmt_ipv4: 172.17.0.5
-    frr:
+    vm1:
       kind: linux
       image: vms:latest
+      binds:
+        - /dev:/dev
 
   links:
-    - endpoints: ["leaf1:swp1", "frr:macvtap0@virbr0"]
-    - endpoints: ["leaf2:swp1", "frr:macvtap0@virbr1"]
+    - endpoints: ["leaf1:swp1", "vm1:lan0"]
+    - endpoints: ["leaf2:swp1", "vm1:lan1"]
 
 #topology:
 #  kinds:

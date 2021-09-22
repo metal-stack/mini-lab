@@ -51,6 +51,7 @@ partition: lab
 .PHONY: lab
 lab:
 	sudo containerlab deploy --topo mini-lab.clab.yaml
+	./deactivate_offloading.sh
 
 .PHONY: route
 route: _ips
