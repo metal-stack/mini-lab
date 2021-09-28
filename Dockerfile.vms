@@ -1,0 +1,13 @@
+FROM ubuntu:18.04
+
+RUN apt update -y && \
+    apt install -y wget curl && \
+    wget https://releases.hashicorp.com/vagrant/2.2.14/vagrant_2.2.14_x86_64.deb && \
+    DEBIAN_FRONTEND=noninteractive apt install -y ./vagrant_2.2.14_x86_64.deb virt-manager ovmf net-tools haveged
+
+RUN DEBIAN_FRONTEND=noninteractive apt install -y qemu qemu-kvm bridge-utils virtinst libvirt-dev libvirt-daemon-system build-essential libvirt-clients && \
+    vagrant plugin install vagrant-libvirt
+
+COPY . .
+
+ENTRYPOINT ["/vms.sh"]
