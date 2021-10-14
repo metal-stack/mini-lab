@@ -19,17 +19,16 @@ $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
 
 .PHONY: up
-up: bake env lab
-	docker-compose up --remove-orphans --force-recreate control-plane partition
+up: control-plane-bake env lab
+	docker-compose up --remove-orphans --force-recreate control-plane partition && \
+	./scripts/wait_for_switches.sh && \
+	docker exec clab-mini-lab-vms vagrant up
 
 .PHONY: restart
 restart: down up
 
 .PHONY: down
 down: cleanup
-
-.PHONY: bake
-bake: control-plane-bake
 
 .PHONY: control-plane-bake
 control-plane-bake:
@@ -51,7 +50,7 @@ partition: lab
 .PHONY: lab
 lab:
 	sudo containerlab deploy --topo mini-lab.clab.yaml
-	./deactivate_offloading.sh
+	./scripts/deactivate_offloading.sh
 
 .PHONY: route
 route: _ips
@@ -147,12 +146,12 @@ delete-machine03: env
 .PHONY: console-machine01
 console-machine01:
 	@echo "exit console with CTRL+5"
-	virsh console metalmachine01
+	docker exec -it clab-mini-lab-vms bash -c "virsh console metalmachine01"
 
 .PHONY: console-machine02
 console-machine02:
 	@echo "exit console with CTRL+5"
-	virsh console metalmachine02
+	docker exec -it clab-mini-lab-vms bash -c "virsh console metalmachine02"
 
 .PHONY: ls
 ls: env
@@ -192,8 +191,8 @@ build-api-image:
 .PHONY: _ips
 _ips:
 	$(eval dev = $(shell virsh net-info vagrant-libvirt | grep Bridge | cut -d' ' -f10 2>/dev/null))
-	$(eval ipL1 = $(shell python3 -c 'import pickle; print(pickle.load(open(".ansible_vagrant_cache", "rb"))["meta_vars"]["leaf01"]["ansible_host"])'))
-	$(eval ipL2 = $(shell python3 -c 'import pickle; print(pickle.load(open(".ansible_vagrant_cache", "rb"))["meta_vars"]["leaf02"]["ansible_host"])'))
+	$(eval ipL1 = $(shell cat clab-mini-lab/ansible-inventory.yml | grep -A1 clab-mini-lab-leaf1 | grep ansible_host | awk -F ' ' '$$0=$$NF'))
+	$(eval ipL2 = $(shell cat clab-mini-lab/ansible-inventory.yml | grep -A1 clab-mini-lab-leaf2 | grep ansible_host | awk -F ' ' '$$0=$$NF'))
 	$(eval staticR = "100.255.254.0/24 nexthop via $(ipL1) dev $(dev) nexthop via $(ipL2) dev $(dev)")
 
 .PHONY: reload-core

@@ -12,6 +12,7 @@ topology:
       binds:
         - provision:/provision
       cmd: bash -c "./provision/config_switch.sh && ./provision/common.sh"
+    linux:
 
   nodes:
     leaf1:
@@ -20,31 +21,16 @@ topology:
     leaf2:
       kind: cvx
       mgmt_ipv4: 172.17.0.5
-    vm1:
+    vms:
       kind: linux
-      image: vms:latest
+      image: grigoriymikh/vms:latest
       binds:
         - /dev:/dev
+      exec:
+        - /scripts/prepare_for_vms.sh
 
   links:
-    - endpoints: ["leaf1:swp1", "vm1:lan0"]
-    - endpoints: ["leaf2:swp1", "vm1:lan1"]
-
-#topology:
-#  kinds:
-#    linux:
-#      image: docker.io/panubo/sshd:1.4.0
-#      publish:
-#        - tcp/22
-#      binds:
-#        - /home/grigoriy/.ssh/id_rsa.pub:/root/.ssh/authorized_keys
-#        - /home/grigoriy/Projects/containerlab/keys/:/etc/ssh/keys
-#        - /home/grigoriy/Projects/containerlab/data/:/data/
-#      env:
-#        SSH_ENABLE_ROOT: true
-#      cmd: bash -c "apk add python3 && /usr/sbin/sshd -D -e -f /etc/ssh/sshd_config"
-#  nodes:
-#    n1:
-#      kind: linux
-#    n2:
-#      kind: linux
+    - endpoints: ["leaf1:swp1", "vms:lan0"]
+    - endpoints: ["leaf2:swp1", "vms:lan1"]
+    - endpoints: ["leaf1:swp2", "vms:lan2" ]
+    - endpoints: ["leaf2:swp2", "vms:lan3" ]

@@ -1,8 +1,7 @@
 #!/bin/bash
 
-chown root:kvm /dev/kvm
-service libvirtd start
-service virtlogd start
+sed -i 's/\#security_driver.*/security_driver\ =\ \"none\"/' /etc/libvirt/qemu.conf
+systemctl restart libvirtd
 
 virsh pool-define /dev/stdin <<EOF
 <pool type='dir'>
@@ -14,8 +13,3 @@ virsh pool-define /dev/stdin <<EOF
 EOF
 
 virsh pool-start default
-
-virsh pool-list
-vagrant up
-
-tail -f /dev/null

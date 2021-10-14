@@ -227,3 +227,12 @@ make
 
 To simplify developing changes for the `metal-api`, `metal-hammer` and `metal-core`, it is possible to use development artifacts from within the mini-lab.
 See the [dev instructions](DEV_INSTRUCTIONS.md) for more details.
+
+FROM ubuntu:20.04
+
+RUN apt update -y && \
+DEBIAN_FRONTEND=noninteractive apt install -y virt-manager ovmf net-tools haveged \
+qemu qemu-kvm bridge-utils virtinst libvirt-dev libvirt-daemon-system build-essential libvirt-clients
+
+CMD ["/usr/sbin/init"]
+
