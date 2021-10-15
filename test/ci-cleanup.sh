@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+echo "Installing containerlab"
+bash -c "$(curl -sL https://get-clab.srlinux.dev)"
+
 echo "Cleanup artifacts of previous runs"
 
 make cleanup
