@@ -5,10 +5,9 @@ KUBECONFIG := $(shell pwd)/.kubeconfig
 MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),default)
 
 # Default values
-VAGRANT_VAGRANTFILE=Vagrantfile
 DOCKER_COMPOSE_OVERRIDE=
 
-# TODO: Adapt machine flavors to containerlab
+# Machine flavors
 MACHINE_OS=ubuntu-20.04
 ifeq ($(MINI_LAB_FLAVOR),default)
 VAGRANT_MACHINES=machine01 machine02
@@ -18,11 +17,14 @@ else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
 
+# Commands
+YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:3 /bin/sh -c
+
 .PHONY: up
 up: control-plane-bake env lab
 	docker-compose up --remove-orphans --force-recreate control-plane partition && \
-	./scripts/wait_for_switches.sh && \
-	docker exec clab-mini-lab-vms vagrant up
+	docker exec clab-mini-lab-vms vagrant up && \
+	sshpass -p root ssh -oStrictHostKeyChecking=no root@clab-mini-lab-leaf1 'systemctl restart metal-core'
 
 .PHONY: restart
 restart: down up
@@ -49,7 +51,7 @@ partition: lab
 
 .PHONY: lab
 lab:
-	sudo containerlab deploy --topo mini-lab.clab.yaml
+	sudo containerlab deploy --topo mini-lab.clab.yaml --reconfigure
 	./scripts/deactivate_offloading.sh
 
 .PHONY: route
@@ -70,7 +72,6 @@ cleanup: caddy-down registry-down
 	kind delete cluster --name metal-control-plane
 	docker-compose down
 	rm -f $(KUBECONFIG)
-	rm -f .ansible_vagrant_cache
 	sudo containerlab destroy --topo mini-lab.clab.yaml
 
 .PHONY: dev-env
@@ -190,10 +191,9 @@ build-api-image:
 
 .PHONY: _ips
 _ips:
-	$(eval dev = $(shell virsh net-info vagrant-libvirt | grep Bridge | cut -d' ' -f10 2>/dev/null))
-	$(eval ipL1 = $(shell cat clab-mini-lab/ansible-inventory.yml | grep -A1 clab-mini-lab-leaf1 | grep ansible_host | awk -F ' ' '$$0=$$NF'))
-	$(eval ipL2 = $(shell cat clab-mini-lab/ansible-inventory.yml | grep -A1 clab-mini-lab-leaf2 | grep ansible_host | awk -F ' ' '$$0=$$NF'))
-	$(eval staticR = "100.255.254.0/24 nexthop via $(ipL1) dev $(dev) nexthop via $(ipL2) dev $(dev)")
+	$(eval ipL1 = $(shell ${YQ} "yq r clab-mini-lab/ansible-inventory.yml 'all.children.cvx.hosts.clab-mini-lab-leaf1.ansible_host'"))
+	$(eval ipL2 = $(shell ${YQ} "yq r clab-mini-lab/ansible-inventory.yml 'all.children.cvx.hosts.clab-mini-lab-leaf2.ansible_host'"))
+	$(eval staticR = "100.255.254.0/24 nexthop via $(ipL1) dev docker0 nexthop via $(ipL2) dev docker0")
 
 .PHONY: reload-core
 reload-core: build-core-image push-core-image _ips
@@ -201,12 +201,12 @@ reload-core: build-core-image push-core-image _ips
 	ssh -i .vagrant/machines/leaf02/libvirt/private_key vagrant@${ipL2} "sudo docker pull 172.17.0.1:5000/metalstack/metal-core:dev; sudo systemctl restart metal-core"
 
 .PHONY: ssh-leaf01
-ssh-leaf01: _ips
-	ssh -i .vagrant/machines/leaf01/libvirt/private_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null vagrant@${ipL1} -t "sudo -i"
+ssh-leaf01:
+	ssh root@clab-mini-lab-leaf1
 
 .PHONY: ssh-leaf02
-ssh-leaf02: _ips
-	ssh -i .vagrant/machines/leaf02/libvirt/private_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null vagrant@${ipL2} -t "sudo -i"
+ssh-leaf02:
+	ssh root@clab-mini-lab-leaf2
 
 .PHONY: build-core-image
 build-core-image:

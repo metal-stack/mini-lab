@@ -1,0 +1,4 @@
+# Soft dependencies extracted from modules themselves.
+softdep uhci_hcd pre: ehci_pci
+softdep sctp_probe pre: sctp
+softdep libcrc32c pre: crc32c

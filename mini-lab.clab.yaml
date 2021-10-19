@@ -17,10 +17,8 @@ topology:
   nodes:
     leaf1:
       kind: cvx
-      mgmt_ipv4: 172.17.0.4
     leaf2:
       kind: cvx
-      mgmt_ipv4: 172.17.0.5
     vms:
       kind: linux
       image: grigoriymikh/vms:latest

@@ -1,0 +1,17 @@
+---
+- name: Gather releases
+  setup_yaml:
+
+- name: Install metal-python
+  block:
+    - name: Install metal-python {{ metal_api_image_tag }}
+      pip:
+        name:
+          - metal_python=={{ metal_api_image_tag }}
+
+  rescue:
+    # attempt with latest available client when fitting client is not available
+    - name: Install latest metal-python (fallback)
+      pip:
+        name:
+          - metal_python

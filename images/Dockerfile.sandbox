@@ -1,0 +1,3 @@
+FROM networkop/ignite:dev
+
+RUN apk add ethtool
