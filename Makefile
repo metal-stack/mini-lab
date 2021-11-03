@@ -60,10 +60,10 @@ route: _ips
 
 .PHONY: fwrules
 fwrules: _ips
-	eval "sudo -- iptables -I LIBVIRT_FWO -s 100.255.254.0/24 -i $(dev) -j ACCEPT;"
-	eval "sudo -- iptables -I LIBVIRT_FWO -s 10.0.1.0/24 -i $(dev) -j ACCEPT;"
-	eval "sudo -- iptables -I LIBVIRT_FWI -d 100.255.254.0/24 -o $(dev) -j ACCEPT;"
-	eval "sudo -- iptables -I LIBVIRT_FWI -d 10.0.1.0/24 -o $(dev) -j ACCEPT;"
+	eval "sudo -- iptables -I LIBVIRT_FWO -s 100.255.254.0/24 -i docker0 -j ACCEPT;"
+	eval "sudo -- iptables -I LIBVIRT_FWO -s 10.0.1.0/24 -i docker0 -j ACCEPT;"
+	eval "sudo -- iptables -I LIBVIRT_FWI -d 100.255.254.0/24 -o docker0 -j ACCEPT;"
+	eval "sudo -- iptables -I LIBVIRT_FWI -d 10.0.1.0/24 -o docker0 -j ACCEPT;"
 	eval "sudo -- iptables -t nat -I LIBVIRT_PRT -s 100.255.254.0/24 ! -d 100.255.254.0/24 -j MASQUERADE"
 	eval "sudo -- iptables -t nat -I LIBVIRT_PRT -s 10.0.1.0/24 ! -d 10.0.1.0/24 -j MASQUERADE"
 
