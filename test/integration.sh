@@ -2,6 +2,7 @@
 set -e
 
 echo "Starting mini-lab"
+sudo apt install sshpass
 make up
 
 echo "Waiting for machines to get to waiting state"
