@@ -12,6 +12,8 @@ topology:
       binds:
         - provision:/provision
       cmd: bash -c "./provision/config_switch.sh && ./provision/common.sh"
+    linux:
+      image: grigoriymikh/vms:latest
 
   nodes:
     leaf1:
@@ -20,14 +22,11 @@ topology:
       kind: cvx
     vms:
       kind: linux
-      image: grigoriymikh/vms:latest
       binds:
         - /dev:/dev
-      exec:
-        - /scripts/prepare_for_vms.sh
 
   links:
     - endpoints: ["leaf1:swp1", "vms:lan0"]
     - endpoints: ["leaf2:swp1", "vms:lan1"]
-    - endpoints: ["leaf1:swp2", "vms:lan2" ]
-    - endpoints: ["leaf2:swp2", "vms:lan3" ]
+    - endpoints: ["leaf1:swp2", "vms:lan2"]
+    - endpoints: ["leaf2:swp2", "vms:lan3"]

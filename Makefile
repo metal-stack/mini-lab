@@ -22,9 +22,8 @@ YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:3 /bin/sh -c
 
 .PHONY: up
 up: control-plane-bake env lab
-	docker-compose up --remove-orphans --force-recreate control-plane partition && \
-	docker exec clab-mini-lab-vms ./create_vm.sh
-
+	docker-compose up --remove-orphans --force-recreate control-plane partition
+	docker exec -d clab-mini-lab-vms bash -c './create_vm.sh'
 #	sshpass -p root ssh -oStrictHostKeyChecking=no root@clab-mini-lab-leaf1 'systemctl restart metal-core'
 #	sshpass -p root ssh -oStrictHostKeyChecking=no root@clab-mini-lab-leaf2 'systemctl restart metal-core'
 
