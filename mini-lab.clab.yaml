@@ -12,7 +12,6 @@ topology:
       binds:
         - provision:/provision
       cmd: bash -c "./provision/config_switch.sh && ./provision/common.sh"
-    linux:
 
   nodes:
     leaf1:

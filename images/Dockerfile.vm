@@ -1,0 +1,11 @@
+FROM ubuntu:20.04
+
+RUN apt update -y && \
+    apt install -y qemu-system-x86 ovmf ifupdown net-tools
+
+COPY ./scripts .
+
+CMD ["./vms_entrypoint.sh"]
+
+
+

@@ -1,2 +1,3 @@
 ---
 metal_stack_release_version: v0.8.4
+metal_core_image_tag: pr-dont-turn-off-chassis-led-on-registration

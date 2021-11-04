@@ -1,7 +1,7 @@
 #!/bin/bash
 
 chown root:kvm /dev/kvm
-sudo chmod +666 /dev/kvm
+#sudo chmod +666 /dev/kvm
 
 sed -i 's/\#security_driver.*/security_driver\ =\ \"none\"/' /etc/libvirt/qemu.conf
 systemctl restart libvirtd
