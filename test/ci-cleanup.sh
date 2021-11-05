@@ -6,8 +6,6 @@ bash -c "$(curl -sL https://get-clab.srlinux.dev)"
 
 echo "Cleanup artifacts of previous runs"
 
-sudo rm -rf /var/lib/gitlab-runner/github/_work/mini-lab/mini-lab/clab-mini-lab
-
 make cleanup
 
 # cleanup does not work 100% on the CI-runner - use virsh commands directly

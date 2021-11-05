@@ -10,6 +10,11 @@ jobs:
     name: Integration tests for PR
     runs-on: self-hosted
     steps:
+    - name: CI Cleanup
+      shell: bash
+      run: |
+        sudo rm -rf /var/lib/gitlab-runner/github/_work/mini-lab/mini-lab/clab-mini-lab
+
     - name: Checkout
       uses: actions/checkout@v2
 
