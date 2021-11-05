@@ -10,16 +10,27 @@ jobs:
     name: Integration tests for PR
     runs-on: self-hosted
     steps:
-    - name: Clean after containerlab
-      shell: bash
-      run: |
-        sudo rm -rf /var/lib/gitlab-runner/github/_work/mini-lab/mini-lab/clab-mini-lab
     - name: Checkout
       uses: actions/checkout@v2
+
+    - name: Docker Login
+      uses: docker/login-action@v1
+      with:
+        registry: ${{ secrets.DOCKER_REGISTRY }}
+        username: ${{ secrets.DOCKER_REGISTRY_USER }}
+        password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
+
+    - name: Build Docker image
+      run: |
+        cd images
+        docker build -f Dockerfile.vms -t ghcr.io/metal-stack/mini-lab-vms:pr-${GITHUB_HEAD_REF##*/} .
+        docker push ghcr.io/metal-stack/mini-lab-vms:pr-${GITHUB_HEAD_REF##*/}
+
     - name: Run integration tests
       shell: bash
       run: |
         export TMPDIR=/var/tmp/
+        export MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:pr-${GITHUB_HEAD_REF##*/}
         ./test/ci-cleanup.sh
         ./test/integration.sh
       env:

@@ -13,7 +13,7 @@ topology:
         - provision:/provision
       cmd: bash -c "./provision/config_switch.sh && ./provision/common.sh"
     linux:
-      image: grigoriymikh/vms:latest
+      image: ${MINI_LAB_VM_IMAGE}
 
   nodes:
     leaf1:

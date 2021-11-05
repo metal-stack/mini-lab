@@ -3,6 +3,7 @@
 
 KUBECONFIG := $(shell pwd)/.kubeconfig
 MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),default)
+MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),latest)
 
 # Default values
 DOCKER_COMPOSE_OVERRIDE=
