@@ -36,6 +36,7 @@ jobs:
       run: |
         export TMPDIR=/var/tmp/
 
+        chmod 600 files/ssh/id_rsa
         ./test/ci-cleanup.sh
         ./test/integration.sh
       env:
