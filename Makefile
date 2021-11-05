@@ -53,7 +53,7 @@ partition: lab
 
 .PHONY: lab
 lab:
-	sudo containerlab deploy --topo mini-lab.clab.yaml --reconfigure
+	MINI_LAB_VM_IMAGE=$(MINI_LAB_VM_IMAGE) sudo --preserve-env containerlab deploy --topo mini-lab.clab.yaml --reconfigure
 	./scripts/deactivate_offloading.sh
 
 .PHONY: route
