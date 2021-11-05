@@ -1,7 +1,6 @@
 ---
 - name: deploy leaves and docker
   hosts: leaves
-  gather_facts: true
   roles:
     - name: metal-roles/partition/roles/leaf
       tags: leaf

@@ -10,8 +10,7 @@ topology:
       kernel: docker.io/grigoriymikh/kernel:4.1.0
       sandbox: grigoriymikh/sandbox:latest
       binds:
-        - provision:/provision
-      cmd: bash -c "./provision/config_switch.sh && ./provision/common.sh"
+        - files/ssh/id_rsa.pub:/root/.ssh/authorized_keys
     linux:
       image: ${MINI_LAB_VM_IMAGE}
 

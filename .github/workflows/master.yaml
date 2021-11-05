@@ -36,8 +36,6 @@ jobs:
       run: |
         export TMPDIR=/var/tmp/
 
-        sudo apt install sshpass
-
         ./test/ci-cleanup.sh
         ./test/integration.sh
       env:

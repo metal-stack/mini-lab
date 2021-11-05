@@ -6,6 +6,3 @@ RUN apt update -y && \
 COPY ./scripts .
 
 CMD ["./vms_entrypoint.sh"]
-
-
-
