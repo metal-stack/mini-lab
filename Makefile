@@ -3,7 +3,8 @@
 
 KUBECONFIG := $(shell pwd)/.kubeconfig
 MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),default)
-MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),latest)
+
+MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
 
 # Default values
 DOCKER_COMPOSE_OVERRIDE=
@@ -53,6 +54,7 @@ partition: lab
 
 .PHONY: lab
 lab:
+	docker pull $(MINI_LAB_VM_IMAGE)
 	MINI_LAB_VM_IMAGE=$(MINI_LAB_VM_IMAGE) sudo --preserve-env containerlab deploy --topo mini-lab.clab.yaml --reconfigure
 	./scripts/deactivate_offloading.sh
 
