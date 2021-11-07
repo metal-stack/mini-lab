@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 
 RUN apt update -y && \
-    apt install -y qemu-system-x86 ovmf ifupdown net-tools
+    apt install -y qemu-system-x86 ovmf ifupdown net-tools telnet
 
 COPY ./scripts .
 

@@ -2,6 +2,8 @@
 
 set -e
 
+echo "Obtaining release vector variables..."
+
 yq_shell() {
   docker run --rm -i -v ${PWD}:/workdir mikefarah/yq:3 /bin/sh -c "$@"
 }

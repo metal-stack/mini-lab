@@ -1,6 +1,6 @@
 ---
 metal_partition_timezone: Europe/Berlin
-metal_partition_id: vagrant
+metal_partition_id: mini-lab
 
 metal_partition_metal_api_protocol: http
 metal_partition_metal_api_addr: api.0.0.0.0.nip.io

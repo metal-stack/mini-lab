@@ -1,4 +1,6 @@
 #!/bin/bash
+set -eo pipefail
+
 # first check if CLAB_INTFS is configured (containerlab's metadata var), defaulting to 0
 INTFS=${CLAB_INTFS:-0}
 
@@ -22,6 +24,23 @@ while [ "$MYINT" -lt "$INTFS" ]; do
   sleep 1
   int_calc
 done
+
+
+ip link add link lan0 name macvtap0 type macvtap mode passthru
+ip link set macvtap0 up
+ifconfig macvtap0 promisc
+
+ip link add link lan1 name macvtap1 type macvtap mode passthru
+ip link set macvtap1 up
+ifconfig macvtap1 promisc
+
+ip link add link lan2 name macvtap2 type macvtap mode passthru
+ip link set macvtap2 up
+ifconfig macvtap2 promisc
+
+ip link add link lan3 name macvtap3 type macvtap mode passthru
+ip link set macvtap3 up
+ifconfig macvtap3 promisc
 
 echo "Connected all interfaces"
 ifdown -a || true

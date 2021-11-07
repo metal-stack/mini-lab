@@ -10,10 +10,8 @@ jobs:
     name: Integration tests for PR
     runs-on: self-hosted
     steps:
-    - name: CI Cleanup
-      shell: bash
-      run: |
-        sudo rm -rf /var/lib/gitlab-runner/github/_work/mini-lab/mini-lab/clab-mini-lab
+    - name: Gain back workspace permissions # https://github.com/actions/checkout/issues/211
+      run: sudo chown -R $USER:$USER $GITHUB_WORKSPACE
 
     - name: Checkout
       uses: actions/checkout@v2
@@ -25,11 +23,13 @@ jobs:
         username: ${{ secrets.DOCKER_REGISTRY_USER }}
         password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
 
+    - name: Set image name
+      run: echo "MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:pr-${GITHUB_HEAD_REF##*/}" >> $GITHUB_ENV
+
     - name: Build Docker image
       run: |
-        cd images
-        docker build -f Dockerfile.vms -t ghcr.io/metal-stack/mini-lab-vms:pr-${GITHUB_HEAD_REF##*/} .
-        docker push ghcr.io/metal-stack/mini-lab-vms:pr-${GITHUB_HEAD_REF##*/}
+        make build-vms-image
+        docker push ${MINI_LAB_VM_IMAGE}
 
     - name: Run integration tests
       shell: bash

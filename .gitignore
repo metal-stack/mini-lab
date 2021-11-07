@@ -1,11 +1,8 @@
-.ansible_vagrant_cache
-.vagrant_version_host_system
 .env
 .idea
 .kubeconfig
-.vagrant
 **/*.pyc
-clab-mini-lab
+mini-lab
 ansible-common
 metal-hammer*
 partition/dynamic_inventory.yaml

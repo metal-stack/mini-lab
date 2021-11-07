@@ -1,4 +1,5 @@
 name: mini-lab
+prefix: ""
 
 mgmt:
   network: bridge
@@ -15,9 +16,9 @@ topology:
       image: ${MINI_LAB_VM_IMAGE}
 
   nodes:
-    leaf1:
+    leaf01:
       kind: cvx
-    leaf2:
+    leaf02:
       kind: cvx
     vms:
       kind: linux
@@ -25,7 +26,7 @@ topology:
         - /dev:/dev
 
   links:
-    - endpoints: ["leaf1:swp1", "vms:lan0"]
-    - endpoints: ["leaf2:swp1", "vms:lan1"]
-    - endpoints: ["leaf1:swp2", "vms:lan2"]
-    - endpoints: ["leaf2:swp2", "vms:lan3"]
+    - endpoints: ["leaf01:swp1", "vms:lan0"]
+    - endpoints: ["leaf02:swp1", "vms:lan1"]
+    - endpoints: ["leaf01:swp2", "vms:lan2"]
+    - endpoints: ["leaf02:swp2", "vms:lan3"]

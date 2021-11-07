@@ -26,7 +26,6 @@ services:
             obtain_role_requirements.yaml
           ansible-galaxy install --ignore-errors -r requirements.yaml
           ansible-playbook \
-            -i inventories/partition-static.yaml \
-            -i ~/.ansible/roles/ansible-common/inventory/vagrant \
+            -i inventories/partition.yaml \
             -e @files/dev_images.yaml \
             deploy_partition.yaml
