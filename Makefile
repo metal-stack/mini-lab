@@ -12,9 +12,9 @@ DOCKER_COMPOSE_OVERRIDE=
 # Machine flavors
 MACHINE_OS=ubuntu-20.04
 ifeq ($(MINI_LAB_FLAVOR),default)
-VAGRANT_MACHINES=machine01 machine02
+LAB_MACHINES=machine01 machine02
 else ifeq ($(MINI_LAB_FLAVOR),cluster-api)
-VAGRANT_MACHINES=machine01 machine02 machine03
+LAB_MACHINES=machine01 machine02 machine03
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
@@ -25,7 +25,7 @@ YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:3 /bin/sh -c
 .PHONY: up
 up: control-plane-bake env lab
 	docker-compose up --remove-orphans --force-recreate control-plane partition && \
-	docker exec -d clab-mini-lab-vms bash -c './create_vm.sh' && \
+	docker exec -d clab-mini-lab-vms bash -c "MACHINES='${LAB_MACHINES}' ./create_vms.sh" && \
 	chmod 600 files/ssh/id_rsa && \
 	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR root@clab-mini-lab-leaf1 -i files/ssh/id_rsa 'systemctl restart metal-core' && \
 	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR root@clab-mini-lab-leaf2 -i files/ssh/id_rsa 'systemctl restart metal-core'
@@ -172,7 +172,6 @@ env:
 .PHONY: dev
 dev: caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
-	vagrant up $(VAGRANT_MACHINES)
 
 .PHONY: load-api-image
 load-api-image:
