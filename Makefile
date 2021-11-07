@@ -24,6 +24,7 @@ YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:3 /bin/sh -c
 
 .PHONY: up
 up: env control-plane-bake partition-bake
+	@chmod 600 files/ssh/id_rsa
 	docker-compose up --remove-orphans --force-recreate control-plane partition
 	@$(MAKE) --no-print-directory reboot-machine01
 	@$(MAKE) --no-print-directory reboot-machine02

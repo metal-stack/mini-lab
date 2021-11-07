@@ -36,8 +36,6 @@ jobs:
       run: |
         export TMPDIR=/var/tmp/
         export MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:pr-${GITHUB_HEAD_REF##*/}
-
-        chmod 600 files/ssh/id_rsa
         ./test/ci-cleanup.sh
         ./test/integration.sh
       env:
