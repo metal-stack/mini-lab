@@ -26,8 +26,9 @@ YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:3 /bin/sh -c
 up: control-plane-bake env lab
 	docker-compose up --remove-orphans --force-recreate control-plane partition && \
 	docker exec -d clab-mini-lab-vms bash -c './create_vm.sh' && \
-	ssh -oStrictHostKeyChecking=no root@clab-mini-lab-leaf1 -i files/ssh/id_rsa 'systemctl restart metal-core' && \
-	ssh -oStrictHostKeyChecking=no root@clab-mini-lab-leaf2 -i files/ssh/id_rsa 'systemctl restart metal-core'
+	chmod 600 files/ssh/id_rsa && \
+	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR root@clab-mini-lab-leaf1 -i files/ssh/id_rsa 'systemctl restart metal-core' && \
+	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR root@clab-mini-lab-leaf2 -i files/ssh/id_rsa 'systemctl restart metal-core'
 
 .PHONY: restart
 restart: down up
