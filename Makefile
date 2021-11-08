@@ -63,6 +63,12 @@ partition-bake:
 env:
 	@./env.sh
 
+.PHONY: _ips
+_ips:
+	$(eval ipL1 = $(shell ${YQ} "yq r mini-lab/ansible-inventory.yml 'all.children.cvx.hosts.mini-lab-leaf01.ansible_host'"))
+	$(eval ipL2 = $(shell ${YQ} "yq r mini-lab/ansible-inventory.yml 'all.children.cvx.hosts.mini-lab-leaf02.ansible_host'"))
+	$(eval staticR = "100.255.254.0/24 nexthop via $(ipL1) dev docker0 nexthop via $(ipL2) dev docker0")
+
 .PHONY: route
 route: _ips
 	eval "sudo ip r a ${staticR}"
@@ -77,7 +83,7 @@ fwrules: _ips
 	eval "sudo -- iptables -t nat -I LIBVIRT_PRT -s 10.0.1.0/24 ! -d 10.0.1.0/24 -j MASQUERADE"
 
 .PHONY: cleanup
-cleanup: caddy-down registry-down cleanup-control-plane cleanup-partition
+cleanup: cleanup-control-plane cleanup-partition
 
 .PHONY: cleanup-control-plane
 cleanup-control-plane:
@@ -119,8 +125,8 @@ ssh-leaf02:
 
 .PHONY: reboot-machine
 reboot-machine:
-	docker exec mini-lab-vms /kill_vm.sh $(MACHINE_UUID)
-	docker exec mini-lab-vms /create_vm.sh $(MACHINE_UUID)
+	docker exec mini-lab-vms /mini-lab/kill_vm.sh $(MACHINE_UUID)
+	docker exec mini-lab-vms /mini-lab/manage_vms.py create --uuid=$(MACHINE_UUID)
 
 .PHONY: reboot-machine01
 reboot-machine01:
@@ -189,66 +195,3 @@ dev-env:
 .PHONY: build-vms-image
 build-vms-image:
 	cd images && docker build -f Dockerfile.vms -t $(MINI_LAB_VM_IMAGE) . && cd -
-
-.PHONY: dev
-dev: caddy registry build-hammer-initrd build-api-image build-core-image push-core-image control-plane-bake load-api-image
-	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
-	vagrant up $(VAGRANT_MACHINES)
-
-.PHONY: load-api-image
-load-api-image:
-	kind --name metal-control-plane load docker-image ghcr.io/metal-stack/metal-api:dev
-
-.PHONY: registry-down
-registry-down:
-	@docker rm -f registry > /dev/null 2>&1 || true
-
-.PHONY: registry
-registry: registry-down
-	docker run -p 5000:443 -v $(shell pwd)/files/certs/registry:/certs -e REGISTRY_HTTP_ADDR=0.0.0.0:443 -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/ca.pem -e REGISTRY_HTTP_TLS_KEY=/certs/ca-key.pem --name registry -d registry:2
-
-.PHONY: reload-api
-reload-api: build-api-image load-api-image
-	kubectl --kubeconfig=$(KUBECONFIG) --namespace metal-control-plane delete pod -l app=metal-api
-
-.PHONY: build-api-image
-build-api-image:
-	docker build -t ghcr.io/metal-stack/metal-api:dev ../metal-api
-
-.PHONY: _ips
-_ips:
-	$(eval ipL1 = $(shell ${YQ} "yq r mini-lab/ansible-inventory.yml 'all.children.cvx.hosts.mini-lab-leaf01.ansible_host'"))
-	$(eval ipL2 = $(shell ${YQ} "yq r mini-lab/ansible-inventory.yml 'all.children.cvx.hosts.mini-lab-leaf02.ansible_host'"))
-	$(eval staticR = "100.255.254.0/24 nexthop via $(ipL1) dev docker0 nexthop via $(ipL2) dev docker0")
-
-.PHONY: reload-core
-reload-core: build-core-image push-core-image _ips
-	ssh -i files/ssh/id_rsa root@${ipL1} "sudo docker pull 172.17.0.1:5000/metalstack/metal-core:dev; sudo systemctl restart metal-core"
-	ssh -i files/ssh/id_rsa root@${ipL2} "sudo docker pull 172.17.0.1:5000/metalstack/metal-core:dev; sudo systemctl restart metal-core"
-
-.PHONY: build-core-image
-build-core-image:
-	docker build -t localhost:5000/metalstack/metal-core:dev ../metal-core
-
-.PHONY: push-core-image
-push-core-image:
-	docker push localhost:5000/metalstack/metal-core:dev
-
-.PHONY: caddy-down
-caddy-down:
-	@docker rm -f caddy > /dev/null 2>&1 || true
-
-.PHONY: caddy
-caddy: caddy-down
-	docker run -v $(shell pwd):/srv -p 20015:2015 --name caddy -d abiosoft/caddy
-
-.PHONY: build-hammer-image
-build-hammer-image:
-	docker build -t metalstack/metal-hammer:dev ../metal-hammer
-
-.PHONY: build-hammer-initrd
-build-hammer-initrd: build-hammer-image
-	docker export $(shell docker create metalstack/metal-hammer:dev /dev/null) > metal-hammer.tar
-	tar -xf metal-hammer.tar metal-hammer-initrd.img.lz4
-	@rm -f metal-hammer.tar
-	md5sum metal-hammer-initrd.img.lz4 > metal-hammer-initrd.img.lz4.md5

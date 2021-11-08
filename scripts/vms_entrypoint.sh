@@ -26,21 +26,21 @@ while [ "$MYINT" -lt "$INTFS" ]; do
 done
 
 
-ip link add link lan0 name macvtap0 type macvtap mode passthru
-ip link set macvtap0 up
-ifconfig macvtap0 promisc
+ip link add link lan0 name tap0 type macvtap mode passthru
+ip link set tap0 up
+ifconfig tap0 promisc
 
-ip link add link lan1 name macvtap1 type macvtap mode passthru
-ip link set macvtap1 up
-ifconfig macvtap1 promisc
+ip link add link lan1 name tap1 type macvtap mode passthru
+ip link set tap1 up
+ifconfig tap1 promisc
 
-ip link add link lan2 name macvtap2 type macvtap mode passthru
-ip link set macvtap2 up
-ifconfig macvtap2 promisc
+ip link add link lan2 name tap2 type macvtap mode passthru
+ip link set tap2 up
+ifconfig tap2 promisc
 
-ip link add link lan3 name macvtap3 type macvtap mode passthru
-ip link set macvtap3 up
-ifconfig macvtap3 promisc
+ip link add link lan3 name tap3 type macvtap mode passthru
+ip link set tap3 up
+ifconfig tap3 promisc
 
 echo "Connected all interfaces"
 ifdown -a || true

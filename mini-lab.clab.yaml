@@ -24,6 +24,7 @@ topology:
       kind: linux
       binds:
         - /dev:/dev
+        - scripts:/mini-lab
 
   links:
     - endpoints: ["leaf01:swp1", "vms:lan0"]
