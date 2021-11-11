@@ -12,9 +12,9 @@ DOCKER_COMPOSE_OVERRIDE=
 # Machine flavors
 MACHINE_OS=ubuntu-20.04
 ifeq ($(MINI_LAB_FLAVOR),default)
-VAGRANT_MACHINES=machine01 machine02
+LAB_MACHINES=machine01 machine02
 else ifeq ($(MINI_LAB_FLAVOR),cluster-api)
-VAGRANT_MACHINES=machine01 machine02 machine03
+LAB_MACHINES=machine01 machine02 machine03
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
@@ -28,6 +28,7 @@ up: env control-plane-bake partition-bake
 	docker-compose up --remove-orphans --force-recreate control-plane partition
 	@$(MAKE) --no-print-directory reboot-machine01
 	@$(MAKE) --no-print-directory reboot-machine02
+	docker exec -d clab-mini-lab-vms bash -c "MACHINES='${LAB_MACHINES}' ./create_vms.sh" && \
 
 .PHONY: restart
 restart: down up
