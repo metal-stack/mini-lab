@@ -26,9 +26,7 @@ YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:3 /bin/sh -c
 up: env control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_rsa
 	docker-compose up --remove-orphans --force-recreate control-plane partition
-	@$(MAKE) --no-print-directory reboot-machine01
-	@$(MAKE) --no-print-directory reboot-machine02
-	docker exec -d clab-mini-lab-vms bash -c "MACHINES='${LAB_MACHINES}' ./create_vms.sh" && \
+	docker exec mini-lab-vms bash -c "MACHINES='${LAB_MACHINES}' /mini-lab/create_vms.sh"
 
 .PHONY: restart
 restart: down up
@@ -127,15 +125,19 @@ ssh-leaf02:
 .PHONY: reboot-machine
 reboot-machine:
 	docker exec mini-lab-vms /mini-lab/kill_vm.sh $(MACHINE_UUID)
-	docker exec mini-lab-vms /mini-lab/manage_vms.py create --uuid=$(MACHINE_UUID)
+	docker exec mini-lab-vms bash -c "MACHINES='$(MACHINE_NAME)' /mini-lab/create_vms.sh"
 
 .PHONY: reboot-machine01
 reboot-machine01:
-	@$(MAKE)	--no-print-directory	reboot-machine	MACHINE_UUID=e0ab02d2-27cd-5a5e-8efc-080ba80cf258
+	@$(MAKE)	--no-print-directory	reboot-machine	MACHINE_UUID=e0ab02d2-27cd-5a5e-8efc-080ba80cf258	MACHINE_NAME=machine01
 
 .PHONY: reboot-machine02
 reboot-machine02:
-	@$(MAKE)	--no-print-directory	reboot-machine	MACHINE_UUID=2294c949-88f6-5390-8154-fa53d93a3313
+	@$(MAKE)	--no-print-directory	reboot-machine	MACHINE_UUID=2294c949-88f6-5390-8154-fa53d93a3313	MACHINE_NAME=machine02
+
+.PHONY: reboot-machine03
+reboot-machine03:
+	@$(MAKE)	--no-print-directory	reboot-machine	MACHINE_UUID=b86a8ef8-0521-4f11-9f48-f4b0af4d98f2	MACHINE_NAME=machine03
 
 .PHONY: password
 password: env
@@ -148,6 +150,10 @@ password-machine01:
 .PHONY: password-machine02
 password-machine02:
 	@$(MAKE)	--no-print-directory	password	MACHINE_UUID=2294c949-88f6-5390-8154-fa53d93a3313
+
+.PHONY: password-machine03
+password-machine03:
+	@$(MAKE)	--no-print-directory	password	MACHINE_UUID=b86a8ef8-0521-4f11-9f48-f4b0af4d98f2
 
 .PHONY: delete-machine
 delete-machine:
@@ -162,6 +168,10 @@ delete-machine01: env
 delete-machine02: env
 	@$(MAKE) --no-print-directory delete-machine	MACHINE_UUID=2294c949-88f6-5390-8154-fa53d93a3313
 
+.PHONY: delete-machine03
+delete-machine03: env
+	@$(MAKE) --no-print-directory delete-machine	MACHINE_UUID=b86a8ef8-0521-4f11-9f48-f4b0af4d98f2
+
 .PHONY: console-machine
 console-machine:
 	@echo "exit console with CTRL+5"
@@ -175,6 +185,10 @@ console-machine01:
 console-machine02:
 	@$(MAKE) --no-print-directory console-machine	CONSOLE_PORT=4001
 
+.PHONY: console-machine03
+console-machine03:
+	@$(MAKE) --no-print-directory console-machine	CONSOLE_PORT=4002
+
 .PHONY: reinstall-machine01
 reinstall-machine01: env
 	docker-compose run metalctl machine reinstall --image ubuntu-20.04 e0ab02d2-27cd-5a5e-8efc-080ba80cf258
@@ -183,6 +197,11 @@ reinstall-machine01: env
 .PHONY: reinstall-machine02
 reinstall-machine02: env
 	docker-compose run metalctl machine reinstall --image ubuntu-20.04 2294c949-88f6-5390-8154-fa53d93a3313
+	@$(MAKE) --no-print-directory reboot-machine02
+
+.PHONY: reinstall-machine03
+reinstall-machine03: env
+	docker-compose run metalctl machine reinstall --image ubuntu-20.04 b86a8ef8-0521-4f11-9f48-f4b0af4d98f2
 	@$(MAKE) --no-print-directory reboot-machine02
 
 ## DEV TARGETS ##
