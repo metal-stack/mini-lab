@@ -1,4 +1,6 @@
 #!/bin/bash
+set -eo pipefail
+
 # first check if CLAB_INTFS is configured (containerlab's metadata var), defaulting to 0
 INTFS=${CLAB_INTFS:-0}
 
@@ -21,6 +23,13 @@ while [ "$MYINT" -lt "$INTFS" ]; do
   echo "Connected $MYINT interfaces out of $INTFS"
   sleep 1
   int_calc
+done
+
+# creating macvtap interfaces for the qemu vms
+for i in $(seq 0 5); do
+  ip link add link lan${i} name macvtap${i} type macvtap mode passthru
+  ip link set macvtap${i} up
+  ip link set macvtap${i} promisc on
 done
 
 echo "Connected all interfaces"

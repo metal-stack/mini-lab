@@ -1,15 +1,19 @@
 ---
 - name: deploy leaves and docker
   hosts: leaves
+  pre_tasks:
+    - name: create docker directory # TODO: move to docker-on-cumulus role
+      file:
+        path: /etc/docker
+        state: directory
   roles:
     - name: metal-roles/partition/roles/leaf
       tags: leaf
-    - name: registry-certs
     - name: metal-roles/partition/roles/docker-on-cumulus
       tags: docker-on-cumulus
 
 - name: deploy dhcp server
-  hosts: clab-mini-lab-leaf1
+  hosts: mini-lab-leaf01
   roles:
     - name: metal-roles/partition/roles/dhcp
       tags: dhcp
