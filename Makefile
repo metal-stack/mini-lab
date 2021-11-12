@@ -12,9 +12,9 @@ DOCKER_COMPOSE_OVERRIDE=
 # Machine flavors
 MACHINE_OS=ubuntu-20.04
 ifeq ($(MINI_LAB_FLAVOR),default)
-LAB_MACHINES=machine01 machine02
+LAB_MACHINES=machine01,machine02
 else ifeq ($(MINI_LAB_FLAVOR),cluster-api)
-LAB_MACHINES=machine01 machine02 machine03
+LAB_MACHINES=machine01,machine02,machine03
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
@@ -123,12 +123,12 @@ ssh-leaf02:
 
 .PHONY: _start-machine
 start-machines:
-	docker exec mini-lab-vms /mini-lab/manage_vms.py create -n 3
+	docker exec mini-lab-vms /mini-lab/manage_vms.py --names $(LAB_MACHINES) create
 
 .PHONY: _reboot-machine
 _reboot-machine:
 	docker exec mini-lab-vms /mini-lab/kill_vm.sh $(MACHINE_UUID)
-	docker exec mini-lab-vms /mini-lab/manage_vms.py create --name $(MACHINE_NAME)
+	docker exec mini-lab-vms /mini-lab/manage_vms.py create --names $(MACHINE_NAME)
 
 .PHONY: reboot-machine01
 reboot-machine01:

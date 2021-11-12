@@ -5,8 +5,8 @@ import sys
 import subprocess
 import os
 
-VMS = [
-    {
+VMS = {
+    "machine01": {
         "name": "machine01",
         "uuid": "e0ab02d2-27cd-5a5e-8efc-080ba80cf258",
         "disk-path": "/machine01.img",
@@ -15,7 +15,7 @@ VMS = [
         "tap-index-fd": [(0, 30), (1, 40)],
         "serial-port": 4000,
     },
-    {
+    "machine02": {
         "name": "machine02",
         "uuid": "2294c949-88f6-5390-8154-fa53d93a3313",
         "disk-path": "/machine02.img",
@@ -24,7 +24,7 @@ VMS = [
         "tap-index-fd": [(2, 50), (3, 60)],
         "serial-port": 4001,
     },
-    {
+    "machine03": {
         "name": "machine03",
         "uuid": "2a92f14d-d3b1-4d46-b813-5d058103743e",
         "disk-path": "/machine03.img",
@@ -33,18 +33,17 @@ VMS = [
         "tap-index-fd": [(4, 70), (5, 80)],
         "serial-port": 4002,
     },
-]
+}
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description="manages vms in the mini-lab")
+    parser.add_argument("--names", type=str, help="the machine names to manage")
+
     subparsers = parser.add_subparsers(help='sub-command help')
 
     create = subparsers.add_parser('create', help='creates vms')
     create.set_defaults(entry_function="create")
-    create.add_argument("-n", "--number", "--amount", type=int,
-                        help="number of vms to spin up", default=2)
-    create.add_argument("--name", type=str, help="a specific machine to create")
 
     return parser.parse_args()
 
@@ -52,8 +51,9 @@ def parse_args():
 class Manager:
     def __init__(self, args):
         self.subcommand = args.entry_function if 'entry_function' in args else None
-        self.amount = args.number if 'number' in args else None
-        self.name = args.name if 'name' in args else None
+        self.names = []
+        if 'names' in args:
+            self.names = args.names.split(",")
 
     def run(self):
         subcommands = {
@@ -68,24 +68,18 @@ class Manager:
         command()
 
     def _create(self):
-        machines_to_create = []
-
-        if self.name:
-            for machine in VMS:
-                if machine.get("name") == self.name:
-                    machines_to_create.append(machine)
-                    break
-        else:
-            for index, machine in enumerate(VMS):
-                if index < self.amount:
-                    machines_to_create.append(machine)
-                else:
-                    break
-
-        for machine in machines_to_create:
+        for machine in self._machines_from_cmdline():
             Manager._create_vm_disk(machine.get(
                 "disk-path"), machine.get("disk-size"))
             Manager._start_vm(machine)
+
+    def _machines_from_cmdline(self):
+        machines = []
+        for name in self.names:
+            if name not in VMS:
+                sys.exit("machine not found: {name}".format(name=name))
+            machines.append(VMS[name])
+        return machines
 
     @staticmethod
     def _create_vm_disk(path, size):
