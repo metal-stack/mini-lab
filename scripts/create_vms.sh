@@ -4,7 +4,7 @@
 declare -A machines
 machines['machine01']='e0ab02d2-27cd-5a5e-8efc-080ba80cf258'
 machines['machine02']='2294c949-88f6-5390-8154-fa53d93a3313'
-machines['machine03']='b86a8ef8-0521-4f11-9f48-f4b0af4d98f2'
+machines['machine03']='2a92f14d-d3b1-4d46-b813-5d058103743e'
 
 # Set up VMs
 i=1

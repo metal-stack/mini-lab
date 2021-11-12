@@ -25,30 +25,12 @@ while [ "$MYINT" -lt "$INTFS" ]; do
   int_calc
 done
 
-
-ip link add link lan0 name macvtap0 type macvtap mode passthru
-ip link set macvtap0 up
-ifconfig macvtap0 promisc
-
-ip link add link lan1 name macvtap1 type macvtap mode passthru
-ip link set macvtap1 up
-ifconfig macvtap1 promisc
-
-ip link add link lan2 name macvtap2 type macvtap mode passthru
-ip link set macvtap2 up
-ifconfig macvtap2 promisc
-
-ip link add link lan3 name macvtap3 type macvtap mode passthru
-ip link set macvtap3 up
-ifconfig macvtap3 promisc
-
-ip link add link lan4 name macvtap4 type macvtap mode passthru
-ip link set macvtap4 up
-ifconfig macvtap4 promisc
-
-ip link add link lan5 name macvtap5 type macvtap mode passthru
-ip link set macvtap5 up
-ifconfig macvtap5 promisc
+# creating macvtap interfaces for the qemu vms
+for i in $(seq 0 5); do
+  ip link add link lan${i} name macvtap${i} type macvtap mode passthru
+  ip link set macvtap${i} up
+  ifconfig macvtap${i} promisc
+done
 
 echo "Connected all interfaces"
 ifdown -a || true
