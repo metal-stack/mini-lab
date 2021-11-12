@@ -1,7 +1,7 @@
 ---
 # this is the static part of the partition inventory
-# the connection details for leaf vms are provided dynamically
-# by the vagrant inventory plugin
+# the connection details for leaf vms are generated
+# by container lab to the mini-lab directory
 partition:
   hosts:
     localhost:
@@ -11,31 +11,30 @@ partition:
 
 leaves:
   hosts:
-    leaf01:
+    mini-lab-leaf01:
       lo: 10.0.0.11
       asn: 4200000011
       metal_core_cidr: 10.0.1.1/24
+
       dhcp_net: 10.0.1.0
       dhcp_netmask: 255.255.255.0
       dhcp_range_min: 10.0.1.2
       dhcp_range_max: 10.0.1.255
-    leaf02:
+    mini-lab-leaf02:
       lo: 10.0.0.12
       asn: 4200000012
       metal_core_cidr: 10.0.1.128/24
   vars:
     ports:
       1: 100G
-      2: 100G
-      3: 100G
     interfaces:
     - name: swp1
-    - name: swp2
-    - name: swp3
     uplinks: []
     dhcp_server_ip: 10.0.1.1
 
     ansible_python_interpreter: /usr/bin/python
+    ansible_user: root
+    ansible_ssh_private_key_file: "{{ playbook_dir }}/files/ssh/id_rsa"
 
     # The best practice recommendation is to set an MTU of 9,216 for the inter-switch links,
     # and an MTU of 9,000 for the server-facing ports, which don’t carry the VXLAN header.
@@ -43,7 +42,3 @@ leaves:
     mtu:
       vxlan: 9216
       default: 9000
-
-vagrant:
-  vars:
-    ansible_become: yes

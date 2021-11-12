@@ -31,14 +31,5 @@
     metal_core_additional_bridge_vids:
       - 4009
 
-# This removes firewall/SNAT state on both leaves(!) for the virtual internet network
-# Otherwise this could happen:
-# - local machine uses route to leaf01 for a request
-# - the answer from a machine may be send over leaf02 (because of asymmetric routing)
-# - leaf02 does not have a state for this connection => drops the response
-
-- name: delete common masquerade rule
-  command: iptables -t nat -D POSTROUTING 2
-
 - name: add masquerade rule that skips virtual internet network
   command: iptables -t nat -A POSTROUTING ! -s 100.255.254.0/24 -o eth0 -j MASQUERADE

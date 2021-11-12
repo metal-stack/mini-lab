@@ -11,17 +11,17 @@ metal_api_filesystemlayouts:
       firewall-ubuntu: "*"
   filesystems:
     - path: "/boot/efi"
-      device: "/dev/sda1"
+      device: "/dev/vda1"
       format: "vfat"
       createoptions:
       - "-F 32"
       label: "efi"
     - path: "/"
-      device: "/dev/sda2"
+      device: "/dev/vda2"
       format: "ext4"
       label: "root"
     - path: "/var/lib"
-      device: "/dev/sda3"
+      device: "/dev/vda3"
       format: "ext4"
       label: "varlib"
     - path: "/tmp"
@@ -29,7 +29,7 @@ metal_api_filesystemlayouts:
       format: "tmpfs"
       mountoptions: ["defaults","noatime","nosuid","nodev","noexec","mode=1777","size=512M"]
   disks:
-    - device: "/dev/sda"
+    - device: "/dev/vda"
       wipeonreinstall: true
       partitions:
         - number: 1
@@ -52,13 +52,13 @@ metal_api_filesystemlayouts:
     images: {}
   filesystems:
     - path: "/boot/efi"
-      device: "/dev/sda1"
+      device: "/dev/vda1"
       format: "vfat"
       createoptions:
         - "-F 32"
       label: "efi"
     - path: "/"
-      device: "/dev/sda2"
+      device: "/dev/vda2"
       format: "ext4"
       label: "root"
     - path: "/var/lib"
@@ -73,11 +73,11 @@ metal_api_filesystemlayouts:
     - arrayname: "/dev/md1"
       level: 1
       devices:
-        - "/dev/sda3"
-        - "/dev/sda4"
+        - "/dev/vda3"
+        - "/dev/vda4"
       createoptions: ["--metadata", "1.0"]
   disks:
-    - device: "/dev/sda"
+    - device: "/dev/vda"
       wipeonreinstall: true
       partitions:
         - number: 1
@@ -104,13 +104,13 @@ metal_api_filesystemlayouts:
     images: {}
   filesystems:
     - path: "/boot/efi"
-      device: "/dev/sda1"
+      device: "/dev/vda1"
       format: "vfat"
       createoptions:
         - "-F 32"
       label: "efi"
     - path: "/"
-      device: "/dev/sda2"
+      device: "/dev/vda2"
       format: "ext4"
       label: "root"
     - path: "/var/lib"
@@ -124,15 +124,15 @@ metal_api_filesystemlayouts:
   volumegroups:
     - name: "vg00"
       devices:
-        - "/dev/sda3"
-        - "/dev/sda4"
+        - "/dev/vda3"
+        - "/dev/vda4"
   logicalvolumes:
     - name: "varlib"
       volumegroup: "vg00"
       size: 200
       lvmtype: "striped"
   disks:
-    - device: "/dev/sda"
+    - device: "/dev/vda"
       wipeonreinstall: true
       partitions:
         - number: 1

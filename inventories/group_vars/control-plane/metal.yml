@@ -41,9 +41,9 @@ metal_api_sizes:
     max: "{{ '10GB' | humanfriendly }}"
 
 metal_api_partitions:
-  - id: vagrant
-    name: Vagrant Lab
-    description: The vagrant lab
+  - id: mini-lab
+    name: mini-lab
+    description: The mini-lab example partition
     bootconfig:
       kernelurl: "{{ metal_kernel_url }}"
       imageurl: "{{ metal_hammer_image_url }}"
@@ -51,36 +51,36 @@ metal_api_partitions:
     privatenetworkprefixlength: 22
 
 metal_api_networks:
-- id: tenant-super-network-vagrant
+- id: tenant-super-network-mini-lab
   name: "Project Super Network"
   description: "Super network of all project networks"
   nat: false
   privatesuper: true
   underlay: false
   destinationprefixes: []
-  partitionid: "vagrant"
+  partitionid: mini-lab
   prefixes:
   - 10.0.0.0/16
-- id: internet-vagrant-lab
+- id: internet-mini-lab
   name: "Virtual Internet Network"
-  description: "Virtual Internet Network for vagrant-lab"
+  description: "Virtual Internet Network for mini-lab"
   nat: true
   privatesuper: false
   underlay: false
   destinationprefixes:
     - 0.0.0.0/0
-  partitionid: "vagrant"
+  partitionid: "mini-lab"
   vrf: 104009
   prefixes:
   - 100.255.254.0/24
-- id: underlay-vagrant-lab
+- id: underlay-mini-lab
   name: "Underlay Network"
-  description: "Underlay Network for vagrant-lab"
+  description: "Underlay Network for mini-lab"
   nat: false
   privatesuper: false
   underlay: true
   destinationprefixes: []
-  partitionid: "vagrant"
+  partitionid: "mini-lab"
   prefixes:
   - 10.1.0.0/24
 

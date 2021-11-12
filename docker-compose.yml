@@ -25,7 +25,7 @@ services:
     network_mode: host
     working_dir: /mini-lab
     dns:
-      - 192.168.121.1
+      - 172.17.0.1
       - 1.1.1.1
       - 1.0.0.1
     entrypoint:
@@ -44,8 +44,6 @@ services:
     image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
     container_name: deploy-partition
     volumes:
-      - ${VAGRANT_HOME:-~/.vagrant.d}:/root/.vagrant.d
-      - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
       - /var/run/docker.sock:/var/run/docker.sock
       - .:/mini-lab
       # for developing role dependencies
@@ -55,16 +53,13 @@ services:
       # - ${HOME}/.ansible/roles/metal-ansible-modules:/root/.ansible/roles/metal-ansible-modules:ro
     environment:
       - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
-      - ANSIBLE_VAGRANT_USE_CACHE=1
-      - ANSIBLE_VAGRANT_CACHE_FILE=/mini-lab/.ansible_vagrant_cache
-      - ANSIBLE_VAGRANT_CACHE_MAX_AGE=0
       - CI=${CI}
       - DOCKER_HUB_USER=${DOCKER_HUB_USER}
       - DOCKER_HUB_TOKEN=${DOCKER_HUB_TOKEN}
     network_mode: host
     working_dir: /mini-lab
     dns:
-      - 192.168.121.1
+      - 172.17.0.1
       - 1.1.1.1
       - 1.0.0.1
     entrypoint:
@@ -76,8 +71,8 @@ services:
             obtain_role_requirements.yaml
           ansible-galaxy install --ignore-errors -r requirements.yaml
           ansible-playbook \
-            -i inventories/partition-static.yaml \
-            -i ~/.ansible/roles/ansible-common/inventory/vagrant \
+            -i inventories/partition.yaml \
+            -i mini-lab/ansible-inventory.yml \
             deploy_partition.yaml
 
   metalctl:
@@ -89,7 +84,7 @@ services:
       - ${HOME}/.ssh:/root/.ssh:ro
     network_mode: host
     dns:
-      - 192.168.121.1
+      - 172.17.0.1
       - 1.1.1.1
       - 1.0.0.1
     command: --version
