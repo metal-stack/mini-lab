@@ -178,7 +178,7 @@ free-machine03:
 
 .PHONY: _console-machine
 _console-machine:
-	@echo "exit console with CTRL+5"
+	@echo "exit console with CTRL+5 and then quit telnet through q + ENTER"
 	@docker exec -it mini-lab-vms telnet 127.0.0.1 $(CONSOLE_PORT)
 
 .PHONY: console-machine01
