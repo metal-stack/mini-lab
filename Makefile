@@ -1,16 +1,20 @@
 .DEFAULT_GOAL := up
 .EXPORT_ALL_VARIABLES:
 
-KUBECONFIG := $(shell pwd)/.kubeconfig
-MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),default)
+# Commands
+YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:3 /bin/sh -c
 
-MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
+KUBECONFIG := $(shell pwd)/.kubeconfig
 
 # Default values
 DOCKER_COMPOSE_OVERRIDE=
 
-# Machine flavors
+MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),default)
+MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
+
 MACHINE_OS=ubuntu-20.04
+
+# Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),default)
 LAB_MACHINES=machine01,machine02
 else ifeq ($(MINI_LAB_FLAVOR),cluster-api)
@@ -18,9 +22,6 @@ LAB_MACHINES=machine01,machine02,machine03
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
-
-# Commands
-YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:3 /bin/sh -c
 
 .PHONY: up
 up: env control-plane-bake partition-bake
@@ -132,15 +133,15 @@ _reboot-machine:
 
 .PHONY: reboot-machine01
 reboot-machine01:
-	@$(MAKE)	--no-print-directory	_reboot-machine	MACHINE_UUID=e0ab02d2-27cd-5a5e-8efc-080ba80cf258	MACHINE_NAME=machine01
+	@$(MAKE)	--no-print-directory	_reboot-machine	MACHINE_NAME=machine01
 
 .PHONY: reboot-machine02
 reboot-machine02:
-	@$(MAKE)	--no-print-directory	_reboot-machine	MACHINE_UUID=2294c949-88f6-5390-8154-fa53d93a3313	MACHINE_NAME=machine02
+	@$(MAKE)	--no-print-directory	_reboot-machine	MACHINE_NAME=machine02
 
 .PHONY: reboot-machine03
 reboot-machine03:
-	@$(MAKE)	--no-print-directory	_reboot-machine	MACHINE_UUID=2a92f14d-d3b1-4d46-b813-5d058103743e	MACHINE_NAME=machine03
+	@$(MAKE)	--no-print-directory	_reboot-machine	MACHINE_NAME=machine03
 
 .PHONY: _password
 _password: env
@@ -161,19 +162,19 @@ password-machine03:
 .PHONY: _free-machine
 _free-machine: env
 	docker-compose run metalctl machine rm $(MACHINE_UUID)
-	@$(MAKE) --no-print-directory reboot-machine	MACHINE_UUID=$(MACHINE_UUID)
+	@$(MAKE) --no-print-directory reboot-machine	MACHINE_NAME=$(MACHINE_NAME)
 
 .PHONY: free-machine01
 free-machine01:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_UUID=e0ab02d2-27cd-5a5e-8efc-080ba80cf258
+	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine01
 
 .PHONY: free-machine02
 free-machine02:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_UUID=2294c949-88f6-5390-8154-fa53d93a3313
+	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine02
 
 .PHONY: free-machine03
 free-machine03:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_UUID=2a92f14d-d3b1-4d46-b813-5d058103743e
+	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine03
 
 .PHONY: _console-machine
 _console-machine:

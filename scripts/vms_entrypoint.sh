@@ -29,7 +29,7 @@ done
 for i in $(seq 0 5); do
   ip link add link lan${i} name macvtap${i} type macvtap mode passthru
   ip link set macvtap${i} up
-  ifconfig macvtap${i} promisc
+  ip link set macvtap${i} promisc on
 done
 
 echo "Connected all interfaces"
