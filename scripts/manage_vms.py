@@ -133,7 +133,6 @@ class Manager:
             "-uuid", machine.get("uuid"),
             "-m", machine.get("memory"),
             "-boot", "n",
-            "-boot", "menu=on",
             "-drive", "if=virtio,format=qcow2,file={disk}".format(disk=machine.get("disk-path")),
             "-drive", "if=pflash,format=raw,readonly,file=/usr/share/OVMF/OVMF_CODE.fd",
             "-drive", "if=pflash,format=raw,file=/usr/share/OVMF/OVMF_VARS.fd",
