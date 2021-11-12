@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 import argparse
-import sys
-import subprocess
 import os
+import signal
+import subprocess
+import sys
 
 VMS = {
     "machine01": {
@@ -38,12 +39,15 @@ VMS = {
 
 def parse_args():
     parser = argparse.ArgumentParser(description="manages vms in the mini-lab")
-    parser.add_argument("--names", type=str, help="the machine names to manage")
+    parser.add_argument("--names", type=str, help="the machine names to manage", required=True)
 
     subparsers = parser.add_subparsers(help='sub-command help')
 
     create = subparsers.add_parser('create', help='creates vms')
     create.set_defaults(entry_function="create")
+
+    kill = subparsers.add_parser('kill', help='kills vm processes')
+    kill.set_defaults(entry_function="kill")
 
     return parser.parse_args()
 
@@ -52,12 +56,13 @@ class Manager:
     def __init__(self, args):
         self.subcommand = args.entry_function if 'entry_function' in args else None
         self.names = []
-        if 'names' in args:
+        if args.names:
             self.names = args.names.split(",")
 
     def run(self):
         subcommands = {
             "create": self._create,
+            "kill": self._kill,
         }
 
         command = subcommands.get(self.subcommand)
@@ -67,11 +72,6 @@ class Manager:
 
         command()
 
-    def _create(self):
-        for machine in self._machines_from_cmdline():
-            Manager._create_vm_disk(machine.get(
-                "disk-path"), machine.get("disk-size"))
-            Manager._start_vm(machine)
 
     def _machines_from_cmdline(self):
         machines = []
@@ -80,6 +80,31 @@ class Manager:
                 sys.exit("machine not found: {name}".format(name=name))
             machines.append(VMS[name])
         return machines
+
+
+    def _create(self):
+        for machine in self._machines_from_cmdline():
+            Manager._create_vm_disk(machine.get(
+                "disk-path"), machine.get("disk-size"))
+            Manager._start_vm(machine)
+
+
+    def _kill(self):
+        for machine in self._machines_from_cmdline():
+            Manager._kill_vm_process(machine.get("uuid"))
+
+
+    @staticmethod
+    def _kill_vm_process(machine_uuid):
+        for line in os.popen("ps ax | grep qemu-system | grep " + machine_uuid + " | grep -v grep"):
+            fields = line.split()
+            if len(fields) == 0:
+                print("vm process not found")
+                return
+
+            pid = fields[0]
+            os.kill(int(pid), signal.SIGKILL)
+
 
     @staticmethod
     def _create_vm_disk(path, size):

@@ -26,7 +26,7 @@ YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:3 /bin/sh -c
 up: env control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_rsa
 	docker-compose up --remove-orphans --force-recreate control-plane partition
-
+	@$(MAKE)	--no-print-directory	start-machines
 .PHONY: restart
 restart: down up
 
@@ -121,14 +121,14 @@ ssh-leaf02:
 
 ## MACHINE MANAGEMENT ##
 
-.PHONY: _start-machine
+.PHONY: start-machines
 start-machines:
 	docker exec mini-lab-vms /mini-lab/manage_vms.py --names $(LAB_MACHINES) create
 
 .PHONY: _reboot-machine
 _reboot-machine:
-	docker exec mini-lab-vms /mini-lab/kill_vm.sh $(MACHINE_UUID)
-	docker exec mini-lab-vms /mini-lab/manage_vms.py create --names $(MACHINE_NAME)
+	docker exec mini-lab-vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) kill
+	docker exec mini-lab-vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) create
 
 .PHONY: reboot-machine01
 reboot-machine01:
