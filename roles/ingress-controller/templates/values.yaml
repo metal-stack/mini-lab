@@ -1,0 +1,39 @@
+---
+controller:
+  containerPort:
+    http: {{ ingress_http_port }}
+    https: {{ ingress_https_port }}
+
+  hostNetwork: true
+
+  extraArgs:
+    http-port: {{ ingress_http_port }}
+    https-port: {{ ingress_https_port }}
+
+  daemonset:
+    useHostPort: true
+
+    hostPorts:
+      http: {{ ingress_http_port }}
+      https: {{ ingress_https_port }}
+
+  service:
+    enabled: true
+
+    type: ClusterIP
+
+    ports:
+      http: {{ ingress_http_port }}
+      https: {{ ingress_https_port }}
+
+  metrics:
+    enabled: false
+
+tcp:
+  4161: "{{ metal_control_plane_namespace }}/nsq-lookupd:4161"
+  4150: "{{ metal_control_plane_namespace }}/nsqd:4150"
+  5222: "{{ metal_control_plane_namespace }}/metal-console:10001"
+  50051: "{{ metal_control_plane_namespace }}/metal-api:50051"
+
+udp:
+  5222: "{{ metal_control_plane_namespace }}/metal-console:10001"
