@@ -82,6 +82,7 @@ Start the mini-lab with a kind cluster, a metal-api instance as well as two cont
 
 ```bash
 make
+# containerlab will ask you for root permissions (https://github.com/srl-labs/containerlab/issues/669)
 ```
 
 After the deployment and waiting for a short amoung of time, two machines in status `PXE booting` become visible through `metalctl machine ls`:
