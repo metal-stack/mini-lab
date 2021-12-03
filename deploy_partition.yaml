@@ -1,11 +1,6 @@
 ---
 - name: deploy leaves and docker
   hosts: leaves
-  pre_tasks:
-    - name: create docker directory # TODO: move to docker-on-cumulus role
-      file:
-        path: /etc/docker
-        state: directory
   roles:
     - name: metal-roles/partition/roles/leaf
       tags: leaf
@@ -68,7 +63,7 @@
       tags: always
     - name: metal-ansible-modules
       tags: always
-    - name: metal-python
+    - name: metal-roles/control-plane/roles/metal-python
       tags: metal-python
   post_tasks:
     - name: Wait for switches to register
