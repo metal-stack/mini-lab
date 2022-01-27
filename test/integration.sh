@@ -47,9 +47,6 @@ sleep 10
 echo "Adding route to leaf01 and leaf02"
 make route
 
-echo "Adding iptables forwarding rules for libvirt networking"
-make fwrules
-
 echo "Check if SSH login to firewall works"
 # FIXME: Again this is unstable in CI integration tests
 # ssh -o StrictHostKeyChecking=no metal@100.255.254.1 -C exit

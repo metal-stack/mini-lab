@@ -84,6 +84,8 @@ _ips:
 route: _ips
 	eval "sudo ip r a ${staticR}"
 
+# there is no libvirt required anymore and thus following rules will not work on systems without
+# TODO: discuss what to do instead?
 .PHONY: fwrules
 fwrules: _ips
 	eval "sudo -- iptables -I LIBVIRT_FWO -s 100.255.254.0/24 -i docker0 -j ACCEPT;"
