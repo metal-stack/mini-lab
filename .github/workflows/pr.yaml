@@ -35,7 +35,6 @@ jobs:
     - name: Run integration tests
       shell: bash
       run: |
-        export TMPDIR=/var/tmp/
         export MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:pr-${GITHUB_HEAD_REF##*/}
         ./test/ci-cleanup.sh
         ./test/integration.sh

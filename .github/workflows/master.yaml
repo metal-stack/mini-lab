@@ -32,7 +32,6 @@ jobs:
     - name: Run integration tests
       shell: bash
       run: |
-        export TMPDIR=/var/tmp/
         ./test/ci-cleanup.sh
         ./test/integration.sh
       env:
