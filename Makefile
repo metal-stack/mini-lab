@@ -26,7 +26,7 @@ endif
 ifeq ($(CI),true)
   DOCKER_COMPOSE_TTY_ARG=-T
 else
-  DOCKER_COMPOSE_TTY_ARG=""
+  DOCKER_COMPOSE_TTY_ARG=
 endif
 
 .PHONY: up
