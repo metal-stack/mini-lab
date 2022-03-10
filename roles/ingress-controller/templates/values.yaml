@@ -34,6 +34,3 @@ tcp:
   4150: "{{ metal_control_plane_namespace }}/nsqd:4150"
   5222: "{{ metal_control_plane_namespace }}/metal-console:10001"
   50051: "{{ metal_control_plane_namespace }}/metal-api:50051"
-
-udp:
-  5222: "{{ metal_control_plane_namespace }}/metal-console:10001"

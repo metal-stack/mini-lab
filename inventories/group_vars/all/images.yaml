@@ -1,2 +1,4 @@
 ---
 metal_stack_release_version: v0.9.1
+
+metal_roles_version: port-exposal
