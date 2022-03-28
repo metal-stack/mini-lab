@@ -72,7 +72,7 @@ services:
           ansible-galaxy install --ignore-errors -r requirements.yaml
           ansible-playbook \
             -i inventories/partition.yaml \
-            -i mini-lab/ansible-inventory.yml \
+            -i clab-mini-lab/ansible-inventory.yml \
             deploy_partition.yaml
 
   metalctl:

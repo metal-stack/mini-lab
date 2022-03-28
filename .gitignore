@@ -2,7 +2,8 @@
 .idea
 .kubeconfig
 **/*.pyc
-mini-lab
+clab-mini-lab
+.mini-lab.clab.yml
 ansible-common
 metal-hammer*
 requirements.yaml
