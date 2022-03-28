@@ -1,2 +1,5 @@
 ---
 metal_stack_release_version: develop
+
+metal_helm_chart_repo: https://helm.metal-stack.io/pull_requests/fix-ingress
+metal_helm_chart_version: 0.3.12
