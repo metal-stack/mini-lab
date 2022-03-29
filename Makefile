@@ -37,8 +37,8 @@ up: env control-plane-bake partition-bake
 # for some reason an allocated machine will not be able to phone home
 # without restarting the metal-core
 # TODO: should be investigated and fixed if possible
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@mini-lab-leaf01 -i files/ssh/id_rsa 'systemctl restart metal-core'
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@mini-lab-leaf02 -i files/ssh/id_rsa 'systemctl restart metal-core'
+	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@leaf01 -i files/ssh/id_rsa 'systemctl restart metal-core'
+	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@leaf02 -i files/ssh/id_rsa 'systemctl restart metal-core'
 
 .PHONY: restart
 restart: down up
@@ -76,8 +76,8 @@ env:
 
 .PHONY: _ips
 _ips:
-	$(eval ipL1 = $(shell ${YQ} "yq r mini-lab/ansible-inventory.yml 'all.children.cvx.hosts.mini-lab-leaf01.ansible_host'"))
-	$(eval ipL2 = $(shell ${YQ} "yq r mini-lab/ansible-inventory.yml 'all.children.cvx.hosts.mini-lab-leaf02.ansible_host'"))
+	$(eval ipL1 = $(shell ${YQ} "yq r clab-mini-lab/ansible-inventory.yml 'all.children.cvx.hosts.leaf01.ansible_host'"))
+	$(eval ipL2 = $(shell ${YQ} "yq r clab-mini-lab/ansible-inventory.yml 'all.children.cvx.hosts.leaf02.ansible_host'"))
 	$(eval staticR = "100.255.254.0/24 nexthop via $(ipL1) dev docker0 nexthop via $(ipL2) dev docker0")
 
 .PHONY: route
@@ -128,22 +128,22 @@ ls: env
 
 .PHONY: ssh-leaf01
 ssh-leaf01:
-	ssh -o StrictHostKeyChecking=no -i files/ssh/id_rsa root@mini-lab-leaf01
+	ssh -o StrictHostKeyChecking=no -i files/ssh/id_rsa root@leaf01
 
 .PHONY: ssh-leaf02
 ssh-leaf02:
-	ssh -o StrictHostKeyChecking=no -i files/ssh/id_rsa root@mini-lab-leaf02
+	ssh -o StrictHostKeyChecking=no -i files/ssh/id_rsa root@leaf02
 
 ## MACHINE MANAGEMENT ##
 
 .PHONY: start-machines
 start-machines:
-	docker exec mini-lab-vms /mini-lab/manage_vms.py --names $(LAB_MACHINES) create
+	docker exec vms /mini-lab/manage_vms.py --names $(LAB_MACHINES) create
 
 .PHONY: _reboot-machine
 _reboot-machine:
-	docker exec mini-lab-vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) kill
-	docker exec mini-lab-vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) create
+	docker exec vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) kill
+	docker exec vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) create
 
 .PHONY: reboot-machine01
 reboot-machine01:
@@ -193,7 +193,7 @@ free-machine03:
 .PHONY: _console-machine
 _console-machine:
 	@echo "exit console with CTRL+5 and then quit telnet through q + ENTER"
-	@docker exec -it mini-lab-vms telnet 127.0.0.1 $(CONSOLE_PORT)
+	@docker exec -it vms telnet 127.0.0.1 $(CONSOLE_PORT)
 
 .PHONY: console-machine01
 console-machine01:
