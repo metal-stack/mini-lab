@@ -1,0 +1,49 @@
+---
+apiVersion: core.gardener.cloud/v1beta1
+kind: Shoot
+metadata:
+  name: metal
+  namespace: garden-local
+  annotations:
+    shoot.gardener.cloud/infrastructure-cleanup-wait-period-seconds: "0"
+    alpha.featuregates.shoot.gardener.cloud/reversed-vpn: "true"
+    cluster.metal-stack.io/name: metal
+    cluster.metal-stack.io/project: 00000000-0000-0000-0000-000000000001
+    cluster.metal-stack.io/tenant: metal-stack
+    garden.sapcloud.io/createdBy: mini-lab@metal-stack.dev
+    gardener.cloud/created-by: admin
+spec:
+  seedName: local
+  cloudProfileName: metal
+  secretBindingName: metal
+  region: lab
+  networking:
+    type: local
+  provider:
+    type: metal
+    infrastructureConfig:
+      apiVersion: metal.provider.extensions.gardener.cloud/v1alpha1
+      firewall:
+        controllerVersion: auto
+        image: firewall-ubuntu-2.0
+        networks:
+        - internet-mini-lab
+        size: v1-small-x86
+      kind: InfrastructureConfig
+      partitionID: mini-lab
+      projectID: 00000000-0000-0000-0000-000000000001
+    workers:
+    - name: group-0
+      machine:
+        image:
+          name: ubuntu
+          version: "20.04"
+        type: v1-small-x86
+      cri:
+        name: containerd
+      minimum: 1
+      maximum: 1
+      maxSurge: 1
+      maxUnavailable: 0
+  kubernetes:
+    version: 1.21.11

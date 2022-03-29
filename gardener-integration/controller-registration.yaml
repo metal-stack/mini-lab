@@ -1,0 +1,93 @@
+---
+apiVersion: core.gardener.cloud/v1beta1
+kind: ControllerDeployment
+metadata:
+  name: provider-metal
+providerConfig:
+  chart: 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
+  values:
+    config:
+      accountingExporter:
+        enabled: false
+      auditToSplunk:
+        enabled: false
+      auth:
+        enabled: false
+      clusterAudit:
+        enabled: false
+      machineImages:
+      - image: ubuntu-20.04.20220315
+        name: ubuntu
+        version: 20.04.20220315
+      storage:
+        duros:
+          enabled: false
+    image:
+      repository: r.metal-stack.io/gardener-extension-provider-metal
+      tag: v0.18.9
+    imageVectorOverwrite: |
+      images:
+      - name: metalccm
+        sourceRepository: https://github.com/metal-stack/metal-ccm
+        repository: ghcr.io/metal-stack/metal-ccm
+        tag: updates
+      - name: droptailer
+        sourceRepository: https://github.com/metal-stack/droptailer
+        repository: r.metal-stack.io/droptailer
+        tag: v0.2.8
+      - name: machine-controller-manager
+        sourceRepository: github.com/gardener/machine-controller-manager
+        repository: eu.gcr.io/gardener-project/gardener/machine-controller-manager
+        tag: v0.41.0
+      - name: machine-controller-manager-provider-metal
+        sourceRepository: https://github.com/metal-stack/machine-controller-manager-provider-metal
+        repository: r.metal-stack.io/machine-controller-manager-provider-metal
+        tag: v0.1.9
+type: helm
+---
+apiVersion: core.gardener.cloud/v1beta1
+kind: ControllerRegistration
+metadata:
+  name: provider-metal
+spec:
+  deployment:
+    deploymentRefs:
+    - name: provider-metal
+    policy: Always
+  resources:
+  - kind: ControlPlane
+    primary: true
+    type: metal
+  - kind: Infrastructure
+    primary: true
+    type: metal
+  - kind: Worker
+    primary: true
+    type: metal
+---
+apiVersion: core.gardener.cloud/v1beta1
+kind: ControllerDeployment
+metadata:
+  name: os-metal
+providerConfig:
+  chart: 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
+  values:
+    image:
+      repository: r.metal-stack.io/os-metal-extension
+      tag: v0.5.6
+type: helm
+---
+apiVersion: core.gardener.cloud/v1beta1
+kind: ControllerRegistration
+metadata:
+  name: os-metal
+spec:
+  deployment:
+    deploymentRefs:
+    - name: os-metal
+    policy: Always
+  resources:
+  - kind: OperatingSystemConfig
+    primary: true
+    type: ubuntu
+apiVersion: core.gardener.cloud/v1beta1
