@@ -64,6 +64,9 @@ metal_api_networks:
 - id: internet-mini-lab
   name: "Virtual Internet Network"
   description: "Virtual Internet Network for mini-lab"
+  labels:
+    network.metal-stack.io/default: ""
+    network.metal-stack.io/default-external: ""
   nat: true
   privatesuper: false
   underlay: false

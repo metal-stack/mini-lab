@@ -18,20 +18,21 @@ spec:
   secretBindingName: metal
   region: lab
   networking:
+    # TODO needs to be changed to calico...
     type: local
   provider:
     type: metal
     infrastructureConfig:
       apiVersion: metal.provider.extensions.gardener.cloud/v1alpha1
+      kind: InfrastructureConfig
+      partitionID: mini-lab
+      projectID: 00000000-0000-0000-0000-000000000001
       firewall:
         controllerVersion: auto
         image: firewall-ubuntu-2.0
         networks:
         - internet-mini-lab
         size: v1-small-x86
-      kind: InfrastructureConfig
-      partitionID: mini-lab
-      projectID: 00000000-0000-0000-0000-000000000001
     workers:
     - name: group-0
       machine:
