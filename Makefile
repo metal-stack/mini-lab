@@ -138,7 +138,8 @@ ssh-leaf02:
 
 .PHONY: start-machines
 start-machines:
-	docker exec vms /mini-lab/manage_vms.py --names $(LAB_MACHINES) create
+	docker exec vm1 /mini-lab/manage_vms.py --names machine01 create
+	docker exec vm2 /mini-lab/manage_vms.py --names machine02 create
 
 .PHONY: _reboot-machine
 _reboot-machine:

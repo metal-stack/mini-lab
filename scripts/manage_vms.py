@@ -13,7 +13,7 @@ VMS = {
         "disk-path": "/machine01.img",
         "disk-size": "5G",
         "memory": "2G",
-        "tap-index-fd": [(0, 30), (1, 40)],
+        "tap_indices": [0, 1],
         "serial-port": 4000,
     },
     "machine02": {
@@ -22,8 +22,8 @@ VMS = {
         "disk-path": "/machine02.img",
         "disk-size": "5G",
         "memory": "2G",
-        "tap-index-fd": [(2, 50), (3, 60)],
-        "serial-port": 4001,
+        "tap_indices": [2, 3],
+        "serial-port": 4000,
     },
     "machine03": {
         "name": "machine03",
@@ -31,8 +31,8 @@ VMS = {
         "disk-path": "/machine03.img",
         "disk-size": "5G",
         "memory": "2G",
-        "tap-index-fd": [(4, 70), (5, 80)],
-        "serial-port": 4002,
+        "tap_indices": [4, 5],
+        "serial-port": 4000,
     },
 }
 
@@ -115,18 +115,6 @@ class Manager:
 
     @staticmethod
     def _start_vm(machine):
-        nics = []
-        netdevices = []
-        for tap in machine.get("tap-index-fd", []):
-            ifindex = tap[0]
-            fd = tap[1]
-
-            mac = subprocess.check_output(["cat", "/sys/class/net/macvtap{ifindex}/address".format(ifindex=ifindex)]).decode("utf-8").strip()
-            tapindex = subprocess.check_output(["cat", "/sys/class/net/macvtap{ifindex}/ifindex".format(ifindex=ifindex)]).decode("utf-8").strip()
-
-            nics.append("nic,model=virtio,macaddr={mac}".format(ifindex=ifindex, mac=mac))
-            netdevices.append("tap,fd={fd} {fd}<>/dev/tap{tapindex}".format(fd=fd, tapindex=tapindex))
-
         cmd = [
             "qemu-system-x86_64",
             "-name", machine.get("name"),
@@ -141,13 +129,9 @@ class Manager:
             "-nographic",
         ]
 
-        for nic in nics:
-            cmd.append("-net")
-            cmd.append(nic)
-
-        for device in netdevices:
-            cmd.append("-net")
-            cmd.append(device)
+        for tapindex in machine["tap_indices"]:
+            cmd.append("-net nic,model=virtio")
+            cmd.append("-net tap,ifname=tap{tapindex},script=/mini-lab/mirror_tap_to_veth.sh,downscript=no".format(tapindex=tapindex))
 
         cmd.append("&")
 

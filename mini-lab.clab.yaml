@@ -20,16 +20,21 @@ topology:
       kind: cvx
     leaf02:
       kind: cvx
-    vms:
+    vm1:
+      kind: linux
+      binds:
+        - /dev:/dev
+        - scripts:/mini-lab
+    vm2:
       kind: linux
       binds:
         - /dev:/dev
         - scripts:/mini-lab
 
   links:
-    - endpoints: ["leaf01:swp1", "vms:lan0"]
-    - endpoints: ["leaf02:swp1", "vms:lan1"]
-    - endpoints: ["leaf01:swp2", "vms:lan2"]
-    - endpoints: ["leaf02:swp2", "vms:lan3"]
-    - endpoints: ["leaf01:swp3", "vms:lan4"]
-    - endpoints: ["leaf02:swp3", "vms:lan5"]
+    - endpoints: ["leaf01:swp1", "vm1:lan0"]
+    - endpoints: ["leaf02:swp1", "vm1:lan1"]
+    - endpoints: ["leaf01:swp2", "vm2:lan0"]
+    - endpoints: ["leaf02:swp2", "vm2:lan1"]
+#    - endpoints: ["leaf01:swp3", "vms:lan4"]
+#    - endpoints: ["leaf02:swp3", "vms:lan5"]
