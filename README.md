@@ -32,7 +32,7 @@ Here is some code that should help you setting up most of the requirements:
 
  ```bash
 # Install kvm
-sudo apt install -y git curl qemu qemu-kvm havaged
+sudo apt install -y git curl qemu qemu-kvm haveged
 
 # Install Docker
 curl -fsSL https://get.docker.com | sh
