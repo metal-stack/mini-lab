@@ -2,4 +2,5 @@
 ingress_http_port: 8080
 ingress_https_port: 4443
 
-ingress_additional_config: {}
+ingress_additional_config:
+  large-client-header-buffers: 4 32k
