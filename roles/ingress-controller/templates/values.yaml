@@ -29,6 +29,8 @@ controller:
   metrics:
     enabled: false
 
+  config: {{ ingress_additional_config | to_json }}
+
 tcp:
   4161: "{{ metal_control_plane_namespace }}/nsq-lookupd:4161"
   4150: "{{ metal_control_plane_namespace }}/nsqd:4150"
