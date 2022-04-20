@@ -38,7 +38,7 @@ services:
           ansible-galaxy install --ignore-errors -r requirements.yaml
           ansible-playbook \
             -i inventories/control-plane.yaml \
-            deploy_control_plane.yaml
+            deploy_control_plane.yaml --extra-vars "@.extra_vars.yaml"
 
   partition:
     image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
@@ -73,7 +73,7 @@ services:
           ansible-playbook \
             -i inventories/partition.yaml \
             -i clab-mini-lab/ansible-inventory.yml \
-            deploy_partition.yaml
+            deploy_partition.yaml --extra-vars "@.extra_vars.yaml"
 
   metalctl:
     image: ghcr.io/metal-stack/metalctl:${METALCTL_IMAGE_TAG}
