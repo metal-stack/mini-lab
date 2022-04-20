@@ -9,6 +9,9 @@ KUBECONFIG := $(shell pwd)/.kubeconfig
 # Default values
 DOCKER_COMPOSE_OVERRIDE=
 
+# extra vars can be used by projects that built on the mini-lab, which want to override default configuration
+ANSIBLE_EXTRA_VARS_FILE := $(or $(ANSIBLE_EXTRA_VARS_FILE),)
+
 MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),default)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
 

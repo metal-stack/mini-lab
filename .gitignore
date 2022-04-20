@@ -7,3 +7,4 @@ clab-mini-lab
 ansible-common
 metal-hammer*
 requirements.yaml
+.extra_vars.yaml

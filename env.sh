@@ -13,6 +13,11 @@ RELEASE_YAML=$(curl -s https://raw.githubusercontent.com/metal-stack/releases/${
 METALCTL_IMAGE_TAG=$(yq_shell "echo \"${RELEASE_YAML}\" | yq r - docker-images.metal-stack.control-plane.metalctl.tag")
 DEPLOYMENT_BASE_IMAGE_TAG=$(yq_shell "echo \"${RELEASE_YAML}\" | yq r - docker-images.metal-stack.generic.deployment-base.tag")
 
+echo "{}" > .extra_vars.yaml
+if [ ! -z ${ANSIBLE_EXTRA_VARS_FILE} ]; then
+  cat ${ANSIBLE_EXTRA_VARS_FILE} > .extra_vars.yaml || echo "{}" > .extra_vars.yaml
+fi
+
 cat << EOF > .env
 METALCTL_IMAGE_TAG=${METALCTL_IMAGE_TAG}
 DEPLOYMENT_BASE_IMAGE_TAG=${DEPLOYMENT_BASE_IMAGE_TAG}
