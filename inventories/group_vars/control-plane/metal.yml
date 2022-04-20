@@ -73,6 +73,9 @@ metal_api_networks:
   vrf: 104009
   prefixes:
   - 100.255.254.0/24
+  labels:
+    network.metal-stack.io/default: ""
+    network.metal-stack.io/default-external: ""
 - id: underlay-mini-lab
   name: "Underlay Network"
   description: "Underlay Network for mini-lab"
