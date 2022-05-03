@@ -117,7 +117,7 @@ metal_masterdata_api_projects:
   name: sample-project
   description: Sample project with static id
 
-metal_console_replicas: 1
+metal_console_enabled: false
 
 metal_api_grpc_certs_server_key: "{{ lookup('file', 'certs/grpc/server-key.pem') }}"
 metal_api_grpc_certs_server_cert: "{{  lookup('file', 'certs/grpc/server.pem') }}"

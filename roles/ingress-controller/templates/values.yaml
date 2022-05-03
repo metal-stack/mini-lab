@@ -34,5 +34,7 @@ controller:
 tcp:
   4161: "{{ metal_control_plane_namespace }}/nsq-lookupd:4161"
   4150: "{{ metal_control_plane_namespace }}/nsqd:4150"
+{% if metal_console_enabled %}
   5222: "{{ metal_control_plane_namespace }}/metal-console:10001"
+{% endif %}
   50051: "{{ metal_control_plane_namespace }}/metal-api:50051"
