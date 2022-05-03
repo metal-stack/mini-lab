@@ -1,0 +1,59 @@
+---
+- name: Create namespace ingress controller
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: monitoring
+        labels:
+          name: monitoring
+
+- name: Deploy loki-stack
+  include_role:
+    name: ansible-common/roles/helm-chart
+  vars:
+    helm_repo: "https://grafana.github.io/helm-charts"
+    helm_chart: loki-stack
+    helm_target_namespace: monitoring
+    helm_release_name: loki-stack
+    helm_value_file_template: "loki-stack-values.yaml"
+
+- name: Deploy prometheus-stack
+  include_role:
+    name: ansible-common/roles/helm-chart
+  vars:
+    helm_repo: "https://prometheus-community.github.io/helm-charts"
+    helm_chart: kube-prometheus-stack
+    helm_target_namespace: monitoring
+    helm_release_name: kube-prometheus-stack
+    helm_value_file_template: "prometheus-stack-values.yaml"
+
+- name: Deploy metal-metrics-exporter
+  k8s:
+    definition: "{{ lookup('template', 'metal-metrics-exporter/' + item) }}"
+    namespace: monitoring
+  loop:
+    - metal-metrics-exporter-secret.yaml
+    - metal-metrics-exporter-deployment.yaml
+    - metal-metrics-exporter-service.yaml
+
+- name: Deploy service montiors
+  k8s:
+    definition: "{{ lookup('template', 'servicemonitors/' + item) }}"
+    namespace: monitoring
+  loop:
+    - metal-metrics-exporter-servicemonitor.yaml
+    - metal_api_servicemonitor.yaml
+    - metal_db_servicemonitor.yaml
+    - masterdata_api_servicemonitor.yaml
+    - masterdata_db_servicemonitor.yaml
+    - ipam_db_servicemonitor.yaml
+
+- name: Deploy grafana dashboards
+  k8s:
+    definition: "{{ lookup('template', 'dashboards/' + item) }}"
+    namespace: monitoring
+  loop:
+    - go-processes.yaml
+    - metal-api.yaml
