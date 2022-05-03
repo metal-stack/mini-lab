@@ -40,8 +40,8 @@ up: env control-plane-bake partition-bake
 # for some reason an allocated machine will not be able to phone home
 # without restarting the metal-core
 # TODO: should be investigated and fixed if possible
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@leaf01 -i files/ssh/id_rsa 'systemctl restart metal-core'
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@leaf02 -i files/ssh/id_rsa 'systemctl restart metal-core'
+	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o "PubkeyAcceptedKeyTypes +ssh-rsa" root@leaf01 -i files/ssh/id_rsa 'systemctl restart metal-core'
+	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o "PubkeyAcceptedKeyTypes +ssh-rsa" root@leaf02 -i files/ssh/id_rsa 'systemctl restart metal-core'
 
 .PHONY: restart
 restart: down up
@@ -131,11 +131,11 @@ ls: env
 
 .PHONY: ssh-leaf01
 ssh-leaf01:
-	ssh -o StrictHostKeyChecking=no -i files/ssh/id_rsa root@leaf01
+	ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa root@leaf01
 
 .PHONY: ssh-leaf02
 ssh-leaf02:
-	ssh -o StrictHostKeyChecking=no -i files/ssh/id_rsa root@leaf02
+	ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa root@leaf02
 
 ## MACHINE MANAGEMENT ##
 
