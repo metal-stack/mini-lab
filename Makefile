@@ -131,11 +131,11 @@ ls: env
 
 .PHONY: ssh-leaf01
 ssh-leaf01:
-	ssh -o StrictHostKeyChecking=no -i files/ssh/id_rsa root@leaf01
+	ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa root@leaf01
 
 .PHONY: ssh-leaf02
 ssh-leaf02:
-	ssh -o StrictHostKeyChecking=no -i files/ssh/id_rsa root@leaf02
+	ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa root@leaf02
 
 ## MACHINE MANAGEMENT ##
 
