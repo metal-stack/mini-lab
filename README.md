@@ -101,8 +101,8 @@ Wait until the machines reach the waiting state:
 docker-compose run metalctl machine ls
 
 ID                                          LAST EVENT   WHEN     AGE  HOSTNAME  PROJECT  SIZE          IMAGE  PARTITION
-e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Waiting      8s                               v1-small-x86         vagrant
-2294c949-88f6-5390-8154-fa53d93a3313        Waiting      8s                               v1-small-x86         vagrant
+e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Waiting      8s                               v1-small-x86         mini-lab
+2294c949-88f6-5390-8154-fa53d93a3313        Waiting      8s                               v1-small-x86         mini-lab
 ```
 
 Create a firewall and a machine with:
@@ -158,8 +158,8 @@ Two machines are now installed and have status "Phoned Home"
 ```bash
 docker-compose run metalctl machine ls
 ID                                          LAST EVENT   WHEN   AGE     HOSTNAME  PROJECT                               SIZE          IMAGE                             PARTITION
-e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Phoned Home  2s     21s     machine   00000000-0000-0000-0000-000000000000  v1-small-x86  Ubuntu 20.04 20200331             vagrant
-2294c949-88f6-5390-8154-fa53d93a3313        Phoned Home  8s     18s     fw        00000000-0000-0000-0000-000000000000  v1-small-x86  Firewall 2 Ubuntu 20200730        vagrant
+e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Phoned Home  2s     21s     machine   00000000-0000-0000-0000-000000000000  v1-small-x86  Ubuntu 20.04 20200331             mini-lab
+2294c949-88f6-5390-8154-fa53d93a3313        Phoned Home  8s     18s     fw        00000000-0000-0000-0000-000000000000  v1-small-x86  Firewall 2 Ubuntu 20200730        mini-lab
 ```
 
 Login with user name metal and the console password from
@@ -171,7 +171,7 @@ docker-compose run metalctl machine consolepassword e0ab02d2-27cd-5a5e-8efc-080b
 If you want to access the firewall with SSH or have internet connectivity from the firewall and machine, you'll need to have a static route configured that points to the leaf switches:
 
 ```bash
-# Add the route to the network internet-vagrant-lab 100.255.254.0/24 via leaf01 and leaf02, whose IPs are dynamically allocated. Make sure there's no old route before execution.
+# Add the route to the network internet-mini-lab 100.255.254.0/24 via leaf01 and leaf02, whose IPs are dynamically allocated. Make sure there's no old route before execution.
 make route
 
 # Connect to the firewall

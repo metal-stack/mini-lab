@@ -1,0 +1,9 @@
+#jinja2: lstrip_blocks: "True", trim_blocks: "True"
+frr defaults datacenter
+hostname {{ ansible_hostname }}
+password zebra
+enable password zebra
+!
+log syslog informational
+log facility local4
+!

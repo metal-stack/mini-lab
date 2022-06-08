@@ -1,0 +1,30 @@
+#jinja2: lstrip_blocks: "True", trim_blocks: "True"
+frr defaults datacenter
+hostname {{ ansible_hostname }}
+password zebra
+enable password zebra
+!
+log syslog informational
+log facility local4
+!
+router bgp {{ asn }}
+ bgp router-id {{ lo }}
+ neighbor FABRIC peer-group
+ neighbor FABRIC remote-as external
+ {% for iface in uplinks %}
+ neighbor {{ iface.name }} interface peer-group FABRIC
+ {% endfor %}
+ !
+ address-family ipv4 unicast
+  neighbor FABRIC activate
+  redistribute connected route-map LOOPBACKS
+ exit-address-family
+ !
+ address-family l2vpn evpn
+  neighbor FABRIC activate
+  advertise-all-vni
+ exit-address-family
+!
+route-map LOOPBACKS permit 10
+  match interface lo
+!

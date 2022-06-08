@@ -6,7 +6,6 @@ services:
     image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
     container_name: deploy-control-plane
     volumes:
-      - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
       - /var/run/docker.sock:/var/run/docker.sock
       - .:/mini-lab
       # for developing role dependencies
@@ -73,7 +72,7 @@ services:
           ansible-playbook \
             -i inventories/partition.yaml \
             -i clab-mini-lab/ansible-inventory.yml \
-            deploy_partition.yaml --extra-vars "@.extra_vars.yaml"
+            deploy_partition.yaml --extra-vars "@.extra_vars.yaml" --diff
 
   metalctl:
     image: ghcr.io/metal-stack/metalctl:${METALCTL_IMAGE_TAG}

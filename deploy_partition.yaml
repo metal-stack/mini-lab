@@ -1,17 +1,41 @@
 ---
-- name: deploy leaves and docker
+- name: configure interface
   hosts: leaves
-  roles:
-    - name: metal-roles/partition/roles/leaf
-      tags: leaf
-    - name: metal-roles/partition/roles/docker-on-cumulus
-      tags: docker-on-cumulus
+  ignore_errors: True
+  pre_tasks:
+    - name: remove initial config
+      command: jq 'delpaths([["DEVICE_METADATA", "localhost", "bgp_asn"]]) | .LOOPBACK_INTERFACE = {} | .BGP_NEIGHBOR = {} | .DEVICE_METADATA.localhost.docker_routing_config_mode = "split" | .INTERFACE = {}'  /etc/sonic/config_db.json
+      register: cleaned_config_db
 
-- name: deploy dhcp server
-  hosts: leaf01
+    - name: place cleaned config db
+      copy:
+        content: "{{ cleaned_config_db.stdout }}"
+        dest: /etc/sonic/config_db.json
+
+    - name: reload config_db
+      command: config load --yes
+
+    - name: configure
+      command: "{{ item }}"
+      loop:
+        - config hostname {{ metal_partition_id }}-{{ inventory_hostname }}
+#        - config vrf add mgmt
+        - config interface ip add Loopback0 {{ lo }}/32
+        - config interface ip add Ethernet0 {{ metal_core_cidr }}
+
+#    - name: add members to Vlan4000
+#      command: "{{ item }}"
+#      loop:
+#        - config vlan add 4000
+#        - config interface ip add Vlan4000 {{ metal_core_cidr }}
+#        - config vlan member add --untagged 4000 Ethernet0
+#        - config vlan member add --untagged 4000 Ethernet4
+#        - config vlan member add --untagged 4000 Ethernet8
+   # TODO: Cannot configure mtu for Vlan4000
+    # $ config interface mtu Vlan4000 9000
+    # Invalid port Vlan4000
   roles:
-    - name: metal-roles/partition/roles/dhcp
-      tags: dhcp
+    - name: frr
 
 - name: deploy metal-core and pixiecore
   hosts: leaves
@@ -41,12 +65,18 @@
   roles:
     - name: ansible-common
       tags: always
-    - name: internet
-      tags: internet
+#    - name: internet
+#      tags: internet
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
     - name: metal-roles/partition/roles/pixiecore
       tags: pixiecore
+
+- name: deploy dhcp server
+  hosts: leaf01
+  roles:
+    - name: dhcp
+      tags: dhcp
 
 - name: wait for switches
   hosts: localhost

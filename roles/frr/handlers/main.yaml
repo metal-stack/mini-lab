@@ -1,0 +1,5 @@
+---
+- name: bgp restart
+  service:
+    name: bgp
+    state: restarted

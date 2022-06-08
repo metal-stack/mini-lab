@@ -32,6 +32,10 @@ leaves:
     uplinks: []
     dhcp_server_ip: 10.0.1.1
 
+    metal_core_image_name: robertvolkmann/metal-stack
+    metal_core_image_tag: metal-core
+    metal_core_reconfigure_switch: false
+
     ansible_python_interpreter: /usr/bin/python
     ansible_user: root
     ansible_ssh_private_key_file: "{{ playbook_dir }}/files/ssh/id_rsa"
