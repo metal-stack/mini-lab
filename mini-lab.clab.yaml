@@ -7,12 +7,10 @@ mgmt:
 topology:
   nodes:
     leaf01:
-      kind: linux
-      image: ignite-sonic
-      kernel: robertvolkmann/ignite-kernel:5.10.77
-      memory: 2GB
+      kind: cvx
+      image: networkop/cx:3.7.0
+      kernel: docker.io/grigoriymikh/kernel:4.1.0
       sandbox: grigoriymikh/sandbox:latest
-      runtime: ignite
       binds:
         - files/ssh/id_rsa.pub:/root/.ssh/authorized_keys
     leaf02:
@@ -32,9 +30,9 @@ topology:
         - scripts:/mini-lab
 
   links:
-    - endpoints: ["leaf01:eth1", "vms:lan0"]
+    - endpoints: ["leaf01:swp1", "vms:lan0"]
     - endpoints: ["leaf02:eth1", "vms:lan1"]
-    - endpoints: ["leaf01:eth2", "vms:lan2"]
+    - endpoints: ["leaf01:swp2", "vms:lan2"]
     - endpoints: ["leaf02:eth2", "vms:lan3"]
-    - endpoints: ["leaf01:eth3", "vms:lan4"]
+    - endpoints: ["leaf01:swp3", "vms:lan4"]
     - endpoints: ["leaf02:eth3", "vms:lan5"]

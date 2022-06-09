@@ -6,3 +6,5 @@ control-plane:
   vars:
     metal_api_image_name: robertvolkmann/metal-stack
     metal_api_image_tag: metal-api
+
+    metal_hammer_image_url: https://images.metal-stack.io/metal-hammer/pull-requests/84-sonic/metal-hammer-initrd.img.lz4

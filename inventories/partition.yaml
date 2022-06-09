@@ -24,6 +24,9 @@ leaves:
       lo: 10.0.0.12
       asn: 4200000012
       metal_core_cidr: 10.0.1.128/24
+      metal_core_image_name: robertvolkmann/metal-stack
+      metal_core_image_tag: metal-core
+      metal_core_reconfigure_switch: false
   vars:
     ports:
       1: 100G
@@ -31,10 +34,6 @@ leaves:
     - name: swp1
     uplinks: []
     dhcp_server_ip: 10.0.1.1
-
-    metal_core_image_name: robertvolkmann/metal-stack
-    metal_core_image_tag: metal-core
-    metal_core_reconfigure_switch: false
 
     ansible_python_interpreter: /usr/bin/python
     ansible_user: root

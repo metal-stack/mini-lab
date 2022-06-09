@@ -1,6 +1,20 @@
 ---
+- name: deploy leaves and docker
+  hosts: leaf01
+  roles:
+    - name: metal-roles/partition/roles/leaf
+      tags: leaf
+    - name: metal-roles/partition/roles/docker-on-cumulus
+      tags: docker-on-cumulus
+
+- name: deploy dhcp server
+  hosts: leaf01
+  roles:
+    - name: metal-roles/partition/roles/dhcp
+      tags: dhcp
+
 - name: configure interface
-  hosts: leaves
+  hosts: leaf02
   ignore_errors: True
   pre_tasks:
     - name: remove initial config
@@ -20,8 +34,16 @@
       loop:
         - config hostname {{ metal_partition_id }}-{{ inventory_hostname }}
 #        - config vrf add mgmt
+        - config loopback add Loopback0
         - config interface ip add Loopback0 {{ lo }}/32
-        - config interface ip add Ethernet0 {{ metal_core_cidr }}
+#        - config interface ip add Ethernet0 {{ metal_core_cidr }}
+        - config vrf add Vrf20
+        - config vlan add 1001
+        - config vxlan add vtep {{ lo }}
+        - config vxlan map add vtep 1001 20
+        - config vrf add_vrf_vni_map Vrf20 20
+        - config interface vrf bind Ethernet4 Vrf20
+        - config interface vrf bind Vlan1001 Vrf20
 
 #    - name: add members to Vlan4000
 #      command: "{{ item }}"
@@ -71,12 +93,6 @@
       tags: metal-core
     - name: metal-roles/partition/roles/pixiecore
       tags: pixiecore
-
-- name: deploy dhcp server
-  hosts: leaf01
-  roles:
-    - name: dhcp
-      tags: dhcp
 
 - name: wait for switches
   hosts: localhost
