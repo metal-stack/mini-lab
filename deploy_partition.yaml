@@ -7,13 +7,15 @@
     - name: metal-roles/partition/roles/docker-on-cumulus
       tags: docker-on-cumulus
 
-- name: deploy dhcp server
+- name: deploy dhcp server and pixiecore
   hosts: leaf01
   roles:
     - name: metal-roles/partition/roles/dhcp
       tags: dhcp
+    - name: metal-roles/partition/roles/pixiecore
+      tags: pixiecore
 
-- name: deploy metal-core and pixiecore
+- name: deploy metal-core
   hosts: leaves
   vars:
     setup_yaml:
@@ -45,8 +47,6 @@
       tags: internet
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
-    - name: metal-roles/partition/roles/pixiecore
-      tags: pixiecore
 
 - name: wait for switches
   hosts: localhost

@@ -87,8 +87,6 @@ metal_api_networks:
   prefixes:
   - 10.1.0.0/24
 
-metal_api_nsq_tls_enabled: false
-
 metal_masterdata_api_tls_ca: "{{ lookup('file', 'certs/ca.pem') }}"
 metal_masterdata_api_tls_cert: "{{ lookup('file', 'certs/masterdata-api/server.pem') }}"
 metal_masterdata_api_tls_cert_key: "{{ lookup('file', 'certs/masterdata-api/server-key.pem') }}"
