@@ -3,6 +3,9 @@ nsq_set_resource_limits: no
 
 nsq_log_level: debug
 
-nsq_tls_enabled: false
+nsq_tls_enabled: true
+nsq_certs_client_key: "{{ lookup('file', 'certs/nsq/client-key.pem') }}"
+nsq_certs_client_cert: "{{  lookup('file', 'certs/nsq/client.crt') }}"
+nsq_certs_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
 
 nsq_broadcast_address: nsqd

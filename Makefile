@@ -214,7 +214,7 @@ console-machine03:
 
 .PHONY: dev-env
 dev-env:
-	@echo "export METALCTL_URL=http://api.0.0.0.0.nip.io:8080/metal"
+	@echo "export METALCTL_URL=http://api.172.17.0.1.nip.io:8080/metal"
 	@echo "export METALCTL_HMAC=metal-admin"
 	@echo "export KUBECONFIG=$(KUBECONFIG)"
 
