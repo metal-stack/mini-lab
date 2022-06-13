@@ -3,7 +3,7 @@ metal_partition_timezone: Europe/Berlin
 metal_partition_id: mini-lab
 
 metal_partition_metal_api_protocol: http
-metal_partition_metal_api_addr: api.0.0.0.0.nip.io
+metal_partition_metal_api_addr: api.172.17.0.1.nip.io
 metal_partition_metal_api_port: 8080
 metal_partition_metal_api_basepath: /metal/
 metal_partition_metal_api_hmac_edit_key: metal-edit
