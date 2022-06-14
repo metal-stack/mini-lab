@@ -1,4 +1,2 @@
 ---
 pixiecore_api_host: http://{{ pixie_server_ip }}
-# TODO: can be reverted to default as soon as metal-core server endpoints were dropped
-pixiecore_api_port: 4243
