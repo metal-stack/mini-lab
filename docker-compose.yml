@@ -6,7 +6,6 @@ services:
     image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
     container_name: deploy-control-plane
     volumes:
-      - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
       - /var/run/docker.sock:/var/run/docker.sock
       - .:/mini-lab
       # for developing role dependencies
