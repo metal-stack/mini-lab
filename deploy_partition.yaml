@@ -7,11 +7,19 @@
     - name: metal-roles/partition/roles/docker-on-cumulus
       tags: docker-on-cumulus
 
-- name: deploy dhcp server
+- name: deploy dhcp server and pixiecore
   hosts: leaf01
+  vars:
+    setup_yaml:
+      - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
+        meta_var: metal_stack_release
   roles:
+    - name: ansible-common
+      tags: always
     - name: metal-roles/partition/roles/dhcp
       tags: dhcp
+    - name: metal-roles/partition/roles/pixiecore
+      tags: pixiecore
 
 - name: configure interface
   hosts: leaf02
@@ -33,10 +41,10 @@
       command: "{{ item }}"
       loop:
         - config hostname {{ metal_partition_id }}-{{ inventory_hostname }}
-#        - config vrf add mgmt
+        #        - config vrf add mgmt
         - config loopback add Loopback0
         - config interface ip add Loopback0 {{ lo }}/32
-#        - config interface ip add Ethernet0 {{ metal_core_cidr }}
+        #        - config interface ip add Ethernet0 {{ metal_core_cidr }}
         - config vrf add Vrf20
         - config vlan add 1001
         - config vxlan add vtep {{ lo }}
@@ -45,45 +53,26 @@
         - config interface vrf bind Ethernet4 Vrf20
         - config interface vrf bind Vlan1001 Vrf20
 
-#    - name: add members to Vlan4000
-#      command: "{{ item }}"
-#      loop:
-#        - config vlan add 4000
-#        - config interface ip add Vlan4000 {{ metal_core_cidr }}
-#        - config vlan member add --untagged 4000 Ethernet0
-#        - config vlan member add --untagged 4000 Ethernet4
-#        - config vlan member add --untagged 4000 Ethernet8
-   # TODO: Cannot configure mtu for Vlan4000
+    #    - name: add members to Vlan4000
+    #      command: "{{ item }}"
+    #      loop:
+    #        - config vlan add 4000
+    #        - config interface ip add Vlan4000 {{ metal_core_cidr }}
+    #        - config vlan member add --untagged 4000 Ethernet0
+    #        - config vlan member add --untagged 4000 Ethernet4
+    #        - config vlan member add --untagged 4000 Ethernet8
+    # TODO: Cannot configure mtu for Vlan4000
     # $ config interface mtu Vlan4000 9000
     # Invalid port Vlan4000
   roles:
     - name: frr
 
-- name: deploy metal-core and pixiecore
+- name: deploy metal-core
   hosts: leaves
   vars:
     setup_yaml:
       - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
         meta_var: metal_stack_release
-  pre_tasks:
-    - name: add docker registry to hosts
-      lineinfile:
-        path: /etc/hosts
-        regexp: '{{ item.regex }}'
-        line: '{{ item.ip }} {{ item.name }}'
-        owner: root
-        group: root
-        mode: 0644
-      with_items:
-        - name: 0.0.0.0.nip.io
-          ip: "{{ metal_partition_mgmt_gateway }}"
-          regex: "{{ '0.0.0.0.nip.io' | regex_escape() }}"
-        - name: api.0.0.0.0.nip.io
-          ip: "{{ metal_partition_mgmt_gateway }}"
-          regex: "{{ 'api.0.0.0.0.nip.io' | regex_escape() }}"
-        - name: nsqd
-          ip: "{{ metal_partition_mgmt_gateway }}"
-          regex: "{{ 'nsqd' | regex_escape() }}"
   roles:
     - name: ansible-common
       tags: always
@@ -91,8 +80,6 @@
 #      tags: internet
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
-    - name: metal-roles/partition/roles/pixiecore
-      tags: pixiecore
 
 - name: wait for switches
   hosts: localhost

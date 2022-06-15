@@ -78,7 +78,7 @@ services:
     image: ghcr.io/metal-stack/metalctl:${METALCTL_IMAGE_TAG}
     environment:
       - METALCTL_HMAC=metal-admin
-      - METALCTL_URL=http://api.0.0.0.0.nip.io:8080/metal
+      - METALCTL_URL=http://api.172.17.0.1.nip.io:8080/metal
     volumes:
       - ./files/ssh:/root/.ssh:ro
     network_mode: host

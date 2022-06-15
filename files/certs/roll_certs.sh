@@ -46,6 +46,15 @@ if [ -z "$TARGET" ] || [ $TARGET == "masterdata-api" ]; then
     popd
 fi
 
+if [ -z "$TARGET" ] || [ $TARGET == "nsq" ]; then
+    pushd nsq
+    rm -f *.pem
+    cfssl gencert -ca=../ca.pem -ca-key=../ca-key.pem -config=../ca-config.json -profile=client-server client.json | cfssljson -bare client
+    cat client.pem client-key.pem > client.crt
+    rm -f *.csr
+    popd
+fi
+
 if [ -n "$VAULT_PASSWORD_FILE" ]; then
     if [ -z "$TARGET" ]; then
         TARGET="*"

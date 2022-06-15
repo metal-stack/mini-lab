@@ -1,0 +1,21 @@
+{
+  "CN": "nsqd",
+  "hosts": [
+    "metal-control-plane-nsqd",
+    "nsqd",
+    ""
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 4096
+  },
+  "names": [
+    {
+      "C":  "DE",
+      "L":  "Muenchen",
+      "O":  "FI-TS",
+      "OU": "DevOps",
+      "ST": "Bayern"
+    }
+  ]
+}

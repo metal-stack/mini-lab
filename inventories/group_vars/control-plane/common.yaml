@@ -1,7 +1,7 @@
 ---
 metal_control_plane_provider_tenant: metal-stack
 metal_control_plane_host_provider: vagrant
-metal_control_plane_ingress_dns: 0.0.0.0.nip.io
+metal_control_plane_ingress_dns: 172.17.0.1.nip.io
 metal_control_plane_stage_name: test
 metal_control_plane_namespace: metal-control-plane
 metal_control_plane_image_pull_policy: Always
