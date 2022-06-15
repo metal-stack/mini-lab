@@ -1,0 +1,10 @@
+[Unit]
+Description=Trigger a validation run of a frr configuration file %I
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/sonic-cfggen --json %I --write-to-db
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target

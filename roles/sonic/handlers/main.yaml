@@ -1,0 +1,14 @@
+---
+- name: bgp restart
+  service:
+    name: bgp
+    state: restarted
+
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: write metal-core.json into db
+  service:
+    name: write-to-db@-etc-sonic-metal\x2dcore\x2ejson.service
+    state: started

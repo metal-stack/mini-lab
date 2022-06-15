@@ -27,6 +27,36 @@ leaves:
       metal_core_image_name: robertvolkmann/metal-stack
       metal_core_image_tag: metal-core
       metal_core_reconfigure_switch: false
+      metal_core_additional_bridge_ports:
+      - Ethernet12
+      - Ethernet16
+      - Ethernet20
+      - Ethernet24
+      - Ethernet28
+      - Ethernet32
+      - Ethernet36
+      - Ethernet40
+      - Ethernet44
+      - Ethernet48
+      - Ethernet52
+      - Ethernet56
+      - Ethernet60
+      - Ethernet64
+      - Ethernet68
+      - Ethernet72
+      - Ethernet76
+      - Ethernet80
+      - Ethernet84
+      - Ethernet88
+      - Ethernet92
+      - Ethernet96
+      - Ethernet100
+      - Ethernet104
+      - Ethernet108
+      - Ethernet112
+      - Ethernet116
+      - Ethernet120
+      - Ethernet124
   vars:
     ports:
       1: 100G

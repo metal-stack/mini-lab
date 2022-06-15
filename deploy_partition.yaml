@@ -41,31 +41,10 @@
       command: "{{ item }}"
       loop:
         - config hostname {{ metal_partition_id }}-{{ inventory_hostname }}
-        #        - config vrf add mgmt
         - config loopback add Loopback0
         - config interface ip add Loopback0 {{ lo }}/32
-        #        - config interface ip add Ethernet0 {{ metal_core_cidr }}
-        - config vrf add Vrf20
-        - config vlan add 1001
-        - config vxlan add vtep {{ lo }}
-        - config vxlan map add vtep 1001 20
-        - config vrf add_vrf_vni_map Vrf20 20
-        - config interface vrf bind Ethernet4 Vrf20
-        - config interface vrf bind Vlan1001 Vrf20
-
-    #    - name: add members to Vlan4000
-    #      command: "{{ item }}"
-    #      loop:
-    #        - config vlan add 4000
-    #        - config interface ip add Vlan4000 {{ metal_core_cidr }}
-    #        - config vlan member add --untagged 4000 Ethernet0
-    #        - config vlan member add --untagged 4000 Ethernet4
-    #        - config vlan member add --untagged 4000 Ethernet8
-    # TODO: Cannot configure mtu for Vlan4000
-    # $ config interface mtu Vlan4000 9000
-    # Invalid port Vlan4000
   roles:
-    - name: frr
+    - name: sonic
 
 - name: deploy metal-core
   hosts: leaves
