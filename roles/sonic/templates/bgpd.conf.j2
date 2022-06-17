@@ -17,61 +17,22 @@ router bgp {{ asn }}
  neighbor FABRIC peer-group
  neighbor FABRIC remote-as external
  neighbor FABRIC timers 2 8
- neighbor FIREWALL peer-group
- neighbor FIREWALL remote-as external
- neighbor FIREWALL timers 2 8
- neighbor Ethernet0 interface peer-group FIREWALL
+ {% for iface in uplinks %}
+ neighbor {{ iface.name }} interface peer-group FABRIC
+ {% endfor %}
  !
  address-family ipv4 unicast
   redistribute connected route-map LOOPBACKS
-  neighbor FIREWALL allowas-in 2
-  neighbor Ethernet0 route-map fw-Ethernet0-in in
  exit-address-family
  !
  address-family l2vpn evpn
   advertise-all-vni
   neighbor FABRIC activate
   neighbor FABRIC allowas-in 2
-  neighbor FIREWALL activate
-  neighbor FIREWALL allowas-in 2
-  neighbor Ethernet0 route-map fw-Ethernet0-vni out
  exit-address-family
 !
 route-map LOOPBACKS permit 10
  match interface Loopback0
 !
-# route-maps for firewall@Ethernet0
-ip prefix-list fw-Ethernet0-in-prefixes permit 10.1.0.1/32 le 32
-route-map fw-Ethernet0-in permit 10
- match ip address prefix-list fw-Ethernet0-in-prefixes
-route-map fw-Ethernet0-vni permit 10
- match evpn vni 104009
-route-map fw-Ethernet0-vni permit 11
- match evpn vni 20
-!
-router bgp {{ asn }} vrf Vrf20
- bgp router-id {{ lo }}
- bgp bestpath as-path multipath-relax
- neighbor MACHINE peer-group
- neighbor MACHINE remote-as external
- neighbor MACHINE timers 2 8
- neighbor Ethernet4 interface peer-group MACHINE
- !
- address-family ipv4 unicast
-  redistribute connected
-  neighbor MACHINE maximum-prefix 24000
-  neighbor MACHINE route-map Vrf20-in in
- exit-address-family
- !
- address-family l2vpn evpn
-  advertise ipv4 unicast
- exit-address-family
-!
-# route-maps for Vrf20
-ip prefix-list Vrf20-in-prefixes permit 10.0.0.0/22 le 32
-ip prefix-list Vrf20-in-prefixes permit 10.1.0.1/32 le 32
-ip prefix-list Vrf20-in-prefixes permit 100.255.254.1/32 le 32
-ip prefix-list Vrf20-in-prefixes permit 10.244.0.0/16 le 32
-route-map Vrf20-in permit 10
- match ip address prefix-list Vrf20-in-prefixes
+line vty
 !
