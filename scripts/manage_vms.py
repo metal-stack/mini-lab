@@ -124,8 +124,8 @@ class Manager:
             mac = subprocess.check_output(["cat", "/sys/class/net/macvtap{ifindex}/address".format(ifindex=ifindex)]).decode("utf-8").strip()
             tapindex = subprocess.check_output(["cat", "/sys/class/net/macvtap{ifindex}/ifindex".format(ifindex=ifindex)]).decode("utf-8").strip()
 
-            nics.append("nic,model=virtio,macaddr={mac}".format(ifindex=ifindex, mac=mac))
-            netdevices.append("tap,fd={fd} {fd}<>/dev/tap{tapindex}".format(fd=fd, tapindex=tapindex))
+            nics.append("virtio-net,netdev=hn{ifindex},mac={mac}".format(ifindex=ifindex, mac=mac))
+            netdevices.append("tap,fd={fd},id=hn{ifindex} {fd}<>/dev/tap{tapindex}".format(fd=fd, ifindex=ifindex, tapindex=tapindex))
 
         cmd = [
             "qemu-system-x86_64",
@@ -142,11 +142,11 @@ class Manager:
         ]
 
         for nic in nics:
-            cmd.append("-net")
+            cmd.append("-device")
             cmd.append(nic)
 
         for device in netdevices:
-            cmd.append("-net")
+            cmd.append("-netdev")
             cmd.append(device)
 
         cmd.append("&")
