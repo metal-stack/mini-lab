@@ -24,3 +24,5 @@
     src: metal-core.json.j2
     dest: /etc/sonic/metal-core.json
   notify: write metal-core.json into db
+
+- ansible.builtin.include_tasks: lldp.yaml
