@@ -1,5 +1,5 @@
 [Unit]
-Description=Trigger a validation run of a frr configuration file %I
+Description=Load file %I into database
 
 [Service]
 Type=oneshot
