@@ -13,17 +13,20 @@
     name: write-to-db@-etc-sonic-metal\x2dcore\x2ejson.service
     state: started
 
-- name: Restart lldp
-  block:
-    - name: Stop lldp
-      service:
-        name: lldp
-        state: stopped
-    - name: Remove existing lldp container
-      community.docker.docker_container:
-        name: lldp
-        state: absent
-    - name: Start lldp
-      service:
-        name: lldp
-        state: started
+- name: Stop lldp
+  service:
+    name: lldp
+    state: stopped
+  listen: Restart lldp
+
+- name: Remove existing lldp container
+  community.docker.docker_container:
+    name: lldp
+    state: absent
+  listen: Restart lldp
+
+- name: Start lldp
+  service:
+    name: lldp
+    state: started
+  listen: Restart lldp
