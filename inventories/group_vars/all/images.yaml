@@ -1,5 +1,5 @@
 ---
-metal_stack_release_version: develop
+metal_stack_release_version: v0.10.0
 
 ##
 ## for development purposes, you can override releases from our image vector here
