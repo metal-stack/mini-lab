@@ -1,13 +1,27 @@
 {
+  "DEVICE_METADATA": {
+    "localhost": {
+      "docker_routing_config_mode": "split"
+    }
+  },
   "INTERFACE": {
     "Ethernet0": {
-      "mac_addr": "8e:ee:7c:58:82:00"
+      "mac_addr": "{{ ansible_eth0.macaddress.rsplit(":", maxsplit=1)[0] }}:00"
     },
     "Ethernet4": {
-      "mac_addr": "8e:ee:7c:58:82:04"
+      "mac_addr": "{{ ansible_eth0.macaddress.rsplit(":", maxsplit=1)[0] }}:04"
     },
     "Ethernet8": {
-      "mac_addr": "8e:ee:7c:58:82:08"
+      "mac_addr": "{{ ansible_eth0.macaddress.rsplit(":", maxsplit=1)[0] }}:08"
+    }
+  },
+  "LOOPBACK_INTERFACE": {
+    "Loopback0": {},
+    "Loopback0|{{ lo }}/32": {}
+  },
+  "MGMT_VRF_CONFIG": {
+    "vrf_global": {
+      "mgmtVrfEnabled": "true"
     }
   },
   "PORT": {
@@ -24,6 +38,7 @@
     }
   },
   "VLAN_INTERFACE": {
+    "Vlan4000": {},
     "Vlan4000|{{ metal_core_cidr }}": {}
   },
   "VLAN_MEMBER": {

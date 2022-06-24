@@ -1,11 +1,16 @@
 ---
-- name: deploy leaves and docker
-  hosts: leaf01
+#- name: deploy leaves and docker
+#  hosts: leaf01
+#  roles:
+#    - name: metal-roles/partition/roles/leaf
+#      tags: leaf
+#    - name: metal-roles/partition/roles/docker-on-cumulus
+#      tags: docker-on-cumulus
+
+- name: SONiC related config
+  hosts: leaves
   roles:
-    - name: metal-roles/partition/roles/leaf
-      tags: leaf
-    - name: metal-roles/partition/roles/docker-on-cumulus
-      tags: docker-on-cumulus
+    - name: sonic
 
 - name: deploy dhcp server and pixiecore
   hosts: leaf01
@@ -16,35 +21,10 @@
   roles:
     - name: ansible-common
       tags: always
-    - name: metal-roles/partition/roles/dhcp
+    - name: dhcp
       tags: dhcp
     - name: metal-roles/partition/roles/pixiecore
       tags: pixiecore
-
-- name: configure interface
-  hosts: leaf02
-  ignore_errors: True
-  pre_tasks:
-    - name: remove initial config
-      command: jq 'delpaths([["DEVICE_METADATA", "localhost", "bgp_asn"]]) | .LOOPBACK_INTERFACE = {} | .BGP_NEIGHBOR = {} | .DEVICE_METADATA.localhost.docker_routing_config_mode = "split" | .INTERFACE = {}'  /etc/sonic/config_db.json
-      register: cleaned_config_db
-
-    - name: place cleaned config db
-      copy:
-        content: "{{ cleaned_config_db.stdout }}"
-        dest: /etc/sonic/config_db.json
-
-    - name: reload config_db
-      command: config load --yes
-
-    - name: configure
-      command: "{{ item }}"
-      loop:
-        - config hostname {{ metal_partition_id }}-{{ inventory_hostname }}
-        - config loopback add Loopback0
-        - config interface ip add Loopback0 {{ lo }}/32
-  roles:
-    - name: sonic
 
 - name: deploy metal-core
   hosts: leaves

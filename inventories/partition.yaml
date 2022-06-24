@@ -24,7 +24,21 @@ leaves:
       lo: 10.0.0.12
       asn: 4200000012
       metal_core_cidr: 10.0.1.128/24
-      metal_core_additional_bridge_ports:
+  vars:
+    ports:
+      1: 100G
+    interfaces:
+    - name: Ethernet0
+    uplinks: []
+    pixie_server_ip: 10.0.1.1
+    dhcp_server_ip: 10.0.1.1
+
+    ansible_python_interpreter: /usr/bin/python
+    ansible_user: root
+    ansible_ssh_private_key_file: "{{ playbook_dir }}/files/ssh/id_rsa"
+
+    metal_core_image_tag: pr-sonic
+    metal_core_additional_bridge_ports:
       - Ethernet12
       - Ethernet16
       - Ethernet20
@@ -54,20 +68,6 @@ leaves:
       - Ethernet116
       - Ethernet120
       - Ethernet124
-  vars:
-    ports:
-      1: 100G
-    interfaces:
-    - name: swp1
-    uplinks: []
-    pixie_server_ip: 10.0.1.1
-    dhcp_server_ip: 10.0.1.1
-
-    ansible_python_interpreter: /usr/bin/python
-    ansible_user: root
-    ansible_ssh_private_key_file: "{{ playbook_dir }}/files/ssh/id_rsa"
-
-    metal_core_image_tag: pr-sonic
 
     # The best practice recommendation is to set an MTU of 9,216 for the inter-switch links,
     # and an MTU of 9,000 for the server-facing ports, which don’t carry the VXLAN header.
