@@ -3,5 +3,3 @@ control-plane:
   hosts:
     localhost:
       ansible_python_interpreter: "{{ ansible_playbook_python }}"
-  vars:
-    metal_api_image_tag: pr-sonic
