@@ -19,16 +19,16 @@
   template:
     src: dhcpd.conf.j2
     dest: /etc/dhcp/dhcpd.conf
-  notify: dhcpd restart
+#  notify: dhcpd restart
 
 - name: render isc config for
   template:
     src: isc-dhcp-server.j2
     dest: /etc/default/isc-dhcp-server
-  notify: dhcpd restart
-
-- name: dhcpd enabled
-  service:
-    name: isc-dhcp-server
-    enabled: true
-    state: started
+#  notify: dhcpd restart
+#
+#- name: dhcpd enabled
+#  service:
+#    name: isc-dhcp-server
+#    enabled: true
+#    state: started
