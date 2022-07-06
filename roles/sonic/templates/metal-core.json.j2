@@ -14,50 +14,5 @@
     "Ethernet8": {
       "mac_addr": "{{ ansible_eth0.macaddress.rsplit(":", maxsplit=1)[0] }}:08"
     }
-  },
-  "LOOPBACK_INTERFACE": {
-    "Loopback0": {},
-    "Loopback0|{{ lo }}/32": {}
-  },
-  "MGMT_VRF_CONFIG": {
-    "vrf_global": {
-      "mgmtVrfEnabled": "true"
-    }
-  },
-  "PORT": {
-    "Ethernet0": {
-      "mtu": "{{ mtu.default }}"
-    },
-    "Ethernet4": {
-      "mtu": "{{ mtu.default }}"
-    }
-  },
-  "VLAN": {
-    "Vlan4000": {
-      "vlanid": "4000"
-    }
-  },
-  "VLAN_INTERFACE": {
-    "Vlan4000": {},
-    "Vlan4000|{{ metal_core_cidr }}": {}
-  },
-  "VLAN_MEMBER": {
-    "Vlan4000|Ethernet0": {
-      "tagging_mode": "untagged"
-    },
-    "Vlan4000|Ethernet4": {
-      "tagging_mode": "untagged"
-    }
-  },
-  "VXLAN_TUNNEL": {
-    "vtep": {
-      "src_ip": "{{ lo }}"
-    }
-  },
-  "VXLAN_TUNNEL_MAP": {
-    "vtep|map_104000_Vlan4000": {
-      "vlan": "Vlan4000",
-      "vni": "104000"
-    }
   }
 }
