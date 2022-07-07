@@ -12,16 +12,23 @@ topology:
       sandbox: grigoriymikh/sandbox:latest
       binds:
         - files/ssh/id_rsa.pub:/root/.ssh/authorized_keys
-    linux:
-      image: ${MINI_LAB_VM_IMAGE}
 
   nodes:
     leaf01:
       kind: cvx
     leaf02:
       kind: cvx
+    mgmt:
+      kind: linux
+      image: weaveworks/ignite-ubuntu:20.04
+      kernel: weaveworks/ignite-kernel:5.4.157
+      sandbox: grigoriymikh/sandbox:latest
+      runtime: ignite
+      binds:
+        - files/ssh/id_rsa.pub:/root/.ssh/authorized_keys
     vms:
       kind: linux
+      image: ${MINI_LAB_VM_IMAGE}
       binds:
         - /dev:/dev
         - scripts:/mini-lab

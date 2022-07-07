@@ -6,6 +6,16 @@ partition:
   hosts:
     localhost:
       ansible_python_interpreter: "{{ ansible_playbook_python }}"
+    mgmt:
+      dhcp_server_ip: "{{ hostvars['mgmt']['ansible_host'] }}"
+      dhcp_net: 10.0.1.0
+      dhcp_netmask: 255.255.255.0
+      dhcp_range_min: 10.0.1.2
+      dhcp_range_max: 10.0.1.255
+      pixie_server_ip: "{{ hostvars['mgmt']['ansible_host'] }}"
+
+      ansible_user: root
+      ansible_ssh_private_key_file: "{{ playbook_dir }}/files/ssh/id_rsa"
   children:
     leaves:
 
@@ -16,10 +26,7 @@ leaves:
       asn: 4200000011
       metal_core_cidr: 10.0.1.1/24
 
-      dhcp_net: 10.0.1.0
-      dhcp_netmask: 255.255.255.0
-      dhcp_range_min: 10.0.1.2
-      dhcp_range_max: 10.0.1.255
+      dhcp_relay_server: "{{ hostvars['mgmt']['ansible_host'] }}"
     leaf02:
       lo: 10.0.0.12
       asn: 4200000012
@@ -30,8 +37,6 @@ leaves:
     interfaces:
     - name: swp1
     uplinks: []
-    pixie_server_ip: 10.0.1.1
-    dhcp_server_ip: 10.0.1.1
 
     ansible_python_interpreter: /usr/bin/python
     ansible_user: root

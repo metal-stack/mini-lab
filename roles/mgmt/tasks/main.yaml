@@ -1,0 +1,11 @@
+---
+- name: Set hostname `mgmt`
+  ansible.builtin.hostname:
+    name: mgmt
+
+- name: Setup dhcpd
+  import_tasks: dhcpd.yaml
+
+- name: Setup docker
+  import_tasks: docker.yaml
+

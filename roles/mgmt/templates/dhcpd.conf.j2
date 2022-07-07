@@ -1,0 +1,18 @@
+default-lease-time 600;
+max-lease-time 600;
+
+log-facility local7;
+
+shared-network pool {
+  subnet {{ dhcp_net }} netmask {{ dhcp_netmask }} {
+    range {{ dhcp_range_min }} {{ dhcp_range_max }};
+    # Provide routers to set up default gateway for clients.
+    option routers {{ dhcp_server_ip }};
+    # In case of Vagrant DNS must not be resolved via mgmt servers.
+    # This is because the setup to provide e.g. metal images via mgmt servers exceeds resources in Vagrant case.
+    option domain-name-servers {{ dhcp_dns_servers | join(', ') }};
+  }
+
+  subnet {{ hostvars[inventory_hostname].ansible_host }} netmask 255.255.255.0 {
+  }
+}

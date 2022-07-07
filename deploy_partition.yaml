@@ -7,19 +7,26 @@
     - name: metal-roles/partition/roles/docker-on-cumulus
       tags: docker-on-cumulus
 
-- name: deploy dhcp server and pixiecore
-  hosts: leaf01
+- name: configure mgmt server
+  hosts: mgmt
   vars:
     setup_yaml:
       - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
         meta_var: metal_stack_release
   roles:
+    - name: mgmt
+      tags: mgmt
     - name: ansible-common
-      tags: always
-    - name: metal-roles/partition/roles/dhcp
-      tags: dhcp
+      tags: pixiecore
     - name: metal-roles/partition/roles/pixiecore
       tags: pixiecore
+
+- name: deploy dhcp relay
+  hosts: leaf01
+  vars:
+  roles:
+    - name: metal-roles/partition/roles/dhcp-relay
+      tags: dhcp
 
 - name: deploy metal-core
   hosts: leaves
