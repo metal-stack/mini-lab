@@ -13,6 +13,6 @@ shared-network pool {
     option domain-name-servers {{ dhcp_dns_servers | join(', ') }};
   }
 
-  subnet {{ hostvars[inventory_hostname].ansible_host }} netmask 255.255.255.0 {
+  subnet 172.17.0.0 netmask 255.255.255.0 {
   }
 }
