@@ -1,0 +1,2 @@
+---
+patched_lldp_image: robertvolkmann/metal-stack:docker-lldp

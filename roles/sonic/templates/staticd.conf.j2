@@ -1,0 +1,13 @@
+#jinja2: lstrip_blocks: "True", trim_blocks: "True"
+frr defaults datacenter
+hostname {{ ansible_hostname }}
+password zebra
+enable password zebra
+!
+log syslog informational
+log facility local4
+!
+ip route 0.0.0.0/0 {{ metal_partition_mgmt_gateway }} nexthop-vrf mgmt
+!
+line vty
+!

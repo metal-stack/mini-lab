@@ -1,0 +1,18 @@
+{
+  "DEVICE_METADATA": {
+    "localhost": {
+      "docker_routing_config_mode": "split"
+    }
+  },
+  "INTERFACE": {
+    "Ethernet0": {
+      "mac_addr": "{{ ansible_eth0.macaddress.rsplit(":", maxsplit=1)[0] }}:00"
+    },
+    "Ethernet4": {
+      "mac_addr": "{{ ansible_eth0.macaddress.rsplit(":", maxsplit=1)[0] }}:04"
+    },
+    "Ethernet8": {
+      "mac_addr": "{{ ansible_eth0.macaddress.rsplit(":", maxsplit=1)[0] }}:08"
+    }
+  }
+}

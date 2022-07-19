@@ -1,0 +1,32 @@
+---
+- name: bgp restart
+  service:
+    name: bgp
+    state: restarted
+
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: write metal-core.json into db
+  service:
+    name: write-to-db@-etc-sonic-metal\x2dcore\x2ejson.service
+    state: started
+
+- name: Stop lldp
+  service:
+    name: lldp
+    state: stopped
+  listen: Restart lldp
+
+- name: Remove existing lldp container
+  community.docker.docker_container:
+    name: lldp
+    state: absent
+  listen: Restart lldp
+
+- name: Start lldp
+  service:
+    name: lldp
+    state: started
+  listen: Restart lldp

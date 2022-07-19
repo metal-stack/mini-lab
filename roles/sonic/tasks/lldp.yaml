@@ -1,0 +1,15 @@
+---
+- name: Pre-pull the patched lldp image
+  community.docker.docker_image:
+    name: "{{ patched_lldp_image }}"
+    source: pull
+  notify:
+    - Restart lldp
+
+- name: Switch to the patched lldp image
+  ansible.builtin.replace:
+    path: /usr/bin/lldp.sh
+    regexp: 'docker-lldp:latest'
+    replace: "{{ patched_lldp_image }}"
+  notify:
+    - Restart lldp

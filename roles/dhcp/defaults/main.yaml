@@ -1,0 +1,10 @@
+---
+dhcp_net:
+dhcp_netmask:
+dhcp_range_min:
+dhcp_range_max:
+dhcp_server_ip:
+
+dhcp_dns_servers:
+- 1.1.1.1
+- 8.8.8.8

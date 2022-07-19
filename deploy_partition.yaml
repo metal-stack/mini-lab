@@ -1,11 +1,16 @@
 ---
-- name: deploy leaves and docker
+#- name: deploy leaves and docker
+#  hosts: leaf01
+#  roles:
+#    - name: metal-roles/partition/roles/leaf
+#      tags: leaf
+#    - name: metal-roles/partition/roles/docker-on-cumulus
+#      tags: docker-on-cumulus
+
+- name: SONiC related config
   hosts: leaves
   roles:
-    - name: metal-roles/partition/roles/leaf
-      tags: leaf
-    - name: metal-roles/partition/roles/docker-on-cumulus
-      tags: docker-on-cumulus
+    - name: sonic
 
 - name: deploy dhcp server and pixiecore
   hosts: leaf01
@@ -16,7 +21,7 @@
   roles:
     - name: ansible-common
       tags: always
-    - name: metal-roles/partition/roles/dhcp
+    - name: dhcp
       tags: dhcp
     - name: metal-roles/partition/roles/pixiecore
       tags: pixiecore
@@ -30,8 +35,8 @@
   roles:
     - name: ansible-common
       tags: always
-    - name: internet
-      tags: internet
+#    - name: internet
+#      tags: internet
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
 

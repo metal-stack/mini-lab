@@ -28,7 +28,7 @@ leaves:
     ports:
       1: 100G
     interfaces:
-    - name: swp1
+    - name: Ethernet0
     uplinks: []
     pixie_server_ip: 10.0.1.1
     dhcp_server_ip: 10.0.1.1
@@ -36,6 +36,38 @@ leaves:
     ansible_python_interpreter: /usr/bin/python
     ansible_user: root
     ansible_ssh_private_key_file: "{{ playbook_dir }}/files/ssh/id_rsa"
+
+    metal_core_image_tag: pr-sonic
+    metal_core_additional_bridge_ports:
+      - Ethernet12
+      - Ethernet16
+      - Ethernet20
+      - Ethernet24
+      - Ethernet28
+      - Ethernet32
+      - Ethernet36
+      - Ethernet40
+      - Ethernet44
+      - Ethernet48
+      - Ethernet52
+      - Ethernet56
+      - Ethernet60
+      - Ethernet64
+      - Ethernet68
+      - Ethernet72
+      - Ethernet76
+      - Ethernet80
+      - Ethernet84
+      - Ethernet88
+      - Ethernet92
+      - Ethernet96
+      - Ethernet100
+      - Ethernet104
+      - Ethernet108
+      - Ethernet112
+      - Ethernet116
+      - Ethernet120
+      - Ethernet124
 
     # The best practice recommendation is to set an MTU of 9,216 for the inter-switch links,
     # and an MTU of 9,000 for the server-facing ports, which don’t carry the VXLAN header.
