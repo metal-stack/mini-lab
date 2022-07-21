@@ -3,3 +3,5 @@ ingress_http_port: 8080
 ingress_https_port: 4443
 
 ingress_additional_config: {}
+ingress_tcp_service_exposals: {}
+ingress_udp_service_exposals: {}
