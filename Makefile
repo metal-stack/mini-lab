@@ -4,6 +4,7 @@
 # Commands
 YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:3 /bin/sh -c
 
+KINDCONFIG := $(or $(KINDCONFIG),control-plane/kind.yaml)
 KUBECONFIG := $(shell pwd)/.kubeconfig
 
 # Default values
@@ -59,7 +60,7 @@ control-plane-bake:
 	@if ! kind get clusters | grep metal-control-plane > /dev/null; then \
 		kind create cluster \
 		  --name metal-control-plane \
-			--config control-plane/kind.yaml \
+			--config $(KINDCONFIG) \
 			--kubeconfig $(KUBECONFIG); fi
 
 .PHONY: partition
