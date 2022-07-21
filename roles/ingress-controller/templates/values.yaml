@@ -33,14 +33,14 @@ controller:
 
 {% if ingress_tcp_service_exposals %}
 tcp:
-{% for port, service in ingress_tcp_service_exposals %}
+{% for port, service in ingress_tcp_service_exposals.items() %}
   {{ port }}: {{ service }}
 {% endfor %}
 {% endif %}
 
 {% if ingress_udp_service_exposals %}
 udp:
-{% for port, service in ingress_udp_service_exposals %}
+{% for port, service in ingress_udp_service_exposals.items() %}
   {{ port }}: {{ service }}
 {% endfor %}
 {% endif %}
