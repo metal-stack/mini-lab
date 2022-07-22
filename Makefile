@@ -17,6 +17,8 @@ MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:
 
 MACHINE_OS=ubuntu-20.04
 
+SONIC_REMOTE_IMG := https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=master&platform=vs&buildId=125016&target=target%2Fsonic-vs.img.gz
+
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),default)
 LAB_MACHINES=machine01,machine02
@@ -221,3 +223,6 @@ dev-env:
 .PHONY: build-vms-image
 build-vms-image:
 	cd images && docker build -f Dockerfile.vms -t $(MINI_LAB_VM_IMAGE) . && cd -
+
+sonic-vs.img:
+	curl --location --output - "${SONIC_REMOTE_IMG}" | gunzip > sonic-vs.img
