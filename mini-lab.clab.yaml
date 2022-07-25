@@ -17,9 +17,19 @@ topology:
 
   nodes:
     leaf01:
-      kind: cvx
+      kind: linux
+      binds:
+        - /dev:/dev
+        - scripts:/mini-lab
+        - sonic-vs.img:/sonic-vs.img
+      cmd: /mini-lab/sonic_entrypoint.sh
     leaf02:
-      kind: cvx
+      kind: linux
+      binds:
+        - /dev:/dev
+        - scripts:/mini-lab
+        - sonic-vs.img:/sonic-vs.img
+      cmd: /mini-lab/sonic_entrypoint.sh
     vms:
       kind: linux
       binds:
@@ -27,9 +37,9 @@ topology:
         - scripts:/mini-lab
 
   links:
-    - endpoints: ["leaf01:swp1", "vms:lan0"]
-    - endpoints: ["leaf02:swp1", "vms:lan1"]
-    - endpoints: ["leaf01:swp2", "vms:lan2"]
-    - endpoints: ["leaf02:swp2", "vms:lan3"]
-    - endpoints: ["leaf01:swp3", "vms:lan4"]
-    - endpoints: ["leaf02:swp3", "vms:lan5"]
+    - endpoints: ["leaf01:eth1", "vms:lan0"]
+    - endpoints: ["leaf02:eth1", "vms:lan1"]
+    - endpoints: ["leaf01:eth2", "vms:lan2"]
+    - endpoints: ["leaf02:eth2", "vms:lan3"]
+    - endpoints: ["leaf01:eth3", "vms:lan4"]
+    - endpoints: ["leaf02:eth3", "vms:lan5"]
