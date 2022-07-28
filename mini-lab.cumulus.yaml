@@ -1,0 +1,35 @@
+name: mini-lab
+prefix: ""
+
+mgmt:
+  network: bridge
+
+topology:
+  kinds:
+    cvx:
+      image: networkop/cx:3.7.0
+      kernel: docker.io/grigoriymikh/kernel:4.1.0
+      sandbox: grigoriymikh/sandbox:latest
+      binds:
+        - files/ssh/id_rsa.pub:/root/.ssh/authorized_keys
+    linux:
+      image: ${MINI_LAB_VM_IMAGE}
+
+  nodes:
+    leaf01:
+      kind: cvx
+    leaf02:
+      kind: cvx
+    vms:
+      kind: linux
+      binds:
+        - /dev:/dev
+        - scripts:/mini-lab
+
+  links:
+    - endpoints: ["leaf01:swp1", "vms:lan0"]
+    - endpoints: ["leaf02:swp1", "vms:lan1"]
+    - endpoints: ["leaf01:swp2", "vms:lan2"]
+    - endpoints: ["leaf02:swp2", "vms:lan3"]
+    - endpoints: ["leaf01:swp3", "vms:lan4"]
+    - endpoints: ["leaf02:swp3", "vms:lan5"]

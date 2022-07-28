@@ -6,12 +6,6 @@ mgmt:
 
 topology:
   kinds:
-    cvx:
-      image: networkop/cx:3.7.0
-      kernel: docker.io/grigoriymikh/kernel:4.1.0
-      sandbox: grigoriymikh/sandbox:latest
-      binds:
-        - files/ssh/id_rsa.pub:/root/.ssh/authorized_keys
     linux:
       image: ${MINI_LAB_VM_IMAGE}
       binds:

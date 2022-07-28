@@ -22,8 +22,13 @@ SONIC_REMOTE_IMG := https://sonic-build.azurewebsites.net/api/sonic/artifacts?br
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),default)
 LAB_MACHINES=machine01,machine02
+LAB_TOPOLOGY=mini-lab.cumulus.yaml
 else ifeq ($(MINI_LAB_FLAVOR),cluster-api)
 LAB_MACHINES=machine01,machine02,machine03
+LAB_TOPOLOGY=mini-lab.cumulus.yaml
+else ifeq ($(MINI_LAB_FLAVOR),sonic)
+LAB_MACHINES=machine01,machine02
+LAB_TOPOLOGY=mini-lab.sonic.yaml
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
@@ -71,8 +76,8 @@ partition: partition-bake
 .PHONY: partition-bake
 partition-bake:
 	# docker pull $(MINI_LAB_VM_IMAGE)
-	@if ! sudo containerlab --topo mini-lab.clab.yaml inspect | grep -i running > /dev/null; then \
-		sudo --preserve-env containerlab deploy --topo mini-lab.clab.yaml --reconfigure && \
+	@if ! sudo containerlab --topo $(LAB_TOPOLOGY) inspect | grep -i running > /dev/null; then \
+		sudo --preserve-env containerlab deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
 
 .PHONY: env
@@ -111,7 +116,7 @@ cleanup-control-plane:
 
 .PHONY: cleanup-partition
 cleanup-partition:
-	sudo containerlab destroy --topo mini-lab.clab.yaml
+	sudo containerlab destroy --topo $(LAB_TOPOLOGY)
 
 .PHONY: _privatenet
 _privatenet: env
