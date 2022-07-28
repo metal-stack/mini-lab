@@ -14,27 +14,25 @@ topology:
         - files/ssh/id_rsa.pub:/root/.ssh/authorized_keys
     linux:
       image: ${MINI_LAB_VM_IMAGE}
+      binds:
+        - /dev:/dev
+        - scripts:/mini-lab
 
   nodes:
     leaf01:
       kind: linux
       binds:
-        - /dev:/dev
-        - scripts:/mini-lab
+        - files/ssh/id_rsa.pub:/id_rsa.pub
         - sonic-vs.img:/sonic-vs.img
-      cmd: /mini-lab/sonic_entrypoint.sh
+      cmd: /mini-lab/sonic_entrypoint.py
     leaf02:
       kind: linux
       binds:
-        - /dev:/dev
-        - scripts:/mini-lab
+        - files/ssh/id_rsa.pub:/id_rsa.pub
         - sonic-vs.img:/sonic-vs.img
-      cmd: /mini-lab/sonic_entrypoint.sh
+      cmd: /mini-lab/sonic_entrypoint.py
     vms:
       kind: linux
-      binds:
-        - /dev:/dev
-        - scripts:/mini-lab
 
   links:
     - endpoints: ["leaf01:eth1", "vms:lan0"]
