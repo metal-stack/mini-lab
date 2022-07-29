@@ -208,6 +208,7 @@ There's few versions of mini-lab environment that you can run. We call them flav
 
 - `default` -- runs 2 machines.
 - `cluster-api` -- runs 3 machines. Usefull for testing Control plane and worker node deployment with [Cluster API provider](https://github.com/metal-stack/cluster-api-provider-metalstack).
+- `sonic` -- use SONiC as network operating system for the leaves
 
 In order to start specific flavor, you can define the flavor as follows:
 
