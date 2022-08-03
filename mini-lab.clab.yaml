@@ -32,11 +32,21 @@ topology:
       binds:
         - /dev:/dev
         - scripts:/mini-lab
+    test:
+      kind: linux
+      image: ignite-ubuntu:22.04
+      kernel: robertvolkmann/ignite-kernel:5.10.77
+      sandbox: grigoriymikh/sandbox:latest
+      runtime: ignite
+      binds:
+        - files/ssh/id_rsa.pub:/root/.ssh/authorized_keys
 
   links:
     - endpoints: ["leaf01:swp1", "vms:lan0"]
     - endpoints: ["leaf02:swp1", "vms:lan1"]
     - endpoints: ["leaf01:swp2", "vms:lan2"]
     - endpoints: ["leaf02:swp2", "vms:lan3"]
-    - endpoints: ["leaf01:swp3", "vms:lan4"]
-    - endpoints: ["leaf02:swp3", "vms:lan5"]
+    - endpoints: ["leaf01:swp3", "test:eth1"]
+    - endpoints: ["leaf02:swp3", "test:eth2"]
+    - endpoints: ["mgmt:eth1", "test:eth3"]
+
