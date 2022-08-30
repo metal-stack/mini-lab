@@ -12,16 +12,16 @@ metal_api_admin_key: metal-admin
 metal_api_nsq_tcp_address: nsqd:4150
 
 metal_api_images:
-- id: firewall-ubuntu-2.0.20220830
-  name: Firewall 2 Ubuntu 20220830
-  description: Firewall 2 Ubuntu 20220830
-  url: http://images.metal-stack.io/metal-os/firewall/2.0-ubuntu/20220830/img.tar.lz4
+- id: firewall-ubuntu-2.0.20221025
+  name: Firewall 2 Ubuntu 20221025
+  description: Firewall 2 Ubuntu 20221025
+  url: http://images.metal-stack.io/metal-os/firewall/2.0-ubuntu/20221025/img.tar.lz4
   features:
     - firewall
-- id: ubuntu-20.04.20220830
-  name: Ubuntu 20.04 20220830
-  description: Ubuntu 20.04 20220830
-  url: http://images.metal-stack.io/metal-os/ubuntu/20.04/20220830/img.tar.lz4
+- id: ubuntu-20.04.20221025
+  name: Ubuntu 20.04 20221025
+  description: Ubuntu 20.04 20221025
+  url: http://images.metal-stack.io/metal-os/ubuntu/20.04/20221025/img.tar.lz4
   features:
     - machine
 
