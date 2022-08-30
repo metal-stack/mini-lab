@@ -8,6 +8,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - .:/mini-lab
+      - /home/grigoriy/Projects/metal-roles:/mini-lab/metal-roles
       # for developing role dependencies
       # TODO: make this a switch
       # - ${HOME}/.ansible/roles/ansible-common:/root/.ansible/roles/ansible-common:ro

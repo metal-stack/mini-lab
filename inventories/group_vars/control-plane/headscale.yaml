@@ -1,0 +1,18 @@
+---
+headscale_image_name: headscale/headscale
+headscale_image_tag: 0.15.0-alpine
+
+headscale_db_image_name: timescale/timescaledb
+headscale_db_image_tag: 2.6.1-pg12
+headscale_db_storage_size: 200Mi
+
+headscale_db_backup_restore_sidecar_image_name: ghcr.io/metal-stack/backup-restore-sidecar
+headscale_db_backup_restore_sidecar_image_tag: v0.6.3
+headscale_db_backup_restore_sidecar_provider: local
+
+headscale_private_key: c8e07b737d04715f1f5c1318334e888f65e6a704ea85d0cddaa31b2c5589ef7f
+headscale_ingress_dns: headscale.metal-stack.io
+
+disable_ingress: true
+
+headscale_db_resources: {}
