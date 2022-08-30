@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  name: headscale-ingress
+  namespace: headscale
+spec:
+  rules:
+  - host: headscale.172.17.0.1.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: headscale
+            port:
+              number: 8080
+        path: /
+        pathType: ImplementationSpecific
