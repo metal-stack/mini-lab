@@ -5,9 +5,10 @@ metal_stack_release_version: develop
 ## for development purposes, you can override releases from our image vector here
 ##
 
-metal_hammer_image_url: https://images.metal-stack.io/metal-hammer/pull-requests/87-headscale/metal-hammer-initrd.img.lz4
+# metal_hammer_image_url:
 # metal_api_image_name:
 # metal_api_image_tag:
+#metal_api_image_name: 
 # metal_metalctl_image_name:
 # metal_metalctl_image_tag:
 # metal_masterdata_api_image_name:
