@@ -26,5 +26,3 @@
       tags: masterdata-db
     - name: metal-roles/control-plane/roles/metal
       tags: metal
-    - name: metal-roles/control-plane/roles/headscale
-      tags: headscale
