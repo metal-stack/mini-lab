@@ -122,3 +122,6 @@ metal_api_grpc_certs_server_cert: "{{  lookup('file', 'certs/grpc/server.pem') }
 metal_api_grpc_certs_client_key: "{{ lookup('file', 'certs/grpc/client-key.pem') }}"
 metal_api_grpc_certs_client_cert: "{{  lookup('file', 'certs/grpc/client.pem') }}"
 metal_api_grpc_certs_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
+
+metal_api_headscale_enabled: true
+metal_api_headscale_tls: no
