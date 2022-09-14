@@ -8,7 +8,6 @@ metal_stack_release_version: v0.11.0
 # metal_hammer_image_url: https://images.metal-stack.io/metal-hammer/pull-requests/<pr-number-and-title>/metal-hammer-initrd.img.lz4
 # metal_api_image_name:
 # metal_api_image_tag:
-# metal_api_image_name:
 # metal_metalctl_image_name:
 # metal_metalctl_image_tag:
 # metal_masterdata_api_image_name:
