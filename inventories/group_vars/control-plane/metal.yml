@@ -15,7 +15,7 @@ metal_api_images:
 - id: firewall-ubuntu-2.0.20220531
   name: Firewall 2 Ubuntu 20220531
   description: Firewall 2 Ubuntu 20220531
-  url: https://storage.googleapis.com/images.metal-pod.io/metal-os/pull_requests/141-headscale/firewall/2.0-ubuntu/img.tar.lz4
+  url: https://images.metal-stack.io/metal-os/pull_requests/141-headscale/firewall/2.0-ubuntu/img.tar.lz4
   features:
     - firewall
 - id: ubuntu-20.04.20220531
