@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import base64
 import fcntl
 import logging
 import os
@@ -128,14 +129,18 @@ def main():
     logger.info('Authorize ssh key')
     authorize_ssh_key(tn)
 
+    logger.info('Configure nameserver')
+    configure_nameserver(tn)
+
     logger.info('Wait until config-setup is done')
     if not wait_until_config_setup_is_done(tn):
         logger.error('config-setup still not done')
         sys.exit(1)
 
     net = get_ip_address('eth0') + '/16'
-    logger.info(f'Configure {net} on eth0')
-    tn.write_and_wait(f'sudo config interface ip add eth0 {net}')
+    gw = get_default_gateway()
+    logger.info(f'Configure {net} on eth0 with gw {gw}')
+    tn.write_and_wait(f'sudo config interface ip add eth0 {net} {gw}')
     tn.write_and_wait('sudo config save --yes')
 
     tn.close()
@@ -169,11 +174,22 @@ def get_ip_address(iface: str) -> str:
     )[20:24])
 
 
+def get_default_gateway() -> str:
+    # Source: https://splunktool.com/python-get-default-gateway-for-a-local-interfaceip-address-in-linux
+    with open("/proc/net/route") as fh:
+        for line in fh:
+            fields = line.strip().split()
+            if fields[1] != '00000000' or not int(fields[3], 16) & 2:
+                # If not default route or not RTF_GATEWAY, skip it
+                continue
+            return socket.inet_ntoa(struct.pack("<L", int(fields[2], 16)))
+
+
 def wait_until_config_setup_is_done(tn: Telnet, max_retries: int = 60) -> bool:
     for i in range(1, max_retries + 1):
         # updategraph is started after the config-setup
         result = tn.write_and_wait('systemctl is-active updategraph')
-        if not 'inactive' in result:
+        if 'active' in result and not 'inactive' in result:
             return True
         time.sleep(1)
         if i == max_retries:
@@ -188,6 +204,16 @@ def authorize_ssh_key(tn: Telnet) -> None:
     tn.write_and_wait('sudo mkdir /root/.ssh')
     tn.write_and_wait('sudo chmod 0600 /root/.ssh')
     tn.write_and_wait('sudo cp authorized_keys /root/.ssh/')
+
+
+def configure_nameserver(tn: Telnet) -> None:
+    with open('/etc/resolv.conf') as f:
+        content = f.read().strip()
+
+    encoded = base64.b64encode(content.encode('utf-8')).decode('utf-8')
+    tn.write_and_wait('sudo systemctl disable --now systemd-resolved')
+    debug = tn.write_and_wait(f'sudo sh -c \'echo "{encoded}" | base64 -d > /etc/resolv.conf\'')
+    logging.info(debug)
 
 
 if __name__ == '__main__':
