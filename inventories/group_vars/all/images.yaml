@@ -5,6 +5,9 @@ metal_stack_release_version: v0.11.0
 ## for development purposes, you can override releases from our image vector here
 ##
 
+metal_core_image_name: ghcr.io/metal-stack/metal-core
+metal_core_image_tag: pr-sonic-support
+
 # metal_hammer_image_url: https://images.metal-stack.io/metal-hammer/pull-requests/<pr-number-and-title>/metal-hammer-initrd.img.lz4
 # metal_api_image_name:
 # metal_api_image_tag:
