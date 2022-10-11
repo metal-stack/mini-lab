@@ -1,25 +1,38 @@
 ---
-- name: deploy leaves and docker
-  hosts: leaves
-  roles:
-    - name: metal-roles/partition/roles/leaf
-      tags: leaf
-    - name: metal-roles/partition/roles/docker-on-cumulus
-      tags: docker-on-cumulus
+#- name: deploy leaves and docker
+#  hosts: leaves
+#  roles:
+#    - name: metal-roles/partition/roles/leaf
+#      tags: leaf
+#    - name: metal-roles/partition/roles/docker-on-cumulus
+#      tags: docker-on-cumulus
 
-- name: deploy dhcp server and pixiecore
-  hosts: leaf01
-  vars:
-    setup_yaml:
-      - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
-        meta_var: metal_stack_release
+- name: SONiC related config
+  hosts: leaves
+  gather_facts: no
+  pre_tasks:
+    - name: Wait for system to become reachable
+      ansible.builtin.wait_for_connection:
+        delay: 10
+        timeout: 50
+    - name: Gather facts
+      ansible.builtin.gather_facts:
   roles:
-    - name: ansible-common
-      tags: always
-    - name: metal-roles/partition/roles/dhcp
-      tags: dhcp
-    - name: metal-roles/partition/roles/pixiecore
-      tags: pixiecore
+    - name: sonic
+
+#- name: deploy dhcp server and pixiecore
+#  hosts: leaf01
+#  vars:
+#    setup_yaml:
+#      - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
+#        meta_var: metal_stack_release
+#  roles:
+#    - name: ansible-common
+#      tags: always
+#    - name: metal-roles/partition/roles/dhcp
+#      tags: dhcp
+#    - name: metal-roles/partition/roles/pixiecore
+#      tags: pixiecore
 
 - name: deploy metal-core
   hosts: leaves
@@ -30,8 +43,8 @@
   roles:
     - name: ansible-common
       tags: always
-    - name: internet
-      tags: internet
+#    - name: internet
+#      tags: internet
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
 
