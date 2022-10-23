@@ -44,7 +44,7 @@ curl -fsSL https://get.docker.com | sh
 sudo usermod -G docker -a ${USER}
 
 # Install containerlab
-bash -c "$(curl -sL https://get-clab.srlinux.dev)"
+bash -c "$(curl -sL https://get.containerlab.dev)"
 
 # Install kind (kubernetes in docker), for more details see https://kind.sigs.k8s.io/docs/user/quick-start/#installation
 sudo curl -Lo /usr/local/bin/kind "https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64"
