@@ -1,0 +1,34 @@
+---
+- name: Check mandatory variables for this role are set
+  assert:
+    fail_msg: "not all mandatory variables given, check role documentation"
+    quiet: yes
+    that:
+      - dhcp_net is defined
+      - dhcp_netmask is not none
+      - dhcp_server_ip is not none
+      - dhcp_range_min is not none
+      - dhcp_range_max is not none
+
+- name: Ensure isc-dhcp-server is installed
+  apt:
+    name: isc-dhcp-server
+    update_cache: yes
+
+- name: render dhcpd conf
+  template:
+    src: dhcpd.conf.j2
+    dest: /etc/dhcp/dhcpd.conf
+  notify: dhcpd restart
+
+- name: render isc config for
+  template:
+    src: isc-dhcp-server.j2
+    dest: /etc/default/isc-dhcp-server
+  notify: dhcpd restart
+
+- name: dhcpd enabled
+  service:
+    name: isc-dhcp-server
+    enabled: true
+    state: started

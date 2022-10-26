@@ -26,7 +26,7 @@ while [ "$MYINT" -lt "$INTFS" ]; do
 done
 
 # creating macvtap interfaces for the qemu vms
-for i in $(seq 0 5); do
+for i in $(seq 0 3); do
   ip link add link lan${i} name macvtap${i} type macvtap mode passthru
   ip link set macvtap${i} up
   ip link set macvtap${i} promisc on

@@ -1,0 +1,6 @@
+---
+- name: dhcpd restart
+  service:
+    name: isc-dhcp-server
+    enabled: true
+    state: restarted

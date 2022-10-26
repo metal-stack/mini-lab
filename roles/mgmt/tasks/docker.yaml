@@ -1,0 +1,30 @@
+---
+- name: ensure dependencies are installed
+  apt:
+    update_cache: yes
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg2
+
+- name: setup key for docker
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+
+- name: add docker engine repo for debian jessie
+  apt_repository:
+    repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable'
+    update_cache: yes
+
+- name: install docker
+  apt:
+    name: docker-ce
+
+- name: enable and start docker.service
+  systemd:
+    name: docker
+    daemon_reload: yes
+    enabled: true
+    state: started
