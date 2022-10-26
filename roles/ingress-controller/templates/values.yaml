@@ -31,10 +31,16 @@ controller:
 
   config: {{ ingress_additional_config | to_json }}
 
+{% if ingress_tcp_service_exposals %}
 tcp:
-  4161: "{{ metal_control_plane_namespace }}/nsq-lookupd:4161"
-  4150: "{{ metal_control_plane_namespace }}/nsqd:4150"
-{% if metal_console_enabled %}
-  5222: "{{ metal_control_plane_namespace }}/metal-console:10001"
+{% for port, service in ingress_tcp_service_exposals.items() %}
+  {{ port }}: {{ service }}
+{% endfor %}
 {% endif %}
-  50051: "{{ metal_control_plane_namespace }}/metal-api:50051"
+
+{% if ingress_udp_service_exposals %}
+udp:
+{% for port, service in ingress_udp_service_exposals.items() %}
+  {{ port }}: {{ service }}
+{% endfor %}
+{% endif %}

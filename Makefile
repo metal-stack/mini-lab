@@ -4,6 +4,7 @@
 # Commands
 YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:3 /bin/sh -c
 
+KINDCONFIG := $(or $(KINDCONFIG),control-plane/kind.yaml)
 KUBECONFIG := $(shell pwd)/.kubeconfig
 
 # Default values
@@ -17,11 +18,18 @@ MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:
 
 MACHINE_OS=ubuntu-20.04
 
+SONIC_REMOTE_IMG := https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=master&platform=vs&buildId=125016&target=target%2Fsonic-vs.img.gz
+
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),default)
 LAB_MACHINES=machine01,machine02
+LAB_TOPOLOGY=mini-lab.cumulus.yaml
 else ifeq ($(MINI_LAB_FLAVOR),cluster-api)
 LAB_MACHINES=machine01,machine02,machine03
+LAB_TOPOLOGY=mini-lab.cumulus.yaml
+else ifeq ($(MINI_LAB_FLAVOR),sonic)
+LAB_MACHINES=machine01,machine02
+LAB_TOPOLOGY=mini-lab.sonic.yaml
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
@@ -59,7 +67,7 @@ control-plane-bake:
 	@if ! kind get clusters | grep metal-control-plane > /dev/null; then \
 		kind create cluster \
 		  --name metal-control-plane \
-			--config control-plane/kind.yaml \
+			--config $(KINDCONFIG) \
 			--kubeconfig $(KUBECONFIG); fi
 
 .PHONY: partition
@@ -69,8 +77,8 @@ partition: partition-bake
 .PHONY: partition-bake
 partition-bake:
 	# docker pull $(MINI_LAB_VM_IMAGE)
-	@if ! sudo containerlab --topo mini-lab.clab.yaml inspect | grep -i running > /dev/null; then \
-		sudo --preserve-env containerlab deploy --topo mini-lab.clab.yaml --reconfigure && \
+	@if ! sudo containerlab --topo $(LAB_TOPOLOGY) inspect | grep -i running > /dev/null; then \
+		sudo --preserve-env containerlab deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
 
 .PHONY: env
@@ -109,7 +117,7 @@ cleanup-control-plane:
 
 .PHONY: cleanup-partition
 cleanup-partition:
-	sudo containerlab destroy --topo mini-lab.clab.yaml
+	sudo containerlab destroy --topo $(LAB_TOPOLOGY)
 
 .PHONY: _privatenet
 _privatenet: env
@@ -214,10 +222,13 @@ console-machine03:
 
 .PHONY: dev-env
 dev-env:
-	@echo "export METALCTL_URL=http://api.172.17.0.1.nip.io:8080/metal"
+	@echo "export METALCTL_API_URL=http://api.172.17.0.1.nip.io:8080/metal"
 	@echo "export METALCTL_HMAC=metal-admin"
 	@echo "export KUBECONFIG=$(KUBECONFIG)"
 
 .PHONY: build-vms-image
 build-vms-image:
 	cd images && docker build -f Dockerfile.vms -t $(MINI_LAB_VM_IMAGE) . && cd -
+
+sonic-vs.img:
+	curl --location --output - "${SONIC_REMOTE_IMG}" | gunzip > sonic-vs.img
