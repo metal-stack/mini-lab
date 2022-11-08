@@ -99,7 +99,7 @@ def main():
     logger = logging.getLogger()
 
     name = os.getenv('CLAB_LABEL_CLAB_NODE_NAME', default='switch')
-    memory = os.getenv('VM_MEMORY', default='2048')
+    memory = os.getenv('VM_MEMORY', default='4096')
     interfaces = int(os.getenv('CLAB_INTFS', 0)) + 1
 
     logger.info(f'Waiting for {interfaces} interfaces to be connected')

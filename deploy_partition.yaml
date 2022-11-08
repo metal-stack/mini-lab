@@ -20,19 +20,19 @@
   roles:
     - name: sonic
 
-#- name: deploy dhcp server and pixiecore
-#  hosts: leaf01
-#  vars:
-#    setup_yaml:
-#      - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
-#        meta_var: metal_stack_release
-#  roles:
-#    - name: ansible-common
-#      tags: always
-#    - name: metal-roles/partition/roles/dhcp
-#      tags: dhcp
-#    - name: metal-roles/partition/roles/pixiecore
-#      tags: pixiecore
+- name: deploy dhcp server and pixiecore
+  hosts: leaf01
+  vars:
+    setup_yaml:
+      - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
+        meta_var: metal_stack_release
+  roles:
+    - name: ansible-common
+      tags: always
+    - name: metal-roles/partition/roles/dhcp
+      tags: dhcp
+    - name: metal-roles/partition/roles/pixiecore
+      tags: pixiecore
 
 - name: deploy metal-core
   hosts: leaves
@@ -75,3 +75,9 @@
         - lookup('metal', 'search', 'switch', api_url=metal_partition_metal_api_protocol+'://'+metal_partition_metal_api_addr+':'+metal_partition_metal_api_port|string+metal_partition_metal_api_basepath, api_hmac=metal_partition_metal_api_hmac_edit_key) | length == 2
         - lookup('metal', 'search', 'switch', api_url=metal_partition_metal_api_protocol+'://'+metal_partition_metal_api_addr+':'+metal_partition_metal_api_port|string+metal_partition_metal_api_basepath, api_hmac=metal_partition_metal_api_hmac_edit_key)[0]["last_sync"] != None
         - lookup('metal', 'search', 'switch', api_url=metal_partition_metal_api_protocol+'://'+metal_partition_metal_api_addr+':'+metal_partition_metal_api_port|string+metal_partition_metal_api_basepath, api_hmac=metal_partition_metal_api_hmac_edit_key)[1]["last_sync"] != None
+
+- name: restart dhcp server
+  hosts: leaf01
+  gather_facts: no
+  roles:
+    - name: restart-dhcp
