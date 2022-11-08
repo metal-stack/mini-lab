@@ -28,7 +28,7 @@ else ifeq ($(MINI_LAB_FLAVOR),cluster-api)
 LAB_MACHINES=machine01,machine02,machine03
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
 else ifeq ($(MINI_LAB_FLAVOR),sonic)
-LAB_MACHINES=machine01,machine02
+LAB_MACHINES=machine01
 LAB_TOPOLOGY=mini-lab.sonic.yaml
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))

@@ -8,9 +8,9 @@ metal_stack_release_version: v0.11.0
 metal_core_image_name: ghcr.io/metal-stack/metal-core
 metal_core_image_tag: pr-sonic-support
 
-# metal_hammer_image_url: https://images.metal-stack.io/metal-hammer/pull-requests/<pr-number-and-title>/metal-hammer-initrd.img.lz4
-# metal_api_image_name:
-# metal_api_image_tag:
+metal_hammer_image_url: https://images.metal-stack.io/metal-hammer/pull-requests/99-sonic-support/metal-hammer-initrd.img.lz4
+metal_api_image_name: ghcr.io/metal-stack/metal-api
+metal_api_image_tag: nic-aliases-support
 # metal_metalctl_image_name:
 # metal_metalctl_image_tag:
 # metal_masterdata_api_image_name:
@@ -29,3 +29,7 @@ metal_core_image_tag: pr-sonic-support
 # ansible_common_version:
 # metal_roles_version:
 # metal_ansible_modules_version:
+
+#2022-11-08T14:28:52.955Z	info	waiting for lldp neighbors	{"interface": "eth0", "actual": 2, "minimum": 2}
+#2022-11-08T14:28:53.967Z	error	metal-hammer failed	{"rebooting in": 5, "error": "register unable to determine neighbors of interface:eth0 not all neighbor requirements where met within: 30.000000002s, exiting"}
+#2022-11-08T14:28:53.982Z	info	event	{"event": "Crashed", "message": "register unable to determine neighbors of interface:eth0 not all neighbor requirements where met within: 30.000000002s, exiting"}

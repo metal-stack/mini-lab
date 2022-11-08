@@ -5,5 +5,8 @@ metal_control_plane_stage_name: test
 metal_control_plane_namespace: metal-control-plane
 metal_control_plane_image_pull_policy: Always
 
+metal_python_version: v0.21.4
+metal_python_version_from_release_vector: no
+
 helm_additional_params:
   - '--debug'
