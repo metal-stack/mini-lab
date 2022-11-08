@@ -88,7 +88,7 @@ make
 After the deployment and waiting for a short amoung of time, two machines in status `PXE booting` become visible through `metalctl machine ls`:
 
 ```bash
-docker-compose run metalctl machine ls
+docker-compose run --rm metalctl machine ls
 
 ID                                          LAST EVENT   WHEN     AGE  HOSTNAME  PROJECT  SIZE          IMAGE  PARTITION
 e0ab02d2-27cd-5a5e-8efc-080ba80cf258        PXE Booting  3s
@@ -98,7 +98,7 @@ e0ab02d2-27cd-5a5e-8efc-080ba80cf258        PXE Booting  3s
 Wait until the machines reach the waiting state:
 
 ```bash
-docker-compose run metalctl machine ls
+docker-compose run --rm metalctl machine ls
 
 ID                                          LAST EVENT   WHEN     AGE  HOSTNAME  PROJECT  SIZE          IMAGE  PARTITION
 e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Waiting      8s                               v1-small-x86         mini-lab
@@ -115,13 +115,13 @@ make machine
 __Alternatively__, you may want to issue the `metalctl` commands on your own:
 
 ```bash
-docker-compose run metalctl network allocate \
+docker-compose run --rm metalctl network allocate \
         --partition mini-lab \
         --project 00000000-0000-0000-0000-000000000000 \
         --name user-private-network
 
 # lookup the network ID and create a machine
-docker-compose run metalctl machine create \
+docker-compose run --rm metalctl machine create \
         --description test \
         --name machine \
         --hostname machine \
@@ -132,7 +132,7 @@ docker-compose run metalctl machine create \
         --networks <network-ID>
 
 # create a firewall that is also connected to the virtual internet-mini-lab network
-docker-compose run metalctl machine create \
+docker-compose run --rm metalctl machine create \
         --description fw \
         --name fw \
         --hostname fw \
@@ -156,7 +156,7 @@ machine login:
 Two machines are now installed and have status "Phoned Home"
 
 ```bash
-docker-compose run metalctl machine ls
+docker-compose run --rm metalctl machine ls
 ID                                          LAST EVENT   WHEN   AGE     HOSTNAME  PROJECT                               SIZE          IMAGE                             PARTITION
 e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Phoned Home  2s     21s     machine   00000000-0000-0000-0000-000000000000  v1-small-x86  Ubuntu 20.04 20200331             mini-lab
 2294c949-88f6-5390-8154-fa53d93a3313        Phoned Home  8s     18s     fw        00000000-0000-0000-0000-000000000000  v1-small-x86  Firewall 2 Ubuntu 20200730        mini-lab
@@ -165,7 +165,7 @@ e0ab02d2-27cd-5a5e-8efc-080ba80cf258        Phoned Home  2s     21s     machin
 Login with user name metal and the console password from
 
 ```bash
-docker-compose run metalctl machine consolepassword e0ab02d2-27cd-5a5e-8efc-080ba80cf258
+docker-compose run --rm metalctl machine consolepassword e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 ```
 
 If you want to access the firewall with SSH or have internet connectivity from the firewall and machine, you'll need to have a static route configured that points to the leaf switches:
@@ -189,7 +189,7 @@ make cleanup
 Reinstall a machine with
 
 ```bash
-docker-compose run metalctl machine reinstall \
+docker-compose run --rm metalctl machine reinstall \
         --image ubuntu-20.04 \
         e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 ```
@@ -199,7 +199,7 @@ docker-compose run metalctl machine reinstall \
 Free a machine with
 
 ```bash
-docker-compose run metalctl machine rm e0ab02d2-27cd-5a5e-8efc-080ba80cf258
+docker-compose run --rm metalctl machine rm e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 ```
 
 ## Flavors
