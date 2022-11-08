@@ -28,7 +28,7 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
 - the lab creates a docker network on your host machine (`172.17.0.1`), this hopefully does not overlap with other networks you have
 - (recommended) haveged to have enough random entropy (only needed if the PXE process does not work)
 
-Here is some code that should help you setting up most of the requirements:
+Here is some code that should help you to set up most of the requirements:
 
  ```bash
 # Install kvm
@@ -85,7 +85,7 @@ make
 # containerlab will ask you for root permissions (https://github.com/srl-labs/containerlab/issues/669)
 ```
 
-After the deployment and waiting for a short amoung of time, two machines in status `PXE booting` become visible through `metalctl machine ls`:
+After the deployment and waiting for a short amount of time, two machines in status `PXE booting` become visible through `metalctl machine ls`:
 
 ```bash
 docker-compose run metalctl machine ls
@@ -207,7 +207,7 @@ docker-compose run metalctl machine rm e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 There's few versions of mini-lab environment that you can run. We call them flavors. There's 2 flavors at the moment:
 
 - `default` -- runs 2 machines.
-- `cluster-api` -- runs 3 machines. Usefull for testing Control plane and worker node deployment with [Cluster API provider](https://github.com/metal-stack/cluster-api-provider-metalstack).
+- `cluster-api` -- runs 3 machines. Useful for testing Control plane and worker node deployment with [Cluster API provider](https://github.com/metal-stack/cluster-api-provider-metalstack).
 - `sonic` -- use SONiC as network operating system for the leaves
 
 In order to start specific flavor, you can define the flavor as follows:
