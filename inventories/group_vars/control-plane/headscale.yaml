@@ -1,5 +1,6 @@
 ---
 headscale_tls: no
 headscale_db_storage_size: 200Mi
-headscale_noise_private_key: c8e07b737d04715f1f5c1318334e888f65e6a704ea85d0cddaa31b2c5589ef7f
+headscale_private_key: c8e07b737d04715f1f5c1318334e888f65e6a704ea85d0cddaa31b2c5589ef7f
+headscale_noise_private_key: 580b8691e0e1f7cd74cf6154e890df015b3d7a0611a06efa5e2fd543ab13be4b
 headscale_db_resources: {}
