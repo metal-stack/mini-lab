@@ -9,8 +9,8 @@ KUBECONFIG := $(shell pwd)/.kubeconfig
 
 # Default values
 DOCKER_COMPOSE_OVERRIDE=
-DOCKER_COMPOSE=$(shell if command -v docker-compose > /dev/null; then echo 'docker-compose'; else echo 'docker compose'; fi)
-CONTAINERLAB=$(shell command -v containerlab)
+DOCKER_COMPOSE=$(shell if which docker-compose > /dev/null; then echo 'docker-compose'; else echo 'docker compose'; fi)
+CONTAINERLAB=$(shell which containerlab)
 
 # extra vars can be used by projects that built on the mini-lab, which want to override default configuration
 ANSIBLE_EXTRA_VARS_FILE := $(or $(ANSIBLE_EXTRA_VARS_FILE),)
