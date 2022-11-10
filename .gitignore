@@ -9,3 +9,4 @@ metal-hammer*
 requirements.yaml
 .extra_vars.yaml
 sonic-vs.img
+.mini-lab.cumulus.yml.*
