@@ -9,7 +9,8 @@ KUBECONFIG := $(shell pwd)/.kubeconfig
 
 # Default values
 DOCKER_COMPOSE_OVERRIDE=
-DOCKER_COMPOSE=$(shell if command -v docker-compose > /dev/null; then echo 'docker-compose'; else echo 'docker compose'; fi)
+DOCKER_COMPOSE=$(shell if which docker-compose > /dev/null; then echo 'docker-compose'; else echo 'docker compose'; fi)
+CONTAINERLAB=$(shell which containerlab)
 
 # extra vars can be used by projects that built on the mini-lab, which want to override default configuration
 ANSIBLE_EXTRA_VARS_FILE := $(or $(ANSIBLE_EXTRA_VARS_FILE),)
@@ -78,8 +79,8 @@ partition: partition-bake
 .PHONY: partition-bake
 partition-bake:
 	# docker pull $(MINI_LAB_VM_IMAGE)
-	@if ! sudo containerlab --topo $(LAB_TOPOLOGY) inspect | grep -i running > /dev/null; then \
-		sudo --preserve-env containerlab deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
+	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i running > /dev/null; then \
+		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
 
 .PHONY: env
@@ -118,7 +119,7 @@ cleanup-control-plane:
 
 .PHONY: cleanup-partition
 cleanup-partition:
-	sudo containerlab destroy --topo $(LAB_TOPOLOGY)
+	sudo $(CONTAINERLAB) destroy --topo $(LAB_TOPOLOGY)
 
 .PHONY: _privatenet
 _privatenet: env
