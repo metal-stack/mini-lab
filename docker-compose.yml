@@ -72,7 +72,7 @@ services:
           ansible-playbook \
             -i inventories/partition.yaml \
             -i clab-mini-lab/ansible-inventory.yml \
-            deploy_partition.yaml --extra-vars "@.extra_vars.yaml"
+            ${DEPLOY_PARTITION_PLAYBOOK} --extra-vars "@.extra_vars.yaml"
 
   metalctl:
     image: ghcr.io/metal-stack/metalctl:${METALCTL_IMAGE_TAG}
