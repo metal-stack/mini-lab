@@ -1,24 +1,11 @@
 ---
-#- name: deploy leaves and docker
-#  hosts: leaves
-#  roles:
-#    - name: metal-roles/partition/roles/leaf
-#      tags: leaf
-#    - name: metal-roles/partition/roles/docker-on-cumulus
-#      tags: docker-on-cumulus
-
-- name: SONiC related config
+- name: deploy leaves and docker
   hosts: leaves
-  gather_facts: no
-  pre_tasks:
-    - name: Wait for system to become reachable
-      ansible.builtin.wait_for_connection:
-        delay: 10
-        timeout: 50
-    - name: Gather facts
-      ansible.builtin.gather_facts:
   roles:
-    - name: sonic
+    - name: metal-roles/partition/roles/leaf
+      tags: leaf
+    - name: metal-roles/partition/roles/docker-on-cumulus
+      tags: docker-on-cumulus
 
 - name: deploy dhcp server and pixiecore
   hosts: leaf01
@@ -43,8 +30,8 @@
   roles:
     - name: ansible-common
       tags: always
-#    - name: internet
-#      tags: internet
+    - name: internet
+      tags: internet
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
 
@@ -75,9 +62,3 @@
         - lookup('metal', 'search', 'switch', api_url=metal_partition_metal_api_protocol+'://'+metal_partition_metal_api_addr+':'+metal_partition_metal_api_port|string+metal_partition_metal_api_basepath, api_hmac=metal_partition_metal_api_hmac_edit_key) | length == 2
         - lookup('metal', 'search', 'switch', api_url=metal_partition_metal_api_protocol+'://'+metal_partition_metal_api_addr+':'+metal_partition_metal_api_port|string+metal_partition_metal_api_basepath, api_hmac=metal_partition_metal_api_hmac_edit_key)[0]["last_sync"] != None
         - lookup('metal', 'search', 'switch', api_url=metal_partition_metal_api_protocol+'://'+metal_partition_metal_api_addr+':'+metal_partition_metal_api_port|string+metal_partition_metal_api_basepath, api_hmac=metal_partition_metal_api_hmac_edit_key)[1]["last_sync"] != None
-
-- name: restart dhcp server
-  hosts: leaf01
-  gather_facts: no
-  roles:
-    - name: restart-dhcp
