@@ -9,6 +9,7 @@ controller:
   extraArgs:
     http-port: {{ ingress_http_port }}
     https-port: {{ ingress_https_port }}
+    enable-ssl-passthrough: ""
 
   daemonset:
     useHostPort: true
