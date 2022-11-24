@@ -31,6 +31,11 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
 Here is some code that should help you to set up most of the requirements:
 
  ```bash
+# If UFW enabled.
+# Disable the firewall or allow traffic through Docker network IP range. 
+sudo ufw status
+sudo ufw allow from 172.17.0.0/16 
+
 # Install kvm
 sudo apt install -y git curl qemu qemu-kvm haveged
 
@@ -216,3 +221,4 @@ In order to start specific flavor, you can define the flavor as follows:
 export MINI_LAB_FLAVOR=cluster-api
 make
 ```
+
