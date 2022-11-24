@@ -31,6 +31,15 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
 Here is some code that should help you to set up most of the requirements:
 
  ```bash
+
+# UFW: Common Firewall Rules.
+# Ubuntu comes pre-installed with a firewall configuration tool, UFW (Uncomplicated Firewall).This interferes with the communication on cluster creation.Disable the firewall, keep in mind that your firewall rules are still in place. 
+sudo ufw status
+sudo systemctl stop ufw
+
+
+
+
 # Install kvm
 sudo apt install -y git curl qemu qemu-kvm haveged
 
@@ -216,3 +225,4 @@ In order to start specific flavor, you can define the flavor as follows:
 export MINI_LAB_FLAVOR=cluster-api
 make
 ```
+
