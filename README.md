@@ -32,13 +32,10 @@ Here is some code that should help you to set up most of the requirements:
 
  ```bash
 
-# UFW: Common Firewall Rules.
-# Ubuntu comes pre-installed with a firewall configuration tool, UFW (Uncomplicated Firewall).This interferes with the communication on cluster creation.Disable the firewall or allow traffic through docker network ip range, keep in mind that your firewall rules are still in place. 
+# If UFW enabled.
+# Disable the firewall or allow traffic through Docker network IP range. 
 sudo ufw status
 sudo ufw allow from 172.17.0.0/16 
-
-
-
 
 # Install kvm
 sudo apt install -y git curl qemu qemu-kvm haveged
