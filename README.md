@@ -33,9 +33,9 @@ Here is some code that should help you to set up most of the requirements:
  ```bash
 
 # UFW: Common Firewall Rules.
-# Ubuntu comes pre-installed with a firewall configuration tool, UFW (Uncomplicated Firewall).This interferes with the communication on cluster creation.Disable the firewall, keep in mind that your firewall rules are still in place. 
+# Ubuntu comes pre-installed with a firewall configuration tool, UFW (Uncomplicated Firewall).This interferes with the communication on cluster creation.Disable the firewall or allow traffic through docker network ip range, keep in mind that your firewall rules are still in place. 
 sudo ufw status
-sudo systemctl stop ufw
+sudo ufw allow from 172.17.0.0/16 
 
 
 
