@@ -1,0 +1,9 @@
+- name: Sleep for 10 seconds
+  ansible.builtin.pause:
+    seconds: 10
+
+- name: dhcpd restart
+  service:
+    name: isc-dhcp-server
+    enabled: true
+    state: restarted

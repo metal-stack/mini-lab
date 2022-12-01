@@ -26,12 +26,15 @@ SONIC_REMOTE_IMG := https://sonic-build.azurewebsites.net/api/sonic/artifacts?br
 ifeq ($(MINI_LAB_FLAVOR),default)
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
+DEPLOY_PARTITION_PLAYBOOK=deploy_cumulus_partition.yaml
 else ifeq ($(MINI_LAB_FLAVOR),cluster-api)
 LAB_MACHINES=machine01,machine02,machine03
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
+DEPLOY_PARTITION_PLAYBOOK=deploy_cumulus_partition.yaml
 else ifeq ($(MINI_LAB_FLAVOR),sonic)
-LAB_MACHINES=machine01,machine02
+LAB_MACHINES=machine01
 LAB_TOPOLOGY=mini-lab.sonic.yaml
+DEPLOY_PARTITION_PLAYBOOK=deploy_sonic_partition.yaml
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
