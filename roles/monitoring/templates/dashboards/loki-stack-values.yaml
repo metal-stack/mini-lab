@@ -1,0 +1,15 @@
+grafana:
+  enabled: false
+
+# promtail:
+#   initContainer:
+#     enabled: true
+#     fsInotifyMaxUserInstances: 10
+
+# loki:
+#   persistence:
+#     enabled: true
+#     accessModes:
+#     - ReadWriteOnce
+#     size: 1Gi
+#     annotations: {}

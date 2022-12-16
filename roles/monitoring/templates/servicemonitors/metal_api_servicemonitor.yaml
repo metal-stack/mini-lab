@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: metal-control-plane-api-servicemonitor
+  namespace: monitoring
+  labels:
+    app: metal-control-plane-api
+    k8s-app: metal-control-plane-api-servicemonitor
+    release: kube-prometheus-stack
+spec:
+  jobLabel: app
+  selector:
+    matchLabels:
+      app: metal-api
+  namespaceSelector:
+    matchNames:
+    - metal-control-plane
+  endpoints:
+  - port: "2112"
+    interval: 15s

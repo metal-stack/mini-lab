@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: kube-prometheus-stack
+  name: metal-metrics-exporter
+spec:
+  endpoints:
+    - path: /metrics
+      port: metrics
+      interval: 60s
+      scrapeTimeout: 30s
+  selector:
+    matchLabels:
+      app: metal-metrics-exporter

@@ -1,0 +1,39 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: metal-db-servicemonitor
+  namespace: monitoring
+  labels:
+    app: metal-db
+    release: kube-prometheus-stack
+spec:
+  jobLabel: app
+  selector:
+    matchLabels:
+      app: metal-db
+  namespaceSelector:
+    matchNames:
+    - metal-control-plane
+  endpoints:
+  - port: "metrics"
+    interval: 60s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: rethinkdb-servicemonitor
+  namespace: monitoring
+  labels:
+    app: rethinkdb-exporter
+    release: prometheus
+spec:
+  jobLabel: app
+  selector:
+    matchLabels:
+      app: rethinkdb-exporter
+    namespaceSelector:
+      matchNames:
+      - monitoring
+  endpoints:
+  - port: metrics
+    interval: 60s
