@@ -4,6 +4,7 @@
 **/*.pyc
 clab-mini-lab
 .mini-lab.clab.yml
+.mini-lab.cumulus.yml
 ansible-common
 metal-hammer*
 requirements.yaml
