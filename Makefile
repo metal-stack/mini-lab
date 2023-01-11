@@ -153,23 +153,6 @@ ssh-leaf02:
 start-machines:
 	docker exec vms /mini-lab/manage_vms.py --names $(LAB_MACHINES) create
 
-.PHONY: _reboot-machine
-_reboot-machine:
-	docker exec vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) kill
-	docker exec vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) create
-
-.PHONY: reboot-machine01
-reboot-machine01:
-	@$(MAKE)	--no-print-directory	_reboot-machine	MACHINE_NAME=machine01
-
-.PHONY: reboot-machine02
-reboot-machine02:
-	@$(MAKE)	--no-print-directory	_reboot-machine	MACHINE_NAME=machine02
-
-.PHONY: reboot-machine03
-reboot-machine03:
-	@$(MAKE)	--no-print-directory	_reboot-machine	MACHINE_NAME=machine03
-
 .PHONY: _password
 _password: env
 	$(DOCKER_COMPOSE) run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine consolepassword $(MACHINE_UUID)
@@ -189,19 +172,20 @@ password-machine03:
 .PHONY: _free-machine
 _free-machine: env
 	$(DOCKER_COMPOSE) run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine rm $(MACHINE_UUID)
-	@$(MAKE) --no-print-directory reboot-machine	MACHINE_NAME=$(MACHINE_NAME)
+	docker exec vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) kill --with-disks
+	docker exec vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) create
 
 .PHONY: free-machine01
 free-machine01:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine01
+	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine01 MACHINE_UUID=e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 
 .PHONY: free-machine02
 free-machine02:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine02
+	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine02 MACHINE_UUID=2294c949-88f6-5390-8154-fa53d93a3313
 
 .PHONY: free-machine03
 free-machine03:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine03
+	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine03 MACHINE_UUID=2a92f14d-d3b1-4d46-b813-5d058103743e
 
 .PHONY: _console-machine
 _console-machine:

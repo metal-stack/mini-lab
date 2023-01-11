@@ -48,6 +48,7 @@ def parse_args():
 
     kill = subparsers.add_parser('kill', help='kills vm processes')
     kill.set_defaults(entry_function="kill")
+    kill.add_argument("--with-disks", default=False, action='store_true', help="also deletes the vm's disks")
 
     return parser.parse_args()
 
@@ -58,6 +59,7 @@ class Manager:
         self.names = []
         if args.names:
             self.names = args.names.split(",")
+        self.with_disks = args.with_disks if 'with_disks' in args else False
 
     def run(self):
         subcommands = {
@@ -92,6 +94,8 @@ class Manager:
     def _kill(self):
         for machine in self._machines_from_cmdline():
             Manager._kill_vm_process(machine.get("uuid"))
+            if self.with_disks:
+                Manager._delete_vm_disk(machine.get("disk-path"))
 
 
     @staticmethod
@@ -112,6 +116,13 @@ class Manager:
             print("disk already exists")
             return
         subprocess.run(['qemu-img', 'create', '-f', 'qcow2', path, size])
+
+    @staticmethod
+    def _delete_vm_disk(path):
+        if not os.path.isfile(path):
+            print("disk does not exist")
+            return
+        os.remove(path)
 
     @staticmethod
     def _start_vm(machine):
@@ -136,7 +147,7 @@ class Manager:
             "-cpu", "host",
             "-drive", "if=virtio,format=qcow2,file={disk}".format(disk=machine.get("disk-path")),
             "-drive", "if=pflash,format=raw,readonly,file=/usr/share/OVMF/OVMF_CODE.fd",
-            "-drive", "if=pflash,format=raw,file=/usr/share/OVMF/OVMF_VARS.fd",
+            "-drive", "if=pflash,format=raw,readonly,file=/usr/share/OVMF/OVMF_VARS.fd",
             "-serial", "telnet:127.0.0.1:{port},server,nowait".format(port=machine.get("serial-port")),
             "-enable-kvm",
             "-nographic",
