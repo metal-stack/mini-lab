@@ -10,5 +10,7 @@
   roles:
     - name: ansible-common
       tags: always
-    - name: monitoring
-      tags: monitoring
+    # - name: metal-roles/control-plane/roles/monitoring
+    #   tags: monitoring
+    - name: metal-roles/control-plane/roles/logging
+      tags: logging

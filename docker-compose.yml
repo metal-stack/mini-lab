@@ -92,9 +92,14 @@ services:
     image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
     container_name: deploy-monitoring
     volumes:
-      - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
       - /var/run/docker.sock:/var/run/docker.sock
       - .:/mini-lab
+      # for developing role dependencies
+      # TODO: make this a switch
+      # - ${HOME}/.ansible/roles/ansible-common:/root/.ansible/roles/ansible-common:ro
+      - ${HOME}/.ansible/roles/metal-roles:/root/.ansible/roles/metal-roles:ro
+      # - ${HOME}/.ansible/roles/metal-ansible-modules:/root/.ansible/roles/metal-ansible-modules:ro
+      # - ${HOME}/git/github.com/metal-stack/helm-charts:/helm-charts:ro
     environment:
       - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
       - KUBECONFIG=/mini-lab/.kubeconfig
