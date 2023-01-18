@@ -1,10 +1,12 @@
 ---
 metal_auditing_enabled: true
-metal_auditing_secret: "secret"
-metal_meilisearch_ingress:
+metal_auditing_meili_secret: "secret"
+
+metal_auditing_meili_chart_version: "0.1.44"
+metal_auditing_meili_ingress:
   enabled: true
   hosts:
-    - mtl-auditing.172.17.0.1.nip.io
-metal_meilisearch_persistence:
+    - auditing.172.17.0.1.nip.io
+metal_auditing_meili_persistence:
   enabled: true
   size: 10Gi
