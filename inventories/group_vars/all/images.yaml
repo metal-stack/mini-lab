@@ -24,5 +24,5 @@ metal_stack_release_version: v0.11.0
 ##
 
 # ansible_common_version:
-# metal_roles_version:
+metal_roles_version: feature/auditing
 # metal_ansible_modules_version:
