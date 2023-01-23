@@ -1,8 +1,8 @@
 ---
 metal_auditing_enabled: true
-metal_auditing_meili_secret: "secret"
+metal_auditing_meili_secret: "geheim"
+metal_auditing_meili_environment: development
 
-metal_auditing_meili_chart_version: "0.1.44"
 metal_auditing_meili_ingress:
   enabled: true
   hosts:
