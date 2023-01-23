@@ -19,8 +19,7 @@ leaves:
       dhcp_default_lease_time: 600
       dhcp_max_lease_time: 600
       dhcp_subnets:
-        - comment: ""
-          network: 10.0.1.0
+        - network: 10.0.1.0
           netmask: 255.255.255.0
           range:
             begin: 10.0.1.2
