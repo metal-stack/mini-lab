@@ -16,10 +16,18 @@ leaves:
       asn: 4200000011
       metal_core_cidr: 10.0.1.1/24
 
-      dhcp_net: 10.0.1.0
-      dhcp_netmask: 255.255.255.0
-      dhcp_range_min: 10.0.1.2
-      dhcp_range_max: 10.0.1.255
+      dhcp_default_lease_time: 600
+      dhcp_max_lease_time: 600
+      dhcp_subnets:
+        - comment: ""
+          network: 10.0.1.0
+          netmask: 255.255.255.0
+          range:
+            begin: 10.0.1.2
+            end: 10.0.1.255
+          options:
+            - routers {{ dhcp_server_ip }}
+            - domain-name-servers 1.1.1.1, 8.8.8.8
     leaf02:
       lo: 10.0.0.12
       asn: 4200000012
