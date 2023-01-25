@@ -23,10 +23,6 @@ services:
       - DOCKER_HUB_TOKEN=${DOCKER_HUB_TOKEN}
     network_mode: host
     working_dir: /mini-lab
-    dns:
-      - 172.17.0.1
-      - 1.1.1.1
-      - 1.0.0.1
     entrypoint:
       - /bin/bash
       - -ce
@@ -57,10 +53,6 @@ services:
       - DOCKER_HUB_TOKEN=${DOCKER_HUB_TOKEN}
     network_mode: host
     working_dir: /mini-lab
-    dns:
-      - 172.17.0.1
-      - 1.1.1.1
-      - 1.0.0.1
     entrypoint:
       - /bin/bash
       - -ce
@@ -82,10 +74,6 @@ services:
     volumes:
       - ./files/ssh:/root/.ssh:ro
     network_mode: host
-    dns:
-      - 172.17.0.1
-      - 1.1.1.1
-      - 1.0.0.1
     command: --version
 
   monitoring:
@@ -97,7 +85,7 @@ services:
       # for developing role dependencies
       # TODO: make this a switch
       # - ${HOME}/.ansible/roles/ansible-common:/root/.ansible/roles/ansible-common:ro
-      - ${HOME}/.ansible/roles/metal-roles:/root/.ansible/roles/metal-roles:ro
+      # - ${HOME}/.ansible/roles/metal-roles:/root/.ansible/roles/metal-roles:ro
       # - ${HOME}/.ansible/roles/metal-ansible-modules:/root/.ansible/roles/metal-ansible-modules:ro
       # - ${HOME}/git/github.com/metal-stack/helm-charts:/helm-charts:ro
     environment:
@@ -106,10 +94,6 @@ services:
       - K8S_AUTH_KUBECONFIG=/mini-lab/.kubeconfig
     network_mode: host
     working_dir: /mini-lab
-    dns:
-      - 172.17.0.1
-      - 1.1.1.1
-      - 1.0.0.1
     entrypoint:
       - /bin/bash
       - -ce

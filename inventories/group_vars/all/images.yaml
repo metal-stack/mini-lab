@@ -1,5 +1,9 @@
 ---
-metal_stack_release_version: monitoring
+metal_stack_release_version: develop
+
+setup_yaml:
+  - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
+    meta_var: metal_stack_release
 
 ##
 ## for development purposes, you can override releases from our image vector here
@@ -24,5 +28,5 @@ metal_stack_release_version: monitoring
 ##
 
 # ansible_common_version:
-metal_roles_version: monitoring-role
+metal_roles_version: rethinkdb_dashboard
 # metal_ansible_modules_version:
