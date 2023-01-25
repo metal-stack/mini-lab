@@ -59,6 +59,10 @@ restart: down up
 .PHONY: down
 down: cleanup
 
+.PHONY: control-plane-monitoring
+control-plane-monitoring: control-plane-bake env
+	docker-compose up --remove-orphans --force-recreate monitoring
+
 .PHONY: control-plane
 control-plane: control-plane-bake env
 	$(DOCKER_COMPOSE) up --remove-orphans --force-recreate control-plane
