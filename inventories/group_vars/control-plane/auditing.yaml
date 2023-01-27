@@ -1,12 +1,12 @@
 ---
-metal_auditing_enabled: true
-metal_auditing_meili_secret: "geheim"
-metal_auditing_meili_environment: development
+auditing_meili_secret: geheim
+auditing_meili_environment: development
 
-metal_auditing_meili_ingress:
+auditing_meili_ingress:
   enabled: true
   hosts:
-    - auditing.172.17.0.1.nip.io
-metal_auditing_meili_persistence:
+    - auditing.{{ metal_control_plane_ingress_dns }}
+
+auditing_meili_persistence:
   enabled: true
   size: 10Gi
