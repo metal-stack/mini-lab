@@ -32,9 +32,9 @@ Here is some code that should help you to set up most of the requirements:
 
  ```bash
 # If UFW enabled.
-# Disable the firewall or allow traffic through Docker network IP range. 
+# Disable the firewall or allow traffic through Docker network IP range.
 sudo ufw status
-sudo ufw allow from 172.17.0.0/16 
+sudo ufw allow from 172.17.0.0/16
 
 # Install kvm
 sudo apt install -y git curl qemu qemu-kvm haveged
@@ -201,7 +201,7 @@ docker-compose run --rm metalctl machine reinstall \
 
 ### Free machine
 
-Free a machine with
+Free a machine with `make free-machine01` or
 
 ```bash
 docker-compose run --rm metalctl machine rm e0ab02d2-27cd-5a5e-8efc-080ba80cf258
@@ -221,4 +221,3 @@ In order to start specific flavor, you can define the flavor as follows:
 export MINI_LAB_FLAVOR=cluster-api
 make
 ```
-
