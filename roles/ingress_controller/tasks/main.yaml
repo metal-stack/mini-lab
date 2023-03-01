@@ -11,7 +11,7 @@
 
 - name: Deploy nginx-ingress
   include_role:
-    name: ansible-common/roles/helm-chart
+    name: metalstack.common.helm_chart
   vars:
     helm_repo: "https://kubernetes.github.io/ingress-nginx"
     helm_chart: ingress-nginx
