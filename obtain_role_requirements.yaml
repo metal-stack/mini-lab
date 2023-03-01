@@ -17,7 +17,11 @@
         dest: "{{ playbook_dir }}/requirements.yaml"
         content: |
           {% for role_name, role_params in (release_vector.content | from_yaml).get('ansible-roles').items() %}
-          - src: {{ role_params.get('repository') }}
-            name: {{ role_name }}
-            version: {{ hostvars[inventory_hostname][role_name | lower | replace('-', '_') + '_version'] | default(role_params.get('version'), true) }}
+          # - src: {{ role_params.get('repository') }}
+          #   name: {{ role_name }}
+          #   version: {{ hostvars[inventory_hostname][role_name | lower | replace('-', '_') + '_version'] | default(role_params.get('version'), true) }}
           {% endfor %}
+          collections:
+          - name: https://github.com/metal-stack/metal-ansible-collections
+            version: main # use release versions if you want to have stable deployment!
+            type: git

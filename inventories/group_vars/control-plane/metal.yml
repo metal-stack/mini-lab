@@ -34,11 +34,11 @@ metal_api_sizes:
     min: 1
     max: 4
   - type: memory
-    min: "{{ '500MB' | humanfriendly }}"
-    max: "{{ '4GB' | humanfriendly }}"
+    min: "{{ '500MB' | metalstack.common.humanfriendly }}"
+    max: "{{ '4GB' | metalstack.common.humanfriendly }}"
   - type: storage
-    min: "{{ '1GB' | humanfriendly }}"
-    max: "{{ '10GB' | humanfriendly }}"
+    min: "{{ '1GB' | metalstack.common.humanfriendly }}"
+    max: "{{ '10GB' | metalstack.common.humanfriendly }}"
 
 metal_api_partitions:
   - id: mini-lab

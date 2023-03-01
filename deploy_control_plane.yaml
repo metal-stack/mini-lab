@@ -3,26 +3,12 @@
   hosts: control-plane
   connection: local
   gather_facts: false
-  vars:
-    setup_yaml:
-      - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
-        meta_var: metal_stack_release
   roles:
-    - name: ansible-common
-      tags: always
-    - name: ingress-controller
-      tags: ingress-controller
-    - name: metal-roles/control-plane/roles/prepare
-      tags: prepare
-    - name: metal-roles/control-plane/roles/nsq
-      tags: nsq
-    - name: metal-roles/control-plane/roles/metal-db
-      tags: metal-db
-    - name: metal-roles/control-plane/roles/ipam-db
-      tags: ipam-db
-    - name: metal-roles/control-plane/roles/masterdata-db
-      tags: masterdata-db
-    - name: metal-roles/control-plane/roles/auditing-meili
-      tags: auditing
-    - name: metal-roles/control-plane/roles/metal
-      tags: metal
+    - ingress_controller
+    - metalstack.controlplane.prepare
+    - metalstack.controlplane.nsq
+    - metalstack.controlplane.metal_db
+    - metalstack.controlplane.ipam_db
+    - metalstack.controlplane.masterdata_db
+    - metalstack.controlplane.auditing_meili
+    - metalstack.controlplane.metal
