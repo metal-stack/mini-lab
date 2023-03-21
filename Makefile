@@ -63,10 +63,15 @@ down: cleanup
 control-plane-monitoring: control-plane-bake env
 	docker-compose up --remove-orphans --force-recreate monitoring
 
+.PHONY: partition-monitoring
+partition-monitoring: env
+	docker-compose up --remove-orphans --force-recreate partition-monitoring
+
+
 .PHONY: control-plane
 control-plane: control-plane-bake env
 	$(DOCKER_COMPOSE) up --remove-orphans --force-recreate control-plane
-
+	$(DOCKER_COMPOSE) up --remove-orphans --force-recreate monitoring
 .PHONY: control-plane-bake
 control-plane-bake:
 	@if ! which kind > /dev/null; then echo "kind needs to be installed"; exit 1; fi

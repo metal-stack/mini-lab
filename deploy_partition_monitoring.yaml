@@ -1,7 +1,6 @@
 ---
-- name: deploy control plane monitoring
-  hosts: control-plane
-  connection: local
+- name: deploy partition monitoring
+  hosts: leaves
   gather_facts: false
   vars:
     setup_yaml:
@@ -10,7 +9,5 @@
   roles:
     - name: ansible-common
       tags: always
-    - name: metal-roles/control-plane/roles/monitoring
+    - name: metal-roles/partition/roles/monitoring/node-exporter
       tags: monitoring
-    - name: metal-roles/control-plane/roles/logging
-      tags: logging

@@ -1,5 +1,5 @@
 ---
-metal_stack_release_version: monitoring
+metal_stack_release_version: develop
 
 ##
 ## for development purposes, you can override releases from our image vector here
@@ -24,5 +24,5 @@ metal_stack_release_version: monitoring
 ##
 
 # ansible_common_version:
-metal_roles_version: monitoring-role
+metal_roles_version: partition_monitoring
 # metal_ansible_modules_version:
