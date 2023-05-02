@@ -1,9 +1,23 @@
 ---
-- name: deploy leaves and docker
+- name: deploy leaves
   hosts: leaves
   roles:
     - name: metal-roles/partition/roles/leaf
       tags: leaf
+
+- name: deploy docker
+  hosts: leaves
+  pre_tasks:
+    - name: update cumulus repo key
+      apt_key:
+        url: http://repo3.cumulusnetworks.com/public-key/repo3-2023-key
+        validate_certs: false
+        state: present
+    - name: unpack jessie fixes
+      command: tar xf /root/jessie-apt-transport-fix.tar.gz
+    - name: install apt-transport
+      shell: dpkg -i /root/https-deps/*.deb && apt-get install -fy
+  roles:
     - name: metal-roles/partition/roles/docker-on-cumulus
       tags: docker-on-cumulus
 
