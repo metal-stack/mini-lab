@@ -10,3 +10,4 @@ auditing_meili_ingress:
 auditing_meili_persistence:
   enabled: true
   size: 10Gi
+  storageClass: null
