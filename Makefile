@@ -18,7 +18,7 @@ ANSIBLE_EXTRA_VARS_FILE := $(or $(ANSIBLE_EXTRA_VARS_FILE),)
 MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),default)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
 
-MACHINE_OS=ubuntu-20.04
+MACHINE_OS=ubuntu-22.04
 
 SONIC_REMOTE_IMG := https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=master&platform=vs&buildId=125016&target=target%2Fsonic-vs.img.gz
 
@@ -131,7 +131,7 @@ machine: _privatenet
 
 .PHONY: firewall
 firewall: _ips _privatenet
-	$(DOCKER_COMPOSE) run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image firewall-ubuntu-2.0 --size v1-small-x86 --networks internet-mini-lab,$(shell $(DOCKER_COMPOSE) run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	$(DOCKER_COMPOSE) run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --networks internet-mini-lab,$(shell $(DOCKER_COMPOSE) run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: ls
 ls: env
