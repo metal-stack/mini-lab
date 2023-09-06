@@ -67,7 +67,6 @@ The following ports are used statically on your host machine:
 | 6443 |   0.0.0.0    | kube-apiserver of the kind cluster |
 | 4443 |   0.0.0.0    | HTTPS ingress                      |
 | 4150 |   0.0.0.0    | nsqd                               |
-| 4161 |   0.0.0.0    | nsq-lookupd                        |
 | 8080 |   0.0.0.0    | HTTP ingress                       |
 
 ## Known Limitations

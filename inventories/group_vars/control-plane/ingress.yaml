@@ -1,5 +1,4 @@
 ---
 ingress_tcp_service_exposals:
   "4150": "{{ metal_control_plane_namespace }}/nsqd:4150"
-  "4161": "{{ metal_control_plane_namespace }}/nsq-lookupd:4161"
   "50051": "{{ metal_control_plane_namespace }}/metal-api:50051"
