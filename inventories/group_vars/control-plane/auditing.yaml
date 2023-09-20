@@ -1,4 +1,3 @@
 ---
 auditing_meili_storage_size: 10Gi
-auditing_meili_env: production
 auditing_meili_resources: {}
