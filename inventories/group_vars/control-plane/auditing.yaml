@@ -1,13 +1,3 @@
 ---
-auditing_meili_secret: geheim
-auditing_meili_environment: development
-
-auditing_meili_ingress:
-  enabled: true
-  hosts:
-    - auditing.{{ metal_control_plane_ingress_dns }}
-
-auditing_meili_persistence:
-  enabled: true
-  size: 10Gi
-  storageClass: null
+auditing_meili_storage_size: 10Gi
+auditing_meili_resources: {}
