@@ -1,0 +1,40 @@
+prometheus:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - prometheus.0.0.0.0.nip.io
+
+grafana:
+  adminPassword: admin
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      url: http://loki-stack:3100/
+      access: proxy
+      orgId: 1
+      version: 1
+      isDefault: false
+      jsonData:
+        maxLines: 1000
+
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - grafana.0.0.0.0.nip.io
+
+alertmanager:
+  enabled: false
+
+kubeProxy:
+  enabled: false
+
+kubeScheduler:
+  enabled: false
+
+kubeEtcd:
+  enabled: false
+
+kubeControllerManager:
+  enabled: false
