@@ -9,7 +9,6 @@ KUBECONFIG := $(shell pwd)/.kubeconfig
 
 # Default values
 DOCKER_COMPOSE_OVERRIDE=
-DOCKER_COMPOSE=$(shell if which docker-compose > /dev/null; then echo 'docker-compose'; else echo 'docker compose'; fi)
 CONTAINERLAB=$(shell which containerlab)
 
 # extra vars can be used by projects that built on the mini-lab, which want to override default configuration
@@ -45,7 +44,7 @@ endif
 .PHONY: up
 up: env control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_rsa
-	$(DOCKER_COMPOSE) up --remove-orphans --force-recreate control-plane partition
+	docker compose up --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
 # for some reason an allocated machine will not be able to phone home
 # without restarting the metal-core
@@ -62,7 +61,7 @@ down: cleanup
 
 .PHONY: control-plane
 control-plane: control-plane-bake env
-	$(DOCKER_COMPOSE) up --remove-orphans --force-recreate control-plane
+	docker compose up --remove-orphans --force-recreate control-plane
 
 .PHONY: control-plane-bake
 control-plane-bake:
@@ -75,7 +74,7 @@ control-plane-bake:
 
 .PHONY: partition
 partition: partition-bake
-	$(DOCKER_COMPOSE) -f docker-compose.yml $(DOCKER_COMPOSE_OVERRIDE) up --remove-orphans --force-recreate partition
+	docker compose -f docker-compose.yml $(DOCKER_COMPOSE_OVERRIDE) up --remove-orphans --force-recreate partition
 
 .PHONY: partition-bake
 partition-bake:
@@ -115,7 +114,7 @@ cleanup: cleanup-control-plane cleanup-partition
 .PHONY: cleanup-control-plane
 cleanup-control-plane:
 	kind delete cluster --name metal-control-plane
-	$(DOCKER_COMPOSE) down
+	docker compose down
 	rm -f $(KUBECONFIG)
 
 .PHONY: cleanup-partition
@@ -124,19 +123,19 @@ cleanup-partition:
 
 .PHONY: _privatenet
 _privatenet: env
-	$(DOCKER_COMPOSE) run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network | grep user-private-network || $(DOCKER_COMPOSE) run $(DOCKER_COMPOSE_TTY_ARG) metalctl network allocate --partition mini-lab --project 00000000-0000-0000-0000-000000000000 --name user-private-network
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network | grep user-private-network || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network allocate --partition mini-lab --project 00000000-0000-0000-0000-000000000000 --name user-private-network
 
 .PHONY: machine
 machine: _privatenet
-	$(DOCKER_COMPOSE) run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --networks $(shell $(DOCKER_COMPOSE) run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --networks $(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: firewall
 firewall: _ips _privatenet
-	$(DOCKER_COMPOSE) run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --networks internet-mini-lab,$(shell $(DOCKER_COMPOSE) run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: ls
 ls: env
-	$(DOCKER_COMPOSE) run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine ls
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine ls
 
 ## SWITCH MANAGEMENT ##
 
@@ -156,7 +155,7 @@ start-machines:
 
 .PHONY: _password
 _password: env
-	$(DOCKER_COMPOSE) run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine consolepassword $(MACHINE_UUID)
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine consolepassword $(MACHINE_UUID)
 
 .PHONY: password-machine01
 password-machine01:
@@ -172,7 +171,7 @@ password-machine03:
 
 .PHONY: _free-machine
 _free-machine: env
-	$(DOCKER_COMPOSE) run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine rm $(MACHINE_UUID)
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine rm $(MACHINE_UUID)
 	docker exec vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) kill --with-disks
 	docker exec vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) create
 
