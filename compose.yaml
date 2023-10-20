@@ -1,6 +1,4 @@
 ---
-version: '3.7'
-
 services:
   control-plane:
     image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}

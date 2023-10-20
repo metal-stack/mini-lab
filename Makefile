@@ -8,7 +8,6 @@ KINDCONFIG := $(or $(KINDCONFIG),control-plane/kind.yaml)
 KUBECONFIG := $(shell pwd)/.kubeconfig
 
 # Default values
-DOCKER_COMPOSE_OVERRIDE=
 CONTAINERLAB=$(shell which containerlab)
 
 # extra vars can be used by projects that built on the mini-lab, which want to override default configuration
@@ -74,7 +73,7 @@ control-plane-bake:
 
 .PHONY: partition
 partition: partition-bake
-	docker compose -f docker-compose.yml $(DOCKER_COMPOSE_OVERRIDE) up --remove-orphans --force-recreate partition
+	docker compose up --remove-orphans --force-recreate partition
 
 .PHONY: partition-bake
 partition-bake:
