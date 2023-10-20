@@ -22,7 +22,7 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
 - Linux machine with hardware virtualization support
 - kvm as hypervisor for the VMs (you can check through the `kvm-ok` command)
 - [docker](https://www.docker.com/) >= 20.10.13 (for using kind and our deployment base image)
-- [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.15.0 (for hosting the metal control plane on a kubernetes cluster v1.25)
+- [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.20.0 (for hosting the metal control plane)
 - [containerlab](https://containerlab.srlinux.dev/install/) == v0.25.1
 - the lab creates a docker network on your host machine (`172.17.0.1`), this hopefully does not overlap with other networks you have
 - (recommended) haveged to have enough random entropy (only needed if the PXE process does not work)
@@ -51,7 +51,7 @@ sudo usermod -G docker -a ${USER}
 bash -c "$(curl -sL https://get.containerlab.dev)" -- -v 0.25.1
 
 # Install kind (kubernetes in docker), for more details see https://kind.sigs.k8s.io/docs/user/quick-start/#installation
-sudo curl -Lo /usr/local/bin/kind "https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64"
+sudo curl -Lo /usr/local/bin/kind "https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64"
 sudo chmod +x /usr/local/bin/kind
 
 The following ports are used statically on your host machine:
