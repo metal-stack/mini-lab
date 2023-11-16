@@ -1,12 +1,10 @@
 ---
-version: '3.7'
-
 services:
   control-plane:
     image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
     container_name: deploy-control-plane
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:z
       - .:/mini-lab
       # for developing role dependencies
       # TODO: make this a switch
@@ -43,7 +41,7 @@ services:
     image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
     container_name: deploy-partition
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:z
       - .:/mini-lab
       # for developing role dependencies
       # TODO: make this a switch
