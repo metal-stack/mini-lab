@@ -30,6 +30,8 @@
   roles:
     - name: ansible-common
       tags: always
+    - name: metal-roles
+      tags: always
     - name: metal-roles/partition/roles/dhcp
       tags: dhcp
     - name: metal-roles/partition/roles/pixiecore
