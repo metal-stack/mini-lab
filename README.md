@@ -53,6 +53,7 @@ bash -c "$(curl -sL https://get.containerlab.dev)"
 # Install kind (kubernetes in docker), for more details see https://kind.sigs.k8s.io/docs/user/quick-start/#installation
 sudo curl -Lo /usr/local/bin/kind "https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64"
 sudo chmod +x /usr/local/bin/kind
+```
 
 The following ports are used statically on your host machine:
 
