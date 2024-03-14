@@ -7,6 +7,7 @@ YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:3 /bin/sh -c
 KINDCONFIG := $(or $(KINDCONFIG),control-plane/kind.yaml)
 KUBECONFIG := $(shell pwd)/.kubeconfig
 
+MKE2FS_CONFIG := $(shell pwd)/mke2fs.conf
 # Default values
 CONTAINERLAB=$(shell which containerlab)
 
