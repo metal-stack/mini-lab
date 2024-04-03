@@ -79,7 +79,7 @@ partition: partition-bake
 .PHONY: partition-bake
 partition-bake:
 	# docker pull $(MINI_LAB_VM_IMAGE)
-	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i running > /dev/null; then \
+	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
 		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
 
