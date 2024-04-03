@@ -119,6 +119,7 @@ cleanup-control-plane:
 
 .PHONY: cleanup-partition
 cleanup-partition:
+	mkdir -p clab-mini-lab
 	sudo $(CONTAINERLAB) destroy --topo $(LAB_TOPOLOGY)
 
 .PHONY: _privatenet
