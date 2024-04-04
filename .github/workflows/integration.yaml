@@ -33,8 +33,8 @@ jobs:
 
     - name: Make tag
       run: |
-        [ "${GITHUB_EVENT_NAME}" == 'pull_request' ] && echo "MINI_LAB_VM_IMAGE=${GITHUB_HEAD_REF##*/}" >> $GITHUB_ENV || true
-        [ "${GITHUB_EVENT_NAME}" == 'push' ] && echo "MINI_LAB_VM_IMAGE=latest" >> $GITHUB_ENV || true
+        [ "${GITHUB_EVENT_NAME}" == 'pull_request' ] && echo "MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:${GITHUB_HEAD_REF##*/}" >> $GITHUB_ENV || true
+        [ "${GITHUB_EVENT_NAME}" == 'push' ] && echo "MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:latest" >> $GITHUB_ENV || true
 
     - name: Build Docker image
       run: |
