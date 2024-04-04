@@ -33,19 +33,17 @@ jobs:
 
     - name: Make tag
       run: |
-        [ "${GITHUB_EVENT_NAME}" == 'pull_request' ] && echo "tag=${GITHUB_HEAD_REF##*/}" >> $GITHUB_ENV || true
-        [ "${GITHUB_EVENT_NAME}" == 'push' ] && echo "tag=latest" >> $GITHUB_ENV || true
+        [ "${GITHUB_EVENT_NAME}" == 'pull_request' ] && echo "MINI_LAB_VM_IMAGE=${GITHUB_HEAD_REF##*/}" >> $GITHUB_ENV || true
+        [ "${GITHUB_EVENT_NAME}" == 'push' ] && echo "MINI_LAB_VM_IMAGE=latest" >> $GITHUB_ENV || true
 
     - name: Build Docker image
       run: |
         make build-vms-image
-        docker push ghcr.io/metal-stack/mini-lab-vms:${tag}
+        docker ${MINI_LAB_VM_IMAGE}
 
     - name: Run integration tests
       shell: bash
       run: |
-        export MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:${tag}
-
         ./test/ci-cleanup.sh
         ./test/integration.sh
       env:
