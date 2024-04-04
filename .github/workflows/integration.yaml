@@ -39,7 +39,7 @@ jobs:
     - name: Build Docker image
       run: |
         make build-vms-image
-        docker ${MINI_LAB_VM_IMAGE}
+        docker push ${MINI_LAB_VM_IMAGE}
 
     - name: Run integration tests
       shell: bash
