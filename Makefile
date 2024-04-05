@@ -35,6 +35,11 @@ else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
 
+KIND_ARGS=
+ifneq ($(K8S_VERSION),)
+KIND_ARGS=--image kindest/node:v$(K8S_VERSION)
+endif
+
 ifeq ($(CI),true)
   DOCKER_COMPOSE_TTY_ARG=-T
 else
@@ -67,8 +72,8 @@ control-plane: control-plane-bake env
 control-plane-bake:
 	@if ! which kind > /dev/null; then echo "kind needs to be installed"; exit 1; fi
 	@if ! kind get clusters | grep metal-control-plane > /dev/null; then \
-		kind create cluster \
-		  --name metal-control-plane \
+		kind create cluster $(KIND_ARGS) \
+			--name metal-control-plane \
 			--config $(KINDCONFIG) \
 			--kubeconfig $(KUBECONFIG); fi
 
