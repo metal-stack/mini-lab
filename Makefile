@@ -35,6 +35,11 @@ else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
 
+KIND_ARGS=
+ifneq ($(K8S_VERSION),)
+KIND_ARGS=--image kindest/node:v$(K8S_VERSION)
+endif
+
 ifeq ($(CI),true)
   DOCKER_COMPOSE_TTY_ARG=-T
 else
@@ -67,8 +72,8 @@ control-plane: control-plane-bake env
 control-plane-bake:
 	@if ! which kind > /dev/null; then echo "kind needs to be installed"; exit 1; fi
 	@if ! kind get clusters | grep metal-control-plane > /dev/null; then \
-		kind create cluster \
-		  --name metal-control-plane \
+		kind create cluster $(KIND_ARGS) \
+			--name metal-control-plane \
 			--config $(KINDCONFIG) \
 			--kubeconfig $(KUBECONFIG); fi
 
@@ -79,7 +84,7 @@ partition: partition-bake
 .PHONY: partition-bake
 partition-bake:
 	# docker pull $(MINI_LAB_VM_IMAGE)
-	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i running > /dev/null; then \
+	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
 		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
 
@@ -119,6 +124,7 @@ cleanup-control-plane:
 
 .PHONY: cleanup-partition
 cleanup-partition:
+	mkdir -p clab-mini-lab
 	sudo $(CONTAINERLAB) destroy --topo $(LAB_TOPOLOGY)
 
 .PHONY: _privatenet
