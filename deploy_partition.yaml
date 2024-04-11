@@ -1,12 +1,14 @@
 ---
-- name: deploy leaves
-  hosts: leaves
+- name: Configure Cumulus switches
+  hosts: leaves:&cvx
   roles:
     - name: metal-roles/partition/roles/leaf
       tags: leaf
+    - name: internet
+      tags: internet
 
-- name: deploy docker
-  hosts: leaves
+- name: Deploy docker on Cumulus switches
+  hosts: leaves:&cvx
   pre_tasks:
     - name: update cumulus repo key
       apt_key:
@@ -21,7 +23,7 @@
     - name: metal-roles/partition/roles/docker-on-cumulus
       tags: docker-on-cumulus
 
-- name: deploy dhcp server and pixiecore
+- name: Deploy dhcp server and pixiecore on leaf01
   hosts: leaf01
   vars:
     setup_yaml:
@@ -35,7 +37,7 @@
     - name: metal-roles/partition/roles/pixiecore
       tags: pixiecore
 
-- name: deploy metal-core
+- name: Deploy metal-core
   hosts: leaves
   vars:
     setup_yaml:
@@ -44,12 +46,10 @@
   roles:
     - name: ansible-common
       tags: always
-    - name: internet
-      tags: internet
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
 
-- name: wait for switches
+- name: Wait for switches
   hosts: localhost
   connection: local
   gather_facts: no
