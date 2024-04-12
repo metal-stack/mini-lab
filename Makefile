@@ -19,7 +19,8 @@ MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:
 
 MACHINE_OS=ubuntu-22.04
 
-SONIC_REMOTE_IMG := https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=202305&platform=vs&buildId=520140&target=target%2Fsonic-vs.img.gz
+# Check: https://sonic-build.azurewebsites.net/ui/sonic/pipelines
+SONIC_REMOTE_IMG := https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=202305&platform=vs&target=target%2Fsonic-vs.img.gz
 
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),default)

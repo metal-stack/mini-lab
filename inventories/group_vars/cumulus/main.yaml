@@ -1,0 +1,13 @@
+---
+ports:
+  1: 100G
+interfaces:
+- name: swp1
+uplinks: []
+
+# The best practice recommendation is to set an MTU of 9,216 for the inter-switch links,
+# and an MTU of 9,000 for the server-facing ports, which don’t carry the VXLAN header.
+# See: EVPN in the Data center (D. Dutt, p.77)
+mtu:
+  vxlan: 9216
+  default: 9000

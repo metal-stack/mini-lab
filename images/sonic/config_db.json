@@ -33,6 +33,7 @@
     "1.1.1.1": {},
     "1.0.0.1": {}
   },
+  "LOOPBACK_INTERFACE": null,
   "MGMT_INTERFACE": null,
   "MGMT_PORT": {
     "eth0": {
@@ -46,7 +47,7 @@
       "alias": "fortyGigE0/0",
       "index": "0",
       "speed": "40000",
-      "admin_status": "down",
+      "admin_status": "up",
       "mtu": "9100"
     },
     "Ethernet4": {
@@ -54,7 +55,7 @@
       "alias": "fortyGigE0/4",
       "index": "1",
       "speed": "40000",
-      "admin_status": "down",
+      "admin_status": "up",
       "mtu": "9100"
     },
     "Ethernet8": {
@@ -62,7 +63,7 @@
       "alias": "fortyGigE0/8",
       "index": "2",
       "speed": "40000",
-      "admin_status": "down",
+      "admin_status": "up",
       "mtu": "9100"
     },
     "Ethernet12": {
@@ -70,7 +71,7 @@
       "alias": "fortyGigE0/12",
       "index": "3",
       "speed": "40000",
-      "admin_status": "down",
+      "admin_status": "up",
       "mtu": "9100"
     }
   }

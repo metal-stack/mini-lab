@@ -1,0 +1,6 @@
+---
+dhcp_listening_interfaces:
+  - Vlan4000
+
+metal_core_spine_uplinks:
+  - Ethernet0
