@@ -1,0 +1,15 @@
+---
+# The metal-api is reachable at 172.17.0.1 that is the gateway of eth0
+- name: Activate IP MASQUERADE on eth0
+  ansible.builtin.iptables:
+    chain: POSTROUTING
+    jump: MASQUERADE
+    out_interface: eth0
+    table: nat
+
+- name: Activate ipv4 forwarding on eth0
+  ansible.posix.sysctl:
+    name: net.ipv4.conf.eth0.forwarding
+    reload: no
+    sysctl_set: yes
+    value: "1"

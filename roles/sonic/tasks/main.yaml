@@ -7,6 +7,9 @@
 - name: Load metal.yaml into ConfigDB
   ansible.builtin.command: sonic-cfggen --yaml /etc/sonic/metal.yaml --write-to-db
 
+- name: Outgoing from eth0
+  ansible.builtin.import_tasks: eth0.yaml
+
 - name: Install frr-pythontools
   ansible.builtin.import_tasks: frr-reload.yaml
 
