@@ -1,6 +1,6 @@
 ---
 - name: Configure Cumulus switches
-  hosts: leaves:&cvx
+  hosts: leaves:&cumulus
   roles:
     - name: metal-roles/partition/roles/leaf
       tags: leaf
@@ -8,7 +8,7 @@
       tags: internet
 
 - name: Deploy docker on Cumulus switches
-  hosts: leaves:&cvx
+  hosts: leaves:&cumulus
   pre_tasks:
     - name: update cumulus repo key
       apt_key:
