@@ -1,4 +1,4 @@
 ---
-branch_name: "202305"
+branch_name: "202211"
 base_url: "https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName={{ branch_name }}&platform=vs"
-frr_pythontools_url: "{{ base_url }}&target=target%2Fdebs%2Fbullseye%2Ffrr-pythontools_8.5.1-sonic-0_all.deb"
+frr_pythontools_url: "{{ base_url }}&target=target%2Fdebs%2Fbullseye%2Ffrr-pythontools_8.2.2-sonic-0_all.deb"
