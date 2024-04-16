@@ -21,14 +21,6 @@ sonic_nameservers:
 
 sonic_ip_masquerade: true
 
-sonic_ports:
-  - name: Ethernet0
-  - name: Ethernet4
-  - name: Ethernet8
-  - name: Ethernet12
-sonic_ports_default_mtu: 9000
-sonic_ports_default_speed: 40000
-
 sonic_vlans:
   - id: 4000
     ip: "{{ metal_core_cidr }}"
