@@ -1,5 +1,5 @@
 ---
-- name: Wait until switches are reachable
+- name: Configure SONiC switches
   hosts: leaves:&sonic
   gather_facts: no
   pre_tasks:
