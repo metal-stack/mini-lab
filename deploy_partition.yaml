@@ -1,6 +1,6 @@
 ---
 - name: Wait until switches are reachable
-  hosts: leaves
+  hosts: leaves:&sonic
   gather_facts: no
   pre_tasks:
     - name: Wait for system to become reachable
@@ -8,7 +8,12 @@
         delay: 10
         timeout: 50
   roles:
+    - name: ansible-common
+      tags: always
+    - name: metal-roles/partition/roles/sonic
+      tags: sonic
     - name: sonic
+      tags: sonic
 
 - name: Configure Cumulus switches
   hosts: leaves:&cumulus

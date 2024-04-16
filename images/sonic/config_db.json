@@ -14,26 +14,6 @@
       "type": "LeafRouter"
     }
   },
-  "FEATURE": {
-    "gnmi": {
-      "state": "disabled"
-    },
-    "mgmt-framework": {
-      "state": "disabled"
-    },
-    "pmon": {
-      "state": "disabled"
-    },
-    "snmp": {
-      "state": "disabled"
-    }
-  },
-  "DNS_NAMESERVER": {
-    "172.17.0.1": {},
-    "1.1.1.1": {},
-    "1.0.0.1": {}
-  },
-  "LOOPBACK_INTERFACE": null,
   "MGMT_INTERFACE": null,
   "MGMT_PORT": {
     "eth0": {
