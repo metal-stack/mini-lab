@@ -5,6 +5,7 @@
 clab-mini-lab
 .mini-lab.clab.yml
 .mini-lab.cumulus.yml
+.mini-lab.sonic.yml
 ansible-common
 metal-hammer*
 requirements.yaml
