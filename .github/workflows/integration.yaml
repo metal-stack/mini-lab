@@ -33,8 +33,7 @@ jobs:
 
     - name: Make tag
       run: |
-        [ "${GITHUB_EVENT_NAME}" == 'pull_request' ] && export "IMAGE_TAG=${GITHUB_HEAD_REF##*/}" || true
-        [ "${GITHUB_EVENT_NAME}" == 'push' ] && export "IMAGE_TAG=latest" || true
+        IMAGE_TAG=$([ "${GITHUB_EVENT_NAME}" == 'pull_request' ] && echo ${GITHUB_HEAD_REF##*/} || echo "latest")
 
         echo "MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:${IMAGE_TAG}" >> $GITHUB_ENV
         echo "MINI_LAB_SONIC_IMAGE=ghcr.io/metal-stack/mini-lab-sonic:${IMAGE_TAG}" >> $GITHUB_ENV
