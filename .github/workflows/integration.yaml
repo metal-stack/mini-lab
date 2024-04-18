@@ -10,6 +10,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   test:
@@ -35,11 +36,23 @@ jobs:
       run: |
         [ "${GITHUB_EVENT_NAME}" == 'pull_request' ] && echo "MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:${GITHUB_HEAD_REF##*/}" >> $GITHUB_ENV || true
         [ "${GITHUB_EVENT_NAME}" == 'push' ] && echo "MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:latest" >> $GITHUB_ENV || true
+        [ "${GITHUB_EVENT_NAME}" == 'pull_request' ] && echo "MINI_LAB_SONIC_IMAGE=ghcr.io/metal-stack/mini-lab-sonic:${GITHUB_HEAD_REF##*/}" >> $GITHUB_ENV || true
+        [ "${GITHUB_EVENT_NAME}" == 'push' ] && echo "MINI_LAB_SONIC_IMAGE=ghcr.io/metal-stack/mini-lab-sonic:latest" >> $GITHUB_ENV || true
 
-    - name: Build Docker image
-      run: |
-        make build-vms-image
-        docker push ${MINI_LAB_VM_IMAGE}
+    - name: Build and push mini-lab-vms container image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./images
+        file: Dockerfile.vms
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.MINI_LAB_VM_IMAGE }}
+
+    - name: Build and push mini-lab-sonic container image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./images/sonic
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.MINI_LAB_SONIC_IMAGE }}
 
     - name: Run integration tests
       shell: bash
