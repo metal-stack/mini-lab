@@ -5,33 +5,47 @@ mgmt:
   network: bridge
 
 topology:
-  kinds:
-    linux:
+  nodes:
+    leaf01:
+      kind: linux
+      image: ghcr.io/metal-stack/mini-lab-sonic:latest
+      labels:
+        ansible-group: sonic
+      binds:
+        - /dev:/dev
+        - files/ssh/id_rsa.pub:/authorized_keys
+        - sonic-vs.img:/sonic-vs.img
+    leaf02:
+      kind: linux
+      image: ghcr.io/metal-stack/mini-lab-sonic:latest
+      labels:
+        ansible-group: sonic
+      binds:
+        - /dev:/dev
+        - files/ssh/id_rsa.pub:/authorized_keys
+        - sonic-vs.img:/sonic-vs.img
+    inet:
+      kind: linux
+      image: quay.io/frrouting/frr:9.1.0
+      binds:
+        - files/inet/daemons:/etc/frr/daemons
+        - files/inet/frr.conf:/etc/frr/frr.conf
+        - files/inet/vtysh.conf:/etc/frr/vtysh.conf
+        - files/inet/network.sh:/root/network.sh
+      exec:
+        - sh /root/network.sh
+    vms:
+      kind: linux
       image: ${MINI_LAB_VM_IMAGE}
       binds:
         - /dev:/dev
         - scripts:/mini-lab
-
-  nodes:
-    leaf01:
-      kind: linux
-      binds:
-        - files/ssh/id_rsa.pub:/id_rsa.pub
-        - sonic-vs.img:/sonic-vs.img
-      cmd: /mini-lab/sonic_entrypoint.py
-    leaf02:
-      kind: linux
-      binds:
-        - files/ssh/id_rsa.pub:/id_rsa.pub
-        - sonic-vs.img:/sonic-vs.img
-      cmd: /mini-lab/sonic_entrypoint.py
-    vms:
-      kind: linux
-
   links:
-    - endpoints: ["leaf01:eth1", "vms:lan0"]
-    - endpoints: ["leaf02:eth1", "vms:lan1"]
-    - endpoints: ["leaf01:eth2", "vms:lan2"]
-    - endpoints: ["leaf02:eth2", "vms:lan3"]
-    - endpoints: ["leaf01:eth3", "vms:lan4"]
-    - endpoints: ["leaf02:eth3", "vms:lan5"]
+    - endpoints: ["leaf01:eth1", "inet:eth1"]
+    - endpoints: ["leaf02:eth1", "inet:eth2"]
+    - endpoints: ["leaf01:eth2", "vms:lan0"]
+    - endpoints: ["leaf02:eth2", "vms:lan1"]
+    - endpoints: ["leaf01:eth3", "vms:lan2"]
+    - endpoints: ["leaf02:eth3", "vms:lan3"]
+    - endpoints: ["leaf01:eth4", "vms:lan4"]
+    - endpoints: ["leaf02:eth4", "vms:lan5"]

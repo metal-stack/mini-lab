@@ -2,7 +2,7 @@
 .EXPORT_ALL_VARIABLES:
 
 # Commands
-YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:3 /bin/sh -c
+YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:4
 
 KINDCONFIG := $(or $(KINDCONFIG),control-plane/kind.yaml)
 KUBECONFIG := $(shell pwd)/.kubeconfig
@@ -19,7 +19,8 @@ MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:
 
 MACHINE_OS=ubuntu-22.04
 
-SONIC_REMOTE_IMG := https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=master&platform=vs&buildId=125016&target=target%2Fsonic-vs.img.gz
+# Check: https://sonic-build.azurewebsites.net/ui/sonic/pipelines
+SONIC_REMOTE_IMG := https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=202211&platform=vs&target=target%2Fsonic-vs.img.gz
 
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),default)
@@ -94,8 +95,8 @@ env:
 
 .PHONY: _ips
 _ips:
-	$(eval ipL1 = $(shell ${YQ} "yq r clab-mini-lab/ansible-inventory.yml 'all.children.cvx.hosts.leaf01.ansible_host'"))
-	$(eval ipL2 = $(shell ${YQ} "yq r clab-mini-lab/ansible-inventory.yml 'all.children.cvx.hosts.leaf02.ansible_host'"))
+	$(eval ipL1 = $(shell ${YQ} --unwrapScalar=true '.nodes.leaf01."mgmt-ipv4-address"' clab-mini-lab/topology-data.json))
+	$(eval ipL2 = $(shell ${YQ} --unwrapScalar=true '.nodes.leaf02."mgmt-ipv4-address"' clab-mini-lab/topology-data.json))
 	$(eval staticR = "100.255.254.0/24 nexthop via $(ipL1) dev docker0 nexthop via $(ipL2) dev docker0")
 
 .PHONY: route

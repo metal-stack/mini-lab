@@ -1,0 +1,72 @@
+{
+  "AUTO_TECHSUPPORT": {
+    "GLOBAL": {
+      "state": "disabled"
+    }
+  },
+  "DEVICE_METADATA": {
+    "localhost": {
+      "docker_routing_config_mode": "split-unified",
+      "hostname": "{{ hostname }}",
+      "hwsku": "Force10-S6000",
+      "mac": "{{ mac }}",
+      "platform": "x86_64-kvm_x86_64-r0",
+      "type": "LeafRouter"
+    }
+  },
+  "FEATURE": {
+    "mgmt-framework": {
+      "state": "disabled"
+    },
+    "pmon": {
+      "state": "disabled"
+    },
+    "snmp": {
+      "state": "disabled"
+    },
+    "telemetry": {
+      "state": "disabled"
+    }
+  },
+  "MGMT_INTERFACE": null,
+  "MGMT_PORT": {
+    "eth0": {
+      "alias": "eth0",
+      "admin_status": "up"
+    }
+  },
+  "PORT": {
+    "Ethernet0": {
+      "lanes": "25,26,27,28",
+      "alias": "fortyGigE0/0",
+      "index": "0",
+      "speed": "40000",
+      "admin_status": "up",
+      "mtu": "9100"
+    },
+    "Ethernet4": {
+      "lanes": "29,30,31,32",
+      "alias": "fortyGigE0/4",
+      "index": "1",
+      "speed": "40000",
+      "admin_status": "up",
+      "mtu": "9100"
+    },
+    "Ethernet8": {
+      "lanes": "33,34,35,36",
+      "alias": "fortyGigE0/8",
+      "index": "2",
+      "speed": "40000",
+      "admin_status": "up",
+      "mtu": "9100"
+    },
+    "Ethernet12": {
+      "lanes": "37,38,39,40",
+      "alias": "fortyGigE0/12",
+      "index": "3",
+      "speed": "40000",
+      "admin_status": "up",
+      "mtu": "9100"
+    }
+  }
+}

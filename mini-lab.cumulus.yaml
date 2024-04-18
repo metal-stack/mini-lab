@@ -10,6 +10,8 @@ topology:
       image: networkop/cx:3.7.0
       kernel: docker.io/grigoriymikh/kernel:4.1.0
       sandbox: grigoriymikh/sandbox:latest
+      labels:
+        ansible-group: cumulus
       binds:
         - files/ssh/id_rsa.pub:/root/.ssh/authorized_keys
     linux:

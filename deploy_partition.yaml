@@ -1,12 +1,30 @@
 ---
-- name: deploy leaves
-  hosts: leaves
+- name: Configure SONiC switches
+  hosts: leaves:&sonic
+  gather_facts: no
+  pre_tasks:
+    - name: Wait for system to become reachable
+      ansible.builtin.wait_for_connection:
+        delay: 10
+        timeout: 50
+  roles:
+    - name: ansible-common
+      tags: always
+    - name: metal-roles/partition/roles/sonic
+      tags: sonic
+    - name: sonic
+      tags: sonic
+
+- name: Configure Cumulus switches
+  hosts: leaves:&cumulus
   roles:
     - name: metal-roles/partition/roles/leaf
       tags: leaf
+    - name: internet
+      tags: internet
 
-- name: deploy docker
-  hosts: leaves
+- name: Deploy docker on Cumulus switches
+  hosts: leaves:&cumulus
   pre_tasks:
     # the following task is not required as long as we do not install something from the cumulus repositories, for which all the keys are expired now
     # the one from here has also expired on 9th Apr 2024: https://docs.nvidia.com/networking-ethernet-software/knowledge-base/Installing-and-Upgrading/Upgrading/Update-Expired-GPG-Keys/#package-upgrade-from-cumulus-linux-37x-to-3716
@@ -23,7 +41,7 @@
     - name: metal-roles/partition/roles/docker-on-cumulus
       tags: docker-on-cumulus
 
-- name: deploy dhcp server and pixiecore
+- name: Deploy dhcp server and pixiecore on leaf01
   hosts: leaf01
   vars:
     setup_yaml:
@@ -37,7 +55,7 @@
     - name: metal-roles/partition/roles/pixiecore
       tags: pixiecore
 
-- name: deploy metal-core
+- name: Deploy metal-core
   hosts: leaves
   vars:
     setup_yaml:
@@ -46,12 +64,10 @@
   roles:
     - name: ansible-common
       tags: always
-    - name: internet
-      tags: internet
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
 
-- name: wait for switches
+- name: Wait for switches
   hosts: localhost
   connection: local
   gather_facts: no
