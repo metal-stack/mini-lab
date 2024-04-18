@@ -10,8 +10,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  VMS_IMAGE_NAME: ghcr.io/metal-stack/mini-lab-vms
-  SONIC_IMAGE_NAME: ghcr.io/metal-stack/mini-lab-sonic
 
 jobs:
   test:
@@ -35,8 +33,11 @@ jobs:
 
     - name: Make tag
       run: |
-        [ "${GITHUB_EVENT_NAME}" == 'pull_request' ] && echo "IMAGE_TAG=${GITHUB_HEAD_REF##*/}" >> $GITHUB_ENV || true
-        [ "${GITHUB_EVENT_NAME}" == 'push' ] && echo "IMAGE_TAG=latest" >> $GITHUB_ENV || true
+        [ "${GITHUB_EVENT_NAME}" == 'pull_request' ] && export "IMAGE_TAG=${GITHUB_HEAD_REF##*/}" || true
+        [ "${GITHUB_EVENT_NAME}" == 'push' ] && export "IMAGE_TAG=latest" || true
+
+        echo "MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:${IMAGE_TAG}" >> $GITHUB_ENV
+        echo "MINI_LAB_SONIC_IMAGE=ghcr.io/metal-stack/mini-lab-sonic:${IMAGE_TAG}" >> $GITHUB_ENV
 
     - name: Build and push mini-lab-vms container
       uses: docker/build-push-action@v5
@@ -44,21 +45,18 @@ jobs:
         context: ./images
         file: Dockerfile.vms
         push: true
-        tags: ${{ env.VMS_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+        tags: ${{ env.MINI_LAB_VM_IMAGE }}
 
     - name: Build and push mini-lab-sonic container
       uses: docker/build-push-action@v5
       with:
         context: ./images/sonic
         push: true
-        tags: ${{ env.SONIC_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+        tags: ${{ env.MINI_LAB_SONIC_IMAGE }}
 
     - name: Run integration tests
       shell: bash
       run: |
-        export ${VMS_IMAGE_NAME}:${IMAGE_TAG}
-        export ${SONIC_IMAGE_NAME}:${IMAGE_TAG}
-
         ./test/ci-cleanup.sh
         ./test/integration.sh
       env:
