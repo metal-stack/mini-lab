@@ -43,7 +43,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: ./images
-        file: Dockerfile.vms
+        file: ./images/Dockerfile.vms
         push: true
         tags: ${{ env.MINI_LAB_VM_IMAGE }}
 
