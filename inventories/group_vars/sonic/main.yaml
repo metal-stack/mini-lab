@@ -30,3 +30,5 @@ sonic_vteps:
 - comment: Dummy
   vlan: Vlan3999
   vni: 103999
+
+metal_core_cidr_mask: 25

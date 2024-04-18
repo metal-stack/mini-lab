@@ -11,3 +11,5 @@ uplinks: []
 mtu:
   vxlan: 9216
   default: 9000
+
+metal_core_cidr_mask: 24

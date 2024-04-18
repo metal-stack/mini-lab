@@ -14,7 +14,7 @@ leaves:
     leaf01:
       lo: 10.0.0.11
       asn: 4200000011
-      metal_core_cidr: 10.0.1.1/25
+      metal_core_cidr: 10.0.1.1/{{ metal_core_cidr_mask }}
 
       dhcp_default_lease_time: 600
       dhcp_max_lease_time: 600
@@ -30,7 +30,7 @@ leaves:
     leaf02:
       lo: 10.0.0.12
       asn: 4200000012
-      metal_core_cidr: 10.0.1.128/25
+      metal_core_cidr: 10.0.1.128/{{ metal_core_cidr_mask }}
   vars:
     pixie_server_ip: 10.0.1.1
     dhcp_server_ip: 10.0.1.1
