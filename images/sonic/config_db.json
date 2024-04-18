@@ -14,6 +14,20 @@
       "type": "LeafRouter"
     }
   },
+  "FEATURE": {
+    "mgmt-framework": {
+      "state": "disabled"
+    },
+    "pmon": {
+      "state": "disabled"
+    },
+    "snmp": {
+      "state": "disabled"
+    },
+    "telemetry": {
+      "state": "disabled"
+    }
+  },
   "MGMT_INTERFACE": null,
   "MGMT_PORT": {
     "eth0": {
