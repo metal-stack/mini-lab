@@ -137,7 +137,7 @@ def main():
     logger = logging.getLogger()
 
     name = os.getenv('CLAB_LABEL_CLAB_NODE_NAME', default='switch')
-    memory = os.getenv('VM_MEMORY', default='4096')
+    memory = os.getenv('VM_MEMORY', default='2048')
     interfaces = int(os.getenv('CLAB_INTFS', 0)) + 1
 
     vm = Qemu(name, memory, interfaces)
