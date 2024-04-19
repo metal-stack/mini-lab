@@ -131,8 +131,13 @@ cleanup-control-plane:
 .PHONY: cleanup-partition
 cleanup-partition:
 	mkdir -p clab-mini-lab
+
 	sudo $(CONTAINERLAB) destroy --topo mini-lab.cumulus.yaml
+
+# destroying the sonic lab requires the image to exist, otherwise it fails with bind path verification
+	touch sonic-vs.img
 	sudo $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
+	rm -f sonic-vs.img
 
 .PHONY: _privatenet
 _privatenet: env
