@@ -131,13 +131,8 @@ cleanup-control-plane:
 .PHONY: cleanup-partition
 cleanup-partition:
 	mkdir -p clab-mini-lab
-ifneq ("$(wildcard .mini-lab.cumulus.yml)","")
 	sudo $(CONTAINERLAB) destroy --topo mini-lab.cumulus.yaml
-	rm -f .mini-lab.cumulus.yml
-else ifneq ("$(wildcard .mini-lab.sonic.yml)","")
 	sudo $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
-	rm -f .mini-lab.sonic.yml
-endif
 
 .PHONY: _privatenet
 _privatenet: env
