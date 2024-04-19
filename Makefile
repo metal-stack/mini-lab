@@ -18,6 +18,7 @@ MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),default)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
 
 MACHINE_OS=ubuntu-22.04
+MAX_RETRIES := 10
 
 # Check: https://sonic-build.azurewebsites.net/ui/sonic/pipelines
 SONIC_REMOTE_IMG := https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=202211&platform=vs&target=target%2Fsonic-vs.img.gz
@@ -227,6 +228,25 @@ ssh-machine:
 		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
 	))
 	ssh -F files/ssh/config $(machine) $(COMMAND)
+
+.PHONY: ping-cloudflare
+ping-cloudflare:
+	@echo "Attempting to ping 1.1.1.1..."
+	@for i in $$(seq 1 $(MAX_RETRIES)); do \
+		if $(MAKE) ssh-machine COMMAND="ping -c 1 1.1.1.1" > /dev/null 2>&1; then \
+			echo "Ping successful"; \
+			exit 0; \
+		else \
+			echo "Ping failed"; \
+			if [ $$i -lt $(MAX_RETRIES) ]; then \
+				echo "Retrying in 1 seconds..."; \
+				sleep 1; \
+			else \
+				echo "Max retries reached"; \
+				exit 1; \
+			fi; \
+		fi; \
+	done
 
 ## DEV TARGETS ##
 

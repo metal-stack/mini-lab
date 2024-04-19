@@ -44,6 +44,9 @@ echo "$phoned/$minPhoned machines have phoned home"
 
 sleep 10
 
+echo "Test connectivity to outside"
+make ping-cloudflare
+
 echo "Adding route to leaf01 and leaf02"
 make route
 
