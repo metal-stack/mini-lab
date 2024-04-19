@@ -242,8 +242,8 @@ ping-cloudflare:
 		else \
 			echo "Ping failed"; \
 			if [ $$i -lt $(MAX_RETRIES) ]; then \
-				echo "Retrying in 1 seconds..."; \
-				sleep 1; \
+				echo "Retrying in 3 seconds..."; \
+				sleep 3; \
 			else \
 				echo "Max retries reached"; \
 				exit 1; \
