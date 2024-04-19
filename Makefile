@@ -16,6 +16,7 @@ ANSIBLE_EXTRA_VARS_FILE := $(or $(ANSIBLE_EXTRA_VARS_FILE),)
 
 MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),default)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
+MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
 
 MACHINE_OS=ubuntu-22.04
 
@@ -218,10 +219,6 @@ dev-env:
 	@echo "export METALCTL_API_URL=http://api.172.17.0.1.nip.io:8080/metal"
 	@echo "export METALCTL_HMAC=metal-admin"
 	@echo "export KUBECONFIG=$(KUBECONFIG)"
-
-.PHONY: build-vms-image
-build-vms-image:
-	cd images && docker build -f Dockerfile.vms -t $(MINI_LAB_VM_IMAGE) . && cd -
 
 sonic-vs.img:
 	curl --location --output - "${SONIC_REMOTE_IMG}" | gunzip > sonic-vs.img
