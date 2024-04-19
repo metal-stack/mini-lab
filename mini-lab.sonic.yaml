@@ -8,7 +8,7 @@ topology:
   nodes:
     leaf01:
       kind: linux
-      image: ghcr.io/metal-stack/mini-lab-sonic:latest
+      image: ${MINI_LAB_SONIC_IMAGE}
       labels:
         ansible-group: sonic
       binds:
@@ -17,7 +17,7 @@ topology:
         - sonic-vs.img:/sonic-vs.img
     leaf02:
       kind: linux
-      image: ghcr.io/metal-stack/mini-lab-sonic:latest
+      image: ${MINI_LAB_SONIC_IMAGE}
       labels:
         ansible-group: sonic
       binds:
