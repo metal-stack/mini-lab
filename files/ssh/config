@@ -1,0 +1,17 @@
+Host leaf01
+    HostName leaf01
+    User root
+    IdentityFile files/ssh/id_rsa
+    PasswordAuthentication no
+    ProxyJump none
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+    PubkeyAcceptedKeyTypes +ssh-rsa
+
+Host * !leaf01
+    User metal
+    IdentityFile files/ssh/id_rsa
+    PasswordAuthentication no
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+    ProxyCommand ssh -q -F files/ssh/config leaf01 'sudo ip vrf exec default bash -c "exec 3<>/dev/tcp/%h/%p; cat<&0 >&3 & cat<&3 >&1"'

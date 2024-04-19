@@ -26,12 +26,15 @@ SONIC_REMOTE_IMG := https://sonic-build.azurewebsites.net/api/sonic/artifacts?br
 ifeq ($(MINI_LAB_FLAVOR),default)
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
+VRF=vrf20
 else ifeq ($(MINI_LAB_FLAVOR),cluster-api)
 LAB_MACHINES=machine01,machine02,machine03
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
+VRF=vrf20
 else ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.sonic.yaml
+VRF=Vrf20
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
@@ -210,6 +213,20 @@ console-machine02:
 .PHONY: console-machine03
 console-machine03:
 	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4002
+
+.PHONY: ssh-fw
+ssh-fw:
+	$(eval fw = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp neighbors fw json' | \
+		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
+	))
+	ssh -F files/ssh/config $(fw) $(COMMAND)
+
+.PHONY: ssh-machine
+ssh-machine:
+	$(eval machine = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp vrf $(VRF) neighbors test json' | \
+		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
+	))
+	ssh -F files/ssh/config $(machine) $(COMMAND)
 
 ## DEV TARGETS ##
 
