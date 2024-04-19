@@ -38,6 +38,10 @@ jobs:
         echo "MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:${IMAGE_TAG}" >> $GITHUB_ENV
         echo "MINI_LAB_SONIC_IMAGE=ghcr.io/metal-stack/mini-lab-sonic:${IMAGE_TAG}" >> $GITHUB_ENV
 
+        SONIC_IMAGE_HASH=$(grep 'SONIC_REMOTE_IMG :=' Makefile | awk '{ print $3 }' | sha256sum | awk '{ print $1 }')
+
+        echo "SONIC_IMAGE_HASH=${SONIC_IMAGE_HASH}" >> $GITHUB_ENV
+
     - name: Build and push mini-lab-vms container
       uses: docker/build-push-action@v5
       with:
@@ -58,7 +62,7 @@ jobs:
       with:
         path: |
           ./sonic-vs.img
-        key: ${{ hashFiles('Makefile') }}
+        key: ${{ env.SONIC_IMAGE_HASH }}
 
     - name: Run integration tests
       shell: bash
