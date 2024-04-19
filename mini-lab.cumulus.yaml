@@ -14,8 +14,6 @@ topology:
         ansible-group: cumulus
       binds:
         - files/ssh/id_rsa.pub:/root/.ssh/authorized_keys
-    linux:
-      image: ${MINI_LAB_VM_IMAGE}
 
   nodes:
     leaf01:
@@ -26,8 +24,19 @@ topology:
       kind: cvx
       binds:
         - apt-transport-https.tar.gz:/root/jessie-apt-transport-fix.tar.gz
+    inet:
+      kind: linux
+      image: quay.io/frrouting/frr:9.1.0
+      binds:
+        - files/inet/daemons:/etc/frr/daemons
+        - files/inet/frr.conf:/etc/frr/frr.conf
+        - files/inet/vtysh.conf:/etc/frr/vtysh.conf
+        - files/inet/network.sh:/root/network.sh
+      exec:
+        - sh /root/network.sh
     vms:
       kind: linux
+      image: ${MINI_LAB_VM_IMAGE}
       binds:
         - /dev:/dev
         - scripts:/mini-lab
@@ -39,3 +48,5 @@ topology:
     - endpoints: ["leaf02:swp2", "vms:lan3"]
     - endpoints: ["leaf01:swp3", "vms:lan4"]
     - endpoints: ["leaf02:swp3", "vms:lan5"]
+    - endpoints: ["leaf01:swp31", "inet:eth1"]
+    - endpoints: ["leaf02:swp31", "inet:eth2"]

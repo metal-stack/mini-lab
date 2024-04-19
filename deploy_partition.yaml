@@ -20,8 +20,6 @@
   roles:
     - name: metal-roles/partition/roles/leaf
       tags: leaf
-    - name: internet
-      tags: internet
 
 - name: Deploy docker on Cumulus switches
   hosts: leaves:&cumulus
