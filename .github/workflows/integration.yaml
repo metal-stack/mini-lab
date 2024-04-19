@@ -53,6 +53,13 @@ jobs:
         push: true
         tags: ${{ env.MINI_LAB_SONIC_IMAGE }}
 
+    - name: Cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ./sonic-vs.img
+        key: ${{ hashFiles('Makefile') }}
+
     - name: Run integration tests
       shell: bash
       run: |
