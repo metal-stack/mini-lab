@@ -216,6 +216,8 @@ console-machine02:
 console-machine03:
 	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4002
 
+## SSH TARGETS FOR MACHINES ##
+# Python code could be replaced by jq, but it is not preinstalled on Cumulus
 .PHONY: ssh-fw
 ssh-fw:
 	$(eval fw = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp neighbors fw json' | \
