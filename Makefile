@@ -147,6 +147,16 @@ ls: env
 
 ## SWITCH MANAGEMENT ##
 
+.PHONY: ssh-leafconfig
+ssh-leafconfig:
+	@grep "Host leaf01" ~/.ssh/config || echo -e "Host leaf01\n    StrictHostKeyChecking no\n    IdentityFile $(shell pwd)/files/ssh/id_rsa\n" >>~/.ssh/config
+	@grep "Host leaf02" ~/.ssh/config || echo -e "Host leaf02\n    StrictHostKeyChecking no\n    IdentityFile $(shell pwd)/files/ssh/id_rsa\n" >>~/.ssh/config
+
+docker-leaf01:
+	@echo "export DOCKER_HOST=ssh://root@leaf01/var/run/docker.sock"
+docker-leaf02:
+	@echo "export DOCKER_HOST=ssh://root@leaf02/var/run/docker.sock"
+
 .PHONY: ssh-leaf01
 ssh-leaf01:
 	ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa root@leaf01
