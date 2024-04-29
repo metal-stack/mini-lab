@@ -14,7 +14,6 @@ topology:
       binds:
         - /dev:/dev
         - files/ssh/id_rsa.pub:/authorized_keys
-        - sonic-vs.img:/sonic-vs.img
     leaf02:
       kind: linux
       image: ${MINI_LAB_SONIC_IMAGE}
@@ -23,7 +22,6 @@ topology:
       binds:
         - /dev:/dev
         - files/ssh/id_rsa.pub:/authorized_keys
-        - sonic-vs.img:/sonic-vs.img
     inet:
       kind: linux
       image: quay.io/frrouting/frr:9.1.0

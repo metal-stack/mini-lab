@@ -20,9 +20,6 @@ MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-la
 
 MACHINE_OS=ubuntu-22.04
 
-# Check: https://sonic-build.azurewebsites.net/ui/sonic/pipelines
-SONIC_REMOTE_IMG := https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=202211&platform=vs&target=target%2Fsonic-vs.img.gz
-
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
 LAB_MACHINES=machine01,machine02
@@ -82,12 +79,6 @@ partition: partition-bake
 
 .PHONY: partition-bake
 partition-bake:
-ifeq ($(MINI_LAB_FLAVOR),sonic)
-ifeq ("$(wildcard sonic-vs.img)","")
-	$(MAKE)	sonic-vs.img
-endif
-endif
-
 	docker pull $(MINI_LAB_VM_IMAGE)
 
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
@@ -131,13 +122,8 @@ cleanup-control-plane:
 .PHONY: cleanup-partition
 cleanup-partition:
 	mkdir -p clab-mini-lab
-
 	sudo $(CONTAINERLAB) destroy --topo mini-lab.cumulus.yaml
-
-# destroying the sonic lab requires the image to exist, otherwise it fails with bind path verification
-	touch sonic-vs.img
 	sudo $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
-	rm -f sonic-vs.img
 
 .PHONY: _privatenet
 _privatenet: env
@@ -242,6 +228,3 @@ dev-env:
 	@echo "export METALCTL_API_URL=http://api.172.17.0.1.nip.io:8080/metal"
 	@echo "export METALCTL_HMAC=metal-admin"
 	@echo "export KUBECONFIG=$(KUBECONFIG)"
-
-sonic-vs.img:
-	curl --location --output - "${SONIC_REMOTE_IMG}" | gunzip > sonic-vs.img
