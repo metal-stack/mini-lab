@@ -14,7 +14,7 @@ CONTAINERLAB=$(shell which containerlab)
 # extra vars can be used by projects that built on the mini-lab, which want to override default configuration
 ANSIBLE_EXTRA_VARS_FILE := $(or $(ANSIBLE_EXTRA_VARS_FILE),)
 
-MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),default)
+MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),sonic)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
 MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
 
@@ -24,11 +24,8 @@ MACHINE_OS=ubuntu-22.04
 SONIC_REMOTE_IMG := https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=202211&platform=vs&target=target%2Fsonic-vs.img.gz
 
 # Machine flavors
-ifeq ($(MINI_LAB_FLAVOR),default)
+ifeq ($(MINI_LAB_FLAVOR),cumulus)
 LAB_MACHINES=machine01,machine02
-LAB_TOPOLOGY=mini-lab.cumulus.yaml
-else ifeq ($(MINI_LAB_FLAVOR),cluster-api)
-LAB_MACHINES=machine01,machine02,machine03
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
 else ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_MACHINES=machine01,machine02
@@ -85,7 +82,14 @@ partition: partition-bake
 
 .PHONY: partition-bake
 partition-bake:
-	# docker pull $(MINI_LAB_VM_IMAGE)
+ifeq ($(MINI_LAB_FLAVOR),sonic)
+ifeq ("$(wildcard sonic-vs.img)","")
+	$(MAKE)	sonic-vs.img
+endif
+endif
+
+	docker pull $(MINI_LAB_VM_IMAGE)
+
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
 		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
@@ -127,7 +131,13 @@ cleanup-control-plane:
 .PHONY: cleanup-partition
 cleanup-partition:
 	mkdir -p clab-mini-lab
-	sudo $(CONTAINERLAB) destroy --topo $(LAB_TOPOLOGY)
+
+	sudo $(CONTAINERLAB) destroy --topo mini-lab.cumulus.yaml
+
+# destroying the sonic lab requires the image to exist, otherwise it fails with bind path verification
+	touch sonic-vs.img
+	sudo $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
+	rm -f sonic-vs.img
 
 .PHONY: _privatenet
 _privatenet: env
