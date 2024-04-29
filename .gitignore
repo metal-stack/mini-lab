@@ -10,4 +10,5 @@ ansible-common
 metal-hammer*
 requirements.yaml
 .extra_vars.yaml
+sonic-vs.img
 *.bak
