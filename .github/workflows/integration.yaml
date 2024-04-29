@@ -21,6 +21,14 @@ jobs:
       run: |
         [ -d "${GITHUB_WORKSPACE}" ] && sudo chown -R $USER:$USER ${GITHUB_WORKSPACE}
 
+    - name: Setup Containerlab
+      run: |
+        bash -c "$(curl -sL https://get.containerlab.dev)"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # we can remove desired version again after this fix was released: https://github.com/srl-labs/containerlab/pull/2000
+        DESIRED_VERSION: v0.52.0
+
     - name: Log in to the container registry
       uses: docker/login-action@v3
       with:
@@ -38,10 +46,6 @@ jobs:
         echo "MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:${IMAGE_TAG}" >> $GITHUB_ENV
         echo "MINI_LAB_SONIC_IMAGE=ghcr.io/metal-stack/mini-lab-sonic:${IMAGE_TAG}" >> $GITHUB_ENV
 
-        SONIC_IMAGE_HASH=$(grep 'SONIC_REMOTE_IMG :=' Makefile | awk '{ print $3 }' | sha256sum | awk '{ print $1 }')
-
-        echo "SONIC_IMAGE_HASH=${SONIC_IMAGE_HASH}" >> $GITHUB_ENV
-
     - name: Build and push mini-lab-vms container
       uses: docker/build-push-action@v5
       with:
@@ -49,6 +53,8 @@ jobs:
         file: ./images/Dockerfile.vms
         push: true
         tags: ${{ env.MINI_LAB_VM_IMAGE }}
+        cache-from: type=registry,ref=${{ env.MINI_LAB_VM_IMAGE }}
+        cache-to: type=inline
 
     - name: Build and push mini-lab-sonic container
       uses: docker/build-push-action@v5
@@ -56,13 +62,8 @@ jobs:
         context: ./images/sonic
         push: true
         tags: ${{ env.MINI_LAB_SONIC_IMAGE }}
-
-    - name: Cache
-      uses: actions/cache@v4
-      with:
-        path: |
-          ./sonic-vs.img
-        key: ${{ env.SONIC_IMAGE_HASH }}
+        cache-from: type=registry,ref=${{ env.MINI_LAB_SONIC_IMAGE }}
+        cache-to: type=inline
 
     - name: Run integration tests
       shell: bash
@@ -72,3 +73,4 @@ jobs:
       env:
         DOCKER_HUB_USER: ${{ secrets.DOCKER_HUB_USER }}
         DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
