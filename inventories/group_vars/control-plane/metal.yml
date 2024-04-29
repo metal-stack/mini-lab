@@ -14,15 +14,15 @@ metal_api_nsq_tcp_address: nsqd:4150
 metal_api_latest_os_image_release_name: "{{ (lookup('url', 'https://api.github.com/repos/metal-stack/metal-images/releases/latest') | from_json).get('name') }}"
 
 metal_api_images:
-- id: firewall-ubuntu-3.0.{{ metal_api_latest_os_image_release_name }}
-  name: Firewall 3 Ubuntu {{ metal_api_latest_os_image_release_name }}
-  description: Firewall 3 Ubuntu {{ metal_api_latest_os_image_release_name }}
+- id: firewall-ubuntu-3.0.20300101
+  name: Firewall 3 Ubuntu
+  description: Firewall 3 Ubuntu Latest Release
   url: https://images.metal-stack.io/metal-os/{{ metal_api_latest_os_image_release_name }}/firewall/3.0-ubuntu/img.tar.lz4
   features:
     - firewall
-- id: ubuntu-22.04.{{ metal_api_latest_os_image_release_name }}
-  name: Ubuntu 22.04 {{ metal_api_latest_os_image_release_name }}
-  description: Ubuntu 22.04 {{ metal_api_latest_os_image_release_name }}
+- id: ubuntu-22.04.20300101
+  name: Ubuntu 22.04
+  description: Ubuntu 22.04 Latest Release
   url: https://images.metal-stack.io/metal-os/{{ metal_api_latest_os_image_release_name }}/ubuntu/22.04/img.tar.lz4
   features:
     - machine
