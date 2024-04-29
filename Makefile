@@ -79,12 +79,6 @@ partition: partition-bake
 
 .PHONY: partition-bake
 partition-bake:
-ifeq ($(MINI_LAB_FLAVOR),sonic)
-ifeq ("$(wildcard sonic-vs.img)","")
-	$(MAKE)	sonic-vs.img
-endif
-endif
-
 	docker pull $(MINI_LAB_VM_IMAGE)
 
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
