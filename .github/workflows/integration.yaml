@@ -45,6 +45,8 @@ jobs:
         file: ./images/Dockerfile.vms
         push: true
         tags: ${{ env.MINI_LAB_VM_IMAGE }}
+        cache-from: type=registry,ref=${{ env.MINI_LAB_VM_IMAGE }}
+        cache-to: type=inline
 
     - name: Build and push mini-lab-sonic container
       uses: docker/build-push-action@v5
@@ -52,6 +54,8 @@ jobs:
         context: ./images/sonic
         push: true
         tags: ${{ env.MINI_LAB_SONIC_IMAGE }}
+        cache-from: type=registry,ref=${{ env.MINI_LAB_SONIC_IMAGE }}
+        cache-to: type=inline
 
     - name: Run integration tests
       shell: bash
