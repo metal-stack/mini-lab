@@ -1,0 +1,7 @@
+{
+  "bridge": {
+    "module_globals": {
+      "bridge_mac_iface": ["eth0", "eth1"]
+    }
+  }
+}

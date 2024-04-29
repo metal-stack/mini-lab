@@ -1,0 +1,13 @@
+---
+- name: reload interfaces
+  shell: sleep 3; ifreload -a
+  async: 1
+  poll: 0
+  notify: wait for new connection
+
+- name: wait for new connection
+  wait_for_connection:
+    connect_timeout: 20
+    sleep: 5
+    delay: 5
+    timeout: 300

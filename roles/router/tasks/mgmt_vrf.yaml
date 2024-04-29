@@ -1,0 +1,22 @@
+---
+- name: check if mgmt vrf is active
+  shell: vrf list | grep mgmt
+  changed_when: false
+  failed_when: false
+  register: mgmt_vrf_exists
+
+- name: activate mgmt vrf; drops connections
+  nclu:
+    commands:
+      - add vrf mgmt
+    commit: true
+  async: 1
+  poll: 0
+  when: mgmt_vrf_exists.rc != 0
+
+- name: wait for new connection
+  wait_for_connection:
+    connect_timeout: 20
+    sleep: 2
+    delay: 6
+    timeout: 60

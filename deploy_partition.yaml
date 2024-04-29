@@ -18,7 +18,7 @@
 - name: Configure Cumulus switches
   hosts: leaves:&cumulus
   roles:
-    - name: metal-roles/partition/roles/leaf
+    - name: leaf
       tags: leaf
     - name: internet
       tags: internet

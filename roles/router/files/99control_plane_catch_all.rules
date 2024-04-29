@@ -1,0 +1,36 @@
+#
+# Note: These are catch-all rules that shall be last in the over all rule set.
+#
+
+INGRESS_INTF = swp+
+
+INGRESS_CHAIN = INPUT
+
+
+
+[iptables]
+
+-A $INGRESS_CHAIN --in-interface $INGRESS_INTF -m addrtype --dst-type LOCAL -j POLICE --set-mode pkt --set-rate 1000 --set-burst 10000 --set-class 2
+
+-A $INGRESS_CHAIN --in-interface $INGRESS_INTF -m addrtype --dst-type IPROUTER -j POLICE --set-mode pkt --set-rate 30000 --set-burst 70000 --set-class 2
+
+-A $INGRESS_CHAIN --in-interface $INGRESS_INTF -j SETCLASS --class 0
+
+
+[ip6tables]
+
+-A $INGRESS_CHAIN --in-interface $INGRESS_INTF -m addrtype --dst-type LOCAL -j POLICE --set-mode pkt --set-rate 1000 --set-burst 1000 --set-class 2
+
+-A $INGRESS_CHAIN --in-interface $INGRESS_INTF -m addrtype --dst-type IPROUTER -j POLICE --set-mode pkt --set-rate 400 --set-burst 100 --set-class 2
+
+-A $INGRESS_CHAIN --in-interface $INGRESS_INTF -j SETCLASS --class 0
+
+
+[ebtables]
+
+-A $INGRESS_CHAIN -p ipv4 --in-interface $INGRESS_INTF -j ACCEPT
+-A $INGRESS_CHAIN -p ipv6 --in-interface $INGRESS_INTF -j ACCEPT
+-A $INGRESS_CHAIN --in-interface $INGRESS_INTF -j setclass --class 0
+# ipv4 multicast misses
+-A $INGRESS_CHAIN -p ipv4 -d 01:00:5e:00:00:00/ff:ff:ff:80:00:00 -j police --set-mode pkt --set-rate 100 --set-burst 100
+-A $INGRESS_CHAIN -j police --set-mode pkt --set-rate 100 --set-burst 100
