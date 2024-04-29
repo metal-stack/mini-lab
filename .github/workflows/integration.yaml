@@ -57,6 +57,11 @@ jobs:
         push: true
         tags: ${{ env.MINI_LAB_SONIC_IMAGE }}
 
+    - name: Runner Cleanup
+      shell: bash
+      run: |
+        ./test/ci-cleanup.sh
+
     - name: Cache
       uses: actions/cache@v4
       with:
@@ -67,7 +72,6 @@ jobs:
     - name: Run integration tests
       shell: bash
       run: |
-        ./test/ci-cleanup.sh
         ./test/integration.sh
       env:
         DOCKER_HUB_USER: ${{ secrets.DOCKER_HUB_USER }}
