@@ -1,7 +1,7 @@
 ---
 - name: configure leaf
   include_role:
-    name: router
+    name: metal-roles/partition/roles/router
   vars:
     router_enable_static_route_leak: true
 
