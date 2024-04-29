@@ -14,8 +14,8 @@ RUN apt-get update && \
         python3-guestfs \
         qemu-system-x86 \
         telnet \
-        tini
-RUN curl --location --output - "${SONIC_REMOTE_IMG}" | gunzip > sonic-vs.img
+        tini && \
+    curl --location --output - "${SONIC_REMOTE_IMG}" | gunzip > sonic-vs.img
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
 
