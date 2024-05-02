@@ -17,14 +17,6 @@
 
 - name: Configure Cumulus switches
   hosts: leaves:&cumulus
-  roles:
-    - name: leaf
-      tags: leaf
-    - name: internet
-      tags: internet
-
-- name: Deploy docker on Cumulus switches
-  hosts: leaves:&cumulus
   pre_tasks:
     # the following task is not required as long as we do not install something from the cumulus repositories, for which all the keys are expired now
     # the one from here has also expired on 9th Apr 2024: https://docs.nvidia.com/networking-ethernet-software/knowledge-base/Installing-and-Upgrading/Upgrading/Update-Expired-GPG-Keys/#package-upgrade-from-cumulus-linux-37x-to-3716
@@ -38,6 +30,8 @@
     - name: install apt-transport
       shell: dpkg -i /root/https-deps/*.deb && apt-get install -fy
   roles:
+    - name: cumulus
+      tags: cumulus
     - name: metal-roles/partition/roles/docker-on-cumulus
       tags: docker-on-cumulus
 

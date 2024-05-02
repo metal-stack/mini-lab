@@ -12,7 +12,7 @@
     src: internet.intf.j2
     dest: /etc/network/interfaces.d/internet.intf
 
-# add the vniInternet inferface to the bridge and configure the new vid at the bridge
+# add the vniInternet interface to the bridge and configure the new vid at the bridge
 # otherwise ifreload will not work
 - name: add internet vni to bridge
   command: net add bridge bridge ports vniInternet

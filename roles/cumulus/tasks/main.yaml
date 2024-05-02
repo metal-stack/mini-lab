@@ -1,9 +1,5 @@
 ---
-- name: configure leaf
-  include_role:
-    name: router
-  vars:
-    router_enable_static_route_leak: true
+- import_tasks: router.yaml
 
 - name: flush handlers
   meta: flush_handlers
@@ -31,3 +27,5 @@
     src: bridgemac.json
     dest: /etc/network/ifupdown2/policy.d/bridgemac.json
   notify: reload interfaces
+
+- import_tasks: internet.yaml
