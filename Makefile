@@ -80,7 +80,9 @@ partition: partition-bake
 .PHONY: partition-bake
 partition-bake:
 	docker pull $(MINI_LAB_VM_IMAGE)
-
+ifeq ($(MINI_LAB_FLAVOR),sonic)
+	docker pull $(MINI_LAB_SONIC_IMAGE)
+endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
 		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
