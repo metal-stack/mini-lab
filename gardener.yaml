@@ -1,0 +1,169 @@
+---
+- name: Deploy Gardener
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Get control plane node details
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Node
+        name: metal-control-plane-control-plane
+      register: control_plane_node
+      failed_when:
+        - control_plane_node.resources | length != 1
+        - control_plane_node.resources[0].get('status', {}).get('addresses') is not defined
+
+    - name: Extract InternalIP address
+      set_fact:
+        control_plane_ip: "{{ item.address }}"
+      loop: "{{ control_plane_node.resources[0].status.addresses }}"
+      when: item.type == 'InternalIP'
+
+    - name: Add external virtual garden domain to coredns
+      kubernetes.core.k8s:
+        state: present
+        template: 'coredns-config.j2'
+        apply: yes
+
+    - name: Create garden namespace
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: garden
+            annotations:
+              namespace.gardener.cloud/keep-after-project-deletion: "true"
+            labels:
+              gardener.cloud/role: project
+              project.gardener.cloud/name: garden
+        apply: yes
+
+    # TODO: The directory has to exist for the virtual-garden-etcd-main-0. Find a better solution.
+    - name: Create backup directory for gardener operator
+      community.docker.docker_container_exec:
+        container: metal-control-plane-control-plane
+        command: /bin/mkdir -p /var/backups/gardener-operator
+
+    - name: Deploy Gardener Operator
+      kubernetes.core.helm:
+        name: gardener-operator
+        chart_ref: https://github.com/gardener-community/gardener-charts/releases/download/gardener-operator-1.88.3/gardener-operator-1.88.3.tgz
+        namespace: garden
+        create_namespace: true
+        values:
+          env:
+            - name: GARDENER_OPERATOR_LOCAL
+              value: "true"
+        wait: true
+
+    - name: Deploy Virtual Garden
+      kubernetes.core.k8s:
+        definition: "{{ lookup('kubernetes.core.kustomize', dir='files/garden') }}"
+        apply: true
+
+    - name: Wait until Virtual Garden API Server is available
+      kubernetes.core.k8s_info:
+        api_version: operator.gardener.cloud/v1alpha1
+        kind: Garden
+        name: local
+        wait: yes
+        wait_condition:
+          reason: HealthzRequestSucceeded
+          status: "True"
+          type: VirtualGardenAPIServerAvailable
+        wait_timeout: 600
+
+    - name: Wait until Virtual Components are healthy
+      kubernetes.core.k8s_info:
+        api_version: operator.gardener.cloud/v1alpha1
+        kind: Garden
+        name: local
+        wait: yes
+        wait_condition:
+          reason: VirtualComponentsRunning
+          status: "True"
+          type: VirtualComponentsHealthy
+        wait_timeout: 180
+
+    - name: Get kubeconfig for virtual garden
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Secret
+        name: gardener
+        namespace: garden
+      register: virtual_garden_kubeconfig_secret
+      failed_when:
+        - virtual_garden_kubeconfig_secret.resources | length != 1
+        - virtual_garden_kubeconfig_secret.resources[0].get('data', {}).get('kubeconfig') is not defined
+
+    - name: Add port 30443 to virtual garden server url
+      ansible.builtin.set_fact:
+        virtual_garden_kubeconfig: "{{ kubeconfig | ansible.builtin.combine(new_clusters, recursive=true) }}"
+      vars:
+        kubeconfig: "{{ virtual_garden_kubeconfig_secret.resources[0].data.kubeconfig | b64decode | from_yaml }}"
+        new_clusters:
+          clusters:
+            - cluster:
+                certificate-authority-data: "{{ kubeconfig.clusters[0].cluster['certificate-authority-data'] }}"
+                server: "{{ kubeconfig.clusters[0].cluster['server'] }}:30443"
+              name: "{{ kubeconfig.clusters[0].name }}"
+
+    - name: Create locally virtual garden kubeconfig
+      ansible.builtin.copy:
+        content: "{{ virtual_garden_kubeconfig | to_nice_yaml }}"
+        dest: .virtual_garden_kubeconfig
+        mode: '0755'
+
+    - name: Add seed secret
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: gardener-seed-kubeconfig
+            namespace: garden
+          type: Opaque
+          data:
+            kubeconfig: "{{ lookup('ansible.builtin.file', '.kubeconfig') | b64encode }}"
+        kubeconfig: "{{ virtual_garden_kubeconfig }}"
+        apply: yes
+
+    - name: Deploy local provider for backups and dns
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('kubernetes.core.kustomize', dir='files/provider-local') }}"
+        kubeconfig: "{{ virtual_garden_kubeconfig }}"
+        apply: true
+
+    - name: Deploy metal provider
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('kubernetes.core.kustomize', dir='files/provider-metal') }}"
+        kubeconfig: "{{ virtual_garden_kubeconfig }}"
+        apply: true
+
+    - name: Deploy Gardenerlet
+      kubernetes.core.helm:
+        name: gardenlet
+        chart_ref: https://github.com/gardener-community/gardener-charts/releases/download/gardenlet-1.88.3/gardenlet-1.88.3.tgz
+        namespace: garden
+        values_files:
+          - files/gardenlet-values.yaml
+        wait: true
+
+    - name: Wait until Seed System Components are healthy
+      kubernetes.core.k8s_info:
+        api_version: operator.gardener.cloud/v1beta1
+        kind: Seed
+        name: local
+        kubeconfig: "{{ virtual_garden_kubeconfig }}"
+        wait: yes
+        wait_condition:
+          reason: SystemComponentsRunning
+          status: "True"
+          type: SeedSystemComponentsHealthy
+        wait_timeout: 180

@@ -1,0 +1,37 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - https://raw.githubusercontent.com/gardener/gardener/v1.88.3/example/gardener-local/controlplane/domain-secrets.yaml
+  - https://raw.githubusercontent.com/gardener/gardener/v1.88.3/example/gardener-local/gardenlet/secret-bootstrap-token.yaml
+  - https://raw.githubusercontent.com/gardener/gardener/v1.88.3/example/provider-local/garden/base/controller-registration.yaml
+  - https://raw.githubusercontent.com/gardener/gardener/v1.88.3/example/provider-local/garden/base/project.yaml
+  - https://raw.githubusercontent.com/gardener/gardener/v1.88.3/example/provider-local/garden/base/secret-backup.yaml
+#  - https://raw.githubusercontent.com/gardener/gardener/v1.88.3/example/provider-local/garden/base/secretbinding.yaml
+  - https://raw.githubusercontent.com/gardener/gardener-extension-networking-calico/v1.34.1/example/controller-registration.yaml
+
+patches:
+  - patch: |
+      - op: replace
+        path: /providerConfig/values/image
+        value: docker.io/robertvolkmann/gardener-extensions-provider-local:v1.88.3
+    target:
+      group: core.gardener.cloud
+      version: v1beta1
+      kind: ControllerDeployment
+      name: provider-local
+  - patch: |
+      - op: replace
+        path: /spec/resources
+        value:
+          - kind: BackupBucket
+            type: local
+          - kind: BackupEntry
+            type: local
+          - kind: DNSRecord
+            type: local
+    target:
+      group: core.gardener.cloud
+      version: v1beta1
+      kind: ControllerRegistration
+      name: provider-local

@@ -1,11 +1,21 @@
-kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
+kind: Cluster
 networking:
   apiServerPort: 6443
   apiServerAddress: 0.0.0.0
+  # TODO: Can be removed after using gardner containing https://github.com/gardener/gardener/pull/9763
+  # The gardener operator set the hard-coded cluster ip 10.2.10.2 to virtual-garden-kube-apiserver
+  podSubnet: 10.1.0.0/16
+  serviceSubnet: 10.2.0.0/16
+#  disableDefaultCNI: true
 nodes:
 - role: control-plane
+#  labels:
+#    topology.kubernetes.io/zone: "0"
   extraPortMappings:
+  - containerPort: 30443
+    hostPort: 30443
+    listenAddress: 0.0.0.0
   - containerPort: 4443
     hostPort: 4443
     listenAddress: 0.0.0.0

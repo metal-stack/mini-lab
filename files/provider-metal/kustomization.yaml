@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - cloudprofile.yaml
+  - secretbinding.yaml
+  - https://raw.githubusercontent.com/metal-stack/gardener-extension-provider-metal/master/example/controller-registration.yaml
+  - https://raw.githubusercontent.com/metal-stack/os-metal-extension/master/example/controller-registration.yaml
+
+patches:
+  - patch: |
+      - op: replace
+        path: /providerConfig/values/image/tag
+        value: latest
+    target:
+      group: core.gardener.cloud
+      version: v1beta1
+      kind: ControllerDeployment
+      name: provider-metal
+  - patch: |
+      - op: replace
+        path: /providerConfig/values/image/tag
+        value: latest
+    target:
+      group: core.gardener.cloud
+      version: v1beta1
+      kind: ControllerDeployment
+      name: os-metal
