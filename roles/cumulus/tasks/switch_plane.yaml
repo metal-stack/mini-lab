@@ -1,0 +1,14 @@
+---
+- name: render ports.conf
+  template:
+    src: ports.conf.j2
+    dest: /etc/cumulus/ports.conf
+  notify: restart switchd
+
+- name: enable static route leak to apply hardware support
+  replace:
+    path: /etc/cumulus/switchd.conf
+    regexp: '#vrf_route_leak_enable = FALSE'
+    replace: 'vrf_route_leak_enable = TRUE'
+  when: router_enable_static_route_leak
+  notify: restart switchd

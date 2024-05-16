@@ -14,23 +14,16 @@ CONTAINERLAB=$(shell which containerlab)
 # extra vars can be used by projects that built on the mini-lab, which want to override default configuration
 ANSIBLE_EXTRA_VARS_FILE := $(or $(ANSIBLE_EXTRA_VARS_FILE),)
 
-MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),default)
+MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),sonic)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
 MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
 
 MACHINE_OS=ubuntu-22.04
 MAX_RETRIES := 10
 
-# Check: https://sonic-build.azurewebsites.net/ui/sonic/pipelines
-SONIC_REMOTE_IMG := https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=202211&platform=vs&target=target%2Fsonic-vs.img.gz
-
 # Machine flavors
-ifeq ($(MINI_LAB_FLAVOR),default)
+ifeq ($(MINI_LAB_FLAVOR),cumulus)
 LAB_MACHINES=machine01,machine02
-LAB_TOPOLOGY=mini-lab.cumulus.yaml
-VRF=vrf20
-else ifeq ($(MINI_LAB_FLAVOR),cluster-api)
-LAB_MACHINES=machine01,machine02,machine03
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
 VRF=vrf20
 else ifeq ($(MINI_LAB_FLAVOR),sonic)
@@ -89,7 +82,10 @@ partition: partition-bake
 
 .PHONY: partition-bake
 partition-bake:
-	# docker pull $(MINI_LAB_VM_IMAGE)
+	docker pull $(MINI_LAB_VM_IMAGE)
+ifeq ($(MINI_LAB_FLAVOR),sonic)
+	docker pull $(MINI_LAB_SONIC_IMAGE)
+endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
 		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
@@ -131,7 +127,8 @@ cleanup-control-plane:
 .PHONY: cleanup-partition
 cleanup-partition:
 	mkdir -p clab-mini-lab
-	sudo $(CONTAINERLAB) destroy --topo $(LAB_TOPOLOGY)
+	sudo $(CONTAINERLAB) destroy --topo mini-lab.cumulus.yaml
+	sudo $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
 
 .PHONY: _privatenet
 _privatenet: env
@@ -150,6 +147,19 @@ ls: env
 	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine ls
 
 ## SWITCH MANAGEMENT ##
+
+.PHONY: ssh-leafconfig
+ssh-leafconfig:
+	@grep "Host leaf01" ~/.ssh/config || echo -e "Host leaf01\n    StrictHostKeyChecking no\n    IdentityFile $(shell pwd)/files/ssh/id_rsa\n" >>~/.ssh/config
+	@grep "Host leaf02" ~/.ssh/config || echo -e "Host leaf02\n    StrictHostKeyChecking no\n    IdentityFile $(shell pwd)/files/ssh/id_rsa\n" >>~/.ssh/config
+
+.PHONY: docker-leaf01
+docker-leaf01:
+	@echo "export DOCKER_HOST=ssh://root@leaf01/var/run/docker.sock"
+
+.PHONY: docker-leaf02
+docker-leaf02:
+	@echo "export DOCKER_HOST=ssh://root@leaf02/var/run/docker.sock"
 
 .PHONY: ssh-leaf01
 ssh-leaf01:
@@ -258,6 +268,3 @@ dev-env:
 	@echo "export METALCTL_API_URL=http://api.172.17.0.1.nip.io:8080/metal"
 	@echo "export METALCTL_HMAC=metal-admin"
 	@echo "export KUBECONFIG=$(KUBECONFIG)"
-
-sonic-vs.img:
-	curl --location --output - "${SONIC_REMOTE_IMG}" | gunzip > sonic-vs.img
