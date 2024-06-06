@@ -27,6 +27,9 @@ LAB_TOPOLOGY=mini-lab.cumulus.yaml
 else ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.sonic.yaml
+else ifeq ($(MINI_LAB_FLAVOR),mixed)
+LAB_MACHINES=machine01,machine02
+LAB_TOPOLOGY=mini-lab.mixed.yaml
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
@@ -121,9 +124,9 @@ cleanup-control-plane:
 
 .PHONY: cleanup-partition
 cleanup-partition:
-	mkdir -p clab-mini-lab
 	sudo $(CONTAINERLAB) destroy --topo mini-lab.cumulus.yaml
 	sudo $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
+	sudo $(CONTAINERLAB) destroy --topo mini-lab.mixed.yaml
 
 .PHONY: _privatenet
 _privatenet: env
