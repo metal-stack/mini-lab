@@ -18,7 +18,7 @@ MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),sonic)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
 MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
 
-MACHINE_OS=ubuntu-22.04
+MACHINE_OS=ubuntu-24.04
 
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
