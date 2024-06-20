@@ -4,7 +4,6 @@
 # Commands
 YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:4
 
-KINDCONFIG := $(or $(KINDCONFIG),control-plane/kind.yaml)
 KUBECONFIG := $(shell pwd)/.kubeconfig
 
 MKE2FS_CONFIG := $(shell pwd)/mke2fs.conf
@@ -31,11 +30,6 @@ else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
 
-KIND_ARGS=
-ifneq ($(K8S_VERSION),)
-KIND_ARGS=--image kindest/node:v$(K8S_VERSION)
-endif
-
 ifeq ($(CI),true)
   DOCKER_COMPOSE_TTY_ARG=-T
 else
@@ -43,7 +37,7 @@ else
 endif
 
 .PHONY: up
-up: env control-plane-bake partition-bake
+up: env partition-bake
 	@chmod 600 files/ssh/id_rsa
 	docker compose up --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
@@ -61,17 +55,8 @@ restart: down up
 down: cleanup
 
 .PHONY: control-plane
-control-plane: control-plane-bake env
+control-plane: env
 	docker compose up --remove-orphans --force-recreate control-plane
-
-.PHONY: control-plane-bake
-control-plane-bake:
-	@if ! which kind > /dev/null; then echo "kind needs to be installed"; exit 1; fi
-	@if ! kind get clusters | grep metal-control-plane > /dev/null; then \
-		kind create cluster $(KIND_ARGS) \
-			--name metal-control-plane \
-			--config $(KINDCONFIG) \
-			--kubeconfig $(KUBECONFIG); fi
 
 .PHONY: partition
 partition: partition-bake
@@ -117,15 +102,14 @@ cleanup: cleanup-control-plane cleanup-partition
 
 .PHONY: cleanup-control-plane
 cleanup-control-plane:
-	kind delete cluster --name metal-control-plane
 	docker compose down
-	rm -f $(KUBECONFIG)
 
 .PHONY: cleanup-partition
 cleanup-partition:
 	mkdir -p clab-mini-lab
 	sudo $(CONTAINERLAB) destroy --topo mini-lab.cumulus.yaml
 	sudo $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
+	rm -f $(KUBECONFIG)
 
 .PHONY: _privatenet
 _privatenet: env
