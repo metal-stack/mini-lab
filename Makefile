@@ -4,6 +4,7 @@
 # Commands
 YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:4
 
+USER := $(USER)
 KUBECONFIG := $(shell pwd)/.kubeconfig
 
 MKE2FS_CONFIG := $(shell pwd)/mke2fs.conf
@@ -37,7 +38,7 @@ else
 endif
 
 .PHONY: up
-up: env partition-bake
+up: env only-control-plane only-partition
 	@chmod 600 files/ssh/id_rsa
 	docker compose up --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
@@ -55,21 +56,28 @@ restart: down up
 down: cleanup
 
 .PHONY: control-plane
-control-plane: env
+control-plane: only-control-plane env
 	docker compose up --remove-orphans --force-recreate control-plane
 
 .PHONY: partition
-partition: partition-bake
+partition: only-partition
 	docker compose up --remove-orphans --force-recreate partition
 
-.PHONY: partition-bake
-partition-bake:
+.PHONY: only-control-plane
+only-control-plane:
+	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i metal-control-plane > /dev/null; then \
+		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --node-filter metal-control-plane --reconfigure && \
+		./scripts/deactivate_offloading.sh && \
+		sudo chown $(USER):$(USER) $(KUBECONFIG); fi
+
+.PHONY: only-partition
+only-partition:
 	docker pull $(MINI_LAB_VM_IMAGE)
 ifeq ($(MINI_LAB_FLAVOR),sonic)
 	docker pull $(MINI_LAB_SONIC_IMAGE)
 endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
-		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
+		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --node-filter leaf01,leaf02,inet,vms --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
 
 .PHONY: env
@@ -98,18 +106,23 @@ fwrules: _ips
 	eval "sudo -- iptables -t nat -I LIBVIRT_PRT -s 10.0.1.0/24 ! -d 10.0.1.0/24 -j MASQUERADE"
 
 .PHONY: cleanup
-cleanup: cleanup-control-plane cleanup-partition
+cleanup: cleanup-only-control-plane cleanup-only-partition
 
-.PHONY: cleanup-control-plane
-cleanup-control-plane:
+.PHONY: cleanup-only-control-plane
+cleanup-only-control-plane:
+	docker rm -f metal-control-plane-control-plane
 	docker compose down
-
-.PHONY: cleanup-partition
-cleanup-partition:
-	mkdir -p clab-mini-lab
-	sudo $(CONTAINERLAB) destroy --topo mini-lab.cumulus.yaml
-	sudo $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
 	rm -f $(KUBECONFIG)
+
+.PHONY: cleanup-only-partition
+cleanup-only-partition:
+ifeq ($(MINI_LAB_FLAVOR),cumulus)
+	sudo --preserve-env $(CONTAINERLAB) destroy --topo $(LAB_TOPOLOGY)
+else ifeq ($(MINI_LAB_FLAVOR),sonic)
+	sudo --preserve-env $(CONTAINERLAB) destroy --topo $(LAB_TOPOLOGY) --node-filter leaf01,leaf02,inet,vms
+else
+	$(error Unknown flavor $(MINI_LAB_FLAVOR))
+endif
 
 .PHONY: _privatenet
 _privatenet: env
