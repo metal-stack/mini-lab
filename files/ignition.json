@@ -1,0 +1,25 @@
+{
+  "ignition": {
+    "config": {},
+    "security": {},
+    "timeouts": {},
+    "version": "2.3.0"
+  },
+  "networkd": {},
+  "passwd": {},
+  "storage": {
+    "files": [
+      {
+        "filesystem": "root",
+        "path": "/etc/hosts.allow",
+        "append": true,
+        "contents": {
+          "source": "data:,ALL%3A%20%5Bfe80%3A%3A%5D%2F10%0D%0A",
+          "verification": {}
+        },
+        "mode": 644
+      }
+    ]
+  },
+  "systemd": {}
+}

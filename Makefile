@@ -19,14 +19,17 @@ MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:
 MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
 
 MACHINE_OS=ubuntu-22.04
+MAX_RETRIES := 10
 
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
+VRF=vrf20
 else ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.sonic.yaml
+VRF=Vrf20
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
@@ -122,11 +125,11 @@ _privatenet: env
 
 .PHONY: machine
 machine: _privatenet
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --networks $(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --networks $(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: firewall
 firewall: _ips _privatenet
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --userdata "@/tmp/ignition.json" --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: ls
 ls: env
@@ -211,6 +214,41 @@ console-machine02:
 .PHONY: console-machine03
 console-machine03:
 	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4002
+
+## SSH TARGETS FOR MACHINES ##
+# Python code could be replaced by jq, but it is not preinstalled on Cumulus
+.PHONY: ssh-fw
+ssh-fw:
+	$(eval fw = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp neighbors fw json' | \
+		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
+	))
+	ssh -F files/ssh/config $(fw) $(COMMAND)
+
+.PHONY: ssh-machine
+ssh-machine:
+	$(eval machine = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp vrf $(VRF) neighbors test json' | \
+		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
+	))
+	ssh -F files/ssh/config $(machine) $(COMMAND)
+
+.PHONY: ping-cloudflare
+ping-cloudflare:
+	@echo "Attempting to ping 1.1.1.1..."
+	@for i in $$(seq 1 $(MAX_RETRIES)); do \
+		if $(MAKE) ssh-machine COMMAND="ping -c 1 1.1.1.1" > /dev/null 2>&1; then \
+			echo "Ping successful"; \
+			exit 0; \
+		else \
+			echo "Ping failed"; \
+			if [ $$i -lt $(MAX_RETRIES) ]; then \
+				echo "Retrying in 3 seconds..."; \
+				sleep 3; \
+			else \
+				echo "Max retries reached"; \
+				exit 1; \
+			fi; \
+		fi; \
+	done
 
 ## DEV TARGETS ##
 
