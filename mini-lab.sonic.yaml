@@ -6,6 +6,9 @@ mgmt:
 
 topology:
   nodes:
+    metal-control-plane:
+      kind: k8s-kind
+      startup-config: control-plane/kind.yaml
     leaf01:
       kind: linux
       image: ${MINI_LAB_SONIC_IMAGE}

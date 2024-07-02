@@ -11,8 +11,8 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
 - [Requirements](#requirements)
 - [Known Limitations](#known-limitations)
 - [Try it out](#try-it-out)
-    - [Reinstall machine](#reinstall-machine)
-    - [Free machine](#free-machine)
+  - [Reinstall machine](#reinstall-machine)
+  - [Free machine](#free-machine)
 - [Flavors](#flavors)
 
 <!-- /TOC -->
@@ -22,14 +22,13 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
 - Linux machine with hardware virtualization support
 - kvm as hypervisor for the VMs (you can check through the `kvm-ok` command)
 - [docker](https://www.docker.com/) >= 20.10.13 (for using kind and our deployment base image)
-- [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.20.0 (for hosting the metal control plane)
 - [containerlab](https://containerlab.srlinux.dev/install/) >= v0.47.1
 - the lab creates a docker network on your host machine (`172.17.0.1`), this hopefully does not overlap with other networks you have
 - (recommended) haveged to have enough random entropy (only needed if the PXE process does not work)
 
 Here is some code that should help you to set up most of the requirements:
 
- ```bash
+```bash
 # If UFW enabled.
 # Disable the firewall or allow traffic through Docker network IP range.
 sudo ufw status
@@ -49,20 +48,16 @@ sudo usermod -G docker -a ${USER}
 
 # Install containerlab
 bash -c "$(curl -sL https://get.containerlab.dev)"
-
-# Install kind (kubernetes in docker), for more details see https://kind.sigs.k8s.io/docs/user/quick-start/#installation
-sudo curl -Lo /usr/local/bin/kind "https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64"
-sudo chmod +x /usr/local/bin/kind
 ```
 
 The following ports are used statically on your host machine:
 
 | Port | Bind Address | Description                        |
-|:----:|:------------ |:---------------------------------- |
-| 6443 |   0.0.0.0    | kube-apiserver of the kind cluster |
-| 4443 |   0.0.0.0    | HTTPS ingress                      |
-| 4150 |   0.0.0.0    | nsqd                               |
-| 8080 |   0.0.0.0    | HTTP ingress                       |
+| :--: | :----------- | :--------------------------------- |
+| 6443 | 0.0.0.0      | kube-apiserver of the kind cluster |
+| 4443 | 0.0.0.0      | HTTPS ingress                      |
+| 4150 | 0.0.0.0      | nsqd                               |
+| 8080 | 0.0.0.0      | HTTP ingress                       |
 
 ## Known Limitations
 
@@ -111,7 +106,7 @@ make firewall
 make machine
 ```
 
-__Alternatively__, you may want to issue the `metalctl` commands on your own:
+**Alternatively**, you may want to issue the `metalctl` commands on your own:
 
 ```bash
 docker compose run --rm metalctl network allocate \
