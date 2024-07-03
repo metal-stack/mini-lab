@@ -20,10 +20,10 @@ metal_api_images:
   url: https://images.metal-stack.io/metal-os/{{ metal_api_latest_os_image_release_name }}/firewall/3.0-ubuntu/img.tar.lz4
   features:
     - firewall
-- id: ubuntu-22.04
-  name: Ubuntu 22.04
-  description: Ubuntu 22.04 Latest Release
-  url: https://images.metal-stack.io/metal-os/{{ metal_api_latest_os_image_release_name }}/ubuntu/22.04/img.tar.lz4
+- id: ubuntu-24.04
+  name: Ubuntu 24.04
+  description: Ubuntu 24.04 Latest Release
+  url: https://images.metal-stack.io/metal-os/{{ metal_api_latest_os_image_release_name }}/ubuntu/24.04/img.tar.lz4
   features:
     - machine
 

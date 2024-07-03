@@ -21,9 +21,9 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
 
 - Linux machine with hardware virtualization support
 - kvm as hypervisor for the VMs (you can check through the `kvm-ok` command)
-- [docker](https://www.docker.com/) >= 20.10.13 (for using kind and our deployment base image)
-- [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.20.0 (for hosting the metal control plane)
-- [containerlab](https://containerlab.srlinux.dev/install/) >= v0.47.1
+- [docker](https://www.docker.com/) >= 24.x.y (for using kind and our deployment base image)
+- [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.23.0 (for hosting the metal control plane)
+- [containerlab](https://containerlab.dev/install/) >= v0.55.0
 - the lab creates a docker network on your host machine (`172.17.0.1`), this hopefully does not overlap with other networks you have
 - (recommended) haveged to have enough random entropy (only needed if the PXE process does not work)
 
