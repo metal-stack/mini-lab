@@ -24,7 +24,7 @@ topology:
         - files/ssh/id_rsa.pub:/authorized_keys
     inet:
       kind: linux
-      image: quay.io/frrouting/frr:9.1.0
+      image: quay.io/frrouting/frr:10.0.1
       binds:
         - files/inet/daemons:/etc/frr/daemons
         - files/inet/frr.conf:/etc/frr/frr.conf

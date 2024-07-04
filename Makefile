@@ -18,7 +18,7 @@ MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),sonic)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
 MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
 
-MACHINE_OS=ubuntu-22.04
+MACHINE_OS=ubuntu-24.04
 
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
@@ -103,17 +103,6 @@ _ips:
 .PHONY: route
 route: _ips
 	eval "sudo ip r a ${staticR}"
-
-# there is no libvirt required anymore and thus following rules will not work on systems without
-# TODO: discuss what to do instead?
-.PHONY: fwrules
-fwrules: _ips
-	eval "sudo -- iptables -I LIBVIRT_FWO -s 100.255.254.0/24 -i docker0 -j ACCEPT;"
-	eval "sudo -- iptables -I LIBVIRT_FWO -s 10.0.1.0/24 -i docker0 -j ACCEPT;"
-	eval "sudo -- iptables -I LIBVIRT_FWI -d 100.255.254.0/24 -o docker0 -j ACCEPT;"
-	eval "sudo -- iptables -I LIBVIRT_FWI -d 10.0.1.0/24 -o docker0 -j ACCEPT;"
-	eval "sudo -- iptables -t nat -I LIBVIRT_PRT -s 100.255.254.0/24 ! -d 100.255.254.0/24 -j MASQUERADE"
-	eval "sudo -- iptables -t nat -I LIBVIRT_PRT -s 10.0.1.0/24 ! -d 10.0.1.0/24 -j MASQUERADE"
 
 .PHONY: cleanup
 cleanup: cleanup-control-plane cleanup-partition
