@@ -33,4 +33,5 @@
       - chmod
       - "0755"
       - frr-reload
+      - frr-reload.py
     chdir: /usr/lib/frr
