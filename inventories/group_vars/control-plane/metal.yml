@@ -63,6 +63,16 @@ metal_api_networks:
   partitionid: mini-lab
   prefixes:
   - 10.0.0.0/16
+- id: tenant-super-network-ipv6-mini-lab
+  name: "Project Super Network IPv6"
+  description: "Super network of all project networks"
+  nat: false
+  privatesuper: true
+  underlay: false
+  destinationprefixes: []
+  partitionid: mini-lab
+  prefixes:
+  - fd00:000a::/48
 - id: internet-mini-lab
   name: "Virtual Internet Network"
   description: "Virtual Internet Network for mini-lab"
@@ -78,6 +88,18 @@ metal_api_networks:
   labels:
     network.metal-stack.io/default: ""
     network.metal-stack.io/default-external: ""
+- id: internet-ipv6-mini-lab
+  name: "Virtual Internet Network IPv6"
+  description: "Virtual Internet Network for mini-lab"
+  nat: true
+  privatesuper: false
+  underlay: false
+  destinationprefixes:
+    - ::/0
+  partitionid: "mini-lab"
+  vrf: 106009
+  prefixes:
+  - fd00:000b::/48
 - id: underlay-mini-lab
   name: "Underlay Network"
   description: "Underlay Network for mini-lab"
