@@ -61,6 +61,7 @@ metal_api_networks:
   underlay: false
   destinationprefixes: []
   partitionid: mini-lab
+  childprefixlength: 22
   prefixes:
   - 10.0.0.0/16
 - id: tenant-super-network-ipv6-mini-lab
@@ -71,6 +72,7 @@ metal_api_networks:
   underlay: false
   destinationprefixes: []
   partitionid: mini-lab
+  childprefixlength: 64
   prefixes:
   - fd00:000a::/48
 - id: internet-mini-lab
