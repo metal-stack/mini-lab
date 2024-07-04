@@ -26,12 +26,12 @@
       - frr-reload
     chdir: /usr/lib/frr
 
-- name: Change frr-reload file permissions
+- name: Change frr file permissions
   community.docker.docker_container_exec:
     container: bgp
     argv:
       - chmod
       - "0755"
-      - frr-reload
       - frr-reload.py
+      - frr-reload
     chdir: /usr/lib/frr
