@@ -14,6 +14,10 @@ vrf vrfInternet
  vni 104009
  ip route 0.0.0.0/0 172.17.0.1 nexthop-vrf mgmt
 exit-vrf
+vrf vrfInternet6
+ vni 106009
+ ip route ::/0 2001:db8:1::1 nexthop-vrf mgmt
+exit-vrf
 {{- range $vrf, $t := .Ports.Vrfs }}
 !
 vrf vrf{{ $t.VNI }}
@@ -60,6 +64,15 @@ router bgp {{ $ASN }}
  address-family ipv4 unicast
   redistribute connected route-map LOOPBACKS
   neighbor FIREWALL allowas-in 1
+  {{- range $k, $f := .Ports.Firewalls }}
+  neighbor {{ $f.Port }} route-map fw-{{ $k }}-in in
+  {{- end }}
+ exit-address-family
+ !
+ address-family ipv6 unicast
+  redistribute connected route-map LOOPBACKS
+  neighbor FIREWALL allowas-in 2
+  neighbor FIREWALL activate
   {{- range $k, $f := .Ports.Firewalls }}
   neighbor {{ $f.Port }} route-map fw-{{ $k }}-in in
   {{- end }}
@@ -112,6 +125,15 @@ router bgp {{ $ASN }} vrf {{ $vrf }}
   {{- end }}
  exit-address-family
  !
+ address-family ipv6 unicast
+  redistribute connected
+  neighbor MACHINE maximum-prefix 24000
+  neighbor MACHINE activate
+  {{- if gt (len $t.IPPrefixLists) 0 }}
+  neighbor MACHINE route-map {{ $vrf }}-in6 in
+  {{- end }}
+ exit-address-family
+ !
  address-family l2vpn evpn
   advertise ipv4 unicast
  exit-address-family
@@ -136,6 +158,11 @@ router bgp {{ $ASN }} vrf vrfInternet
  address-family ipv4 unicast
   import vrf mgmt
   network 0.0.0.0/0
+ exit-address-family
+ !
+ address-family ipv6 unicast
+  import vrf mgmt
+  network ::/0
  exit-address-family
  !
  address-family l2vpn evpn

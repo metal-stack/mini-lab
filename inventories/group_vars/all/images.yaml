@@ -9,7 +9,7 @@ metal_stack_release_version: develop
 # metal_api_image_name:
 metal_api_image_tag: ipv6-support
 # metal_metalctl_image_name:
-# metal_metalctl_image_tag:
+metal_metalctl_image_tag: 252-ipv6-support
 # metal_masterdata_api_image_name:
 # metal_masterdata_api_image_tag:
 # metal_console_image_name:
@@ -19,6 +19,7 @@ metal_api_image_tag: ipv6-support
 # further overrides can be looked up in the metal-role projects where the mapping is defined:
 # https://github.com/metal-stack/metal-roles/blob/master/defaults/main.yaml
 
+metal_core_image_tag: ipv6-support
 ##
 ## for ansible roles
 ##
