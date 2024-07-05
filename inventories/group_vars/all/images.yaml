@@ -19,6 +19,7 @@ metal_stack_release_version: develop
 # further overrides can be looked up in the metal-role projects where the mapping is defined:
 # https://github.com/metal-stack/metal-roles/blob/master/defaults/main.yaml
 
+metal_core_image_tag: configure-vlan
 ##
 ## for ansible roles
 ##
@@ -26,3 +27,6 @@ metal_stack_release_version: develop
 # ansible_common_version:
 # metal_roles_version:
 # metal_ansible_modules_version:
+
+metal_roles_version: configure-metal-core-vlan
+metal_core_pxe_vlan_id: 966

@@ -1,6 +1,6 @@
 ---
 dhcp_listening_interfaces:
-  - Vlan4000
+  - "Vlan{{ metal_core_pxe_vlan_id }}"
 
 metal_core_spine_uplinks:
   - Ethernet0
@@ -22,7 +22,7 @@ sonic_nameservers:
 sonic_ip_masquerade: true
 
 sonic_vlans:
-  - id: 4000
+  - id: "{{ metal_core_pxe_vlan_id }}"
     ip: "{{ metal_core_cidr }}"
 
 # Dummy VTEP so that basic VXLAN config will be deployed by sonic role:
