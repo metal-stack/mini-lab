@@ -22,5 +22,7 @@
       tags: ipam-db
     - name: metal-roles/control-plane/roles/masterdata-db
       tags: masterdata-db
+    - name: metal-roles/control-plane/roles/auditing-meili
+      tags: auditing
     - name: metal-roles/control-plane/roles/metal
       tags: metal

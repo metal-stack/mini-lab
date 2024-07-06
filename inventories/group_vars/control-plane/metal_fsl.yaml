@@ -14,7 +14,8 @@ metal_api_filesystemlayouts:
       device: "/dev/vda1"
       format: "vfat"
       createoptions:
-      - "-F 32"
+      - "-F"
+      - "32"
       label: "efi"
     - path: "/"
       device: "/dev/vda2"
@@ -55,7 +56,8 @@ metal_api_filesystemlayouts:
       device: "/dev/vda1"
       format: "vfat"
       createoptions:
-        - "-F 32"
+        - "-F"
+        - "32"
       label: "efi"
     - path: "/"
       device: "/dev/vda2"
@@ -107,7 +109,8 @@ metal_api_filesystemlayouts:
       device: "/dev/vda1"
       format: "vfat"
       createoptions:
-        - "-F 32"
+        - "-F"
+        - "32"
       label: "efi"
     - path: "/"
       device: "/dev/vda2"

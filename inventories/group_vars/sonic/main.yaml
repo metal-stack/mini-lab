@@ -1,0 +1,34 @@
+---
+dhcp_listening_interfaces:
+  - Vlan4000
+
+metal_core_spine_uplinks:
+  - Ethernet0
+
+sonic_docker_routing_config_mode: split-unified
+sonic_frr_mgmt_framework_config: false
+
+sonic_loopback_address: "{{ lo }}"
+sonic_mgmtif_ip: "{{ ansible_host }}/16`"
+sonic_mgmtif_gateway: "172.17.0.1"
+
+sonic_mgmt_vrf: false
+
+sonic_nameservers:
+  - "172.17.0.1"
+  - "1.1.1.1"
+  - "1.0.0.1"
+
+sonic_ip_masquerade: true
+
+sonic_vlans:
+  - id: 4000
+    ip: "{{ metal_core_cidr }}"
+
+# Dummy VTEP so that basic VXLAN config will be deployed by sonic role:
+sonic_vteps:
+- comment: Dummy
+  vlan: Vlan3999
+  vni: 103999
+
+metal_core_cidr_mask: 25

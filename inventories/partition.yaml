@@ -14,22 +14,24 @@ leaves:
     leaf01:
       lo: 10.0.0.11
       asn: 4200000011
-      metal_core_cidr: 10.0.1.1/24
+      metal_core_cidr: 10.0.1.1/{{ metal_core_cidr_mask }}
 
-      dhcp_net: 10.0.1.0
-      dhcp_netmask: 255.255.255.0
-      dhcp_range_min: 10.0.1.2
-      dhcp_range_max: 10.0.1.255
+      dhcp_default_lease_time: 600
+      dhcp_max_lease_time: 600
+      dhcp_subnets:
+        - network: 10.0.1.0
+          netmask: 255.255.255.0
+          range:
+            begin: 10.0.1.2
+            end: 10.0.1.255
+          options:
+            - routers {{ dhcp_server_ip }}
+            - domain-name-servers 1.1.1.1, 8.8.8.8
     leaf02:
       lo: 10.0.0.12
       asn: 4200000012
-      metal_core_cidr: 10.0.1.128/24
+      metal_core_cidr: 10.0.1.128/{{ metal_core_cidr_mask }}
   vars:
-    ports:
-      1: 100G
-    interfaces:
-    - name: swp1
-    uplinks: []
     pixie_server_ip: 10.0.1.1
     dhcp_server_ip: 10.0.1.1
 
@@ -37,9 +39,7 @@ leaves:
     ansible_user: root
     ansible_ssh_private_key_file: "{{ playbook_dir }}/files/ssh/id_rsa"
 
-    # The best practice recommendation is to set an MTU of 9,216 for the inter-switch links,
-    # and an MTU of 9,000 for the server-facing ports, which don’t carry the VXLAN header.
-    # See: EVPN in the Data center (D. Dutt, p.77)
-    mtu:
-      vxlan: 9216
-      default: 9000
+cumulus:
+  vars:
+    router_enable_static_route_leak: true
+sonic:

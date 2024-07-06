@@ -1,0 +1,31 @@
+---
+- import_tasks: router.yaml
+
+- name: flush handlers
+  meta: flush_handlers
+
+- name: masquerade for eth0
+  iptables:
+    table: nat
+    chain: POSTROUTING
+    out_interface: eth0
+    jump: MASQUERADE
+
+- name: check for static route in mgmt vrf
+  command: ip r s vrf mgmt
+  register: route_check
+  changed_when: false
+
+- name: ensure that static route for return path to pxe network is present
+  command: "ip r a 10.0.1.0/24 vrf mgmt via {{ dhcp_server_ip }} dev vlan4000"
+  when:
+    - '"10.0.1.0/24" not in route_check.stdout'
+    - dhcp_server_ip is defined
+
+- name: create bridgemac.json
+  copy:
+    src: bridgemac.json
+    dest: /etc/network/ifupdown2/policy.d/bridgemac.json
+  notify: reload interfaces
+
+- import_tasks: internet.yaml

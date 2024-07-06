@@ -1,0 +1,37 @@
+---
+- name: Wait until the bgpd is up
+  ansible.builtin.wait_for:
+    port: 2605
+    state: started
+
+- name: Download frr-reload.py
+  community.docker.docker_container_exec:
+    container: bgp
+    argv:
+      - curl
+      - --location
+      - "{{ frr_python_url }}"
+      - --output
+      - frr-reload.py
+    chdir: /usr/lib/frr
+
+- name: Download frr-reload
+  community.docker.docker_container_exec:
+    container: bgp
+    argv:
+      - curl
+      - --location
+      - "{{ frr_url }}"
+      - --output
+      - frr-reload
+    chdir: /usr/lib/frr
+
+- name: Change frr file permissions
+  community.docker.docker_container_exec:
+    container: bgp
+    argv:
+      - chmod
+      - "0755"
+      - frr-reload.py
+      - frr-reload
+    chdir: /usr/lib/frr

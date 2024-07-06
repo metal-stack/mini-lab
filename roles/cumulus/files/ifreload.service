@@ -1,0 +1,10 @@
+[Unit]
+Description=Trigger Interface Reload with ifreload
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/ifreload -v -a
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target

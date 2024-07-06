@@ -1,0 +1,49 @@
+name: mini-lab
+prefix: ""
+
+mgmt:
+  network: bridge
+
+topology:
+  nodes:
+    leaf01:
+      kind: linux
+      image: ${MINI_LAB_SONIC_IMAGE}
+      labels:
+        ansible-group: sonic
+      binds:
+        - /dev:/dev
+        - files/ssh/id_rsa.pub:/authorized_keys
+    leaf02:
+      kind: linux
+      image: ${MINI_LAB_SONIC_IMAGE}
+      labels:
+        ansible-group: sonic
+      binds:
+        - /dev:/dev
+        - files/ssh/id_rsa.pub:/authorized_keys
+    inet:
+      kind: linux
+      image: quay.io/frrouting/frr:10.0.1
+      binds:
+        - files/inet/daemons:/etc/frr/daemons
+        - files/inet/frr.conf:/etc/frr/frr.conf
+        - files/inet/vtysh.conf:/etc/frr/vtysh.conf
+        - files/inet/network.sh:/root/network.sh
+      exec:
+        - sh /root/network.sh
+    vms:
+      kind: linux
+      image: ${MINI_LAB_VM_IMAGE}
+      binds:
+        - /dev:/dev
+        - scripts:/mini-lab
+  links:
+    - endpoints: ["leaf01:eth1", "inet:eth1"]
+    - endpoints: ["leaf02:eth1", "inet:eth2"]
+    - endpoints: ["leaf01:eth2", "vms:lan0"]
+    - endpoints: ["leaf02:eth2", "vms:lan1"]
+    - endpoints: ["leaf01:eth3", "vms:lan2"]
+    - endpoints: ["leaf02:eth3", "vms:lan3"]
+    - endpoints: ["leaf01:eth4", "vms:lan4"]
+    - endpoints: ["leaf02:eth4", "vms:lan5"]
