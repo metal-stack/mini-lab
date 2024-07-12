@@ -19,7 +19,7 @@ MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:
 MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
 
 MACHINE_OS=ubuntu-24.04
-MAX_RETRIES := 10
+MAX_RETRIES := 20
 
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
@@ -235,7 +235,7 @@ ssh-machine:
 ping-cloudflare:
 	@echo "Attempting to ping 1.1.1.1..."
 	@for i in $$(seq 1 $(MAX_RETRIES)); do \
-		if $(MAKE) ssh-machine COMMAND="ping -c 1 1.1.1.1" > /dev/null 2>&1; then \
+		if $(MAKE) ssh-machine COMMAND="sudo ping -c 1 1.1.1.1" > /dev/null 2>&1; then \
 			echo "Ping successful"; \
 			exit 0; \
 		else \
