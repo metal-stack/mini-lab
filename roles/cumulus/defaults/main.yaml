@@ -1,5 +1,0 @@
----
-router_enable_mgmt_vrf: true
-router_enable_static_route_leak: false
-
-router_nameservers: []
