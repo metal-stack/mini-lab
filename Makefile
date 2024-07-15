@@ -231,15 +231,15 @@ ssh-machine:
 	))
 	ssh -F files/ssh/config $(machine) $(COMMAND)
 
-.PHONY: ping-cloudflare
-ping-cloudflare:
-	@echo "Attempting to ping 1.1.1.1..."
+.PHONY: connect-to-cloudflare
+connect-to-cloudflare:
+	@echo "Attempting to connect to 1.1.1.1..."
 	@for i in $$(seq 1 $(MAX_RETRIES)); do \
-		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent https://1.1.1.1"; then \
-			echo "Ping successful"; \
+		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent https://1.1.1.1" > /dev/null 2>&1; then \
+			echo "Connected successfully"; \
 			exit 0; \
 		else \
-			echo "Ping failed"; \
+			echo "Connection failed"; \
 			if [ $$i -lt $(MAX_RETRIES) ]; then \
 				echo "Retrying in 3 seconds..."; \
 				sleep 3; \
