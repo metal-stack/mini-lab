@@ -1,4 +1,5 @@
 ---
-branch_name: "202211"
-base_url: "https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName={{ branch_name }}&platform=vs"
-frr_pythontools_url: "{{ base_url }}&target=target%2Fdebs%2Fbullseye%2Ffrr-pythontools_8.2.2-sonic-0_all.deb"
+base_url: "https://raw.githubusercontent.com/FRRouting/frr"
+branch_name: "frr-8.2.2"
+frr_python_url: "{{ base_url }}/{{ branch_name }}/tools/frr-reload.py"
+frr_url: "{{ base_url }}/{{ branch_name }}/tools/frr-reload"

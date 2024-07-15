@@ -4,31 +4,34 @@
     port: 2605
     state: started
 
-- name: Download frr-pythontools
+- name: Download frr-reload.py
   community.docker.docker_container_exec:
     container: bgp
     argv:
       - curl
       - --location
-      - "{{ frr_pythontools_url }}"
+      - "{{ frr_python_url }}"
       - --output
-      - frr-pythontools.deb
-    chdir: /root
+      - frr-reload.py
+    chdir: /usr/lib/frr
 
-- name: Install frr-pythontools
+- name: Download frr-reload
   community.docker.docker_container_exec:
     container: bgp
     argv:
-      - dpkg
-      - -i
-      - frr-pythontools.deb
-    chdir: /root
+      - curl
+      - --location
+      - "{{ frr_url }}"
+      - --output
+      - frr-reload
+    chdir: /usr/lib/frr
 
-- name: Place frr-reload
-  community.docker.docker_container_copy_into:
+- name: Change frr file permissions
+  community.docker.docker_container_exec:
     container: bgp
-    content: |
-      #!/bin/sh
-      exec python3 /usr/lib/frr/frr-reload.py --reload /etc/frr/frr.conf
-    container_path: /usr/lib/frr/frr-reload
-    mode: "0755"
+    argv:
+      - chmod
+      - "0755"
+      - frr-reload.py
+      - frr-reload
+    chdir: /usr/lib/frr
