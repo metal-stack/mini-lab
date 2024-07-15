@@ -235,7 +235,7 @@ ssh-machine:
 ping-cloudflare:
 	@echo "Attempting to ping 1.1.1.1..."
 	@for i in $$(seq 1 $(MAX_RETRIES)); do \
-		if $(MAKE) ssh-machine COMMAND="sudo ping -c 1 1.1.1.1" > /dev/null 2>&1; then \
+		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent https://1.1.1.1"; then \
 			echo "Ping successful"; \
 			exit 0; \
 		else \
