@@ -80,6 +80,7 @@ services:
     volumes:
       - ./files/ssh:/root/.ssh:ro
       - ./files/ignition.json:/tmp/ignition.json
+      - ./files/rules.yaml:/tmp/rules.yaml
     network_mode: host
     dns:
       - 172.17.0.1

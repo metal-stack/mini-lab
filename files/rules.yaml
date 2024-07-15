@@ -1,0 +1,21 @@
+---
+egress:
+  - comment: allow outgoing https
+    ports:
+      - 443
+    protocol: TCP
+    to:
+      - 0.0.0.0/0
+  - comment: allow outgoing dns via tcp
+    ports:
+      - 53
+    protocol: TCP
+    to:
+      - 0.0.0.0/0
+  - comment: allow outgoing dns and ntp via udp
+    ports:
+      - 53
+      - 123
+    protocol: UDP
+    to:
+      - 0.0.0.0/0
