@@ -233,7 +233,7 @@ ssh-machine:
 
 .PHONY: connect-to-cloudflare
 connect-to-cloudflare:
-	@echo "Attempting to connect to 1.1.1.1..."
+	@echo "Attempting to connect to Cloudflare..."
 	@for i in $$(seq 1 $(MAX_RETRIES)); do \
 		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent https://1.1.1.1" > /dev/null 2>&1; then \
 			echo "Connected successfully"; \
