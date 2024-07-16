@@ -81,7 +81,7 @@ partition: partition-bake
 	docker compose up --remove-orphans --force-recreate partition
 
 .PHONY: partition-bake
-partition-bake:
+partition-bake: external_network
 	docker pull $(MINI_LAB_VM_IMAGE)
 ifeq ($(MINI_LAB_FLAVOR),sonic)
 	docker pull $(MINI_LAB_SONIC_IMAGE)
@@ -90,19 +90,21 @@ endif
 		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
 
+.PHONY: external_network
+external_network:
+	@if ! docker network ls | grep -q mini_lab_ext; then \
+  		docker network create mini_lab_ext \
+			--driver=bridge \
+			--gateway=203.0.113.1 \
+			--subnet=203.0.113.0/24 \
+			--opt "com.docker.network.driver.mtu=1500" \
+			--opt "com.docker.network.bridge.name=mini_lab_ext" \
+			--opt "com.docker.network.bridge.enable_ip_masquerade=true" && \
+		sudo ip route add 203.0.113.128/25 via 203.0.113.2 dev mini_lab_ext; fi
+
 .PHONY: env
 env:
 	@./env.sh
-
-.PHONY: _ips
-_ips:
-	$(eval ipL1 = $(shell ${YQ} --unwrapScalar=true '.nodes.leaf01."mgmt-ipv4-address"' clab-mini-lab/topology-data.json))
-	$(eval ipL2 = $(shell ${YQ} --unwrapScalar=true '.nodes.leaf02."mgmt-ipv4-address"' clab-mini-lab/topology-data.json))
-	$(eval staticR = "100.255.254.0/24 nexthop via $(ipL1) dev docker0 nexthop via $(ipL2) dev docker0")
-
-.PHONY: route
-route: _ips
-	eval "sudo ip r a ${staticR}"
 
 .PHONY: cleanup
 cleanup: cleanup-control-plane cleanup-partition
@@ -116,8 +118,9 @@ cleanup-control-plane:
 .PHONY: cleanup-partition
 cleanup-partition:
 	mkdir -p clab-mini-lab
-	sudo $(CONTAINERLAB) destroy --topo mini-lab.cumulus.yaml
-	sudo $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
+	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.cumulus.yaml
+	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
+	docker network rm --force mini_lab_ext
 
 .PHONY: _privatenet
 _privatenet: env
@@ -128,7 +131,7 @@ machine: _privatenet
 	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --networks $(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: firewall
-firewall: _ips _privatenet
+firewall: _privatenet
 	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --userdata "@/tmp/ignition.json" --firewall-rules-file=/tmp/rules.yaml --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: ls
@@ -217,8 +220,8 @@ console-machine03:
 
 ## SSH TARGETS FOR MACHINES ##
 # Python code could be replaced by jq, but it is not preinstalled on Cumulus
-.PHONY: ssh-fw
-ssh-fw:
+.PHONY: ssh-firewall
+ssh-firewall:
 	$(eval fw = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp neighbors fw json' | \
 		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
 	))

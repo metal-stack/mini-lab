@@ -16,6 +16,8 @@ topology:
         - files/ssh/id_rsa.pub:/root/.ssh/authorized_keys
 
   nodes:
+    mini_lab_ext:
+      kind: bridge
     leaf01:
       kind: cvx
       binds:
@@ -26,7 +28,7 @@ topology:
         - apt-transport-https.tar.gz:/root/jessie-apt-transport-fix.tar.gz
     inet:
       kind: linux
-      image: quay.io/frrouting/frr:9.1.0
+      image: quay.io/frrouting/frr:10.0.1
       binds:
         - files/inet/daemons:/etc/frr/daemons
         - files/inet/frr.conf:/etc/frr/frr.conf
@@ -42,6 +44,7 @@ topology:
         - scripts:/mini-lab
 
   links:
+    - endpoints: ["inet:ext", "mini_lab_ext:inet"]
     - endpoints: ["leaf01:swp1", "vms:lan0"]
     - endpoints: ["leaf02:swp1", "vms:lan1"]
     - endpoints: ["leaf01:swp2", "vms:lan2"]
