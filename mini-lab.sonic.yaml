@@ -31,6 +31,7 @@ topology:
         - files/inet/vtysh.conf:/etc/frr/vtysh.conf
         - files/inet/network.sh:/root/network.sh
       exec:
+        - apk add iptables
         - sh /root/network.sh
     vms:
       kind: linux

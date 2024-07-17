@@ -116,6 +116,7 @@ cleanup-partition:
 	sudo $(CONTAINERLAB) destroy --topo mini-lab.cumulus.yaml
 	sudo $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
 
+# IPv4
 .PHONY: _privatenet
 _privatenet: env
 	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network | grep user-private-network || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network allocate --partition mini-lab --project 00000000-0000-0000-0000-000000000000 --name user-private-network
@@ -127,6 +128,20 @@ machine: _privatenet
 .PHONY: firewall
 firewall: _ips _privatenet
 	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+
+# IPv6
+.PHONY: _privatenet6
+_privatenet6: env
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network-6 | grep user-private-network-6 || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network allocate --partition mini-lab --project 00000000-0000-0000-0000-000000000000 --name user-private-network-6 --addressfamily ipv6
+
+.PHONY: machine6
+machine6: _privatenet6
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description test6 --name test6 --hostname test6 --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --networks $(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network-6 -o template --template '{{ .id }}')
+
+.PHONY: firewall6
+firewall6: _ips _privatenet6
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --networks internet-ipv6-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network-6 -o template --template '{{ .id }}')
+
 
 .PHONY: ls
 ls: env
