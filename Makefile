@@ -19,7 +19,7 @@ MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:
 MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
 
 MACHINE_OS=ubuntu-24.04
-MAX_RETRIES := 20
+MAX_RETRIES := 30
 
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
@@ -244,8 +244,8 @@ connect-to-cloudflare:
 		else \
 			echo "Connection failed"; \
 			if [ $$i -lt $(MAX_RETRIES) ]; then \
-				echo "Retrying in 3 seconds..."; \
-				sleep 3; \
+				echo "Retrying in 2 seconds..."; \
+				sleep 2; \
 			else \
 				echo "Max retries reached"; \
 				exit 1; \
