@@ -19,12 +19,3 @@ egress:
     protocol: UDP
     to:
       - 0.0.0.0/0
-ingress:
-  - comment: allow incoming ssh
-    ports:
-      - 22
-    protocol: TCP
-    from:
-      - 203.0.113.1/25
-    to:
-      - 203.0.113.128/25
