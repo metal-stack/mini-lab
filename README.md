@@ -24,7 +24,7 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
 - [docker](https://www.docker.com/) >= 24.x.y (for using kind and our deployment base image)
 - [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.23.0 (for hosting the metal control plane)
 - [containerlab](https://containerlab.dev/install/) >= v0.55.0
-- the lab creates a docker network on your host machine (`203.0.113.1`), this hopefully does not overlap with other networks you have
+- the lab creates a docker network on your host machine with the address block `203.0.113.0/24`, designated as TEST-NET-3 for documentation and examples.
 - (recommended) haveged to have enough random entropy (only needed if the PXE process does not work)
 
 Here is some code that should help you to set up most of the requirements:
