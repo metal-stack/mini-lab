@@ -24,6 +24,7 @@ sonic_ip_masquerade: true
 sonic_vlans:
   - id: 4000
     ip: "{{ metal_core_cidr }}"
+    dhcp_servers: "{{ dhcp_relay_server }}"
 
 # Dummy VTEP so that basic VXLAN config will be deployed by sonic role:
 sonic_vteps:
