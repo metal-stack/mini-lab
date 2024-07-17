@@ -48,6 +48,6 @@ echo "Test connectivity to outside"
 make connect-to-cloudflare
 
 echo "Check if SSH login to firewall works"
-#ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa metal@203.0.113.129 -C exit
+ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa metal@203.0.113.129 -C exit
 
 echo "Successfully started mini-lab"
