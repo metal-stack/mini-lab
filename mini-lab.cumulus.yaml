@@ -13,19 +13,15 @@ topology:
       labels:
         ansible-group: cumulus
       binds:
+        - apt-transport-https.tar.gz:/root/jessie-apt-transport-fix.tar.gz
         - files/ssh/id_rsa.pub:/root/.ssh/authorized_keys
     linux:
       image: ${MINI_LAB_VM_IMAGE}
-
   nodes:
     leaf01:
       kind: cvx
-      binds:
-        - apt-transport-https.tar.gz:/root/jessie-apt-transport-fix.tar.gz
     leaf02:
       kind: cvx
-      binds:
-        - apt-transport-https.tar.gz:/root/jessie-apt-transport-fix.tar.gz
     vms:
       kind: linux
       binds:
