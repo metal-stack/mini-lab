@@ -45,4 +45,7 @@ echo "$phoned/$minPhoned machines have phoned home"
 echo "Test connectivity to outside"
 make connect-to-cloudflare
 
+echo "Test connectivity from outside"
+ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa metal@203.0.113.130 -C exit
+
 echo "Successfully started mini-lab"
