@@ -16,6 +16,12 @@ jobs:
     name: Run tests
     runs-on: self-hosted
 
+    strategy:
+      matrix:
+        flavors:
+          - name: cumulus
+          - name: sonic
+
     steps:
     - name: Gain back workspace permissions # https://github.com/actions/checkout/issues/211
       run: |
@@ -64,6 +70,7 @@ jobs:
         tags: ${{ env.MINI_LAB_SONIC_IMAGE }}
         cache-from: type=registry,ref=${{ env.MINI_LAB_SONIC_IMAGE }}
         cache-to: type=inline
+      if: ${{ matrix.flavors.name == 'sonic' }}
 
     - name: Run integration tests
       shell: bash
