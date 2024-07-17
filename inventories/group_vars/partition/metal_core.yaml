@@ -9,3 +9,5 @@ metal_core_rack_id: test-rack
 metal_core_log_level: debug
 
 metal_core_consider_hosts_file_resolution: true
+
+metal_core_pxe_vlan_id: 966

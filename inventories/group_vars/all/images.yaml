@@ -29,4 +29,3 @@ metal_core_image_tag: configure-vlan
 # metal_ansible_modules_version:
 
 metal_roles_version: configure-metal-core-vlan
-metal_core_pxe_vlan_id: 966

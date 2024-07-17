@@ -17,7 +17,7 @@
   changed_when: false
 
 - name: ensure that static route for return path to pxe network is present
-  command: "ip r a 10.0.1.0/24 vrf mgmt via {{ dhcp_server_ip }} dev vlan4000"
+  command: "ip r a 10.0.1.0/24 vrf mgmt via {{ dhcp_server_ip }} dev vlan{{ metal_core_pxe_vlan_id }}"
   when:
     - '"10.0.1.0/24" not in route_check.stdout'
     - dhcp_server_ip is defined
