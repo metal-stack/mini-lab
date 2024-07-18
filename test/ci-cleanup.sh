@@ -15,5 +15,3 @@ if [ ! -z "$running_containers" ]; then
 fi
 
 make cleanup
-
-sudo ip r d 100.255.254.0/24 || true

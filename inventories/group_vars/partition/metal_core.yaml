@@ -1,9 +1,4 @@
 ---
-metal_core_change_boot_order: false
-
-metal_core_nsqd_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
-metal_core_nsqd_client_cert: "{{ lookup('file', 'certs/nsq/client.crt') }}"
-
 metal_core_rack_id: test-rack
 
 metal_core_log_level: debug
