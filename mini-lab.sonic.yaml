@@ -37,7 +37,7 @@ topology:
       network-mode: container:inet # join the network namespace of inet
       image: docker.cloudsmith.io/isc/docker/kea-dhcp4:2.6.0
       binds:
-        - files/kea.conf:/etc/kea/kea-dhcp4.conf
+        - files/kea.json:/etc/kea/kea-dhcp4.conf
     vms:
       kind: linux
       image: ${MINI_LAB_VM_IMAGE}

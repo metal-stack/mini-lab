@@ -8,3 +8,14 @@
   delay: 3
   register: result
   until: result.rc == 0
+
+- name: Add dummy IPv4 to Ethernet0 as workaround for dhcp relay
+  ansible.builtin.command: config interface ip add Ethernet0 169.254.0.1/32
+
+- name: Set state of Ethernet0 for dhcp relay
+  ansible.builtin.command: sonic-db-cli STATE_DB HSET "INTERFACE_TABLE|Ethernet0|169.254.0.1/32" state ok
+
+- name: Restart dhcp relay to see new Vlans
+  ansible.builtin.service:
+    name: dhcp_relay.service
+    state: restarted
