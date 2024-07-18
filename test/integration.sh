@@ -42,13 +42,10 @@ do
 done
 echo "$phoned/$minPhoned machines have phoned home"
 
-sleep 10
+echo "Test connectivity to outside"
+make connect-to-cloudflare
 
-echo "Adding route to leaf01 and leaf02"
-make route
-
-echo "Check if SSH login to firewall works"
-# FIXME: Again this is unstable in CI integration tests
-# ssh -o StrictHostKeyChecking=no metal@100.255.254.1 -C exit
+echo "Test connectivity from outside"
+ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa metal@203.0.113.130 -C exit
 
 echo "Successfully started mini-lab"
