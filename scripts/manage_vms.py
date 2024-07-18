@@ -147,7 +147,7 @@ class Manager:
             cmd.append('-device')
             cmd.append(f'virtio-net,netdev=hn{i},mac={mac}')
             cmd.append(f'-netdev')
-            cmd.append(f'tap,id=hn{i},ifname=tap{i},script=/mirror_tap_to_lan.sh,downscript=no')
+            cmd.append(f'tap,id=hn{i},ifname=tap{i},script=/mini-lab/mirror_tap_to_lan.sh,downscript=no')
 
         cmd.append("&")
 
