@@ -97,7 +97,7 @@ external_network:
 			--driver=bridge \
 			--gateway=203.0.113.1 \
 			--subnet=203.0.113.0/24 \
-			--opt "com.docker.network.driver.mtu=1500" \
+			--opt "com.docker.network.driver.mtu=9000" \
 			--opt "com.docker.network.bridge.name=mini_lab_ext" \
 			--opt "com.docker.network.bridge.enable_ip_masquerade=true" && \
 		sudo ip route add 203.0.113.128/25 via 203.0.113.2 dev mini_lab_ext; fi

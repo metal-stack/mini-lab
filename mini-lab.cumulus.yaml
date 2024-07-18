@@ -45,6 +45,7 @@ topology:
 
   links:
     - endpoints: ["inet:ext", "mini_lab_ext:inet"]
+      mtu: 9000
     - endpoints: ["leaf01:swp1", "vms:lan0"]
     - endpoints: ["leaf02:swp1", "vms:lan1"]
     - endpoints: ["leaf01:swp2", "vms:lan2"]

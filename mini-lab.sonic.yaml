@@ -42,6 +42,7 @@ topology:
         - scripts:/mini-lab
   links:
     - endpoints: ["inet:ext", "mini_lab_ext:inet"]
+      mtu: 9000
     - endpoints: ["leaf01:eth1", "inet:eth1"]
     - endpoints: ["leaf02:eth1", "inet:eth2"]
     - endpoints: ["leaf01:eth2", "vms:lan0"]
