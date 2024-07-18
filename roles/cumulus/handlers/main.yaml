@@ -25,6 +25,25 @@
     enabled: true
     state: restarted
 
+- name: reload interfaces
+  shell: sleep 3; ifreload -a
+  async: 1
+  poll: 0
+  notify: wait for new connection
+
+- name: wait for new connection
+  wait_for_connection:
+    connect_timeout: 20
+    sleep: 5
+    delay: 5
+    timeout: 300
+
+- name: reload frr
+  service:
+    name: frr
+    enabled: true
+    state: reloaded
+
 - name: restart frr
   service:
     name: frr
@@ -34,5 +53,11 @@
 - name: lldpd restart
   service:
     name: lldpd
+    enabled: true
+    state: restarted
+
+- name: restart ntp@mgmt
+  service:
+    name: ntp@mgmt
     enabled: true
     state: restarted
