@@ -17,8 +17,9 @@ BASE_IMG = '/sonic-vs.img'
 
 
 class Qemu:
-    def __init__(self, name: str, memory: str, interfaces: int):
+    def __init__(self, name: str, smp: str, memory: str, interfaces: int):
         self._name = name
+        self._smp = smp
         self._memory = memory
         self._interfaces = interfaces
         self._p = None
@@ -46,6 +47,7 @@ class Qemu:
         cmd = [
             'qemu-system-x86_64',
             '-cpu', 'host',
+            '-smp', self._smp,
             '-display', 'none',
             '-enable-kvm',
             '-machine', 'q35',
@@ -78,10 +80,15 @@ def initial_configuration(g: GuestFS) -> None:
     sonic_target_wants = systemd_system + 'sonic.target.wants/'
     g.mkdir_p(sonic_target_wants)
 
+    # Copy frr-pythontools into the image
+    g.copy_in(localpath='/frr-pythontools.deb', remotedir=image + 'rw/')
+
     # Workaround: Speed up lldp startup by remove hardcoded wait of 90 seconds
     g.ln_s(linkname=systemd_system + 'aaastatsd.timer', target='/dev/null') # Radius
     g.ln_s(linkname=systemd_system + 'featured.timer', target='/dev/null') # Feature handling not necessary
     g.ln_s(linkname=systemd_system + 'hostcfgd.timer', target='/dev/null') # After boot Host configuration
+    g.ln_s(linkname=systemd_system + 'rasdaemon.timer', target='/dev/null') # After boot Host configuration
+    g.ln_s(linkname=systemd_system + 'tacacs-config.timer', target='/dev/null') # After boot Host configuration
     # Started by featured
     g.ln_s(linkname=sonic_target_wants + 'lldp.service', target='/lib/systemd/system/lldp.service')
 
@@ -137,10 +144,11 @@ def main():
     logger = logging.getLogger()
 
     name = os.getenv('CLAB_LABEL_CLAB_NODE_NAME', default='switch')
-    memory = os.getenv('VM_MEMORY', default='2048')
+    smp = os.getenv('QEMU_SMP', default='2')
+    memory = os.getenv('QEMU_MEMORY', default='2048')
     interfaces = int(os.getenv('CLAB_INTFS', 0)) + 1
 
-    vm = Qemu(name, memory, interfaces)
+    vm = Qemu(name, smp, memory, interfaces)
 
     logger.info('Prepare disk')
     vm.prepare_overlay(BASE_IMG)
