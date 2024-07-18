@@ -10,5 +10,4 @@
     path: /etc/cumulus/switchd.conf
     regexp: '#vrf_route_leak_enable = FALSE'
     replace: 'vrf_route_leak_enable = TRUE'
-  when: router_enable_static_route_leak
   notify: restart switchd

@@ -13,19 +13,15 @@ topology:
       labels:
         ansible-group: cumulus
       binds:
+        - apt-transport-https.tar.gz:/root/jessie-apt-transport-fix.tar.gz
         - files/ssh/id_rsa.pub:/root/.ssh/authorized_keys
-
   nodes:
     mini_lab_ext:
       kind: bridge
     leaf01:
       kind: cvx
-      binds:
-        - apt-transport-https.tar.gz:/root/jessie-apt-transport-fix.tar.gz
     leaf02:
       kind: cvx
-      binds:
-        - apt-transport-https.tar.gz:/root/jessie-apt-transport-fix.tar.gz
     inet:
       kind: linux
       image: quay.io/frrouting/frr:10.0.1
