@@ -141,11 +141,13 @@ class Manager:
             "-nographic",
         ]
 
-        for lan_index in machine["lan_indices"]:
-            mac = subprocess.check_output(["cat", f"/sys/class/net/lan{lan_index}/address"]).decode("utf-8").strip()
-
-            cmd.append(f"-device virtio-net,netdev=hn{lan_index},mac={mac}")
-            cmd.append(f"-netdev tap,id=hn{lan_index},ifname=tap{lan_index},script=/mini-lab/mirror_tap_to_lan.sh,downscript=no")
+        for i in machine["lan_indices"]:
+            with open(f'/sys/class/net/lan{i}/address', 'r') as f:
+                mac = f.read().strip()
+            cmd.append('-device')
+            cmd.append(f'virtio-net,netdev=hn{i},mac={mac}')
+            cmd.append(f'-netdev')
+            cmd.append(f'tap,id=hn{i},ifname=tap{i},script=/mirror_tap_to_lan.sh,downscript=no')
 
         cmd.append("&")
 
