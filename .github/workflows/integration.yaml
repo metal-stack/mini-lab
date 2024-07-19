@@ -16,6 +16,12 @@ jobs:
     name: Run tests
     runs-on: self-hosted
 
+    strategy:
+      matrix:
+        flavors:
+          - name: cumulus
+          - name: sonic
+
     steps:
     - name: Gain back workspace permissions # https://github.com/actions/checkout/issues/211
       run: |
@@ -27,7 +33,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # we can remove desired version again after this fix was released: https://github.com/srl-labs/containerlab/pull/2000
-        DESIRED_VERSION: v0.52.0
+        DESIRED_VERSION: v0.56.0
 
     - name: Log in to the container registry
       uses: docker/login-action@v3
@@ -64,6 +70,7 @@ jobs:
         tags: ${{ env.MINI_LAB_SONIC_IMAGE }}
         cache-from: type=registry,ref=${{ env.MINI_LAB_SONIC_IMAGE }}
         cache-to: type=inline
+      if: ${{ matrix.flavors.name == 'sonic' }}
 
     - name: Run integration tests
       shell: bash
