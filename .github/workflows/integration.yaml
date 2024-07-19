@@ -78,6 +78,7 @@ jobs:
         ./test/ci-cleanup.sh
         ./test/integration.sh
       env:
+        MINI_LAB_FLAVOR: ${{ matrix.flavors.name }}
         DOCKER_HUB_USER: ${{ secrets.DOCKER_HUB_USER }}
         DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
