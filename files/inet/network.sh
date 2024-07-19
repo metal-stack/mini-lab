@@ -3,7 +3,7 @@ set -o errexit -o xtrace
 
 ip link add vrfInternet type vrf table 1000
 ip link set dev vrfInternet up
-ip link set dev eth0 master vrfInternet
+ip link set dev ext master vrfInternet
 
 # IPv6
 ip link add vrfInternet6 type vrf table 1006
@@ -30,7 +30,7 @@ bridge vlan add vid 1006 dev bridge self
 ip link set dev vlanInternet6 up
 
 ip link add vniInternet type vxlan id 104009 dstport 4789 local 10.0.0.21 nolearning
-ip link set dev vlanInternet mtu 9000
+ip link set dev vniInternet mtu 9000
 ip link set dev vniInternet master bridge
 bridge vlan del vid 1 dev vniInternet
 bridge vlan del vid 1 untagged pvid dev vniInternet

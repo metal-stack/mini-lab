@@ -23,8 +23,8 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
 - kvm as hypervisor for the VMs (you can check through the `kvm-ok` command)
 - [docker](https://www.docker.com/) >= 24.x.y (for using kind and our deployment base image)
 - [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.23.0 (for hosting the metal control plane)
-- [containerlab](https://containerlab.dev/install/) >= v0.55.0
-- the lab creates a docker network on your host machine (`172.17.0.1`), this hopefully does not overlap with other networks you have
+- [containerlab](https://containerlab.dev/install/) >= v0.56.0
+- the lab creates a docker network on your host machine with the address block `203.0.113.0/24`, designated as TEST-NET-3 for documentation and examples.
 - (recommended) haveged to have enough random entropy (only needed if the PXE process does not work)
 
 Here is some code that should help you to set up most of the requirements:
@@ -173,16 +173,6 @@ Login with user name metal and the console password from
 
 ```bash
 docker compose run --rm metalctl machine consolepassword e0ab02d2-27cd-5a5e-8efc-080ba80cf258
-```
-
-If you want to access the firewall with SSH or have internet connectivity from the firewall and machine, you'll need to have a static route configured that points to the leaf switches:
-
-```bash
-# Add the route to the network internet-mini-lab 100.255.254.0/24 via leaf01 and leaf02, whose IPs are dynamically allocated. Make sure there's no old route before execution.
-make route
-
-# Connect to the firewall
-ssh metal@100.255.254.1
 ```
 
 To remove the kind cluster, the switches and machines, run:

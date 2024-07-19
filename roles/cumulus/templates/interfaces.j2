@@ -10,7 +10,9 @@ iface lo inet loopback
 
 # The primary network interface
 auto eth0
-iface eth0 inet dhcp
+iface eth0
+    address {{ ansible_host }}/24
+    gateway {{ metal_partition_mgmt_gateway }}
     vrf mgmt
 
 auto mgmt
@@ -18,13 +20,6 @@ iface mgmt
     address 127.0.0.1/8
     vrf-table auto
 
-{% for iface in interfaces %}
-auto {{ iface.name }}
-iface {{ iface.name }}
-    mtu {{ mtu.default }}
-    bridge-access 4000
-
-{% endfor %}
 {% for iface in uplinks %}
 auto {{ iface.name }}
 iface {{ iface.name }}
@@ -34,7 +29,7 @@ iface {{ iface.name }}
 
 auto bridge
 iface bridge
-    bridge-ports {% for iface in interfaces %}{{ iface.name }} {% endfor %}vni104000
+    bridge-ports vni104000
     bridge-vids 4000
     bridge-vlan-aware yes
 
@@ -54,4 +49,3 @@ iface vni104000
     mstpctl-portbpdufilter yes
     vxlan-id 104000
     vxlan-local-tunnelip {{ lo }}
-

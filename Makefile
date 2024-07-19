@@ -19,14 +19,17 @@ MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:
 MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
 
 MACHINE_OS=ubuntu-24.04
+MAX_RETRIES := 30
 
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
+VRF=vrf20
 else ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.sonic.yaml
+VRF=Vrf20
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
@@ -78,7 +81,7 @@ partition: partition-bake
 	docker compose up --remove-orphans --force-recreate partition
 
 .PHONY: partition-bake
-partition-bake:
+partition-bake: external_network
 	docker pull $(MINI_LAB_VM_IMAGE)
 ifeq ($(MINI_LAB_FLAVOR),sonic)
 	docker pull $(MINI_LAB_SONIC_IMAGE)
@@ -87,19 +90,21 @@ endif
 		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
 
+.PHONY: external_network
+external_network:
+	@if ! docker network ls | grep -q mini_lab_ext; then \
+  		docker network create mini_lab_ext \
+			--driver=bridge \
+			--gateway=203.0.113.1 \
+			--subnet=203.0.113.0/24 \
+			--opt "com.docker.network.driver.mtu=9000" \
+			--opt "com.docker.network.bridge.name=mini_lab_ext" \
+			--opt "com.docker.network.bridge.enable_ip_masquerade=true" && \
+		sudo ip route add 203.0.113.128/25 via 203.0.113.2 dev mini_lab_ext; fi
+
 .PHONY: env
 env:
 	@./env.sh
-
-.PHONY: _ips
-_ips:
-	$(eval ipL1 = $(shell ${YQ} --unwrapScalar=true '.nodes.leaf01."mgmt-ipv4-address"' clab-mini-lab/topology-data.json))
-	$(eval ipL2 = $(shell ${YQ} --unwrapScalar=true '.nodes.leaf02."mgmt-ipv4-address"' clab-mini-lab/topology-data.json))
-	$(eval staticR = "100.255.254.0/24 nexthop via $(ipL1) dev docker0 nexthop via $(ipL2) dev docker0")
-
-.PHONY: route
-route: _ips
-	eval "sudo ip r a ${staticR}"
 
 .PHONY: cleanup
 cleanup: cleanup-control-plane cleanup-partition
@@ -113,21 +118,27 @@ cleanup-control-plane:
 .PHONY: cleanup-partition
 cleanup-partition:
 	mkdir -p clab-mini-lab
-	sudo $(CONTAINERLAB) destroy --topo mini-lab.cumulus.yaml
-	sudo $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
+	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.cumulus.yaml
+	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
+	docker network rm --force mini_lab_ext
 
 # IPv4
 .PHONY: _privatenet
 _privatenet: env
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network | grep user-private-network || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network allocate --partition mini-lab --project 00000000-0000-0000-0000-000000000000 --name user-private-network
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network | grep user-private-network || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network allocate --partition mini-lab --project 00000000-0000-0000-0000-000000000001 --name user-private-network
+
+.PHONY: _public_ips
+_public_ips: env
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name firewall | grep firewall || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip create --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --ipaddress 203.0.113.129 --name firewall
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name machine | grep machine || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip create --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --ipaddress 203.0.113.130 --name machine
 
 .PHONY: machine
-machine: _privatenet
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --networks $(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+machine: _privatenet _public_ips
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --ips 203.0.113.130 --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: firewall
-firewall: _ips _privatenet
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+firewall: _privatenet _public_ips
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --userdata "@/tmp/ignition.json" --ips 203.0.113.129 --firewall-rules-file=/tmp/rules.yaml --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 # IPv6
 .PHONY: _privatenet6
@@ -226,6 +237,41 @@ console-machine02:
 .PHONY: console-machine03
 console-machine03:
 	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4002
+
+## SSH TARGETS FOR MACHINES ##
+# Python code could be replaced by jq, but it is not preinstalled on Cumulus
+.PHONY: ssh-firewall
+ssh-firewall:
+	$(eval fw = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp neighbors fw json' | \
+		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
+	))
+	ssh -F files/ssh/config $(fw) $(COMMAND)
+
+.PHONY: ssh-machine
+ssh-machine:
+	$(eval machine = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp vrf $(VRF) neighbors test json' | \
+		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
+	))
+	ssh -F files/ssh/config $(machine) $(COMMAND)
+
+.PHONY: connect-to-cloudflare
+connect-to-cloudflare:
+	@echo "Attempting to connect to Cloudflare..."
+	@for i in $$(seq 1 $(MAX_RETRIES)); do \
+		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent https://1.1.1.1" > /dev/null 2>&1; then \
+			echo "Connected successfully"; \
+			exit 0; \
+		else \
+			echo "Connection failed"; \
+			if [ $$i -lt $(MAX_RETRIES) ]; then \
+				echo "Retrying in 2 seconds..."; \
+				sleep 2; \
+			else \
+				echo "Max retries reached"; \
+				exit 1; \
+			fi; \
+		fi; \
+	done
 
 ## DEV TARGETS ##
 
