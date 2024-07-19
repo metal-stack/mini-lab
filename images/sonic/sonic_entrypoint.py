@@ -83,6 +83,8 @@ def initial_configuration(g: GuestFS) -> None:
     g.ln_s(linkname=systemd_system + 'featured.timer', target='/dev/null') # Feature handling not necessary
     g.ln_s(linkname=systemd_system + 'hostcfgd.timer', target='/dev/null') # After boot Host configuration
     # Started by featured
+    g.ln_s(linkname=systemd_system + 'dhcp_relay.service', target='/lib/systemd/system/dhcp_relay.service')
+    g.ln_s(linkname=sonic_target_wants + 'dhcp_relay.service', target='/lib/systemd/system/dhcp_relay.service')
     g.ln_s(linkname=sonic_target_wants + 'lldp.service', target='/lib/systemd/system/lldp.service')
 
     # Workaround: Only useful for BackEndToRRouter

@@ -32,10 +32,12 @@
   roles:
     - name: cumulus
       tags: cumulus
+    - name: metal-roles/partition/roles/dhcp-relay
+      tags: dhcp
     - name: metal-roles/partition/roles/docker-on-cumulus
       tags: docker-on-cumulus
 
-- name: Deploy dhcp server and pixiecore on leaf01
+- name: Deploy pixiecore on leaf01
   hosts: leaf01
   vars:
     setup_yaml:
@@ -44,8 +46,6 @@
   roles:
     - name: ansible-common
       tags: always
-    - name: metal-roles/partition/roles/dhcp
-      tags: dhcp
     - name: metal-roles/partition/roles/pixiecore
       tags: pixiecore
 

@@ -1,0 +1,68 @@
+{
+  "Dhcp4": {
+    "option-data": [
+      {
+        "name": "domain-name-servers",
+        "data": "1.1.1.1, 8.8.8.8",
+        "always-send": true
+      }
+    ],
+    "subnet4": [
+      {
+        "id": 1,
+        "subnet": "10.0.1.0/25",
+        "pools": [
+          {
+            "pool": "10.0.1.2 - 10.0.1.127"
+          }
+        ],
+        "option-data": [
+          {
+            "name": "routers",
+            "data": "10.0.1.1"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "subnet": "10.0.1.128/25",
+        "pools": [
+          {
+            "pool": "10.0.1.129 - 10.0.1.254"
+          }
+        ],
+        "option-data": [
+          {
+            "name": "routers",
+            "data": "10.0.1.128"
+          }
+        ]
+      }
+    ],
+    "interfaces-config": {
+      "interfaces": [
+        "lo"
+      ],
+      "dhcp-socket-type": "udp",
+      "outbound-interface": "use-routing",
+    },
+    "control-socket": {
+      "socket-type": "unix",
+      "socket-name": "/run/kea/control_socket_4"
+    },
+    "loggers": [
+      {
+        "name": "kea-dhcp4",
+        "output_options": [
+          {
+            "output": "stdout"
+          }
+        ],
+        "severity": "DEBUG"
+      }
+    ],
+    "lease-database": {
+      "type": "memfile"
+    }
+  }
+}
