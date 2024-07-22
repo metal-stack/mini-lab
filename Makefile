@@ -125,20 +125,35 @@ cleanup-partition:
 _privatenet: env
 	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network | grep user-private-network || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network allocate --partition mini-lab --project 00000000-0000-0000-0000-000000000001 --name user-private-network
 
+define create_public_ip
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name $(1) | grep $(1) || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip create --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --ipaddress $(2) --name $(1)
+endef
+
+define private_net_id
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}'
+endef
+
+define create_common_args
+	--description $(1) --name $(1) --hostname $(1) --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --size v1-small-x86 --userdata "@/tmp/ignition.json"
+endef
+
 .PHONY: firewall
 firewall: _privatenet
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name firewall | grep firewall || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip create --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --ipaddress 203.0.113.129 --name firewall
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description firewall --name firewall --hostname firewall --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --userdata "@/tmp/ignition.json" --ips 203.0.113.129 --firewall-rules-file=/tmp/rules.yaml --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	$(call create_public_ip,firewall,203.0.113.129)
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create $(create_common_args,firewall) \
+		--firewall-rules-file=/tmp/rules.yaml --image firewall-ubuntu-3.0 --ips 203.0.113.129 --networks internet-mini-lab,$(call private_net_id)
 
 .PHONY: machine01
 machine01: _privatenet
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name machine01 | grep machine01 || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip create --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --ipaddress 203.0.113.130 --name machine01
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description machine01 --name machine01 --hostname machine01 --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --ips 203.0.113.130 --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	$(call create_public_ip,machine01,203.0.113.130)
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create $(create_common_args,machine01) \
+		--image $(MACHINE_OS) --ips 203.0.113.130 --networks internet-mini-lab,$(call private_net_id)
 
 .PHONY: machine02
 machine02: _privatenet
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name machine02 | grep machine02 || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip create --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --ipaddress 203.0.113.131 --name machine02
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description machine02 --name machine02 --hostname machine02 --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --ips 203.0.113.131 --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	$(call create_public_ip,machine02,203.0.113.131)
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create $(create_common_args,machine02,203.0.113.131) \
+		--image $(MACHINE_OS) --ips 203.0.113.131 --networks internet-mini-lab,$(call private_net_id)
 
 .PHONY: ls
 ls: env
@@ -242,24 +257,18 @@ endef
 
 .PHONY: ssh-firewall
 ssh-firewall:
-	$(eval firewall = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp neighbors firewall json' | \
-		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
-	))
-	ssh -F files/ssh/config $(firewall) $(COMMAND)
+	$(eval address = $(call get-ipv6-link-local-address,firewall))
+	ssh -F files/ssh/config $(address) $(COMMAND)
 
 .PHONY: ssh-machine01
 ssh-machine01:
-	$(eval machine = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp vrf $(VRF) neighbors machine01 json' | \
-		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
-	))
-	ssh -F files/ssh/config $(machine) $(COMMAND)
+	$(eval address = $(call get-ipv6-link-local-address,machine01,$(VRF)))
+	ssh -F files/ssh/config $(address) $(COMMAND)
 
 .PHONY: ssh-machine02
 ssh-machine02:
-	$(eval machine = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp vrf $(VRF) neighbors machine02 json' | \
-		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
-	))
-	ssh -F files/ssh/config $(machine) $(COMMAND)
+	$(eval address = $(call get-ipv6-link-local-address,machine02,$(VRF)))
+	ssh -F files/ssh/config $(address) $(COMMAND)
 
 .PHONY: connect-to-cloudflare
 connect-to-cloudflare:
