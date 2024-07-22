@@ -23,11 +23,9 @@ MAX_RETRIES := 30
 
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
-LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
 VRF=vrf20
 else ifeq ($(MINI_LAB_FLAVOR),sonic)
-LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.sonic.yaml
 VRF=Vrf20
 else
@@ -49,7 +47,8 @@ endif
 up: env control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_rsa
 	docker compose up --remove-orphans --force-recreate control-plane partition
-	@$(MAKE)	--no-print-directory	start-machines
+	@$(MAKE) --no-print-directory start-vm01
+	@$(MAKE) --no-print-directory start-vm02
 # for some reason an allocated machine will not be able to phone home
 # without restarting the metal-core
 # TODO: should be investigated and fixed if possible
@@ -126,18 +125,20 @@ cleanup-partition:
 _privatenet: env
 	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network | grep user-private-network || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network allocate --partition mini-lab --project 00000000-0000-0000-0000-000000000001 --name user-private-network
 
-.PHONY: _public_ips
-_public_ips: env
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name firewall | grep firewall || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip create --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --ipaddress 203.0.113.129 --name firewall
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name machine | grep machine || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip create --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --ipaddress 203.0.113.130 --name machine
-
-.PHONY: machine
-machine: _privatenet _public_ips
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --ips 203.0.113.130 --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
-
 .PHONY: firewall
-firewall: _privatenet _public_ips
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --userdata "@/tmp/ignition.json" --ips 203.0.113.129 --firewall-rules-file=/tmp/rules.yaml --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+firewall: _privatenet
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name firewall | grep firewall || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip create --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --ipaddress 203.0.113.129 --name firewall
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description firewall --name firewall --hostname firewall --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --userdata "@/tmp/ignition.json" --ips 203.0.113.129 --firewall-rules-file=/tmp/rules.yaml --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+
+.PHONY: machine01
+machine01: _privatenet
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name machine01 | grep machine01 || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip create --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --ipaddress 203.0.113.130 --name machine01
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description machine01 --name machine01 --hostname machine01 --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --ips 203.0.113.130 --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+
+.PHONY: machine02
+machine02: _privatenet
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name machine02 | grep machine02 || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip create --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --ipaddress 203.0.113.131 --name machine02
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description machine02 --name machine02 --hostname machine02 --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --ips 203.0.113.131 --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: ls
 ls: env
@@ -166,75 +167,96 @@ ssh-leaf01:
 ssh-leaf02:
 	ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa root@leaf02
 
-## MACHINE MANAGEMENT ##
+## MACHINE VM MANAGEMENT ##
 
-.PHONY: start-machines
-start-machines:
-	docker exec vms /mini-lab/manage_vms.py --names $(LAB_MACHINES) create
+.PHONY: start-vm01
+start-vm01:
+	docker exec vms /mini-lab/manage_vms.py --names vm01 create
+
+.PHONY: start-vm02
+start-vm02:
+	docker exec vms /mini-lab/manage_vms.py --names vm02 create
+
+.PHONY: start-vm03
+start-vm03:
+	docker exec vms /mini-lab/manage_vms.py --names vm03 create
 
 .PHONY: _password
 _password: env
 	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine consolepassword $(MACHINE_UUID)
 
-.PHONY: password-machine01
-password-machine01:
-	@$(MAKE)	--no-print-directory	_password	MACHINE_UUID=e0ab02d2-27cd-5a5e-8efc-080ba80cf258
+.PHONY: password-vm01
+password-vm01:
+	@$(MAKE) --no-print-directory _password MACHINE_UUID=e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 
-.PHONY: password-machine02
-password-machine02:
-	@$(MAKE)	--no-print-directory	_password	MACHINE_UUID=2294c949-88f6-5390-8154-fa53d93a3313
+.PHONY: password-vm02
+password-vm02:
+	@$(MAKE) --no-print-directory _password MACHINE_UUID=2294c949-88f6-5390-8154-fa53d93a3313
 
-.PHONY: password-machine03
-password-machine03:
-	@$(MAKE)	--no-print-directory	_password	MACHINE_UUID=2a92f14d-d3b1-4d46-b813-5d058103743e
+.PHONY: password-vm03
+password-vm03:
+	@$(MAKE) --no-print-directory _password MACHINE_UUID=2a92f14d-d3b1-4d46-b813-5d058103743e
 
-.PHONY: _free-machine
-_free-machine: env
+.PHONY: _free_vm
+_free_vm: env
 	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine rm $(MACHINE_UUID)
-	docker exec vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) kill --with-disks
-	docker exec vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) create
+	docker exec vms /mini-lab/manage_vms.py --names $(VM_NAME) kill --with-disks
+	docker exec vms /mini-lab/manage_vms.py --names $(VM_NAME) create
 
-.PHONY: free-machine01
-free-machine01:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine01 MACHINE_UUID=e0ab02d2-27cd-5a5e-8efc-080ba80cf258
+.PHONY: free-vm01
+free-vm01:
+	@$(MAKE) --no-print-directory _free_vm VM_NAME=vm01 MACHINE_UUID=e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 
-.PHONY: free-machine02
-free-machine02:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine02 MACHINE_UUID=2294c949-88f6-5390-8154-fa53d93a3313
+.PHONY: free-vm02
+free-vm02:
+	@$(MAKE) --no-print-directory _free_vm VM_NAME=vm02 MACHINE_UUID=2294c949-88f6-5390-8154-fa53d93a3313
 
-.PHONY: free-machine03
-free-machine03:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine03 MACHINE_UUID=2a92f14d-d3b1-4d46-b813-5d058103743e
+.PHONY: free-vm03
+free-vm03:
+	@$(MAKE) --no-print-directory _free_vm VM_NAME=vm03 MACHINE_UUID=2a92f14d-d3b1-4d46-b813-5d058103743e
 
-.PHONY: _console-machine
-_console-machine:
+.PHONY: _console-vm
+_console-vm:
 	@echo "exit console with CTRL+5 and then quit telnet through q + ENTER"
 	@docker exec -it vms telnet 127.0.0.1 $(CONSOLE_PORT)
 
-.PHONY: console-machine01
-console-machine01:
-	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4000
+.PHONY: console-vm01
+console-vm01:
+	@$(MAKE) --no-print-directory _console-vm	CONSOLE_PORT=4000
 
-.PHONY: console-machine02
-console-machine02:
-	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4001
+.PHONY: console-vm02
+console-vm02:
+	@$(MAKE) --no-print-directory _console-vm	CONSOLE_PORT=4001
 
-.PHONY: console-machine03
-console-machine03:
-	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4002
+.PHONY: console-vm03
+console-vm03:
+	@$(MAKE) --no-print-directory _console-vm	CONSOLE_PORT=4002
 
 ## SSH TARGETS FOR MACHINES ##
 # Python code could be replaced by jq, but it is not preinstalled on Cumulus
+define get-ipv6-link-local-address
+	$(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp $(if $(2),vrf $(2) )neighbors $(1) json' | \
+	python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
+	)
+endef
+
 .PHONY: ssh-firewall
 ssh-firewall:
-	$(eval fw = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp neighbors fw json' | \
+	$(eval firewall = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp neighbors firewall json' | \
 		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
 	))
-	ssh -F files/ssh/config $(fw) $(COMMAND)
+	ssh -F files/ssh/config $(firewall) $(COMMAND)
 
-.PHONY: ssh-machine
-ssh-machine:
-	$(eval machine = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp vrf $(VRF) neighbors test json' | \
+.PHONY: ssh-machine01
+ssh-machine01:
+	$(eval machine = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp vrf $(VRF) neighbors machine01 json' | \
+		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
+	))
+	ssh -F files/ssh/config $(machine) $(COMMAND)
+
+.PHONY: ssh-machine02
+ssh-machine02:
+	$(eval machine = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp vrf $(VRF) neighbors machine02 json' | \
 		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
 	))
 	ssh -F files/ssh/config $(machine) $(COMMAND)
@@ -243,7 +265,7 @@ ssh-machine:
 connect-to-cloudflare:
 	@echo "Attempting to connect to Cloudflare..."
 	@for i in $$(seq 1 $(MAX_RETRIES)); do \
-		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent https://1.1.1.1" > /dev/null 2>&1; then \
+		if $(MAKE) ssh-machine01 COMMAND="sudo curl --connect-timeout 1 --fail --silent https://1.1.1.1" > /dev/null 2>&1; then \
 			echo "Connected successfully"; \
 			exit 0; \
 		else \

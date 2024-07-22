@@ -7,28 +7,28 @@ import subprocess
 import sys
 
 VMS = {
-    "machine01": {
-        "name": "machine01",
+    "vm01": {
+        "name": "vm01",
         "uuid": "e0ab02d2-27cd-5a5e-8efc-080ba80cf258",
-        "disk-path": "/machine01.img",
+        "disk-path": "/vm01.img",
         "disk-size": "5G",
         "memory": "2G",
         "tap-index-fd": [(0, 30), (1, 40)],
         "serial-port": 4000,
     },
-    "machine02": {
-        "name": "machine02",
+    "vm02": {
+        "name": "vm02",
         "uuid": "2294c949-88f6-5390-8154-fa53d93a3313",
-        "disk-path": "/machine02.img",
+        "disk-path": "/vm02.img",
         "disk-size": "5G",
         "memory": "2G",
         "tap-index-fd": [(2, 50), (3, 60)],
         "serial-port": 4001,
     },
-    "machine03": {
-        "name": "machine03",
+    "vm03": {
+        "name": "vm03",
         "uuid": "2a92f14d-d3b1-4d46-b813-5d058103743e",
-        "disk-path": "/machine03.img",
+        "disk-path": "/vm03.img",
         "disk-size": "5G",
         "memory": "2G",
         "tap-index-fd": [(4, 70), (5, 80)],

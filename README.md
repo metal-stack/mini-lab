@@ -185,7 +185,7 @@ docker compose run --rm metalctl machine reinstall \
 
 ### Free machine
 
-Free a machine with `make free-machine01` or
+Free a machine with `make free-vm01` or
 
 ```bash
 docker compose run --rm metalctl machine rm e0ab02d2-27cd-5a5e-8efc-080ba80cf258
