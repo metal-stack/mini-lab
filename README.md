@@ -191,6 +191,16 @@ Free a machine with `make free-machine01` or
 docker compose run --rm metalctl machine rm e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 ```
 
+## iPerf
+
+To test network performance between the machines run:
+
+```bash
+make start-machine03
+make machine02
+./test/iperf.sh
+```
+
 ## Flavors
 
 There's few versions of mini-lab environment that you can run. We call them flavors. There's 2 flavors at the moment:
