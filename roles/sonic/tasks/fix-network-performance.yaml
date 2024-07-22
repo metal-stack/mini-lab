@@ -1,4 +1,11 @@
 ---
+- name: Collect facts about interfaces
+  ansible.builtin.setup:
+    gather_subset:
+      - '!all'
+      - '!min'
+      - interfaces
+
 - name: Gather all network interfaces except eth0
   set_fact:
     interfaces: "{{ ansible_interfaces | select('match', '^eth[0-9]+$') | reject('equalto', 'eth0') | list }}"
