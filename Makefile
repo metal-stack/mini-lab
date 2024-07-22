@@ -38,9 +38,9 @@ KIND_ARGS=--image kindest/node:v$(K8S_VERSION)
 endif
 
 ifeq ($(CI),true)
-  DOCKER_COMPOSE_TTY_ARG=-T
+  METALCTL=docker compose run --no-TTY metalctl
 else
-  DOCKER_COMPOSE_TTY_ARG=
+  METALCTL=docker compose run --no-TTY metalctl
 endif
 
 .PHONY: up
@@ -123,14 +123,10 @@ cleanup-partition:
 
 .PHONY: _privatenet
 _privatenet: env
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network | grep user-private-network || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network allocate --partition mini-lab --project 00000000-0000-0000-0000-000000000001 --name user-private-network
+	$(METALCTL) network list --name user-private-network | grep user-private-network || $(METALCTL) network allocate --partition mini-lab --project 00000000-0000-0000-0000-000000000001 --name user-private-network
 
 define create_public_ip
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name $(1) | grep $(1) || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip create --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --ipaddress $(2) --name $(1)
-endef
-
-define private_net_id
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}'
+	$(METALCTL) network ip list --name $(1) | grep $(1) || $(METALCTL) network ip create --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --ipaddress $(2) --name $(1)
 endef
 
 define create_common_args
@@ -140,24 +136,24 @@ endef
 .PHONY: firewall
 firewall: _privatenet
 	$(call create_public_ip,firewall,203.0.113.129)
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create $(create_common_args,firewall) \
-		--firewall-rules-file=/tmp/rules.yaml --image firewall-ubuntu-3.0 --ips 203.0.113.129 --networks internet-mini-lab,$(call private_net_id)
+	$(METALCTL) firewall create $(call create_common_args,firewall) --firewall-rules-file=/tmp/rules.yaml --image firewall-ubuntu-3.0 --ips 203.0.113.129 \
+		--networks internet-mini-lab,$(shell $(METALCTL) network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: machine01
 machine01: _privatenet
 	$(call create_public_ip,machine01,203.0.113.130)
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create $(create_common_args,machine01) \
-		--image $(MACHINE_OS) --ips 203.0.113.130 --networks internet-mini-lab,$(call private_net_id)
+	$(METALCTL) machine create $(call create_common_args,machine01) --image $(MACHINE_OS) --ips 203.0.113.130 \
+		--networks internet-mini-lab,$(shell $(METALCTL) network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: machine02
 machine02: _privatenet
 	$(call create_public_ip,machine02,203.0.113.131)
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create $(create_common_args,machine02,203.0.113.131) \
-		--image $(MACHINE_OS) --ips 203.0.113.131 --networks internet-mini-lab,$(call private_net_id)
+	$(METALCTL) machine create $(call create_common_args,machine02) --image $(MACHINE_OS) --ips 203.0.113.131 \
+		--networks internet-mini-lab,$(shell $(METALCTL) network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: ls
 ls: env
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine ls
+	$(METALCTL) machine ls
 
 ## SWITCH MANAGEMENT ##
 
@@ -198,7 +194,7 @@ start-vm03:
 
 .PHONY: _password
 _password: env
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine consolepassword $(MACHINE_UUID)
+	$(METALCTL) machine consolepassword $(MACHINE_UUID)
 
 .PHONY: password-vm01
 password-vm01:
@@ -214,7 +210,7 @@ password-vm03:
 
 .PHONY: _free_vm
 _free_vm: env
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine rm $(MACHINE_UUID)
+	$(METALCTL) machine rm $(MACHINE_UUID)
 	docker exec vms /mini-lab/manage_vms.py --names $(VM_NAME) kill --with-disks
 	docker exec vms /mini-lab/manage_vms.py --names $(VM_NAME) create
 
