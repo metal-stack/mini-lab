@@ -21,9 +21,9 @@ do
 done
 echo "$waiting/$minWaiting machines are waiting"
 
-echo "Create firewall and machine"
+echo "Create firewall and machine01"
 make firewall
-make machine
+make machine01
 
 echo "Waiting for machines to get to Phoned Home state"
 phoned=$(docker compose run -T metalctl machine ls | grep Phoned | wc -l)
