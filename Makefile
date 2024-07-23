@@ -238,9 +238,16 @@ ssh-firewall:
 	))
 	ssh -F files/ssh/config $(fw) $(COMMAND)
 
-.PHONY: ssh-machine
-ssh-machine:
-	$(eval machine = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp vrf $(VRF) neighbors test json' | \
+.PHONY: ssh-machine01
+ssh-machine01:
+	$(eval machine = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp vrf $(VRF) neighbors machine01 json' | \
+		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
+	))
+	ssh -F files/ssh/config $(machine) $(COMMAND)
+
+.PHONY: ssh-machine02
+ssh-machine02:
+	$(eval machine = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp vrf $(VRF) neighbors machine02 json' | \
 		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
 	))
 	ssh -F files/ssh/config $(machine) $(COMMAND)
@@ -249,7 +256,7 @@ ssh-machine:
 connect-to-cloudflare:
 	@echo "Attempting to connect to Cloudflare..."
 	@for i in $$(seq 1 $(MAX_RETRIES)); do \
-		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent https://1.1.1.1" > /dev/null 2>&1; then \
+		if $(MAKE) ssh-machine01 COMMAND="sudo curl --connect-timeout 1 --fail --silent https://1.1.1.1" > /dev/null 2>&1; then \
 			echo "Connected successfully"; \
 			exit 0; \
 		else \
