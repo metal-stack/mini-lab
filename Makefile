@@ -40,7 +40,7 @@ endif
 ifeq ($(CI),true)
   METALCTL=docker compose run --no-TTY metalctl
 else
-  METALCTL=docker compose run --no-TTY metalctl
+  METALCTL=docker compose run --rm metalctl
 endif
 
 .PHONY: up
