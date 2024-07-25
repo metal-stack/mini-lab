@@ -13,7 +13,7 @@ VMS = {
         "disk-path": "/machine01.img",
         "disk-size": "5G",
         "memory": "2G",
-        "tap-index-fd": [(0, 30), (1, 40)],
+        "lan_indices": [0, 1],
         "serial-port": 4000,
     },
     "machine02": {
@@ -22,7 +22,7 @@ VMS = {
         "disk-path": "/machine02.img",
         "disk-size": "5G",
         "memory": "2G",
-        "tap-index-fd": [(2, 50), (3, 60)],
+        "lan_indices": [2, 3],
         "serial-port": 4001,
     },
     "machine03": {
@@ -31,7 +31,7 @@ VMS = {
         "disk-path": "/machine03.img",
         "disk-size": "5G",
         "memory": "2G",
-        "tap-index-fd": [(4, 70), (5, 80)],
+        "lan_indices": [4, 5],
         "serial-port": 4002,
     },
 }
@@ -126,18 +126,6 @@ class Manager:
 
     @staticmethod
     def _start_vm(machine):
-        nics = []
-        netdevices = []
-        for tap in machine.get("tap-index-fd", []):
-            ifindex = tap[0]
-            fd = tap[1]
-
-            mac = subprocess.check_output(["cat", "/sys/class/net/macvtap{ifindex}/address".format(ifindex=ifindex)]).decode("utf-8").strip()
-            tapindex = subprocess.check_output(["cat", "/sys/class/net/macvtap{ifindex}/ifindex".format(ifindex=ifindex)]).decode("utf-8").strip()
-
-            nics.append("virtio-net,netdev=hn{ifindex},mac={mac}".format(ifindex=ifindex, mac=mac))
-            netdevices.append("tap,fd={fd},id=hn{ifindex} {fd}<>/dev/tap{tapindex}".format(fd=fd, ifindex=ifindex, tapindex=tapindex))
-
         cmd = [
             "qemu-system-x86_64",
             "-name", machine.get("name"),
@@ -153,13 +141,13 @@ class Manager:
             "-nographic",
         ]
 
-        for nic in nics:
-            cmd.append("-device")
-            cmd.append(nic)
-
-        for device in netdevices:
-            cmd.append("-netdev")
-            cmd.append(device)
+        for i in machine["lan_indices"]:
+            with open(f'/sys/class/net/lan{i}/address', 'r') as f:
+                mac = f.read().strip()
+            cmd.append('-device')
+            cmd.append(f'virtio-net,netdev=hn{i},mac={mac}')
+            cmd.append(f'-netdev')
+            cmd.append(f'tap,id=hn{i},ifname=tap{i},script=/mini-lab/mirror_tap_to_lan.sh,downscript=no')
 
         cmd.append("&")
 
