@@ -1,24 +1,24 @@
-FROM ubuntu:22.04
+FROM debian:bookworm-slim
 
 ENV LIBGUESTFS_BACKEND=direct
 # Check: https://sonic-build.azurewebsites.net/ui/sonic/pipelines
-ENV SONIC_REMOTE_IMG=https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=202211&platform=vs&target=target%2Fsonic-vs.img.gz
+ARG SONIC_BASE_URL=https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=202311&platform=vs
+ARG SONIC_IMG_URL=${SONIC_BASE_URL}&target=target%2Fsonic-vs.img.gz
+ARG FRR_RELOAD_URL=${SONIC_BASE_URL}&target=target%2Fdebs%2Fbullseye%2Ffrr-pythontools_8.5.1-sonic-0_all.deb
 
 RUN apt-get update && \
     apt-get --no-install-recommends install --yes \
         curl \
-        linux-image-5.15.0-102-generic \
+        linux-image-cloud-amd64 \
         net-tools \
-        ovmf \
         python3 \
         python3-guestfs \
         qemu-system-x86 \
-        telnet \
-        tini && \
-    curl --location --output - "${SONIC_REMOTE_IMG}" | gunzip > sonic-vs.img
+        telnet
 
-ENTRYPOINT ["/usr/bin/tini", "--"]
+RUN curl --location --output - "${SONIC_IMG_URL}" | gunzip > sonic-vs.img && \
+    curl --location --output /frr-pythontools.deb "${FRR_RELOAD_URL}"
 
-COPY config_db.json mirror_tap_to_eth.sh sonic_entrypoint.py /
+ENTRYPOINT ["/launch.py"]
 
-CMD ["/usr/bin/python3", "-u", "/sonic_entrypoint.py"]
+COPY config_db.json mirror_tap_to_eth.sh launch.py /

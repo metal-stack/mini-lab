@@ -1,5 +1,0 @@
----
-base_url: "https://raw.githubusercontent.com/FRRouting/frr"
-branch_name: "frr-8.2.2"
-frr_python_url: "{{ base_url }}/{{ branch_name }}/tools/frr-reload.py"
-frr_url: "{{ base_url }}/{{ branch_name }}/tools/frr-reload"

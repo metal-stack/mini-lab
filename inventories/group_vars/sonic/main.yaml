@@ -7,6 +7,7 @@ metal_core_spine_uplinks:
 
 sonic_docker_routing_config_mode: split-unified
 sonic_frr_mgmt_framework_config: false
+sonic_frr_render: false
 
 sonic_loopback_address: "{{ lo }}"
 sonic_mgmtif_ip: "{{ ansible_host }}/16`"
