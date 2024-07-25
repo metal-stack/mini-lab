@@ -15,6 +15,9 @@
     }
   },
   "FEATURE": {
+    "gnmi": {
+      "state": "disabled"
+    },
     "mgmt-framework": {
       "state": "disabled"
     },
@@ -24,7 +27,7 @@
     "snmp": {
       "state": "disabled"
     },
-    "telemetry": {
+    "teamd": {
       "state": "disabled"
     }
   },
@@ -67,6 +70,11 @@
       "speed": "40000",
       "admin_status": "up",
       "mtu": "9100"
+    }
+  },
+  "VERSIONS": {
+    "DATABASE": {
+      "VERSION": "version_202311_03"
     }
   }
 }
