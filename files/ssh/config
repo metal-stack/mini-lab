@@ -1,3 +1,6 @@
+Host leaf*
+    User root
+
 Host *
     User metal
     IdentityFile files/ssh/id_rsa
@@ -5,9 +8,6 @@ Host *
     StrictHostKeyChecking no
     UserKnownHostsFile /dev/null
     PubkeyAcceptedKeyTypes +ssh-rsa
-
-Host leaf*
-    User root
 
 Host fe80::*
     # bash could be replaced with ncat, but it is not preinstalled on Cumulus
