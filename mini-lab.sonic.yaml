@@ -40,9 +40,17 @@ topology:
       binds:
         - /dev:/dev
         - scripts:/mini-lab
+    www:
+      kind: linux
+      image: docker.io/library/nginx:alpine-slim
+      network-mode: none
+      exec:
+        - ip addr add 203.0.113.3/24 dev ext
+        - ip route add 203.0.113.128/25 via 203.0.113.2 dev ext
   links:
     - endpoints: ["inet:ext", "mini_lab_ext:inet"]
       mtu: 9000
+    - endpoints: ["www:ext", "mini_lab_ext:www"]
     - endpoints: ["leaf01:eth1", "inet:eth1"]
     - endpoints: ["leaf02:eth1", "inet:eth2"]
     - endpoints: ["leaf01:eth2", "vms:lan0"]
