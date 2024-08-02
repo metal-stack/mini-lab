@@ -1,10 +1,6 @@
-FROM debian:bookworm-slim
+FROM docker.io/library/debian:bookworm-slim
 
 ENV LIBGUESTFS_BACKEND=direct
-# Check: https://sonic-build.azurewebsites.net/ui/sonic/pipelines
-ARG SONIC_BASE_URL=https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=202311&platform=vs
-ARG SONIC_IMG_URL=${SONIC_BASE_URL}&target=target%2Fsonic-vs.img.gz
-ARG FRR_RELOAD_URL=${SONIC_BASE_URL}&target=target%2Fdebs%2Fbullseye%2Ffrr-pythontools_8.5.1-sonic-0_all.deb
 
 RUN apt-get update && \
     apt-get --no-install-recommends install --yes \
@@ -16,8 +12,8 @@ RUN apt-get update && \
         qemu-system-x86 \
         telnet
 
-RUN curl --location --output - "${SONIC_IMG_URL}" | gunzip > sonic-vs.img && \
-    curl --location --output /frr-pythontools.deb "${FRR_RELOAD_URL}"
+COPY --from=ghcr.io/metal-stack/mini-lab-sonic:base /sonic-vs.img /sonic-vs.img
+COPY --from=ghcr.io/metal-stack/mini-lab-sonic:base /frr-pythontools.deb /frr-pythontools.deb
 
 ENTRYPOINT ["/launch.py"]
 
