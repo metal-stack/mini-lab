@@ -126,18 +126,17 @@ cleanup-partition:
 _privatenet: env
 	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network | grep user-private-network || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network allocate --partition mini-lab --project 00000000-0000-0000-0000-000000000001 --name user-private-network
 
-.PHONY: _public_ips
-_public_ips: env
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name firewall | grep firewall || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip create --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --ipaddress 203.0.113.129 --name firewall
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name machine | grep machine || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip create --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --ipaddress 203.0.113.130 --name machine
-
 .PHONY: machine
-machine: _privatenet _public_ips
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --ips 203.0.113.130 --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+machine: _privatenet
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: firewall
-firewall: _privatenet _public_ips
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --userdata "@/tmp/ignition.json" --ips 203.0.113.129 --firewall-rules-file=/tmp/rules.yaml --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+firewall: _privatenet
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --userdata "@/tmp/ignition.json" --firewall-rules-file=/tmp/rules.yaml --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+
+.PHONY: public-ip
+public-ip:
+	@docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name test --network internet-mini-lab -o template --template "{{ .ipaddress }}"
 
 .PHONY: ls
 ls: env
