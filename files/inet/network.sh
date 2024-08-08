@@ -26,6 +26,3 @@ bridge vlan del vid 1 untagged pvid dev vniInternet
 bridge vlan add vid 1000 dev vniInternet
 bridge vlan add vid 1000 untagged pvid dev vniInternet
 ip link set up dev vniInternet
-
-# Does not have a ipv6 address on eth0 on startup, fix this
-ip ad add 2001:db8:1::42/64 dev eth0

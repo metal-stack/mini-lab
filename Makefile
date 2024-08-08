@@ -97,6 +97,9 @@ external_network:
 			--driver=bridge \
 			--gateway=203.0.113.1 \
 			--subnet=203.0.113.0/24 \
+			--ipv6 \
+			--gateway=2001:db8:1::1 \
+			--subnet=2001:db8:1::/64 \
 			--opt "com.docker.network.driver.mtu=9000" \
 			--opt "com.docker.network.bridge.name=mini_lab_ext" \
 			--opt "com.docker.network.bridge.enable_ip_masquerade=true" && \
@@ -134,11 +137,11 @@ _public_ips: env
 
 .PHONY: machine
 machine: _privatenet _public_ips
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --ips 203.0.113.130 --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --networks $(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: firewall
 firewall: _privatenet _public_ips
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --userdata "@/tmp/ignition.json" --ips 203.0.113.129 --firewall-rules-file=/tmp/rules.yaml --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --userdata "@/tmp/ignition.json" --firewall-rules-file=/tmp/rules.yaml --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 # IPv6
 .PHONY: _privatenet6
@@ -259,6 +262,47 @@ connect-to-www:
 	@echo "Attempting to connect to container www..."
 	@for i in $$(seq 1 $(MAX_RETRIES)); do \
 		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://203.0.113.3" > /dev/null 2>&1; then \
+			echo "Connected successfully"; \
+			exit 0; \
+		else \
+			echo "Connection failed"; \
+			if [ $$i -lt $(MAX_RETRIES) ]; then \
+				echo "Retrying in 2 seconds..."; \
+				sleep 2; \
+			else \
+				echo "Max retries reached"; \
+				exit 1; \
+			fi; \
+		fi; \
+	done
+
+.PHONY: connect-to-www-ipv6
+connect-to-www-ipv6:
+	@echo "Attempting to connect to container www..."
+	@for i in $$(seq 1 $(MAX_RETRIES)); do \
+		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://[2001:db8:1::3]" > /dev/null 2>&1; then \
+			echo "Connected successfully"; \
+			exit 0; \
+		else \
+			echo "Connection failed"; \
+			if [ $$i -lt $(MAX_RETRIES) ]; then \
+				echo "Retrying in 2 seconds..."; \
+				sleep 2; \
+			else \
+				echo "Max retries reached"; \
+				exit 1; \
+			fi; \
+		fi; \
+	done
+
+FWIP := $(shell metalctl network ip list --name fw --network $(shell metalctl network list --name user-private-network -o template --template '{{ .id }}') -o template --template "{{ .ipaddress }}" --addressfamily IPv6 )
+
+.PHONY: connect-to-node-exporter-on-firewall
+connect-to-node-exporter-on-firewall:
+	@echo "Attempting to connect to node exporter on the firewall"
+	echo "Firewall IP: $(FWIP)"
+	@for i in $$(seq 1 $(MAX_RETRIES)); do \
+		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://[$(FWIP)]:9100/metrics" > /dev/null 2>&1; then \
 			echo "Connected successfully"; \
 			exit 0; \
 		else \

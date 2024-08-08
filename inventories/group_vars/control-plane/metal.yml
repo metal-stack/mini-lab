@@ -18,7 +18,8 @@ metal_api_images:
   name: Firewall 3 Ubuntu
   description: Firewall 3 Ubuntu Latest Release
   # url: https://images.metal-stack.io/metal-os/{{ metal_api_latest_os_image_release_name }}/firewall/3.0-ubuntu/img.tar.lz4
-  url: https://images.metal-stack.io/metal-os/pull_requests/247-ipv6-support/firewall/3.0-ubuntu/img.tar.lz4
+  url: https://images.metal-stack.io/metal-os/pull_requests/252-allow-ipv6-firewall-rules/firewall/3.0-ubuntu/img.tar.lz4
+  # url: https://images.metal-stack.io/metal-os/stable/firewall/3.0-ubuntu/img.tar.lz4
   features:
     - firewall
 - id: ubuntu-24.04
@@ -82,7 +83,7 @@ metal_api_networks:
   vrf: 104009
   prefixes:
   - 203.0.113.128/25
-  - 2001:db8:3::/48
+  - 2001:db8:1:1::/80
   labels:
     network.metal-stack.io/default: ""
     network.metal-stack.io/default-external: ""

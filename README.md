@@ -30,12 +30,6 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
 Here is some code that should help you to set up most of the requirements:
 
  ```bash
-# Enable IPv6 for docker
-# cat /etc/docker/daemon.json 
-{
-  "ipv6": true,
-  "fixed-cidr-v6": "2001:db8:1::/64"
-}
 # systemctl restart docker if changes where made to this file
 
 # If UFW enabled.
