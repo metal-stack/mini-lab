@@ -17,6 +17,7 @@ bridge vlan del vid 1 dev bridge self
 bridge vlan add vid 1000 dev bridge self
 ip link set dev vlanInternet up
 
+
 ip link add vniInternet type vxlan id 104009 dstport 4789 local 10.0.0.21 nolearning
 ip link set dev vniInternet mtu 9000
 ip link set dev vniInternet master bridge

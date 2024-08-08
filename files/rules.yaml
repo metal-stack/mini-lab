@@ -6,6 +6,12 @@ egress:
     protocol: TCP
     to:
       - 0.0.0.0/0
+  - comment: allow outgoing http
+    ports:
+      - 80
+    protocol: TCP
+    to:
+      - ::/0
   - comment: allow outgoing https
     ports:
       - 443

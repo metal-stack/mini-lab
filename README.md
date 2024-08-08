@@ -30,6 +30,8 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
 Here is some code that should help you to set up most of the requirements:
 
  ```bash
+# systemctl restart docker if changes where made to this file
+
 # If UFW enabled.
 # Disable the firewall or allow traffic through Docker network IP range.
 sudo ufw status
