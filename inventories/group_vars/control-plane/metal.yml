@@ -74,7 +74,7 @@ metal_api_networks:
   partitionid: "mini-lab"
   vrf: 104009
   prefixes:
-  - 100.255.254.0/24
+  - 203.0.113.128/25
   labels:
     network.metal-stack.io/default: ""
     network.metal-stack.io/default-external: ""

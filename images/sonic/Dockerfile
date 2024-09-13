@@ -1,24 +1,20 @@
-FROM ubuntu:22.04
+FROM docker.io/library/debian:bookworm-slim
 
 ENV LIBGUESTFS_BACKEND=direct
-# Check: https://sonic-build.azurewebsites.net/ui/sonic/pipelines
-ENV SONIC_REMOTE_IMG=https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=202211&platform=vs&target=target%2Fsonic-vs.img.gz
 
 RUN apt-get update && \
     apt-get --no-install-recommends install --yes \
         curl \
-        linux-image-5.15.0-102-generic \
+        linux-image-cloud-amd64 \
         net-tools \
-        ovmf \
         python3 \
         python3-guestfs \
         qemu-system-x86 \
-        telnet \
-        tini && \
-    curl --location --output - "${SONIC_REMOTE_IMG}" | gunzip > sonic-vs.img
+        telnet
 
-ENTRYPOINT ["/usr/bin/tini", "--"]
+COPY --from=ghcr.io/metal-stack/mini-lab-sonic:base /sonic-vs.img /sonic-vs.img
+COPY --from=ghcr.io/metal-stack/mini-lab-sonic:base /frr-pythontools.deb /frr-pythontools.deb
 
-COPY config_db.json mirror_tap_to_eth.sh sonic_entrypoint.py /
+ENTRYPOINT ["/launch.py"]
 
-CMD ["/usr/bin/python3", "-u", "/sonic_entrypoint.py"]
+COPY config_db.json mirror_tap_to_eth.sh launch.py /
