@@ -5,9 +5,8 @@ mgmt:
   network: bridge
 
 topology:
-  nodes:
-    leaf01:
-      kind: cvx
+  kinds:
+    cvx:
       image: networkop/cx:3.7.0
       kernel: docker.io/grigoriymikh/kernel:4.1.0
       sandbox: grigoriymikh/sandbox:latest
@@ -16,7 +15,17 @@ topology:
       binds:
         - apt-transport-https.tar.gz:/root/jessie-apt-transport-fix.tar.gz
         - files/ssh/id_rsa.pub:/root/.ssh/authorized_keys
-    leaf02:
+    linux:
+      image: ${MINI_LAB_VM_IMAGE}
+
+  nodes:
+    mini_lab_ext:
+      kind: bridge
+    leaf01:
+      kind: cvx
+    leaf02-cvx:
+      kind: cvx
+    leaf02-sonic:
       kind: linux
       image: ${MINI_LAB_SONIC_IMAGE}
       labels:
@@ -26,7 +35,7 @@ topology:
         - files/ssh/id_rsa.pub:/authorized_keys
     inet:
       kind: linux
-      image: quay.io/frrouting/frr:9.1.0
+      image: quay.io/frrouting/frr:10.0.1
       binds:
         - files/inet/daemons:/etc/frr/daemons
         - files/inet/frr.conf:/etc/frr/frr.conf
@@ -36,16 +45,33 @@ topology:
         - sh /root/network.sh
     vms:
       kind: linux
-      image: ${MINI_LAB_VM_IMAGE}
       binds:
         - /dev:/dev
         - scripts:/mini-lab
+    www:
+      kind: linux
+      image: docker.io/library/nginx:alpine-slim
+      network-mode: none
+      exec:
+        - ip addr add 203.0.113.3/24 dev ext
+        - ip route add 203.0.113.128/25 via 203.0.113.2 dev ext
+
   links:
-    - endpoints: ["leaf01:swp31", "inet:eth1"]
-    - endpoints: ["leaf02:eth1", "inet:eth2"]
-    - endpoints: ["leaf01:swp1", "vms:lan0"]
-    - endpoints: ["leaf02:eth2", "vms:lan1"]
-    - endpoints: ["leaf01:swp2", "vms:lan2"]
-    - endpoints: ["leaf02:eth3", "vms:lan3"]
-    - endpoints: ["leaf01:swp3", "vms:lan4"]
-    - endpoints: ["leaf02:eth4", "vms:lan5"]
+    - endpoints: ["inet:ext", "mini_lab_ext:inet"]
+      mtu: 9000
+    - endpoints: ["www:ext", "mini_lab_ext:www"]
+
+    - endpoints: ["leaf01:swp1", "inet:eth1"]
+    - endpoints: ["leaf01:swp2", "vms:lan0"]
+    - endpoints: ["leaf01:swp3", "vms:lan2"]
+    - endpoints: ["leaf01:swp4", "vms:lan4"]
+
+    - endpoints: ["leaf02-cvx:swp1", "inet:eth2"]
+    - endpoints: ["leaf02-cvx:swp2", "vms:lan1"]
+    - endpoints: ["leaf02-cvx:swp3", "vms:lan3"]
+    - endpoints: ["leaf02-cvx:swp4", "vms:lan5"]
+
+    - endpoints: ["leaf02-sonic:eth1", "inet:eth3"]
+    - endpoints: ["leaf02-sonic:eth2", "vms:lan6"]
+    - endpoints: ["leaf02-sonic:eth3", "vms:lan7"]
+    - endpoints: ["leaf02-sonic:eth4", "vms:lan8"]

@@ -25,13 +25,16 @@ MAX_RETRIES := 30
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
+LAB_SWITCHES=leaf01 leaf02
 VRF=vrf20
 else ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.sonic.yaml
+LAB_SWITCHES=leaf01 leaf02
 else ifeq ($(MINI_LAB_FLAVOR),mixed)
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.mixed.yaml
+LAB_SWITCHES=leaf01 leaf02-cvx leaf02-sonic
 VRF=Vrf20
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
@@ -57,8 +60,7 @@ up: env control-plane-bake partition-bake
 # without restarting the metal-core
 # TODO: should be investigated and fixed if possible
 	sleep 10
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o "PubkeyAcceptedKeyTypes +ssh-rsa" root@leaf01 -i files/ssh/id_rsa 'systemctl restart metal-core'
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o "PubkeyAcceptedKeyTypes +ssh-rsa" root@leaf02 -i files/ssh/id_rsa 'systemctl restart metal-core'
+	@$(MAKE) --no-print-directory restart-metal-core
 
 .PHONY: restart
 restart: down up
@@ -169,6 +171,20 @@ ssh-leaf01:
 .PHONY: ssh-leaf02
 ssh-leaf02:
 	ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa root@leaf02
+
+.PHONY: restart-metal-core
+restart-metal-core:
+	$(foreach host,$(LAB_SWITCHES),ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o "PubkeyAcceptedKeyTypes +ssh-rsa" root@$(host) -i files/ssh/id_rsa 'systemctl restart metal-core';)
+
+.PHONY: migrate-cumulus-to-sonic
+migrate-cumulus-to-sonic:
+	docker exec vms /mini-lab/migrate.sh tap1 lan1 lan6
+	docker exec vms /mini-lab/migrate.sh tap3 lan3 lan7
+
+.PHONY: migrate-sonic-to-cumulus
+migrate-sonic-to-cumulus:
+	docker exec vms /mini-lab/migrate.sh tap1 lan6 lan1
+	docker exec vms /mini-lab/migrate.sh tap3 lan7 lan3
 
 ## MACHINE MANAGEMENT ##
 
