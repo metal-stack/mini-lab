@@ -34,7 +34,7 @@ LAB_SWITCHES=leaf01 leaf02
 else ifeq ($(MINI_LAB_FLAVOR),mixed)
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.mixed.yaml
-LAB_SWITCHES=leaf01 leaf02-cvx leaf02-sonic
+LAB_SWITCHES=leaf01 leaf02 leaf02-sonic
 VRF=Vrf20
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
