@@ -21,6 +21,7 @@ jobs:
         flavors:
           - name: cumulus
           - name: sonic
+          - name: mixed
 
     steps:
     - name: Gain back workspace permissions # https://github.com/actions/checkout/issues/211
