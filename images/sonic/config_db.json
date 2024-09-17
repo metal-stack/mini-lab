@@ -63,14 +63,6 @@
       "admin_status": "up",
       "mtu": "9100"
     },
-    "Ethernet12": {
-      "lanes": "37,38,39,40",
-      "alias": "fortyGigE0/12",
-      "index": "3",
-      "speed": "40000",
-      "admin_status": "up",
-      "mtu": "9100"
-    }
   },
   "VERSIONS": {
     "DATABASE": {

@@ -178,13 +178,13 @@ restart-metal-core:
 
 .PHONY: migrate-cumulus-to-sonic
 migrate-cumulus-to-sonic:
-	docker exec vms /mini-lab/migrate.sh tap1 lan1 lan6
-	docker exec vms /mini-lab/migrate.sh tap3 lan3 lan7
+	docker exec vms /mini-lab/migrate.sh tap1 lan1 lan4
+	docker exec vms /mini-lab/migrate.sh tap3 lan3 lan5
 
 .PHONY: migrate-sonic-to-cumulus
 migrate-sonic-to-cumulus:
-	docker exec vms /mini-lab/migrate.sh tap1 lan6 lan1
-	docker exec vms /mini-lab/migrate.sh tap3 lan7 lan3
+	docker exec vms /mini-lab/migrate.sh tap1 lan4 lan1
+	docker exec vms /mini-lab/migrate.sh tap3 lan5 lan3
 
 ## MACHINE MANAGEMENT ##
 
