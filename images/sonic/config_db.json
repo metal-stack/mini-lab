@@ -62,7 +62,7 @@
       "speed": "40000",
       "admin_status": "up",
       "mtu": "9100"
-    },
+    }
   },
   "VERSIONS": {
     "DATABASE": {
