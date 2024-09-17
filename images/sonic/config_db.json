@@ -55,7 +55,7 @@
       "admin_status": "up",
       "mtu": "9100"
     },
-    "Ethernet120": {
+    "Ethernet8": {
       "lanes": "33,34,35,36",
       "alias": "fortyGigE0/8",
       "index": "2",
