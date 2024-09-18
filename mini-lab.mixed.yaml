@@ -61,14 +61,14 @@ topology:
       mtu: 9000
     - endpoints: ["www:ext", "mini_lab_ext:www"]
 
-    - endpoints: ["leaf01:swp2", "vms:lan0"]
-    - endpoints: ["leaf01:swp3", "vms:lan2"]
+    - endpoints: ["leaf01:swp1", "vms:lan0"]
+    - endpoints: ["leaf01:swp2", "vms:lan2"]
     - endpoints: ["leaf01:swp31", "inet:eth1"]
 
-    - endpoints: ["leaf02:swp2", "vms:lan1"]
-    - endpoints: ["leaf02:swp3", "vms:lan3"]
+    - endpoints: ["leaf02:swp1", "vms:lan1"]
+    - endpoints: ["leaf02:swp2", "vms:lan3"]
     - endpoints: ["leaf02:swp31", "inet:eth2"]
 
-    - endpoints: ["leaf02-sonic:eth2", "vms:lan4"]
-    - endpoints: ["leaf02-sonic:eth3", "vms:lan5"]
-    - endpoints: ["leaf02-sonic:eth1", "inet:eth3"]
+    - endpoints: ["leaf02-sonic:eth1", "vms:lan4"]
+    - endpoints: ["leaf02-sonic:eth2", "vms:lan5"]
+    - endpoints: ["leaf02-sonic:eth3", "inet:eth3"]
