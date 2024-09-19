@@ -25,15 +25,6 @@ VMS = {
         "lan_indices": [2, 3],
         "serial-port": 4001,
     },
-    "machine03": {
-        "name": "machine03",
-        "uuid": "2a92f14d-d3b1-4d46-b813-5d058103743e",
-        "disk-path": "/machine03.img",
-        "disk-size": "5G",
-        "memory": "2G",
-        "lan_indices": [4, 5],
-        "serial-port": 4002,
-    },
 }
 
 
