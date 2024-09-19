@@ -209,7 +209,7 @@ make
 # Switch migration
 
 The strategy for migrating a Cumulus rack to SONiC without downtime involves migrating one switch first creating a mixed setup with Cumulus and SONiC running alongside each other and then migrating the second one.
-To simulate the first half of this procdure in the mini-lab, the following steps are performed:
+To simulate the first half of this procedure in the mini-lab, the following steps are performed:
 
 - start the mini-lab with the `mixed` flavor.
 - run `eval $(make dev-env)` to get access to the lab via `metalctl`.
