@@ -199,6 +199,7 @@ There are three versions, or flavors, of the mini-lab environment which differ i
 - `sonic` -- runs 2 SONiC switches
 - `mixed` -- starts 2 Cumulus switches and one SONiC switch, where the SONiC switch is not connected to any machines yet. Read the `Switch migration` section to see how this setup can be used to simulate switch migration from Cumulus to SONiC or vice versa.
 
+
 In order to start specific flavor, you can define the flavor as follows:
 
 ```bash
