@@ -25,6 +25,7 @@ for container in $running_containers; do
     label=$(echo $labeled | cut -d' ' -f2)
     if [ $label = "mini-lab" ]; then
         echo deleting $id
+        docker stop $id
         docker rm $id
     fi
 done
