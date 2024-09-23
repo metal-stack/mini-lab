@@ -15,17 +15,3 @@ if [ ! -z "$running_containers" ]; then
 fi
 
 make cleanup
-
-# cleanup orphaned containers; this can occur if a topo file got deleted, as in such a case containerlab will not feel responsible for the containers it created
-running_containers=$(docker ps -aq)
-
-for container in $running_containers; do
-    labeled=$(docker inspect -f '{{ .Id }} {{ index .Config.Labels "containerlab" }}' $container)
-    id=$(echo $labeled | cut -d' ' -f1)
-    label=$(echo $labeled | cut -d' ' -f2)
-    if [ $label = "mini-lab" ]; then
-        echo deleting $id
-        docker stop $id
-        docker rm $id
-    fi
-done
