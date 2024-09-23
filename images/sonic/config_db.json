@@ -41,25 +41,25 @@
   "PORT": {
     "Ethernet0": {
       "lanes": "25,26,27,28",
-      "alias": "fortyGigE0/0",
-      "index": "0",
-      "speed": "40000",
+      "alias": "Eth1/1(Port1)",
+      "index": "1",
+      "speed": "25000",
       "admin_status": "up",
       "mtu": "9100"
     },
     "Ethernet4": {
       "lanes": "29,30,31,32",
-      "alias": "fortyGigE0/4",
-      "index": "1",
-      "speed": "40000",
+      "alias": "Eth2/1(Port2)",
+      "index": "2",
+      "speed": "25000",
       "admin_status": "up",
       "mtu": "9100"
     },
     "Ethernet120": {
       "lanes": "33,34,35,36",
-      "alias": "fortyGigE0/8",
-      "index": "2",
-      "speed": "40000",
+      "alias": "Eth31(Port31)",
+      "index": "31",
+      "speed": "100000",
       "admin_status": "up",
       "mtu": "9100"
     }
