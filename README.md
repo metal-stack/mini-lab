@@ -193,7 +193,7 @@ docker compose run --rm metalctl machine rm e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 
 ## Flavors
 
-There are three versions, or flavors, of the mini-lab environment which differ in regards to the NOS running on the leaves:
+There are two versions, or flavors, of the mini-lab environment which differ in regards to the NOS running on the leaves:
 
 - `cumulus` -- runs 2 Cumulus switches.
 - `sonic` -- runs 2 SONiC switches
