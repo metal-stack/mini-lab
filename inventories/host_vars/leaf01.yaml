@@ -1,0 +1,15 @@
+lo: 10.0.0.11
+asn: 4200000011
+metal_core_cidr: 10.0.1.1/{{ metal_core_cidr_mask }}
+
+dhcp_default_lease_time: 600
+dhcp_max_lease_time: 600
+dhcp_subnets:
+  - network: 10.0.1.0
+    netmask: 255.255.255.0
+    range:
+      begin: 10.0.1.2
+      end: 10.0.1.255
+    options:
+      - routers {{ dhcp_server_ip }}
+      - domain-name-servers 1.1.1.1, 8.8.8.8

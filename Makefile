@@ -25,11 +25,18 @@ MAX_RETRIES := 30
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
+LAB_SWITCHES=leaf01 leaf02
 VRF=vrf20
 else ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.sonic.yaml
+LAB_SWITCHES=leaf01 leaf02
 VRF=Vrf20
+else ifeq ($(MINI_LAB_FLAVOR),mixed)
+LAB_MACHINES=machine01,machine02
+LAB_TOPOLOGY=mini-lab.mixed.yaml
+LAB_SWITCHES=leaf01 leaf02 leaf02-sonic
+VRF=vrf20
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
@@ -54,8 +61,7 @@ up: env control-plane-bake partition-bake
 # without restarting the metal-core
 # TODO: should be investigated and fixed if possible
 	sleep 10
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o "PubkeyAcceptedKeyTypes +ssh-rsa" root@leaf01 -i files/ssh/id_rsa 'systemctl restart metal-core'
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o "PubkeyAcceptedKeyTypes +ssh-rsa" root@leaf02 -i files/ssh/id_rsa 'systemctl restart metal-core'
+	@$(MAKE) --no-print-directory restart-metal-core
 
 .PHONY: restart
 restart: down up
@@ -83,9 +89,7 @@ partition: partition-bake
 .PHONY: partition-bake
 partition-bake: external_network
 	docker pull $(MINI_LAB_VM_IMAGE)
-ifeq ($(MINI_LAB_FLAVOR),sonic)
 	docker pull $(MINI_LAB_SONIC_IMAGE)
-endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
 		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
@@ -120,6 +124,7 @@ cleanup-partition:
 	mkdir -p clab-mini-lab
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.cumulus.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
+	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.mixed.yaml
 	docker network rm --force mini_lab_ext
 
 .PHONY: _privatenet
@@ -165,6 +170,20 @@ ssh-leaf01:
 .PHONY: ssh-leaf02
 ssh-leaf02:
 	ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa root@leaf02
+
+.PHONY: restart-metal-core
+restart-metal-core:
+	$(foreach host,$(LAB_SWITCHES),ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o "PubkeyAcceptedKeyTypes +ssh-rsa" root@$(host) -i files/ssh/id_rsa 'systemctl restart metal-core';)
+
+.PHONY: migrate-cumulus-to-sonic
+migrate-cumulus-to-sonic:
+	docker exec vms /mini-lab/migrate.sh tap1 lan1 lan4
+	docker exec vms /mini-lab/migrate.sh tap3 lan3 lan5
+
+.PHONY: migrate-sonic-to-cumulus
+migrate-sonic-to-cumulus:
+	docker exec vms /mini-lab/migrate.sh tap1 lan4 lan1
+	docker exec vms /mini-lab/migrate.sh tap3 lan5 lan3
 
 ## MACHINE MANAGEMENT ##
 
