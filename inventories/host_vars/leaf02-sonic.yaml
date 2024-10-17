@@ -1,0 +1,3 @@
+lo: 10.0.0.13
+asn: 4200000013
+metal_core_cidr: 10.0.1.255/{{ metal_core_cidr_mask }}
