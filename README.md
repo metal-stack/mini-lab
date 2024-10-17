@@ -11,8 +11,8 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
 - [Requirements](#requirements)
 - [Known Limitations](#known-limitations)
 - [Try it out](#try-it-out)
-    - [Reinstall machine](#reinstall-machine)
-    - [Free machine](#free-machine)
+  - [Reinstall machine](#reinstall-machine)
+  - [Free machine](#free-machine)
 - [Flavors](#flavors)
 
 <!-- /TOC -->
@@ -29,7 +29,7 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
 
 Here is some code that should help you to set up most of the requirements:
 
- ```bash
+```bash
 # If UFW enabled.
 # Disable the firewall or allow traffic through Docker network IP range.
 sudo ufw status
@@ -58,11 +58,11 @@ sudo chmod +x /usr/local/bin/kind
 The following ports are used statically on your host machine:
 
 | Port | Bind Address | Description                        |
-|:----:|:------------ |:---------------------------------- |
-| 6443 |   0.0.0.0    | kube-apiserver of the kind cluster |
-| 4443 |   0.0.0.0    | HTTPS ingress                      |
-| 4150 |   0.0.0.0    | nsqd                               |
-| 8080 |   0.0.0.0    | HTTP ingress                       |
+| :--: | :----------- | :--------------------------------- |
+| 6443 | 0.0.0.0      | kube-apiserver of the kind cluster |
+| 4443 | 0.0.0.0      | HTTPS ingress                      |
+| 4150 | 0.0.0.0      | nsqd                               |
+| 8080 | 0.0.0.0      | HTTP ingress                       |
 
 ## Known Limitations
 
@@ -111,7 +111,7 @@ make firewall
 make machine
 ```
 
-__Alternatively__, you may want to issue the `metalctl` commands on your own:
+**Alternatively**, you may want to issue the `metalctl` commands on your own:
 
 ```bash
 docker compose run --rm metalctl network allocate \
@@ -198,7 +198,6 @@ There are three versions, or flavors, of the mini-lab environment which differ i
 - `cumulus` -- runs 2 Cumulus switches.
 - `sonic` -- runs 2 SONiC switches
 - `mixed` -- starts 2 Cumulus switches and one SONiC switch, where the SONiC switch is not connected to any machines yet. Read the `Switch migration` section to see how this setup can be used to simulate switch migration from Cumulus to SONiC or vice versa.
-
 
 In order to start specific flavor, you can define the flavor as follows:
 
