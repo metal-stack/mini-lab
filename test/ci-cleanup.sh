@@ -15,3 +15,11 @@ if [ ! -z "$running_containers" ]; then
 fi
 
 make cleanup
+
+echo "Remove containers from previous runs"
+
+previous_mini_lab_containers=$(docker container list --all --filter label=containerlab=mini-lab --quiet)
+
+if [ ! -z "$previous_mini_lab_containers" ]; then
+    docker container rm --force $(docker container list --all --filter label=containerlab=mini-lab --quiet)
+fi
