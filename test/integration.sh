@@ -43,7 +43,7 @@ done
 echo "$phoned/$minPhoned machines have phoned home"
 
 echo "Test connectivity to outside"
-make connect-to-cloudflare
+make connect-to-www
 
 echo "Test connectivity from outside"
 ssh -F files/ssh/config 203.0.113.130 -C exit

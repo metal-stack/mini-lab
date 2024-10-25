@@ -184,10 +184,6 @@ password-machine01:
 password-machine02:
 	@$(MAKE)	--no-print-directory	_password	MACHINE_UUID=2294c949-88f6-5390-8154-fa53d93a3313
 
-.PHONY: password-machine03
-password-machine03:
-	@$(MAKE)	--no-print-directory	_password	MACHINE_UUID=2a92f14d-d3b1-4d46-b813-5d058103743e
-
 .PHONY: _free-machine
 _free-machine: env
 	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine rm $(MACHINE_UUID)
@@ -202,10 +198,6 @@ free-machine01:
 free-machine02:
 	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine02 MACHINE_UUID=2294c949-88f6-5390-8154-fa53d93a3313
 
-.PHONY: free-machine03
-free-machine03:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine03 MACHINE_UUID=2a92f14d-d3b1-4d46-b813-5d058103743e
-
 .PHONY: _console-machine
 _console-machine:
 	@echo "exit console with CTRL+5 and then quit telnet through q + ENTER"
@@ -218,10 +210,6 @@ console-machine01:
 .PHONY: console-machine02
 console-machine02:
 	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4001
-
-.PHONY: console-machine03
-console-machine03:
-	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4002
 
 ## SSH TARGETS FOR MACHINES ##
 # Python code could be replaced by jq, but it is not preinstalled on Cumulus
@@ -239,11 +227,11 @@ ssh-machine:
 	))
 	ssh -F files/ssh/config $(machine) $(COMMAND)
 
-.PHONY: connect-to-cloudflare
-connect-to-cloudflare:
-	@echo "Attempting to connect to Cloudflare..."
+.PHONY: connect-to-www
+connect-to-www:
+	@echo "Attempting to connect to container www..."
 	@for i in $$(seq 1 $(MAX_RETRIES)); do \
-		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent https://1.1.1.1" > /dev/null 2>&1; then \
+		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://203.0.113.3" > /dev/null 2>&1; then \
 			echo "Connected successfully"; \
 			exit 0; \
 		else \

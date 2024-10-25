@@ -193,15 +193,14 @@ docker compose run --rm metalctl machine rm e0ab02d2-27cd-5a5e-8efc-080ba80cf258
 
 ## Flavors
 
-There's few versions of mini-lab environment that you can run. We call them flavors. There's 2 flavors at the moment:
+There are two versions, or flavors, of the mini-lab environment which differ in regards to the NOS running on the leaves:
 
-- `default` -- runs 2 machines.
-- `cluster-api` -- runs 3 machines. Useful for testing Control plane and worker node deployment with [Cluster API provider](https://github.com/metal-stack/cluster-api-provider-metalstack).
-- `sonic` -- use SONiC as network operating system for the leaves
+- `cumulus` -- runs 2 Cumulus switches.
+- `sonic` -- runs 2 SONiC switches
 
 In order to start specific flavor, you can define the flavor as follows:
 
 ```bash
-export MINI_LAB_FLAVOR=cluster-api
+export MINI_LAB_FLAVOR=sonic
 make
 ```
