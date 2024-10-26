@@ -54,8 +54,8 @@ up: env control-plane-bake partition-bake
 # without restarting the metal-core
 # TODO: should be investigated and fixed if possible
 	sleep 10
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o "PubkeyAcceptedKeyTypes +ssh-rsa" root@leaf01 -i files/ssh/id_rsa 'systemctl restart metal-core'
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o "PubkeyAcceptedKeyTypes +ssh-rsa" root@leaf02 -i files/ssh/id_rsa 'systemctl restart metal-core'
+	ssh -F files/ssh/config leaf01 'systemctl restart metal-core'
+	ssh -F files/ssh/config leaf02 'systemctl restart metal-core'
 
 .PHONY: restart
 restart: down up
@@ -160,11 +160,11 @@ docker-leaf02:
 
 .PHONY: ssh-leaf01
 ssh-leaf01:
-	ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa root@leaf01
+	ssh -F files/ssh/config leaf01
 
 .PHONY: ssh-leaf02
 ssh-leaf02:
-	ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa root@leaf02
+	ssh -F files/ssh/config leaf02
 
 ## MACHINE MANAGEMENT ##
 
