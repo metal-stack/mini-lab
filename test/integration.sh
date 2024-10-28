@@ -46,6 +46,6 @@ echo "Test connectivity to outside"
 make connect-to-www
 
 echo "Test connectivity from outside"
-ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa metal@$(make public-ip) -C exit
+ssh -F files/ssh/config metal@$(make public-ip) -C exit
 
 echo "Successfully started mini-lab"
