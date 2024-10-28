@@ -46,6 +46,6 @@ echo "Test connectivity to outside"
 make connect-to-www
 
 echo "Test connectivity from outside"
-ssh -F files/ssh/config 203.0.113.130 -C exit
+ssh -F files/ssh/config metal@$(make public-ip) -C exit
 
 echo "Successfully started mini-lab"
