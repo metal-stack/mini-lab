@@ -13,6 +13,9 @@ import time
 import guestfs
 from guestfs import GuestFS
 
+from scapy.all import sniff
+from scapy.contrib.lldp import LLDPDU, LLDPDUChassisID
+
 BASE_IMG = '/sonic-vs.img'
 
 
@@ -165,6 +168,14 @@ def main():
     logger.info('Start QEMU')
     vm.start()
 
+    # SONiC will start sending LLDP packets after PortConfigDone is set in APPL database
+    logger.info('Wait until port configuration is done')
+    sniff(iface="eth0", filter="ether proto 0x88cc", stop_filter=is_port_configuration_done, store=0)
+
+    logger.info('Port configuration is done')
+    with open('/healthy', 'w'):
+        pass
+
     logger.info('Wait until QEMU is terminated')
     vm.wait()
 
@@ -213,6 +224,14 @@ def get_default_gateway() -> str:
                 # If not default route or not RTF_GATEWAY, skip it
                 continue
             return socket.inet_ntoa(struct.pack("<L", int(fields[2], 16)))
+
+
+def is_port_configuration_done(packet):
+    if packet.haslayer(LLDPDUChassisID):
+        chassis_id_tlv = packet.getlayer(LLDPDUChassisID)
+        if chassis_id_tlv.subtype == LLDPDUChassisID.SUBTYPE_MAC_ADDRESS and chassis_id_tlv.id == get_mac_address('eth0'):
+            return True
+    return False
 
 
 if __name__ == '__main__':
