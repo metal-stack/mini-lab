@@ -1,6 +1,12 @@
-FROM ubuntu:20.04
+FROM docker.io/library/debian:bookworm-backports
 
-RUN apt update -y && \
-    apt install -y qemu-system-x86 ovmf ifupdown net-tools telnet
+RUN apt update && \
+    apt-get --no-install-recommends install --yes \
+        iproute2 \
+        ovmf \
+        python3 \
+        qemu-utils \
+        qemu-system-x86 \
+        telnet
 
-CMD ["/mini-lab/vms_entrypoint.sh"]
+ENTRYPOINT ["/mini-lab/vms_entrypoint.sh"]
