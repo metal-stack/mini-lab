@@ -103,7 +103,7 @@ external_network:
 			--opt "com.docker.network.driver.mtu=9000" \
 			--opt "com.docker.network.bridge.name=mini_lab_ext" \
 			--opt "com.docker.network.bridge.enable_ip_masquerade=true" && \
-		sudo ip route add 203.0.113.128/25 via 203.0.113.2 dev mini_lab_ext; \
+		sudo ip route add 203.0.113.128/25 via 203.0.113.2 dev mini_lab_ext && \
 		sudo ip route add 2001:db8:1:1::/80 via 2001:db8:1::2 dev mini_lab_ext; \
 		fi
 
