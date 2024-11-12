@@ -40,3 +40,9 @@ ingress:
       - 203.0.113.1/25
     to:
       - 203.0.113.128/25
+  - comment: allow incoming ssh ipv6
+    ports:
+      - 22
+    protocol: TCP
+    to:
+      - 2001:db8:1:1::1/80

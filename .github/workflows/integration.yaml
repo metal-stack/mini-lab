@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - master
+      - fix-incoming-ipv6
 
 env:
   REGISTRY: ghcr.io

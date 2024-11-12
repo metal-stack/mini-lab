@@ -53,7 +53,5 @@ topology:
     - endpoints: ["leaf02:swp1", "vms:lan1"]
     - endpoints: ["leaf01:swp2", "vms:lan2"]
     - endpoints: ["leaf02:swp2", "vms:lan3"]
-    - endpoints: ["leaf01:swp3", "vms:lan4"]
-    - endpoints: ["leaf02:swp3", "vms:lan5"]
     - endpoints: ["leaf01:swp31", "inet:eth1"]
     - endpoints: ["leaf02:swp31", "inet:eth2"]

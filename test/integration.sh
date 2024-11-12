@@ -49,6 +49,6 @@ echo "Test connectivity to outside ipv6"
 make connect-to-www-ipv6
 
 echo "Test connectivity from outside"
-ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa metal@203.0.113.130 -C exit
+ssh -F files/ssh/config metal@$(make public-ip) -C exit
 
 echo "Successfully started mini-lab"
