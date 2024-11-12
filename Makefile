@@ -54,8 +54,8 @@ up: env control-plane-bake partition-bake
 # without restarting the metal-core
 # TODO: should be investigated and fixed if possible
 	sleep 10
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o "PubkeyAcceptedKeyTypes +ssh-rsa" root@leaf01 -i files/ssh/id_rsa 'systemctl restart metal-core'
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o "PubkeyAcceptedKeyTypes +ssh-rsa" root@leaf02 -i files/ssh/id_rsa 'systemctl restart metal-core'
+	ssh -F files/ssh/config leaf01 'systemctl restart metal-core'
+	ssh -F files/ssh/config leaf02 'systemctl restart metal-core'
 
 .PHONY: restart
 restart: down up
@@ -130,32 +130,17 @@ cleanup-partition:
 _privatenet: env
 	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network | grep user-private-network || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network allocate --partition mini-lab --project 00000000-0000-0000-0000-000000000001 --name user-private-network
 
-.PHONY: _public_ips
-_public_ips: env
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name firewall | grep firewall || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip create --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --ipaddress 203.0.113.129 --name firewall
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name machine | grep machine || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip create --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --ipaddress 203.0.113.130 --name machine
-
 .PHONY: machine
-machine: _privatenet _public_ips
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --networks $(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+machine: _privatenet
+	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: firewall
-firewall: _privatenet _public_ips
+firewall: _privatenet
 	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --userdata "@/tmp/ignition.json" --firewall-rules-file=/tmp/rules.yaml --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
-# IPv6
-.PHONY: _privatenet6
-_privatenet6: env
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network-6 | grep user-private-network-6 || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network allocate --partition mini-lab --project 00000000-0000-0000-0000-000000000000 --name user-private-network-6 --addressfamily ipv6
-
-.PHONY: machine6
-machine6: _privatenet6
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description test6 --name test6 --hostname test6 --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --networks $(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network-6 -o template --template '{{ .id }}')
-
-.PHONY: firewall6
-firewall6: _ips _privatenet6
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000000 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --networks internet-ipv6-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network-6 -o template --template '{{ .id }}')
-
+.PHONY: public-ip
+public-ip:
+	@docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name test --network internet-mini-lab -o template --template "{{ .ipaddress }}"
 
 .PHONY: ls
 ls: env
@@ -178,11 +163,11 @@ docker-leaf02:
 
 .PHONY: ssh-leaf01
 ssh-leaf01:
-	ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa root@leaf01
+	ssh -F files/ssh/config leaf01
 
 .PHONY: ssh-leaf02
 ssh-leaf02:
-	ssh -o StrictHostKeyChecking=no -o "PubkeyAcceptedKeyTypes +ssh-rsa" -i files/ssh/id_rsa root@leaf02
+	ssh -F files/ssh/config leaf02
 
 ## MACHINE MANAGEMENT ##
 
@@ -202,10 +187,6 @@ password-machine01:
 password-machine02:
 	@$(MAKE)	--no-print-directory	_password	MACHINE_UUID=2294c949-88f6-5390-8154-fa53d93a3313
 
-.PHONY: password-machine03
-password-machine03:
-	@$(MAKE)	--no-print-directory	_password	MACHINE_UUID=2a92f14d-d3b1-4d46-b813-5d058103743e
-
 .PHONY: _free-machine
 _free-machine: env
 	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine rm $(MACHINE_UUID)
@@ -220,10 +201,6 @@ free-machine01:
 free-machine02:
 	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine02 MACHINE_UUID=2294c949-88f6-5390-8154-fa53d93a3313
 
-.PHONY: free-machine03
-free-machine03:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine03 MACHINE_UUID=2a92f14d-d3b1-4d46-b813-5d058103743e
-
 .PHONY: _console-machine
 _console-machine:
 	@echo "exit console with CTRL+5 and then quit telnet through q + ENTER"
@@ -236,10 +213,6 @@ console-machine01:
 .PHONY: console-machine02
 console-machine02:
 	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4001
-
-.PHONY: console-machine03
-console-machine03:
-	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4002
 
 ## SSH TARGETS FOR MACHINES ##
 # Python code could be replaced by jq, but it is not preinstalled on Cumulus
