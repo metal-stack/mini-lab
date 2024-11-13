@@ -3,10 +3,6 @@
   hosts: control-plane
   connection: local
   gather_facts: false
-  vars:
-    setup_yaml:
-      - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
-        meta_var: metal_stack_release
   roles:
     - name: ansible-common
       tags: always
@@ -26,3 +22,30 @@
       tags: auditing
     - name: metal-roles/control-plane/roles/metal
       tags: metal
+
+- name: deploy gardener
+  hosts: control-plane
+  connection: local
+  gather_facts: false
+  pre_tasks:
+    - name: Fake Gardener metal shoot
+      k8s:
+        definition:
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: shoot-info
+            namespace: kube-system
+          data:
+            nodeNetwork: 172.18.0.0/16
+            podNetwork: 10.244.0.0/24
+            serviceNetwork: 10.96.0.0/16
+
+  roles:
+    - name: ansible-common
+      tags: always
+    - name: metal-roles/control-plane/roles/gardener
+      tags: gardener
+      when: gardener_enabled
+  vars:
+    metal_control_plane_host_provider: metal

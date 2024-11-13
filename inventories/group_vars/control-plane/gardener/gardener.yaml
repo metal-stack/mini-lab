@@ -1,0 +1,4 @@
+---
+gardener_enabled: true
+
+gardener_cert_management_issuer_email: mini-lab@metal-stack.io

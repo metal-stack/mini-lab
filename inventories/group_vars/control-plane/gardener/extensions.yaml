@@ -1,0 +1,3 @@
+---
+gardener_extension_provider_local_enabled: true
+gardener_extension_provider_gcp_enabled: false

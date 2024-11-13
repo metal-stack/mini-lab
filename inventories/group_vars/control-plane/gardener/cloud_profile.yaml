@@ -1,0 +1,35 @@
+---
+gardener_cloud_profile_metal_api_hmac: "metal-admin"
+
+gardener_cloud_profile_firewall_images_from_machine_images: true
+
+gardener_cloud_profile_firewall_controller_versions:
+  - version: v2.3.5
+    url: https://images.metal-stack.io/firewall-controller/v2.3.5/firewall-controller
+    classification: supported
+
+gardener_cloud_profile_kubernetes:
+  versions:
+  - version: 1.30.6
+
+gardener_cloud_profile_machine_types:
+  - name: v1-small-x86
+    cpu: "1"
+    gpu: "0"
+    memory: 1Gi
+    usable: true
+    storage:
+      class: standard
+      type: default
+      size: 4G
+
+gardener_cloud_profile_regions:
+  - name: local
+    zones:
+    - name: mini-lab
+
+gardener_cloud_profile_partitions:
+  mini-lab:
+    default-machine-types:
+      firewall:
+        - v1-small-x86

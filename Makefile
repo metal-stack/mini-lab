@@ -252,3 +252,30 @@ dev-env:
 	@echo "export METALCTL_API_URL=http://api.172.17.0.1.nip.io:8080/metal"
 	@echo "export METALCTL_HMAC=metal-admin"
 	@echo "export KUBECONFIG=$(KUBECONFIG)"
+
+## Gardener integration
+
+.PHONY: fetch-virtual-kubeconfig
+fetch-virtual-kubeconfig:
+	kubectl config unset users.virtual-garden
+	kubectl config unset contexts.virtual-garden
+	kubectl config unset clusters.virtual-garden
+	kubectl get secret -n garden garden-kubeconfig-for-admin -o jsonpath='{.data.kubeconfig}' | base64 -d > .virtual-kubeconfig
+	kubectl --kubeconfig=.virtual-kubeconfig config rename-context garden virtual-garden
+	sed -i 's/name: garden/name: virtual-garden/g' .virtual-kubeconfig
+	sed -i 's/name: admin/name: virtual-garden/g' .virtual-kubeconfig
+	kubectl --kubeconfig=.virtual-kubeconfig config set contexts.virtual-garden.cluster virtual-garden
+	kubectl --kubeconfig=.virtual-kubeconfig config set contexts.virtual-garden.user virtual-garden
+	KUBECONFIG=$$KUBECONFIG:.virtual-kubeconfig kubectl config view --flatten > .merged-kubeconfig
+	rm .virtual-kubeconfig
+	mv .merged-kubeconfig .kubeconfig
+
+.PHONY: build-provider-local
+build-provider-local:
+	rm -rf gardener-tmp
+	mkdir -p gardener-tmp
+	curl -L https://github.com/gardener/gardener/archive/refs/tags/v1.98.6.tar.gz | tar xzf - -C gardener-tmp
+	cd gardener-tmp/* && docker build -t provider-local:latest -f Dockerfile --target gardener-extension-provider-local . && cd -
+	kind load docker-image provider-local:latest --name metal-control-plane
+	./provider-local-chart-gen.sh
+	rm -rf gardener-tmp

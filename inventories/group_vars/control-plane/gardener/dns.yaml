@@ -1,0 +1,3 @@
+---
+gardener_dns_domain: "gardener.172.17.0.1"
+gardener_dns_provider: local
