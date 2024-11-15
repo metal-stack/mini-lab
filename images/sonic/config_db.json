@@ -21,9 +21,6 @@
     "mgmt-framework": {
       "state": "disabled"
     },
-    "pmon": {
-      "state": "disabled"
-    },
     "snmp": {
       "state": "disabled"
     },
