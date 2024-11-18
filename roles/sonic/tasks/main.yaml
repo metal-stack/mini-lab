@@ -2,6 +2,9 @@
 - name: Install frr-pythontools
   ansible.builtin.import_tasks: frr-reload.yaml
 
+- name: Fix Network Performance
+  ansible.builtin.import_tasks: fix-network-performance.yaml
+
 - name: Set lldp tx-interval to 10
   ansible.builtin.command: lldpcli configure lldp tx-interval 10
   retries: 10
