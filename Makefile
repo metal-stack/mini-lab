@@ -40,9 +40,9 @@ KIND_ARGS=--image kindest/node:v$(K8S_VERSION)
 endif
 
 ifeq ($(CI),true)
-  DOCKER_COMPOSE_TTY_ARG=-T
+  DOCKER_COMPOSE_RUN_ARG=--no-TTY --rm
 else
-  DOCKER_COMPOSE_TTY_ARG=
+  DOCKER_COMPOSE_RUN_ARG=--rm
 endif
 
 .PHONY: up
@@ -124,23 +124,23 @@ cleanup-partition:
 
 .PHONY: _privatenet
 _privatenet: env
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network | grep user-private-network || docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network allocate --partition mini-lab --project 00000000-0000-0000-0000-000000000001 --name user-private-network
+	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network list --name user-private-network | grep user-private-network || docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network allocate --partition mini-lab --project 00000000-0000-0000-0000-000000000001 --name user-private-network
 
 .PHONY: machine
 machine: _privatenet
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: firewall
 firewall: _privatenet
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --userdata "@/tmp/ignition.json" --firewall-rules-file=/tmp/rules.yaml --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --userdata "@/tmp/ignition.json" --firewall-rules-file=/tmp/rules.yaml --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: public-ip
 public-ip:
-	@docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl network ip list --name test --network internet-mini-lab -o template --template "{{ .ipaddress }}"
+	@docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network ip list --name test --network internet-mini-lab -o template --template "{{ .ipaddress }}"
 
 .PHONY: ls
 ls: env
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine ls
+	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine ls
 
 ## SWITCH MANAGEMENT ##
 
@@ -173,7 +173,7 @@ start-machines:
 
 .PHONY: _password
 _password: env
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine consolepassword $(MACHINE_UUID)
+	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine consolepassword $(MACHINE_UUID)
 
 .PHONY: password-machine01
 password-machine01:
@@ -185,7 +185,7 @@ password-machine02:
 
 .PHONY: _free-machine
 _free-machine: env
-	docker compose run $(DOCKER_COMPOSE_TTY_ARG) metalctl machine rm $(MACHINE_UUID)
+	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine rm $(MACHINE_UUID)
 	docker exec vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) kill --with-disks
 	docker exec vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) create
 
