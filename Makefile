@@ -269,13 +269,3 @@ fetch-virtual-kubeconfig:
 	KUBECONFIG=$$KUBECONFIG:.virtual-kubeconfig kubectl config view --flatten > .merged-kubeconfig
 	rm .virtual-kubeconfig
 	mv .merged-kubeconfig .kubeconfig
-
-.PHONY: build-provider-local
-build-provider-local:
-	rm -rf gardener-tmp
-	mkdir -p gardener-tmp
-	curl -L https://github.com/gardener/gardener/archive/refs/tags/v1.98.6.tar.gz | tar xzf - -C gardener-tmp
-	cd gardener-tmp/* && docker build -t provider-local:latest -f Dockerfile --target gardener-extension-provider-local . && cd -
-	kind load docker-image provider-local:latest --name metal-control-plane
-	./provider-local-chart-gen.sh
-	rm -rf gardener-tmp

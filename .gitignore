@@ -12,6 +12,4 @@ requirements.yaml
 .extra_vars.yaml
 sonic-vs.img
 *.bak
-gardener-tmp
-inventories/group_vars/control-plane/gardener/provider_local.yaml
 .ansible
