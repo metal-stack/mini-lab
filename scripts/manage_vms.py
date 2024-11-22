@@ -122,21 +122,22 @@ class Manager:
             "-name", machine.get("name"),
             "-uuid", machine.get("uuid"),
             "-m", machine.get("memory"),
-            "-boot", "n",
             "-cpu", "host",
-            "-drive", "if=virtio,format=qcow2,file={disk}".format(disk=machine.get("disk-path")),
-            "-drive", "if=pflash,format=raw,readonly,file=/usr/share/OVMF/OVMF_CODE.fd",
-            "-drive", "if=pflash,format=raw,readonly,file=/usr/share/OVMF/OVMF_VARS.fd",
-            "-serial", "telnet:127.0.0.1:{port},server,nowait".format(port=machine.get("serial-port")),
+            "-display", "none",
             "-enable-kvm",
-            "-nographic",
+            "-machine", "q35",
+            "-nodefaults",
+            "-drive", "if=virtio,format=qcow2,file={disk}".format(disk=machine.get("disk-path")),
+            "-drive", "if=pflash,format=raw,readonly=on,file=/opt/OVMF/OVMF_CODE.fd",
+            "-drive", "if=pflash,format=raw,readonly=on,file=/opt/OVMF/OVMF_VARS.fd",
+            "-serial", "telnet:127.0.0.1:{port},server,nowait".format(port=machine.get("serial-port")),
         ]
 
         for i in machine["lan_indices"]:
             with open(f'/sys/class/net/lan{i}/address', 'r') as f:
                 mac = f.read().strip()
             cmd.append('-device')
-            cmd.append(f'virtio-net,netdev=hn{i},mac={mac}')
+            cmd.append(f'virtio-net-pci,netdev=hn{i},mac={mac},romfile=')
             cmd.append(f'-netdev')
             cmd.append(f'tap,id=hn{i},ifname=tap{i},script=/mini-lab/mirror_tap_to_lan.sh,downscript=/mini-lab/remove_mirror.sh')
 
