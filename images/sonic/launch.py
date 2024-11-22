@@ -92,6 +92,8 @@ def initial_configuration(g: GuestFS) -> None:
     g.ln_s(linkname=systemd_system + 'tacacs-config.timer', target='/dev/null') # After boot Host configuration
     # Started by featured
     g.ln_s(linkname=sonic_target_wants + 'lldp.service', target='/lib/systemd/system/lldp.service')
+    g.ln_s(linkname=systemd_system + 'pmon.service', target='/lib/systemd/system/pmon.service')
+    g.ln_s(linkname=sonic_target_wants + 'pmon.service', target='/lib/systemd/system/pmon.service')
 
     # Workaround: Only useful for BackEndToRRouter
     g.ln_s(linkname=systemd_system + 'backend-acl.service', target='/dev/null')
