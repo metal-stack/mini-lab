@@ -53,6 +53,7 @@ class Qemu:
             '-smp', self._smp,
             '-display', 'none',
             '-enable-kvm',
+            '-nodefaults',
             '-machine', 'q35',
             '-name', self._name,
             '-m', self._memory,
@@ -64,7 +65,7 @@ class Qemu:
             with open(f'/sys/class/net/eth{i}/address', 'r') as f:
                 mac = f.read().strip()
             cmd.append('-device')
-            cmd.append(f'virtio-net,netdev=hn{i},mac={mac}')
+            cmd.append(f'virtio-net-pci,netdev=hn{i},mac={mac}')
             cmd.append(f'-netdev')
             cmd.append(f'tap,id=hn{i},ifname=tap{i},script=/mirror_tap_to_eth.sh,downscript=no')
 
@@ -94,6 +95,8 @@ def initial_configuration(g: GuestFS) -> None:
     g.ln_s(linkname=systemd_system + 'tacacs-config.timer', target='/dev/null') # After boot Host configuration
     # Started by featured
     g.ln_s(linkname=sonic_target_wants + 'lldp.service', target='/lib/systemd/system/lldp.service')
+    g.ln_s(linkname=systemd_system + 'pmon.service', target='/lib/systemd/system/pmon.service')
+    g.ln_s(linkname=sonic_target_wants + 'pmon.service', target='/lib/systemd/system/pmon.service')
 
     # Workaround: Only useful for BackEndToRRouter
     g.ln_s(linkname=systemd_system + 'backend-acl.service', target='/dev/null')

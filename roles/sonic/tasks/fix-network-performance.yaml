@@ -1,0 +1,16 @@
+---
+- name: Collect facts about interfaces
+  ansible.builtin.setup:
+    gather_subset:
+      - '!all'
+      - '!min'
+      - interfaces
+
+- name: Gather all network interfaces except eth0
+  set_fact:
+    interfaces: "{{ ansible_interfaces | select('match', '^eth[0-9]+$') | reject('equalto', 'eth0') | list }}"
+
+- name: Disable GRO on all network interfaces except eth0
+  shell: ethtool -K {{ item }} gro off
+  become: true
+  with_items: "{{ interfaces }}"
