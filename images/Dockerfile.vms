@@ -3,6 +3,7 @@ FROM docker.io/library/debian:bookworm-backports
 RUN apt update && \
     apt-get --no-install-recommends install --yes \
         iproute2 \
+        procps \
         python3 \
         qemu-utils \
         qemu-system-x86 \
