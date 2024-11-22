@@ -98,7 +98,7 @@ class Manager:
                 return
 
             pid = fields[0]
-            os.kill(int(pid), signal.SIGKILL)
+            os.kill(int(pid), signal.SIGTERM)
 
 
     @staticmethod
