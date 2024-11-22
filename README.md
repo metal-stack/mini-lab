@@ -11,8 +11,8 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
 - [Requirements](#requirements)
 - [Known Limitations](#known-limitations)
 - [Try it out](#try-it-out)
-    - [Reinstall machine](#reinstall-machine)
-    - [Free machine](#free-machine)
+  - [Reinstall machine](#reinstall-machine)
+  - [Free machine](#free-machine)
 - [Flavors](#flavors)
 
 <!-- /TOC -->
@@ -29,7 +29,7 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
 
 Here is some code that should help you to set up most of the requirements:
 
- ```bash
+```bash
 # If UFW enabled.
 # Disable the firewall or allow traffic through Docker network IP range.
 sudo ufw status
@@ -58,11 +58,11 @@ sudo chmod +x /usr/local/bin/kind
 The following ports are used statically on your host machine:
 
 | Port | Bind Address | Description                        |
-|:----:|:------------ |:---------------------------------- |
-| 6443 |   0.0.0.0    | kube-apiserver of the kind cluster |
-| 4443 |   0.0.0.0    | HTTPS ingress                      |
-| 4150 |   0.0.0.0    | nsqd                               |
-| 8080 |   0.0.0.0    | HTTP ingress                       |
+| :--: | :----------- | :--------------------------------- |
+| 6443 | 0.0.0.0      | kube-apiserver of the kind cluster |
+| 4443 | 0.0.0.0      | HTTPS ingress                      |
+| 4150 | 0.0.0.0      | nsqd                               |
+| 8080 | 0.0.0.0      | HTTP ingress                       |
 
 ## Known Limitations
 
@@ -111,7 +111,7 @@ make firewall
 make machine
 ```
 
-__Alternatively__, you may want to issue the `metalctl` commands on your own:
+**Alternatively**, you may want to issue the `metalctl` commands on your own:
 
 ```bash
 docker compose run --rm metalctl network allocate \
@@ -204,3 +204,122 @@ In order to start specific flavor, you can define the flavor as follows:
 export MINI_LAB_FLAVOR=sonic
 make
 ```
+
+# Connect Firewall Controller to Kind Cluster
+
+We need a few different repositories, if you see a 💿 icon you need to change the to the repository that is written after the icon. Using tmux or any terminal multiplexer is recommended. 🌞
+
+To establish a connection between the Firewall Controller (FC) and the Kind cluster, you need to configure routing between the FC and the Kind cluster. Follow the steps below to set this up:
+
+## 1. Configure BGP
+
+### 💿 MINI-LAB
+
+Run the following command to configure BGP:
+
+```bash
+make configure-bgp
+```
+
+```bash
+make _privatenet
+```
+
+## 2. Deploy FC to Connect to the Kind Cluster
+
+### 💿 FIREWALL-CONTROLLER-MANAGER
+
+Before executing replace the args of the config/examples/deployment.yaml with:
+
+```yaml
+args:
+  - -metal-api-url=http://metal-api.metal-control-plane.svc.cluster.local:8080/metal
+  - -cert-dir=/certs
+  - -log-level=info
+  - -seed-api-url=http://172.17.0.1
+  - -enable-leader-election
+  - -namespace=firewall
+  - -shoot-kubeconfig-secret-name=generic-token-kubeconfig ## Need to create this urself bc usually gardener creates this
+  - -shoot-token-secret-name=firewall-controller-shoot-access-firewall
+  - -ssh-key-secret-name=ssh-secret
+```
+
+Now run:
+
+```bash
+make deploy
+```
+
+## 3. Update .seed-kubeconfig
+
+You also need to update the .seed-kubeconfig file on the machine. Follow these steps:
+
+    Connect to the machine.
+    Replace the existing /etc/firewall-controller/.seed-kubeconfig with the output of the following command:
+
+### 💿 MINI-LAB
+
+```bash
+make generate-insecure-kubeconfig
+```
+
+## Running Your Local Firewall Controller in Mini-Lab
+
+To run your own local Firewall Controller (FC) in the mini-lab, follow these steps:
+
+### 1. Clone the Metal-Images Repository
+
+Pull the metal-images repository. 2. Build Your Local Firewall Controller
+
+### 💿 FIREWALL-CONTROLLER
+
+```bash
+make docker
+```
+
+### 3. Modify the Firewall/Dockerfile
+
+### 💿 METAL-IMAGES
+
+Replace:
+
+```bash
+FROM ghcr.io/metal-stack/firewall-controller:${FIREWALL_CONTROLLER_VERSION} AS firewall-controller-artifacts
+```
+
+With:
+
+```bash
+FROM my-local-firewall-controller:latest AS firewall-controller-artifacts
+```
+
+### 4. Build the Firewall Image
+
+```bash
+make firewall
+```
+
+Sometimes the test.sh line in the **builds.after** fail Just remove that whole line in all the docker-make files.
+
+### 5. Serve the Built Images
+
+Start a local HTTP server to serve the images. From within the metal-images repository:
+
+```bash
+cd images
+python3 -m http.server 8000 --bind 0.0.0.0
+```
+
+### 6. Create Firewall Image in Mini-Lab
+
+### 💿 MINI-LAB
+
+```bash
+make create-firewall-image
+```
+
+**Make sure that spec.template.spec.image is firewall-ubuntu-4.0.❗**
+
+Now create the firewalldeployment.yaml inside the config/examples directory inside the fcm repository.
+
+Now your local Firewall Controller should be running in the mini-lab environment and also has connection to your cluster! Great job! 💪

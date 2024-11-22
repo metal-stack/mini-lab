@@ -21,6 +21,9 @@ MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-la
 MACHINE_OS=ubuntu-24.04
 MAX_RETRIES := 30
 
+
+HOSTNAME_IP ?= $(shell hostname -I | awk '{print $1}'')
+
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
 LAB_MACHINES=machine01,machine02
@@ -119,15 +122,14 @@ configure-bgp:
 create-firewall-image:
 	@metalctl image create \
 		--id firewall-ubuntu-4.0 \
-		--url http://172.19.154.155:8000/firewall/3.0-ubuntu/img.tar.lz4 \
+		--url http://$(HOSTNAME_IP):8000/firewall/3.0-ubuntu/img.tar.lz4 \
 		--features "firewall"
 
-generate-insecure-kubeconfig:
-	@echo "Generating .kubeconfig_insecure..."
+.PHONY: insecure_kubeconfig
+insecure-kubeconfig:
 	@sed -e 's/certificate-authority-data: .*/insecure-skip-tls-verify: true/' \
 	    -e 's/server: https:\/\/0.0.0.0:6443/server: https:\/\/172.17.0.1:6443/' \
 	    .kubeconfig > .kubeconfig_insecure
-	@echo ".kubeconfig_insecure has been created with the desired modifications."
 
 
 
