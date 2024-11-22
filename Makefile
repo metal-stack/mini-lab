@@ -106,6 +106,31 @@ external_network:
 env:
 	@./env.sh
 
+configure-bgp:
+	@docker exec -it $$(docker ps -qf "name=inet") bash -c "\
+		vtysh -c 'configure terminal' \
+		      -c 'router bgp 4200000021' \
+		      -c 'network 172.17.0.0/16' \
+		      -c 'end' \
+		      -c 'write memory' \
+		      -c 'show run'"
+
+
+create-firewall-image:
+	@metalctl image create \
+		--id firewall-ubuntu-4.0 \
+		--url http://172.19.154.155:8000/firewall/3.0-ubuntu/img.tar.lz4 \
+		--features "firewall"
+
+generate-insecure-kubeconfig:
+	@echo "Generating .kubeconfig_insecure..."
+	@sed -e 's/certificate-authority-data: .*/insecure-skip-tls-verify: true/' \
+	    -e 's/server: https:\/\/0.0.0.0:6443/server: https:\/\/172.17.0.1:6443/' \
+	    .kubeconfig > .kubeconfig_insecure
+	@echo ".kubeconfig_insecure has been created with the desired modifications."
+
+
+
 .PHONY: cleanup
 cleanup: cleanup-control-plane cleanup-partition
 
