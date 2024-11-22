@@ -1,5 +1,5 @@
 name: mini-lab
-prefix: ""
+prefix: ''
 
 mgmt:
   network: bridge
@@ -40,6 +40,12 @@ topology:
       binds:
         - /dev:/dev
         - scripts:/mini-lab
+    test_vm:
+      kind: linux
+      image: ${MINI_LAB_VM_IMAGE}
+      binds:
+        - /dev:/dev
+        - scripts:/mini-lab
     www:
       kind: linux
       image: docker.io/library/nginx:alpine-slim
@@ -48,12 +54,14 @@ topology:
         - ip addr add 203.0.113.3/24 dev ext
         - ip route add 203.0.113.128/25 via 203.0.113.2 dev ext
   links:
-    - endpoints: ["inet:ext", "mini_lab_ext:inet"]
+    - endpoints: ['inet:ext', 'mini_lab_ext:inet']
       mtu: 9000
-    - endpoints: ["www:ext", "mini_lab_ext:www"]
-    - endpoints: ["leaf01:eth1", "vms:lan0"]
-    - endpoints: ["leaf02:eth1", "vms:lan1"]
-    - endpoints: ["leaf01:eth2", "vms:lan2"]
-    - endpoints: ["leaf02:eth2", "vms:lan3"]
-    - endpoints: ["leaf01:eth3", "inet:eth1"]
-    - endpoints: ["leaf02:eth3", "inet:eth2"]
+    - endpoints: ['www:ext', 'mini_lab_ext:www']
+    - endpoints: ['leaf01:eth1', 'vms:lan0']
+    - endpoints: ['leaf02:eth1', 'vms:lan1']
+    - endpoints: ['leaf01:eth2', 'vms:lan2']
+    - endpoints: ['leaf02:eth2', 'vms:lan3']
+    - endpoints: ['test_vm:lan0', 'vms:lan4']
+    - endpoints: ['test_vm:lan1', 'vms:lan5']
+    - endpoints: ['leaf01:eth3', 'inet:eth1']
+    - endpoints: ['leaf02:eth3', 'inet:eth2']

@@ -22,7 +22,10 @@ MACHINE_OS=ubuntu-24.04
 MAX_RETRIES := 30
 
 
-HOSTNAME_IP ?= $(shell hostname -I | awk '{print $1}'')
+HOSTNAME_IP := $(shell hostname -I | awk '{print $$1}')
+
+
+
 
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
@@ -120,16 +123,17 @@ configure-bgp:
 
 
 create-firewall-image:
+	@echo "Using URL: http://$(HOSTNAME_IP):8000/firewall/3.0-ubuntu/img.tar.lz4"
 	@metalctl image create \
-		--id firewall-ubuntu-4.0 \
-		--url http://$(HOSTNAME_IP):8000/firewall/3.0-ubuntu/img.tar.lz4 \
-		--features "firewall"
+        --id firewall-ubuntu-4.0 \
+        --url http://$(HOSTNAME_IP):8000/firewall/3.0-ubuntu/img.tar.lz4 \
+        --features "firewall"
 
-.PHONY: insecure_kubeconfig
 insecure-kubeconfig:
 	@sed -e 's/certificate-authority-data: .*/insecure-skip-tls-verify: true/' \
 	    -e 's/server: https:\/\/0.0.0.0:6443/server: https:\/\/172.17.0.1:6443/' \
 	    .kubeconfig > .kubeconfig_insecure
+	@echo "Exporting insecure kubeconfig into .kubeconfig_insecure"
 
 
 
