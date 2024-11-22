@@ -128,8 +128,8 @@ class Manager:
             "-machine", "q35",
             "-nodefaults",
             "-drive", "if=virtio,format=qcow2,file={disk}".format(disk=machine.get("disk-path")),
-            "-drive", "if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE.fd",
-            "-drive", "if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_VARS.fd",
+            "-drive", "if=pflash,format=raw,readonly=on,file=/opt/OVMF/OVMF_CODE.fd",
+            "-drive", "if=pflash,format=raw,readonly=on,file=/opt/OVMF/OVMF_VARS.fd",
             "-serial", "telnet:127.0.0.1:{port},server,nowait".format(port=machine.get("serial-port")),
         ]
 
