@@ -1,6 +1,8 @@
 FROM ubuntu:20.04
 
 RUN apt update -y && \
-    apt install -y qemu-system-x86 ovmf ifupdown net-tools telnet
+    apt install -y qemu-system-x86 ifupdown net-tools telnet
+
+COPY --from=ghcr.io/metal-stack/mini-lab-ovmf:edk2-stable202408.01 /OVMF_*.fd /opt/OVMF/
 
 CMD ["/mini-lab/vms_entrypoint.sh"]
