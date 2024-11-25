@@ -40,7 +40,7 @@ metal_api_sizes:
     max: "{{ '4GB' | humanfriendly }}"
   - type: storage
     min: "{{ '1GB' | humanfriendly }}"
-    max: "{{ '10GB' | humanfriendly }}"
+    max: "{{ '100GB' | humanfriendly }}"
 
 metal_api_partitions:
   - id: mini-lab
