@@ -1,12 +1,12 @@
-FROM docker.io/library/debian:bookworm-slim
+FROM docker.io/library/debian:bookworm-backports
 
 ENV LIBGUESTFS_BACKEND=direct
 
 RUN apt-get update && \
     apt-get --no-install-recommends install --yes \
         curl \
+        iproute2 \
         linux-image-cloud-amd64 \
-        net-tools \
         python3 \
         python3-guestfs \
         qemu-system-x86 \
