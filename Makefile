@@ -57,6 +57,12 @@ up: env control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_rsa
 	docker compose up --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
+# for some reason an allocated machine will not be able to phone home
+# without restarting the metal-core
+# TODO: should be investigated and fixed if possible
+	sleep 10
+	ssh -F files/ssh/config leaf01 'systemctl restart metal-core'
+	ssh -F files/ssh/config leaf02 'systemctl restart metal-core'
 
 .PHONY: restart
 restart: down up
