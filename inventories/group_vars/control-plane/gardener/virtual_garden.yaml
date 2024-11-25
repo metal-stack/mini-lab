@@ -1,0 +1,5 @@
+---
+gardener_virtual_api_server_healthcheck_static_token: change-me
+gardener_virtual_api_server_public_dns: gardener-kube-apiserver.{{ metal_control_plane_ingress_dns }}
+gardener_virtual_api_server_public_wait_port: 4443
+gardener_virtual_api_server_port: 4443
