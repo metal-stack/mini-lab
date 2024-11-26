@@ -122,20 +122,58 @@ configure-bgp:
 		      -c 'show run'"
 
 
-create-firewall-image:
-	@echo "Using URL: http://$(HOSTNAME_IP):8000/firewall/3.0-ubuntu/img.tar.lz4"
+
+deploy-fc: configure-bgp _privatenet insecure-kubeconfig deploy-firewall-controller-manager build-firewall-controller create-firewall-image
+
+deploy-firewall-controller-manager:
+	@echo "Deploying firewall-controller-manager"
+	$(MAKE) -C ../firewall-controller-manager deploy
+
+build-firewall-controller:
+	@echo "Building firewall-controller docker image"
+	$(MAKE) -C ../firewall-controller docker
+
+firewall-metal-images:
+	@echo "Building firewall image in ../metal-images"
+	$(MAKE) -C ../metal-images firewall
+
+create-firewall-image: firewall-metal-images
+	@echo "Starting HTTP server in ../metal-images on port 8000"
+	@cd ../metal-images && python3 -m http.server 8000 &
+	@echo $$! > server_pid.txt
+	@sleep 5 # Wait for the server to start
+	@echo "Using URL: http://$(HOSTNAME_IP):8000/images/firewall/3.0-ubuntu/img.tar.lz4"
 	@metalctl image create \
-        --id firewall-ubuntu-4.0 \
-        --url http://$(HOSTNAME_IP):8000/firewall/3.0-ubuntu/img.tar.lz4 \
-        --features "firewall"
+		--id firewall-ubuntu-4.0 \
+		--url http://$(HOSTNAME_IP):8000/images/firewall/3.0-ubuntu/img.tar.lz4 \
+		--features "firewall"
+
+start-server:
+	@echo "Starting HTTP server on port 8000"
+	@cd ../metal-images && python3 -m http.server 8000 & echo $$! > server_pid.txt
+	@echo "HTTP server started with PID: $$(cat server_pid.txt)"
+
+shut-down-server:
+	@if [ -f server_pid.txt ]; then \
+		PID=$$(cat server_pid.txt); \
+		if [ -n "$$PID" ] && ps -p $$PID > /dev/null 2>&1; then \
+			echo "Shutting down HTTP server with PID: $$PID"; \
+			kill $$PID && rm server_pid.txt; \
+		else \
+			echo "No running process found for PID: $$PID. Cleaning up."; \
+			rm -f server_pid.txt; \
+		fi; \
+	else \
+		echo "Error: server_pid.txt not found."; \
+	fi
+
+
 
 insecure-kubeconfig:
 	@sed -e 's/certificate-authority-data: .*/insecure-skip-tls-verify: true/' \
 	    -e 's/server: https:\/\/0.0.0.0:6443/server: https:\/\/172.17.0.1:6443/' \
 	    .kubeconfig > .kubeconfig_insecure
 	@echo "Exporting insecure kubeconfig into .kubeconfig_insecure"
-
-
 
 .PHONY: cleanup
 cleanup: cleanup-control-plane cleanup-partition

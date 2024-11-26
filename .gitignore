@@ -12,3 +12,5 @@ requirements.yaml
 .extra_vars.yaml
 sonic-vs.img
 *.bak
+server_pid.txt
+.kubeconfig_insecure
