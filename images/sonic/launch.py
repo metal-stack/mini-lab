@@ -146,7 +146,7 @@ def initial_configuration(path: str) -> None:
 
     config_db['DEVICE_METADATA']['localhost']['hostname'] = socket.gethostname()
     config_db['DEVICE_METADATA']['localhost']['mac'] = get_mac_address('eth0')
-    cidr = get_ip_address('eth0'), '/16'
+    cidr = get_ip_address('eth0') + '/16'
     config_db['MGMT_INTERFACE'] = {
         f'eth0|{cidr}': {
             'gwaddr': get_default_gateway()
