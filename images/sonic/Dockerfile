@@ -5,10 +5,13 @@ ENV LIBGUESTFS_BACKEND=direct
 RUN apt-get update && \
     apt-get --no-install-recommends install --yes \
         curl \
+        fuse \
+        fuse2fs \
+        libnbd-bin \
+        nbdkit \
         iproute2 \
-        linux-image-cloud-amd64 \
         python3 \
-        python3-guestfs \
+        qemu-utils \
         qemu-system-x86 \
         telnet
 
