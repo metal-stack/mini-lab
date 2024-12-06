@@ -138,7 +138,7 @@ def initial_configuration(g: GuestFS, hwsku: str) -> None:
     sonic_environment = f'''
         SONIC_VERSION=${sonic_version}
         PLATFORM=x86_64-kvm_x86_64-r0
-        HWSKU=${hwsku}
+        HWSKU={hwsku}
         DEVICE_TYPE=LeafRouter
         ASIC_TYPE=vs
         '''.encode('utf-8')
