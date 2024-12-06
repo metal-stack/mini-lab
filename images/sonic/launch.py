@@ -41,13 +41,14 @@ class Qemu:
     def mount(self, path: str):
         self._nbd = subprocess.Popen(['qemu-nbd', '--socket', '/nbd.sock', self._disk])
 
+        if self._nbd.poll() is not None:
+            print('qemu-nbd terminated with exit code ' + self._nbd.returncode)
+            exit(1)
+
         nbdkit = ['nbdkit', '--single', 'nbd', 'socket=/nbd.sock', '--filter=partition', 'partition=3']
         self._fuse = subprocess.Popen(['nbdfuse', FUSE_PATH, '--command'] + nbdkit)
 
         while not os.path.exists(FUSE_PATH):
-            if self._nbd.poll() is not None:
-                print('qemu-nbd terminated with exit code ' + self._nbd.returncode)
-                exit(1)
             if self._fuse.poll() is not None:
                 print('nbdfuse terminated with exit code ' + self._fuse.returncode)
                 exit(1)
