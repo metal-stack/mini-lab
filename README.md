@@ -21,6 +21,7 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
 
 - Linux machine with hardware virtualization support
 - kvm as hypervisor for the VMs (you can check through the `kvm-ok` command)
+- the fuse kernel module needs to be loaded (you can check through the `lsmod | grep fuse` command)
 - [docker](https://www.docker.com/) >= 24.x.y (for using kind and our deployment base image)
 - [kind](https://github.com/kubernetes-sigs/kind/releases) == v0.23.0 (for hosting the metal control plane)
 - [containerlab](https://containerlab.dev/install/) >= v0.56.0
