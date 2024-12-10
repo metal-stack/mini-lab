@@ -9,7 +9,10 @@ TAP_IF=$1
 # tap123 -> 123
 INDEX=${TAP_IF:3:3}
 
+# tap$INDEX corresponds to eth$INDEX in the virtual machine
+# The virtual switch assigns lanes to the Linux interface ethX. The assignment is specified in the lanemap.ini file in the following format: ethX:<lanes>.
 LANES=$(grep ^eth$INDEX: /lanemap.ini | cut -d':' -f2)
+# Identify the front panel using the lanes.
 FRONT_PANEL=$(grep -E "^Ethernet[0-9]+\s+$LANES\s+Eth" /port_config.ini | cut -d' ' -f1)
 
 ip link set $TAP_IF up

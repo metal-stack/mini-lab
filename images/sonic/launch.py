@@ -124,7 +124,10 @@ def initial_configuration(g: GuestFS, hwsku: str) -> None:
     g.ln_s(linkname=sonic_share + 'platform', target=VS_DEVICES_PATH)
 
     ifaces = get_ethernet_interfaces()
+    # The port_config.ini file contains the assignment of front panels to lanes.
     port_config = parse_port_config()
+    # The lanemap.ini file is used by the virtual switch image to assign front panels to the Linux interfaces ethX.
+    # This assignment will later also be used by the script mirror_tap_to_front_panel.sh.
     lanemap = create_lanemap(port_config, ifaces)
     with open('/lanemap.ini', 'w') as f:
         f.write('\n'.join(lanemap))
