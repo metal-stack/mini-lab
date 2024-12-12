@@ -41,6 +41,9 @@ topology:
       binds:
         - /dev:/dev
         - scripts:/mini-lab
+      env:
+        QEMU_MACHINE_CPU_CORES: 2
+        QEMU_MACHINE_DISK_SIZE: 20G
   links:
     - endpoints: ["inet:ext", "mini_lab_ext:inet"]
       mtu: 9000

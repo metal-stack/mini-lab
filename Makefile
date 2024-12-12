@@ -26,17 +26,14 @@ ifeq ($(MINI_LAB_FLAVOR),cumulus)
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
 VRF=vrf20
-VM_ARGS=
 else ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.sonic.yaml
 VRF=Vrf20
-VM_ARGS=
 else ifeq ($(MINI_LAB_FLAVOR),capms)
 LAB_MACHINES=machine01,machine02,machine03
 LAB_TOPOLOGY=mini-lab.capms.yaml
 VRF=Vrf20
-VM_ARGS=-e QEMU_MACHINE_CPU_CORES=2 -e QEMU_MACHINE_DISK_SIZE=20G
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
@@ -177,11 +174,11 @@ ssh-leaf02:
 
 .PHONY: start-machines
 start-machines:
-	docker exec $(VM_ARGS) vms /mini-lab/manage_vms.py --names $(LAB_MACHINES) create
+	docker exec vms /mini-lab/manage_vms.py --names $(LAB_MACHINES) create
 
 .PHONY: kill-machines
 kill-machines:
-	docker exec $(VM_ARGS) vms /mini-lab/manage_vms.py --names $(LAB_MACHINES) kill
+	docker exec vms /mini-lab/manage_vms.py --names $(LAB_MACHINES) kill
 
 .PHONY: _password
 _password: env
