@@ -186,15 +186,15 @@ _password: env
 
 .PHONY: password-machine01
 password-machine01:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine01 MACHINE_UUID=00000000-0000-0000-0000-000000000001
+	@$(MAKE) --no-print-directory _password	MACHINE_NAME=machine01 MACHINE_UUID=00000000-0000-0000-0000-000000000001
 
 .PHONY: password-machine02
 password-machine02:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine02 MACHINE_UUID=00000000-0000-0000-0000-000000000002
+	@$(MAKE) --no-print-directory _password	MACHINE_NAME=machine02 MACHINE_UUID=00000000-0000-0000-0000-000000000002
 
 .PHONY: password-machine0%
 password-machine0%:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine0$* MACHINE_UUID=00000000-0000-0000-0000-00000000000$*
+	@$(MAKE) --no-print-directory _password	MACHINE_NAME=machine0$* MACHINE_UUID=00000000-0000-0000-0000-00000000000$*
 
 .PHONY: _free-machine
 _free-machine: env
