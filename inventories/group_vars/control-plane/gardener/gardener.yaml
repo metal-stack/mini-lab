@@ -1,4 +1,18 @@
 ---
-gardener_enabled: true
+gardener_enabled: "{{ lookup('env', 'GARDENER_ENABLED') | default('', false) }}"
+gardener_operator_enabled: true
 
 gardener_cert_management_issuer_email: mini-lab@metal-stack.io
+
+gardener_backup_infrastructure:
+  provider: S3
+  region: us-east-1
+  bucket: mini-lab
+  secretRef:
+   name: backup-secret
+   namespace: garden
+
+gardener_backup_infrastructure_secret:
+  endpoint: "{{ 'https://' + minio_dns_name | b64encode }}"
+  accessKeyID: "{{ minio_root_password | b64encode }}"
+  secretAccessKey: "{{ minio_root_user | b64encode }}"

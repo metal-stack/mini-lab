@@ -1,0 +1,5 @@
+---
+minio_root_user: mini-lab
+minio_root_password: change-me
+
+minio_dns_name: minio.172.17.0.1.nip.io

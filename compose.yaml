@@ -9,7 +9,7 @@ services:
       # for developing role dependencies
       # TODO: make this a switch
       # - ${HOME}/.ansible/roles/ansible-common:/root/.ansible/roles/ansible-common:ro
-      # - ${HOME}/.ansible/roles/metal-roles:/root/.ansible/roles/metal-roles:ro
+      - ${HOME}/.ansible/roles/metal-roles:/root/.ansible/roles/metal-roles:ro
       # - ${HOME}/.ansible/roles/metal-ansible-modules:/root/.ansible/roles/metal-ansible-modules:ro
       # - ${HOME}/git/github.com/metal-stack/helm-charts:/helm-charts:ro
     environment:
@@ -19,6 +19,7 @@ services:
       - CI=${CI}
       - DOCKER_HUB_USER=${DOCKER_HUB_USER}
       - DOCKER_HUB_TOKEN=${DOCKER_HUB_TOKEN}
+      - GARDENER_ENABLED=${GARDENER_ENABLED}
     network_mode: host
     working_dir: /mini-lab
     entrypoint:
@@ -31,7 +32,7 @@ services:
           ansible-galaxy install --ignore-errors -r requirements.yaml
           ansible-playbook \
             -i inventories/control-plane.yaml \
-            deploy_control_plane.yaml --extra-vars "@.extra_vars.yaml"
+            deploy_control_plane.yaml --extra-vars "@.extra_vars.yaml" --tags gardener --diff
 
   partition:
     image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
