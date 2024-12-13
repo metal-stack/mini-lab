@@ -30,6 +30,10 @@ else ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.sonic.yaml
 VRF=Vrf20
+else ifeq ($(MINI_LAB_FLAVOR),capms)
+LAB_MACHINES=machine01,machine02,machine03
+LAB_TOPOLOGY=mini-lab.capms.yaml
+VRF=Vrf20
 else ifeq ($(MINI_LAB_FLAVOR),gardener)
 GARDENER_ENABLED=true
 # usually gardener restricts the maximum version for k8s:
@@ -127,6 +131,7 @@ cleanup-partition:
 	mkdir -p clab-mini-lab
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.cumulus.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
+	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.capms.yaml
 	docker network rm --force mini_lab_ext
 
 .PHONY: _privatenet
@@ -178,17 +183,25 @@ ssh-leaf02:
 start-machines:
 	docker exec vms /mini-lab/manage_vms.py --names $(LAB_MACHINES) create
 
+.PHONY: kill-machines
+kill-machines:
+	docker exec vms /mini-lab/manage_vms.py --names $(LAB_MACHINES) kill
+
 .PHONY: _password
 _password: env
 	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine consolepassword $(MACHINE_UUID)
 
 .PHONY: password-machine01
 password-machine01:
-	@$(MAKE)	--no-print-directory	_password	MACHINE_UUID=e0ab02d2-27cd-5a5e-8efc-080ba80cf258
+	@$(MAKE) --no-print-directory _password	MACHINE_NAME=machine01 MACHINE_UUID=00000000-0000-0000-0000-000000000001
 
 .PHONY: password-machine02
 password-machine02:
-	@$(MAKE)	--no-print-directory	_password	MACHINE_UUID=2294c949-88f6-5390-8154-fa53d93a3313
+	@$(MAKE) --no-print-directory _password	MACHINE_NAME=machine02 MACHINE_UUID=00000000-0000-0000-0000-000000000002
+
+.PHONY: password-machine0%
+password-machine0%:
+	@$(MAKE) --no-print-directory _password	MACHINE_NAME=machine0$* MACHINE_UUID=00000000-0000-0000-0000-00000000000$*
 
 .PHONY: _free-machine
 _free-machine: env
@@ -198,11 +211,15 @@ _free-machine: env
 
 .PHONY: free-machine01
 free-machine01:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine01 MACHINE_UUID=e0ab02d2-27cd-5a5e-8efc-080ba80cf258
+	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine01 MACHINE_UUID=00000000-0000-0000-0000-000000000001
 
 .PHONY: free-machine02
 free-machine02:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine02 MACHINE_UUID=2294c949-88f6-5390-8154-fa53d93a3313
+	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine02 MACHINE_UUID=00000000-0000-0000-0000-000000000002
+
+.PHONY: free-machine0%
+free-machine0%:
+	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine0$* MACHINE_UUID=00000000-0000-0000-0000-00000000000$*
 
 .PHONY: _console-machine
 _console-machine:
@@ -211,11 +228,15 @@ _console-machine:
 
 .PHONY: console-machine01
 console-machine01:
-	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4000
+	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4001
 
 .PHONY: console-machine02
 console-machine02:
-	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4001
+	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4002
+
+.PHONY: console-machine0%
+console-machine0%:
+	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=400$*
 
 ## SSH TARGETS FOR MACHINES ##
 # Python code could be replaced by jq, but it is not preinstalled on Cumulus
