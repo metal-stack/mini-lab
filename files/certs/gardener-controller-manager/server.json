@@ -1,0 +1,24 @@
+{
+  "CN": "gardener-controller-manager",
+  "hosts": [
+    "localhost",
+    "gardener-controller-manager",
+    "gardener-controller-manager.garden",
+    "gardener-controller-manager.garden.svc",
+    "gardener-controller-manager.garden.svc.cluster",
+    "gardener-controller-manager.garden.svc.cluster.local"
+  ],
+  "key": {
+    "algo": "ecdsa",
+    "size": 256
+  },
+  "names": [
+    {
+      "C":  "DE",
+      "L":  "Munich",
+      "O":  "Metal-Stack",
+      "OU": "DevOps",
+      "ST": "Bavaria"
+    }
+  ]
+}

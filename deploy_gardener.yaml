@@ -1,0 +1,47 @@
+---
+- name: deploy gardener
+  hosts: control-plane
+  connection: local
+  gather_facts: false
+  pre_tasks:
+    - name: Fake Gardener metal shoot
+      k8s:
+        definition:
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: shoot-info
+            namespace: kube-system
+          data:
+            nodeNetwork: 172.18.0.0/16
+            podNetwork: 10.244.0.0/24
+            serviceNetwork: 10.96.0.0/16
+
+    - name: Create garden namespace
+      k8s:
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: garden
+
+    # our current state in metal-roles/gardener does not support network policies from gardenlet <-> virtual garden
+    # this should be possible to resolve when we use the Gardener Operator
+    - name: Deploy allow all network policy
+      k8s:
+        definition: "{{ lookup('file', 'netpol-allow-all.yaml') }}"
+        namespace: garden
+        apply: yes
+  roles:
+    - name: ansible-common
+      tags: always
+    - name: minio
+      tags: gardener
+    - name: powerdns
+    - name: metal-roles/control-plane/roles/gardener
+      tags: gardener
+  vars:
+    metal_control_plane_host_provider: metal
+
+    # TODO: this should not be required:
+    gardener_extension_dns_powerdns_image_tag: anti-affinity-rule

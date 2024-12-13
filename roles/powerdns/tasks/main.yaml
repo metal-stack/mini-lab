@@ -1,0 +1,14 @@
+---
+- name: Create namespace powerdns
+  kubernetes.core.k8s:
+    name: powerdns
+    api_version: v1
+    kind: Namespace
+
+- name: Deploy powerdns
+  kubernetes.core.k8s:
+    apply: true
+    namespace: powerdns
+    template:
+      - path: mariadb.yaml.j2
+      - path: powerdns.yaml.j2
