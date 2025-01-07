@@ -19,6 +19,6 @@ COPY --from=ghcr.io/metal-stack/mini-lab-sonic:base /frr-pythontools.deb /frr-py
 
 ENTRYPOINT ["/launch.py"]
 
-COPY config_db.json mirror_tap_to_eth.sh launch.py /
+COPY mirror_tap_to_eth.sh mirror_tap_to_front_panel.sh port_config.ini launch.py /
 
 HEALTHCHECK --start-period=10s --interval=5s --retries=20 CMD test -f /healthy
