@@ -28,5 +28,5 @@ setup_yaml:
 ##
 
 # ansible_common_version:
-metal_roles_version: gardener-on-mini-lab
+# metal_roles_version:
 # metal_ansible_modules_version:
