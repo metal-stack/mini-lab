@@ -44,9 +44,10 @@ topology:
       kind: linux
       image: docker.io/library/nginx:alpine-slim
       network-mode: none
+      binds:
+        - files/www/network.sh:/root/network.sh
       exec:
-        - ip addr add 203.0.113.3/24 dev ext
-        - ip route add 203.0.113.128/25 via 203.0.113.2 dev ext
+        - sh /root/network.sh
   links:
     - endpoints: ["exit:isp", "mini_lab_isp:exit"]
       mtu: 9000
