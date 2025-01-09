@@ -17,6 +17,14 @@ topology:
         - files/exit/network.sh:/root/network.sh
       exec:
         - sh /root/network.sh
+    external_service:
+      kind: linux
+      image: docker.io/library/nginx:alpine-slim
+      network-mode: none
+      binds:
+        - files/external_service/network.sh:/root/network.sh
+      exec:
+        - sh /root/network.sh
     mini_lab_ext:
       kind: bridge
     leaf01:
@@ -41,18 +49,11 @@ topology:
       binds:
         - /dev:/dev
         - scripts:/mini-lab
-    www:
-      kind: linux
-      image: docker.io/library/nginx:alpine-slim
-      network-mode: none
-      binds:
-        - files/www/network.sh:/root/network.sh
-      exec:
-        - sh /root/network.sh
   links:
     - endpoints: ["exit:mini_lab_ext", "mini_lab_ext:exit"]
       mtu: 9000
-    - endpoints: ["www:mini_lab_ext", "mini_lab_ext:www"]
+    - endpoints: ["external_service:mini_lab_ext", "mini_lab_ext:external_service"]
+      mtu: 9000
     - endpoints: ["leaf01:Ethernet0", "vms:lan0"]
     - endpoints: ["leaf02:Ethernet0", "vms:lan1"]
     - endpoints: ["leaf01:Ethernet1", "vms:lan2"]

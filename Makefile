@@ -247,9 +247,9 @@ ssh-machine:
 	))
 	ssh -F files/ssh/config $(machine) $(COMMAND)
 
-.PHONY: connect-to-www
-connect-to-www:
-	@echo "Attempting to connect to container www..."
+.PHONY: test-connectivity-to-external-service
+test-connectivity-to-external-service:
+	@echo "Test connectivity to container external_service..."
 	@for i in $$(seq 1 $(MAX_RETRIES)); do \
 		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://203.0.113.10" > /dev/null 2>&1; then \
 			echo "Connected successfully"; \

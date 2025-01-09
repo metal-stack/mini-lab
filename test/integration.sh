@@ -43,7 +43,7 @@ done
 echo "$phoned/$minPhoned machines have phoned home"
 
 echo "Test connectivity to outside"
-make connect-to-www
+make test-connectivity-to-external-service
 
 echo "Test connectivity from outside"
 ssh -F files/ssh/config metal@$(make public-ip) -C exit
