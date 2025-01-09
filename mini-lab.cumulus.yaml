@@ -19,6 +19,7 @@ topology:
     exit:
       kind: linux
       image: quay.io/frrouting/frr:10.0.1
+      network-mode: none
       binds:
         - files/exit/daemons:/etc/frr/daemons
         - files/exit/frr.conf:/etc/frr/frr.conf
