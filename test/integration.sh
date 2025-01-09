@@ -46,6 +46,23 @@ echo "Test connectivity to outside"
 make test-connectivity-to-external-service
 
 echo "Test connectivity from outside"
-ssh -F files/ssh/config metal@$(make public-ip) -C exit
+public_ip=$(make public-ip)
+make ssh-machine COMMAND="sudo ip addr add ${public_ip}/32 dev lo"
+
+for i in $(seq 1 10); do
+  if ssh -F files/ssh/config metal@"${public_ip}" -C exit > /dev/null 2>&1; then
+    echo "Connected successfully"
+    break
+  else
+    echo "Connection failed"
+    if [ $i -lt 10 ]; then
+      echo "Retrying in 1 second..."
+      sleep 1
+    else
+      echo "Max retries reached"
+      exit 1
+    fi
+  fi
+done
 
 echo "Successfully started mini-lab"
