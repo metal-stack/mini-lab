@@ -16,22 +16,22 @@ topology:
         - apt-transport-https.tar.gz:/root/jessie-apt-transport-fix.tar.gz
         - files/ssh/id_rsa.pub:/root/.ssh/authorized_keys
   nodes:
-    mini_lab_ext:
+    exit:
+      kind: linux
+      image: quay.io/frrouting/frr:10.0.1
+      binds:
+        - files/exit/daemons:/etc/frr/daemons
+        - files/exit/frr.conf:/etc/frr/frr.conf
+        - files/exit/vtysh.conf:/etc/frr/vtysh.conf
+        - files/exit/network.sh:/root/network.sh
+      exec:
+        - sh /root/network.sh
+    mini_lab_isp:
       kind: bridge
     leaf01:
       kind: cvx
     leaf02:
       kind: cvx
-    inet:
-      kind: linux
-      image: quay.io/frrouting/frr:10.0.1
-      binds:
-        - files/inet/daemons:/etc/frr/daemons
-        - files/inet/frr.conf:/etc/frr/frr.conf
-        - files/inet/vtysh.conf:/etc/frr/vtysh.conf
-        - files/inet/network.sh:/root/network.sh
-      exec:
-        - sh /root/network.sh
     vms:
       kind: linux
       image: ${MINI_LAB_VM_IMAGE}
@@ -46,12 +46,12 @@ topology:
         - ip addr add 203.0.113.3/24 dev ext
         - ip route add 203.0.113.128/25 via 203.0.113.2 dev ext
   links:
-    - endpoints: ["inet:ext", "mini_lab_ext:inet"]
+    - endpoints: ["exit:ext", "mini_lab_isp:exit"]
       mtu: 9000
-    - endpoints: ["www:ext", "mini_lab_ext:www"]
+    - endpoints: ["www:ext", "mini_lab_isp:www"]
     - endpoints: ["leaf01:swp1", "vms:lan0"]
     - endpoints: ["leaf02:swp1", "vms:lan1"]
     - endpoints: ["leaf01:swp2", "vms:lan2"]
     - endpoints: ["leaf02:swp2", "vms:lan3"]
-    - endpoints: ["leaf01:swp31", "inet:eth1"]
-    - endpoints: ["leaf02:swp31", "inet:eth2"]
+    - endpoints: ["leaf01:swp31", "exit:eth1"]
+    - endpoints: ["leaf02:swp31", "exit:eth2"]

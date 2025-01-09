@@ -96,15 +96,15 @@ endif
 
 .PHONY: external_network
 external_network:
-	@if ! docker network ls | grep -q mini_lab_ext; then \
-  		docker network create mini_lab_ext \
+	@if ! docker network ls | grep -q mini_lab_isp; then \
+  		docker network create mini_lab_isp \
 			--driver=bridge \
 			--gateway=203.0.113.1 \
 			--subnet=203.0.113.0/24 \
 			--opt "com.docker.network.driver.mtu=9000" \
-			--opt "com.docker.network.bridge.name=mini_lab_ext" \
+			--opt "com.docker.network.bridge.name=mini_lab_isp" \
 			--opt "com.docker.network.bridge.enable_ip_masquerade=true" && \
-		sudo ip route add 203.0.113.128/25 via 203.0.113.2 dev mini_lab_ext; fi
+		sudo ip route add 203.0.113.128/25 via 203.0.113.2 dev mini_lab_isp; fi
 
 .PHONY: env
 env:
@@ -126,6 +126,7 @@ cleanup-partition:
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.capms.yaml
 	docker network rm --force mini_lab_ext
+	docker network rm --force mini_lab_isp
 
 .PHONY: _privatenet
 _privatenet: env
