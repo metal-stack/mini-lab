@@ -47,6 +47,9 @@ topology:
       exec:
         - ip addr add 203.0.113.3/24 dev ext
         - ip route add 203.0.113.128/25 via 203.0.113.2 dev ext
+        - ip -6 addr add 2001:db8:1234:1::3/64 dev ext
+        - ip -6 route add 2001:db8:1234:0001:8000:0000:0000:0000/65 via 2001:db8:1234:0001:0000:0000:0000:0002 dev ext
+
   links:
     - endpoints: ["inet:ext", "mini_lab_ext:inet"]
       mtu: 9000

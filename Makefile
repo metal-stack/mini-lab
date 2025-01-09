@@ -101,10 +101,14 @@ external_network:
 			--driver=bridge \
 			--gateway=203.0.113.1 \
 			--subnet=203.0.113.0/24 \
+			--ipv6 \
+			--gateway=2001:db8:1234:1::1 \
+			--subnet=2001:db8:1234:1::/64 \
 			--opt "com.docker.network.driver.mtu=9000" \
 			--opt "com.docker.network.bridge.name=mini_lab_ext" \
 			--opt "com.docker.network.bridge.enable_ip_masquerade=true" && \
-		sudo ip route add 203.0.113.128/25 via 203.0.113.2 dev mini_lab_ext; fi
+		sudo ip route add 203.0.113.128/25 via 203.0.113.2 dev mini_lab_ext && \
+		sudo ip -6 route add 2001:db8:1234:0001:8000:0000:0000:0000/65 via 2001:db8:1234:0001:0000:0000:0000:0002 dev mini_lab_ext; fi
 
 .PHONY: env
 env:
@@ -141,7 +145,7 @@ firewall: _privatenet
 
 .PHONY: public-ip
 public-ip:
-	@docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network ip list --name test --network internet-mini-lab -o template --template "{{ .ipaddress }}"
+	@docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network ip list --name test --network internet-mini-lab --addressfamily IPv4 -o template --template "{{ .ipaddress }}"
 
 .PHONY: ls
 ls: env
