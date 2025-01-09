@@ -18,7 +18,7 @@ topology:
         - files/exit/network.sh:/root/network.sh
       exec:
         - sh /root/network.sh
-    mini_lab_isp:
+    mini_lab_ext:
       kind: bridge
     leaf01:
       kind: linux
@@ -46,7 +46,7 @@ topology:
         QEMU_MACHINE_CPU_CORES: 2
         QEMU_MACHINE_DISK_SIZE: 20G
   links:
-    - endpoints: ["exit:ext", "mini_lab_isp:exit"]
+    - endpoints: ["exit:mini_lab_ext", "mini_lab_ext:exit"]
       mtu: 9000
     - endpoints: ["leaf01:Ethernet0", "vms:lan0"]
     - endpoints: ["leaf02:Ethernet0", "vms:lan1"]

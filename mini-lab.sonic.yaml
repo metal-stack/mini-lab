@@ -17,7 +17,7 @@ topology:
         - files/exit/network.sh:/root/network.sh
       exec:
         - sh /root/network.sh
-    mini_lab_isp:
+    mini_lab_ext:
       kind: bridge
     leaf01:
       kind: linux
@@ -50,9 +50,9 @@ topology:
       exec:
         - sh /root/network.sh
   links:
-    - endpoints: ["exit:isp", "mini_lab_isp:exit"]
+    - endpoints: ["exit:mini_lab_ext", "mini_lab_ext:exit"]
       mtu: 9000
-    - endpoints: ["www:isp", "mini_lab_isp:www"]
+    - endpoints: ["www:mini_lab_ext", "mini_lab_ext:www"]
     - endpoints: ["leaf01:Ethernet0", "vms:lan0"]
     - endpoints: ["leaf02:Ethernet0", "vms:lan1"]
     - endpoints: ["leaf01:Ethernet1", "vms:lan2"]

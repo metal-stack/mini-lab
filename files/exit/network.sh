@@ -3,7 +3,7 @@ set -o errexit -o xtrace
 
 ip link add vrfInternet type vrf table 1000
 ip link set dev vrfInternet up
-ip link set dev isp master vrfInternet
+ip link set dev mini_lab_ext master vrfInternet
 
 ip link add name bridge type bridge stp_state 0
 ip link set dev bridge type bridge vlan_filtering 1

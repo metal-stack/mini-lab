@@ -211,9 +211,3 @@ make
 An Nginx is running inside of the www container to allow automatic testing of outgoing connections.
 
 ![Network topology](docs/network.svg)
-
-|     Network     | Notes                                                                                    |
-|:---------------:|:-----------------------------------------------------------------------------------------|
-|  192.0.2.0/24   | TEST-NET-1 (RFC 5723) used to connect to the ISP (Linux bridge mini-lab-isp)             |
-| 198.51.100.0/24 | TEST-NET-2 (RFC 5723) used to reach the www container which fakes some external resource |
-| 203.0.113.0/24  | TEST-NET-3 (RFC 5723) used for the network internet-mini-lab                             |

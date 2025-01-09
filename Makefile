@@ -96,16 +96,15 @@ endif
 
 .PHONY: external_network
 external_network:
-	@if ! docker network ls | grep -q mini_lab_isp; then \
-  		docker network create mini_lab_isp \
+	@if ! docker network ls | grep -q mini_lab_ext; then \
+  		docker network create mini_lab_ext \
 			--driver=bridge \
-			--gateway=192.0.2.1 \
-			--subnet=192.0.2.0/24 \
+			--gateway=203.0.113.1 \
+			--subnet=203.0.113.0/24 \
 			--opt "com.docker.network.driver.mtu=9000" \
-			--opt "com.docker.network.bridge.name=mini_lab_isp" \
+			--opt "com.docker.network.bridge.name=mini_lab_ext" \
 			--opt "com.docker.network.bridge.enable_ip_masquerade=true" && \
-		sudo ip route add 203.0.113.0/24 via 192.0.2.2 dev mini_lab_isp && \
-		sudo ip route add 198.51.100.1/32 via 192.0.2.10 dev mini_lab_isp; fi
+		sudo ip route add 203.0.113.128/25 via 203.0.113.128 dev mini_lab_ext; fi
 
 .PHONY: env
 env:
@@ -127,7 +126,6 @@ cleanup-partition:
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.capms.yaml
 	docker network rm --force mini_lab_ext
-	docker network rm --force mini_lab_isp
 
 .PHONY: _privatenet
 _privatenet: env
@@ -253,7 +251,7 @@ ssh-machine:
 connect-to-www:
 	@echo "Attempting to connect to container www..."
 	@for i in $$(seq 1 $(MAX_RETRIES)); do \
-		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://198.51.100.1" > /dev/null 2>&1; then \
+		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://203.0.113.10" > /dev/null 2>&1; then \
 			echo "Connected successfully"; \
 			exit 0; \
 		else \
