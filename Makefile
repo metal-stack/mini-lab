@@ -104,7 +104,7 @@ external_network:
 			--opt "com.docker.network.driver.mtu=9000" \
 			--opt "com.docker.network.bridge.name=mini_lab_ext" \
 			--opt "com.docker.network.bridge.enable_ip_masquerade=true" && \
-		sudo ip route add 203.0.113.128/25 via 203.0.113.2 dev mini_lab_ext; fi
+		sudo ip route add 203.0.113.128/25 via 203.0.113.128 dev mini_lab_ext; fi
 
 .PHONY: env
 env:
@@ -133,7 +133,7 @@ _privatenet: env
 
 .PHONY: machine
 machine: _privatenet
-	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --networks $(shell docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: firewall
 firewall: _privatenet
@@ -141,7 +141,7 @@ firewall: _privatenet
 
 .PHONY: public-ip
 public-ip:
-	@docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network ip list --name test --network internet-mini-lab -o template --template "{{ .ipaddress }}"
+	@docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network ip create --name test --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 -o template --template "{{ .ipaddress }}"
 
 .PHONY: ls
 ls: env
@@ -247,11 +247,10 @@ ssh-machine:
 	))
 	ssh -F files/ssh/config $(machine) $(COMMAND)
 
-.PHONY: connect-to-www
-connect-to-www:
-	@echo "Attempting to connect to container www..."
+.PHONY: test-connectivity-to-external-service
+test-connectivity-to-external-service:
 	@for i in $$(seq 1 $(MAX_RETRIES)); do \
-		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://203.0.113.3" > /dev/null 2>&1; then \
+		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://203.0.113.10" > /dev/null 2>&1; then \
 			echo "Connected successfully"; \
 			exit 0; \
 		else \
