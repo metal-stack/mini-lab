@@ -66,7 +66,7 @@ metal_api_networks:
     IPv6: 96
   prefixes:
   - 10.0.0.0/16
-  - 2001:db8:1234:2::/64
+  - 2001:db8:0:10::/64
   additionalannouncablecidrs:
   - 11.0.0.0/16
 - id: internet-mini-lab
@@ -82,10 +82,7 @@ metal_api_networks:
   vrf: 104009
   prefixes:
   - 203.0.113.128/25
-  # - 2001:db8:1234:0001:0000:0000:0000:0000/64
-  # - 2001:db8:1234:0001:0000:0000:0000:0000/65
-  - 2001:db8:1234:0001:8000:0000:0000:0000/65
-  #0  16  32   48   64   80   96  112  128
+  - 2001:db8:0:113::/64
   labels:
     network.metal-stack.io/default: ""
     network.metal-stack.io/default-external: ""

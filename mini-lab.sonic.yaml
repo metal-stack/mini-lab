@@ -43,16 +43,6 @@ topology:
       binds:
         - /dev:/dev
         - files/ssh/id_rsa.pub:/authorized_keys
-    inet:
-      kind: linux
-      image: quay.io/frrouting/frr:10.0.1
-      binds:
-        - files/inet/daemons:/etc/frr/daemons
-        - files/inet/frr.conf:/etc/frr/frr.conf
-        - files/inet/vtysh.conf:/etc/frr/vtysh.conf
-        - files/inet/network.sh:/root/network.sh
-      exec:
-        - sh /root/network.sh
     vms:
       kind: linux
       image: ${MINI_LAB_VM_IMAGE}
