@@ -14,7 +14,7 @@
         "path": "/etc/hosts.allow",
         "append": true,
         "contents": {
-          "source": "data:,ALL%3A%20%5Bfe80%3A%3A%5D%2F10%0D%0AALL%3A%20203.0.113.1%0D%0A",
+          "source": "data:,ALL%3A%20%5Bfe80%3A%3A%5D%2F10%0D%0AALL%3A%20203.0.113.1%0D%0AALL%3A%202001%3Adb8%3A%3A1",
           "verification": {}
         },
         "mode": 644
