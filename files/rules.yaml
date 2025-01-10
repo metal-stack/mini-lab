@@ -1,13 +1,7 @@
 ---
 egress:
-  - comment: allow outgoing http
-    ports:
+  - comment: allow outgoing http and https
       - 80
-    protocol: TCP
-    to:
-      - 0.0.0.0/0
-  - comment: allow outgoing https
-    ports:
       - 443
     protocol: TCP
     to:
@@ -29,6 +23,15 @@ ingress:
   - comment: allow incoming ssh
     ports:
       - 22
+    protocol: TCP
+    from:
+      - 203.0.113.1/32
+    to:
+      - 203.0.113.128/25
+  - comment: allow incoming http and https
+    ports:
+      - 80
+      - 443
     protocol: TCP
     from:
       - 203.0.113.1/32
