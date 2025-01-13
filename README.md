@@ -14,6 +14,7 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
     - [Reinstall machine](#reinstall-machine)
     - [Free machine](#free-machine)
 - [Flavors](#flavors)
+- [Network Topology](#network-topology)
 
 <!-- /TOC -->
 
@@ -206,3 +207,9 @@ In order to start specific flavor, you can define the flavor as follows:
 export MINI_LAB_FLAVOR=sonic
 make
 ```
+
+## Network topology
+
+An Nginx is running inside of the www container to allow automatic testing of outgoing connections.
+
+![Network topology](docs/network.svg)
