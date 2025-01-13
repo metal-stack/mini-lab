@@ -1,0 +1,23 @@
+{
+  "CN": "etcd-test-etcd-client",
+  "hosts": [
+    "localhost",
+    "etcd-test-etcd-0",
+    "etcd-test-etcd-client",
+    "etcd-test-etcd-client.garden.svc",
+    "etcd-test-etcd-client.garden.svc.cluster.local"
+  ],
+  "key": {
+    "algo": "ecdsa",
+    "size": 256
+  },
+  "names": [
+    {
+      "C":  "DE",
+      "L":  "Munich",
+      "O":  "Metal-Stack",
+      "OU": "DevOps",
+      "ST": "Bavaria"
+    }
+  ]
+}

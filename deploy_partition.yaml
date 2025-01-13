@@ -37,10 +37,6 @@
 
 - name: Deploy dhcp server and pixiecore on leaf01
   hosts: leaf01
-  vars:
-    setup_yaml:
-      - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
-        meta_var: metal_stack_release
   roles:
     - name: ansible-common
       tags: always
@@ -51,10 +47,6 @@
 
 - name: Deploy metal-core
   hosts: leaves
-  vars:
-    setup_yaml:
-      - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
-        meta_var: metal_stack_release
   roles:
     - name: ansible-common
       tags: always
@@ -65,10 +57,6 @@
   hosts: localhost
   connection: local
   gather_facts: no
-  vars:
-    setup_yaml:
-      - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
-        meta_var: metal_stack_release
   roles:
     - name: ansible-common
       tags: always

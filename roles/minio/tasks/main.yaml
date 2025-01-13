@@ -1,0 +1,24 @@
+---
+- name: Add stable MinIO Helm repository
+  kubernetes.core.helm_repository:
+    name: minio
+    repo_url: https://operator.min.io/
+
+- name: Deploy MinIO Operator
+  kubernetes.core.helm:
+    chart_ref: minio/operator
+    chart_version: "{{ minio_chart_version }}"
+    release_name: minio-operator
+    release_namespace: minio-operator
+    create_namespace: true
+    wait: true
+
+- name: Deploy MinIO Tenant
+  kubernetes.core.helm:
+    chart_ref: minio/tenant
+    chart_version: "{{ minio_chart_version }}"
+    release_name: minio-tenant
+    release_namespace: minio-tenant
+    create_namespace: true
+    values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+    wait: true

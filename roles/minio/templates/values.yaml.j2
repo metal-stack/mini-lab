@@ -1,0 +1,32 @@
+---
+tenant:
+  # Tenant name
+  name: metal-stack
+
+  certificate:
+    requestAutoCert: false
+
+  configuration:
+    name: mini-lab
+
+  configSecret:
+    name: mini-lab
+    accessKey: {{ minio_root_user }}
+    secretKey: {{ minio_root_password }}
+
+  pools:
+    - servers: 1
+      name: pool-0
+      volumesPerServer: 1
+      size: 2Gi
+
+  buckets:
+   - name: mini-lab
+
+ingress:
+  api:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: 10m
+    host: "{{ minio_dns_name }}"
