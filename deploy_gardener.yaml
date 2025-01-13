@@ -45,3 +45,26 @@
 
     # TODO: this should not be required:
     gardener_extension_dns_powerdns_image_tag: anti-affinity-rule
+
+  post_tasks:
+    # gardener exposes the istio ingress gateway through service type load balancer
+    # we can fake the exposal by patching the status field, which is also what's
+    # done in the gardener local environment
+    - name: Wait for istio ingress gateway service
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Service
+        name: istio-ingressgateway
+        namespace: istio-ingress
+        retries: 30
+        delay: 10
+
+    - name: Patch ingress status of istio ingress gateway to allow seed to get ready
+      patch_service_status_k8s:
+        name: istio-ingressgateway
+        namespace: istio-ingress
+        body:
+          status:
+            loadBalancer:
+              ingress:
+                - ip: "172.17.0.1"
