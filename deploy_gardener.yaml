@@ -52,6 +52,8 @@
         kind: Service
         name: istio-ingressgateway
         namespace: istio-ingress
+      register: result
+      until: result is not failed
       retries: 30
       delay: 10
 
