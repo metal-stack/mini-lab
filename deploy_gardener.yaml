@@ -53,7 +53,7 @@
         name: istio-ingressgateway
         namespace: istio-ingress
       register: result
-      until: result is not failed
+      until: result.resources
       retries: 30
       delay: 10
 
