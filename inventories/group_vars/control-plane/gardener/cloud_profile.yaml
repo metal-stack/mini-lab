@@ -4,13 +4,13 @@ gardener_cloud_profile_metal_api_hmac: "metal-admin"
 gardener_cloud_profile_firewall_images_from_machine_images: true
 
 gardener_cloud_profile_firewall_controller_versions:
-  - version: v2.3.5
-    url: https://images.metal-stack.io/firewall-controller/v2.3.5/firewall-controller
+  - version: v2.3.7
+    url: https://images.metal-stack.io/firewall-controller/v2.3.7/firewall-controller
     classification: supported
 
 gardener_cloud_profile_kubernetes:
   versions:
-  - version: 1.30.6
+  - version: 1.30.8
 
 gardener_cloud_profile_machine_types:
   - name: v1-small-x86
