@@ -66,3 +66,16 @@
             loadBalancer:
               ingress:
                 - ip: "172.17.0.1"
+
+    - name: Wait until seed is ready
+      kubernetes.core.k8s_info:
+        api_version: "core.gardener.cloud/v1beta1"
+        kind: Seed
+        name: "{{ metal_control_plane_stage_name }}"
+        kubeconfig: "{{ gardener_kube_apiserver_kubeconfig_path }}"
+        wait: yes
+        wait_condition:
+          reason: GardenletReady
+          status: "True"
+          type: GardenletReady
+        wait_timeout: 300
