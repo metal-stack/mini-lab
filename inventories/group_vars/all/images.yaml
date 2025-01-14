@@ -1,4 +1,6 @@
+---
 metal_stack_release_version: develop
+
 setup_yaml:
   - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
     meta_var: metal_stack_release
