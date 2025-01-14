@@ -84,6 +84,13 @@ gen-certs:
 			-v ${PWD}:/work \
 			cfssl/cfssl /work/scripts/roll_certs.sh; fi
 
+.PHONY: roll-certs
+roll-certs:
+	rm -f files/certs/**/*.pem
+	rm -f files/certs/**/*.crt
+	rm -f files/certs/*.pem
+	$(MAKE) gen-certs
+
 .PHONY: control-plane
 control-plane: control-plane-bake env
 	docker compose up --remove-orphans --force-recreate control-plane
