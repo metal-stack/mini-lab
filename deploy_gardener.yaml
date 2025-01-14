@@ -37,6 +37,7 @@
       tags: always
     - name: minio
     - name: powerdns
+      tags: powerdns
     - name: metal-roles/control-plane/roles/gardener
       tags: gardener
   vars:
