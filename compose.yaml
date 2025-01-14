@@ -19,7 +19,7 @@ services:
       - CI=${CI}
       - DOCKER_HUB_USER=${DOCKER_HUB_USER}
       - DOCKER_HUB_TOKEN=${DOCKER_HUB_TOKEN}
-      - GARDENER_ENABLED=${GARDENER_ENABLED:-false}
+      - GARDENER_ENABLED=${GARDENER_ENABLED:-}
     network_mode: host
     working_dir: /mini-lab
     entrypoint:
