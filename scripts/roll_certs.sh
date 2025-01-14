@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
+cd /work/files/certs
+
 for i in "$@"
 do
 case $i in

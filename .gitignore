@@ -13,3 +13,6 @@ requirements.yaml
 sonic-vs.img
 *.bak
 .ansible
+files/certs/*.pem
+files/certs/**/*.pem
+files/certs/**/*.crt

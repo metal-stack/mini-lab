@@ -57,7 +57,7 @@ else
 endif
 
 .PHONY: up
-up: env control-plane-bake partition-bake
+up: env gen-certs control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_rsa
 	docker compose up --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
@@ -73,6 +73,16 @@ restart: down up
 
 .PHONY: down
 down: cleanup
+
+.PHONY: gen-certs
+gen-certs:
+	@if ! [ -f "files/certs/ca.pem" ]; then \
+		echo "certificate generation required, running cfssl container"; \
+		docker run --rm \
+			--user $$(id -u):$$(id -g) \
+			--entrypoint bash \
+			-v ${PWD}:/work \
+			cfssl/cfssl /work/scripts/roll_certs.sh; fi
 
 .PHONY: control-plane
 control-plane: control-plane-bake env
