@@ -6,10 +6,6 @@ cd /work/files/certs
 for i in "$@"
 do
 case $i in
-    -v=*|--vault-password-file=*)
-    VAULT_PASSWORD_FILE="${i#*=}"
-    shift
-    ;;
     -t=*|--target=*)
     TARGET="${i#*=}"
     shift
@@ -132,12 +128,4 @@ if [ -z "$TARGET" ] || [ $TARGET == "virtual-service-account-token" ]; then
     cfssl gencert -ca=../ca.pem -ca-key=../ca-key.pem -config=../ca-config.json -profile=client client.json | cfssljson -bare client
     rm *.csr
     popd
-fi
-
-if [ -n "$VAULT_PASSWORD_FILE" ]; then
-    if [ -z "$TARGET" ]; then
-        TARGET="*"
-    fi
-    ansible-vault encrypt --vault-password-file "${VAULT_PASSWORD_FILE}" $TARGET/*.pem
-    ansible-vault encrypt --vault-password-file "${VAULT_PASSWORD_FILE}" $TARGET/*.crt >/dev/null 2>&1 || true
 fi
