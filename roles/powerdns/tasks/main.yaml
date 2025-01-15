@@ -10,5 +10,4 @@
     apply: true
     namespace: powerdns
     template:
-      - path: mariadb.yaml.j2
       - path: powerdns.yaml.j2
