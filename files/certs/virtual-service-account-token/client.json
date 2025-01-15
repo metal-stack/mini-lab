@@ -1,9 +1,9 @@
 {
-  "CN": "masterdata-client",
-  "hosts": [""],
+  "CN": "Service Account Token",
+  "hosts": [],
   "key": {
-    "algo": "ecdsa",
-    "size": 256
+    "algo": "rsa",
+    "size": 4096
   },
   "names": [
     {

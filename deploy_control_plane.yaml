@@ -3,10 +3,6 @@
   hosts: control-plane
   connection: local
   gather_facts: false
-  vars:
-    setup_yaml:
-      - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
-        meta_var: metal_stack_release
   roles:
     - name: ansible-common
       tags: always
@@ -26,3 +22,7 @@
       tags: auditing
     - name: metal-roles/control-plane/roles/metal
       tags: metal
+
+- name: deploy gardener
+  import_playbook: deploy_gardener.yaml
+  when: gardener_enabled
