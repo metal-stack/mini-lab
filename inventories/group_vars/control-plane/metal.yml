@@ -11,7 +11,8 @@ metal_api_admin_key: metal-admin
 
 metal_api_nsq_tcp_address: nsqd:4150
 
-metal_api_latest_os_image_release_name: "{{ (lookup('url', 'https://api.github.com/repos/metal-stack/metal-images/releases/latest', headers=({'authorization': 'Bearer ' + github_runner_token} if github_runner_token else {})) | from_json).get('name') }}"
+# metal_api_latest_os_image_release_name: "{{ (lookup('url', 'https://api.github.com/repos/metal-stack/metal-images/releases/latest', headers=({'authorization': 'Bearer ' + github_runner_token} if github_runner_token else {})) | from_json).get('name') }}""{{ (lookup('url', 'https://api.github.com/repos/metal-stack/metal-images/releases/latest', headers=({'authorization': 'Bearer ' + github_runner_token} if github_runner_token else {})) | from_json).get('name') }}"
+metal_api_latest_os_image_release_name: stable
 
 metal_api_images:
 - id: firewall-ubuntu-3.0
