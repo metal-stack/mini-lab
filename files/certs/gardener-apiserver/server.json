@@ -1,10 +1,12 @@
 {
-  "CN": "masterdata-api",
+  "CN": "gardener-apiserver",
   "hosts": [
     "localhost",
-    "masterdata-api",
-    "masterdata-api.metal-control-plane.svc",
-    "masterdata-api.metal-control-plane.svc.cluster.local"
+    "gardener-apiserver",
+    "gardener-apiserver.garden",
+    "gardener-apiserver.garden.svc",
+    "gardener-apiserver.garden.svc.cluster",
+    "gardener-apiserver.garden.svc.cluster.local"
   ],
   "key": {
     "algo": "ecdsa",

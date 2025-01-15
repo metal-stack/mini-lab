@@ -19,12 +19,9 @@ services:
       - CI=${CI}
       - DOCKER_HUB_USER=${DOCKER_HUB_USER}
       - DOCKER_HUB_TOKEN=${DOCKER_HUB_TOKEN}
+      - GARDENER_ENABLED=${GARDENER_ENABLED:-}
     network_mode: host
     working_dir: /mini-lab
-    dns:
-      - 172.17.0.1
-      - 1.1.1.1
-      - 1.0.0.1
     entrypoint:
       - /bin/bash
       - -ce
@@ -55,10 +52,6 @@ services:
       - DOCKER_HUB_TOKEN=${DOCKER_HUB_TOKEN}
     network_mode: host
     working_dir: /mini-lab
-    dns:
-      - 172.17.0.1
-      - 1.1.1.1
-      - 1.0.0.1
     entrypoint:
       - /bin/bash
       - -ce
@@ -82,8 +75,4 @@ services:
       - ./files/ignition.json:/tmp/ignition.json
       - ./files/rules.yaml:/tmp/rules.yaml
     network_mode: host
-    dns:
-      - 172.17.0.1
-      - 1.1.1.1
-      - 1.0.0.1
     command: --version

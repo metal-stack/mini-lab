@@ -1,0 +1,19 @@
+---
+gardener_enabled: "{{ lookup('env', 'GARDENER_ENABLED') | default('', false) }}"
+
+gardener_cert_management_issuer_email: mini-lab@metal-stack.io
+
+gardener_backup_infrastructure:
+  provider: S3
+  region: us-east-1
+  bucket: mini-lab
+  secretRef:
+   name: backup-secret
+   namespace: garden
+
+gardener_backup_infrastructure_secret:
+  endpoint: "{{ ('http://' + minio_dns_name + ':8080' ) | b64encode }}"
+  accessKeyID: "{{ minio_root_user | b64encode }}"
+  secretAccessKey: "{{ minio_root_password | b64encode }}"
+  region: "{{ 'us-east-1' | b64encode }}"
+  s3ForcePathStyle: "{{ 'true' | b64encode }}"

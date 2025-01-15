@@ -1,0 +1,6 @@
+---
+gardener_dns_domain: "gardener.172.17.0.1.nip.io"
+gardener_dns_provider: powerdns
+gardener_dns_credentials:
+  apiKey: "{{ powerdns_api_key | b64encode }}"
+  server: "{{ 'http://powerdns-api.powerdns.svc.cluster.local:8081' | b64encode }}"

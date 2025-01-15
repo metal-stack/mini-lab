@@ -1,11 +1,6 @@
 {
-  "CN": "masterdata-api",
-  "hosts": [
-    "localhost",
-    "masterdata-api",
-    "masterdata-api.metal-control-plane.svc",
-    "masterdata-api.metal-control-plane.svc.cluster.local"
-  ],
+  "CN": "client",
+  "hosts": [""],
   "key": {
     "algo": "ecdsa",
     "size": 256

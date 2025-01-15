@@ -1,10 +1,11 @@
 {
-  "CN": "masterdata-api",
+  "CN": "etcd-test-etcd-client",
   "hosts": [
     "localhost",
-    "masterdata-api",
-    "masterdata-api.metal-control-plane.svc",
-    "masterdata-api.metal-control-plane.svc.cluster.local"
+    "etcd-test-etcd-0",
+    "etcd-test-etcd-client",
+    "etcd-test-etcd-client.garden.svc",
+    "etcd-test-etcd-client.garden.svc.cluster.local"
   ],
   "key": {
     "algo": "ecdsa",
