@@ -86,9 +86,7 @@ gen-certs:
 
 .PHONY: roll-certs
 roll-certs:
-	rm -f files/certs/**/*.pem
-	rm -f files/certs/**/*.crt
-	rm -f files/certs/*.pem
+	rm files/certs/ca.pem
 	$(MAKE) gen-certs
 
 .PHONY: control-plane
