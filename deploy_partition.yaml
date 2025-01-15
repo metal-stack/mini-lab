@@ -29,6 +29,22 @@
       command: tar xf /root/jessie-apt-transport-fix.tar.gz
     - name: install apt-transport
       shell: dpkg -i /root/https-deps/*.deb && apt-get install -fy
+    - name: use own repo mirrors (old ones are 404)
+      copy:
+        dest: /etc/apt/sources.list
+        content: |
+          deb https://cumulus-3.apt.metal-stack.io/cumulus CumulusLinux-3 main
+          deb-src https://cumulus-3.apt.metal-stack.io/cumulus CumulusLinux-3 main
+
+          deb https://cumulus-3.apt.metal-stack.io/cumulus-updates CumulusLinux-3-updates main
+          deb-src https://cumulus-3.apt.metal-stack.io/cumulus-updates CumulusLinux-3-updates main
+
+          deb https://cumulus-3.apt.metal-stack.io/cumulus-security-updates CumulusLinux-3-security-updates main
+          deb-src https://cumulus-3.apt.metal-stack.io/cumulus-security-updates CumulusLinux-3-security-updates main
+    - name: set resolv.conf
+      shell: rm /etc/resolv.conf && echo 'nameserver 8.8.8.8' > /etc/resolv.conf
+    - name: use own repo key
+      shell: curl -fsSL https://cumulus-3.apt.metal-stack.io/cumulus-3-repo.gpg | apt-key add -
   roles:
     - name: cumulus
       tags: cumulus
