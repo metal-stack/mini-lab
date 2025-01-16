@@ -166,10 +166,13 @@ machine: _privatenet
 firewall: _privatenet
 	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --userdata "@/tmp/ignition.json" --firewall-rules-file=/tmp/rules.yaml --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
-ADDRESS_FAMILY := "IPv4"
 .PHONY: public-ip
 public-ip:
-	@docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network ip create --name test --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --addressfamily $(ADDRESS_FAMILY) -o template --template "{{ .ipaddress }}"
+	@docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network ip create --name test --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --addressfamily IPv4 -o template --template "{{ .ipaddress }}"
+
+.PHONY: public-ipv6
+public-ipv6:
+	@docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network ip create --name test --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --addressfamily IPv6 -o template --template "{{ .ipaddress }}"
 
 .PHONY: ls
 ls: env
@@ -275,10 +278,10 @@ ssh-machine:
 	))
 	ssh -F files/ssh/config $(machine) $(COMMAND)
 
-.PHONY: test-connectivity-from-machine
-test-connectivity-from-machine:
+.PHONY: test-connectivity-to-external-service
+test-connectivity-to-external-service:
 	@for i in $$(seq 1 $(MAX_RETRIES)); do \
-		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent $(URL)" > /dev/null 2>&1; then \
+		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://203.0.113.10" > /dev/null 2>&1; then \
 			echo "Connected successfully"; \
 			exit 0; \
 		else \
@@ -293,13 +296,23 @@ test-connectivity-from-machine:
 		fi; \
 	done
 
-.PHONY: test-connectivity-to-external-service
-test-connectivity-to-external-service:
-	$(MAKE) test-connectivity-from-machine URL="http://203.0.113.10"
-
 .PHONY: test-connectivity-to-external-service-via-ipv6
 test-connectivity-to-external-service-via-ipv6:
-	$(MAKE) test-connectivity-from-machine URL="http://[2001:db8::10]"
+	@for i in $$(seq 1 $(MAX_RETRIES)); do \
+		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://[2001:db8::10]" > /dev/null 2>&1; then \
+			echo "Connected successfully"; \
+			exit 0; \
+		else \
+			echo "Connection failed"; \
+			if [ $$i -lt $(MAX_RETRIES) ]; then \
+				echo "Retrying in 2 seconds..."; \
+				sleep 2; \
+			else \
+				echo "Max retries reached"; \
+				exit 1; \
+			fi; \
+		fi; \
+	done
 
 
 ## DEV TARGETS ##
