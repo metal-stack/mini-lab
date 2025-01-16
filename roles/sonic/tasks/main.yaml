@@ -11,3 +11,6 @@
   delay: 3
   register: result
   until: result.rc == 0
+
+- name: Increase vtep mtu rate to 9100
+  command: ip link set dev vtep-1001 mtu 9100
