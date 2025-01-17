@@ -1,6 +1,7 @@
 ---
 egress:
   - comment: allow outgoing http and https
+    ports:
       - 80
       - 443
     protocol: TCP
