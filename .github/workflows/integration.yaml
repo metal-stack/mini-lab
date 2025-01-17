@@ -76,6 +76,7 @@ jobs:
     - name: Run integration tests
       shell: bash
       run: |
+        eval $(make dev-env)
         ./test/ci-cleanup.sh
         ./test/integration.sh
       env:
