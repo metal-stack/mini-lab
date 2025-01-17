@@ -7,6 +7,9 @@ YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:4
 KINDCONFIG := $(or $(KINDCONFIG),control-plane/kind.yaml)
 KUBECONFIG := $(shell pwd)/.kubeconfig
 
+METALCTL_HMAC := $(or $(METALCTL_HMAC),metal-admin)
+METALCTL_API_URL := $(or $(METALCTL_API_URL),http://api.172.17.0.1.nip.io:8080/metal)
+
 MKE2FS_CONFIG := $(shell pwd)/mke2fs.conf
 # Default values
 CONTAINERLAB=$(shell which containerlab)
