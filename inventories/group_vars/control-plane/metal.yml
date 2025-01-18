@@ -26,6 +26,12 @@ metal_api_images:
   url: https://images.metal-stack.io/metal-os/{{ metal_api_latest_os_image_release_name }}/ubuntu/24.04/img.tar.lz4
   features:
     - machine
+- id: ubuntu-24.04-k8s-1.30.6
+  name: Ubuntu 24.04 with Kubernetes 1.30.6
+  description: Ubuntu 24.04 with Kubernetes 1.30.6
+  url: https://images.metal-stack.io/metal-os/273-cluster-api-k8s-v1.30.6/cluster-api/cluster-api-k8s-1.30.6/img.tar.lz4
+  features:
+    - machine
 
 metal_api_sizes:
 - id: v1-small-x86
