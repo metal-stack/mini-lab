@@ -127,7 +127,7 @@ docker compose run --rm metalctl machine create \
         --hostname machine \
         --project 00000000-0000-0000-0000-000000000000 \
         --partition mini-lab \
-        --image ubuntu-20.04 \
+        --image ubuntu-24.04 \
         --size v1-small-x86 \
         --networks <network-ID>
 
@@ -138,7 +138,7 @@ docker compose run --rm metalctl machine create \
         --hostname fw \
         --project 00000000-0000-0000-0000-000000000000 \
         --partition mini-lab \
-        --image firewall-ubuntu-2.0 \
+        --image firewall-ubuntu-3.0 \
         --size v1-small-x86 \
         --networks internet-mini-lab,$(privatenet)
 ```
@@ -148,7 +148,7 @@ See the installation process in action
 ```bash
 make console-machine01/02
 ...
-Ubuntu 20.04 machine ttyS0
+Ubuntu 24.04 machine ttyS0
 
 machine login:
 ```
@@ -157,9 +157,9 @@ Two machines are now installed and have status "Phoned Home"
 
 ```bash
 docker compose run --rm metalctl machine ls
-ID                                          LAST EVENT   WHEN   AGE     HOSTNAME  PROJECT                               SIZE          IMAGE                             PARTITION
-00000000-0000-0000-0000-000000000001        Phoned Home  2s     21s     machine   00000000-0000-0000-0000-000000000000  v1-small-x86  Ubuntu 20.04 20200331             mini-lab
-00000000-0000-0000-0000-000000000002        Phoned Home  8s     18s     fw        00000000-0000-0000-0000-000000000000  v1-small-x86  Firewall 2 Ubuntu 20200730        mini-lab
+ID                                          LAST EVENT   WHEN   AGE     HOSTNAME  PROJECT                               SIZE          IMAGE               PARTITION
+00000000-0000-0000-0000-000000000001        Phoned Home  2s     21s     machine   00000000-0000-0000-0000-000000000000  v1-small-x86  Ubuntu 24.04        mini-lab
+00000000-0000-0000-0000-000000000002        Phoned Home  8s     18s     fw        00000000-0000-0000-0000-000000000000  v1-small-x86  Firewall 3 Ubuntu   mini-lab
 ```
 
 Login with user name metal and the console password from
@@ -180,7 +180,7 @@ Reinstall a machine with
 
 ```bash
 docker compose run --rm metalctl machine reinstall \
-        --image ubuntu-20.04 \
+        --image ubuntu-24.04 \
         00000000-0000-0000-0000-000000000001
 ```
 

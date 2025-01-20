@@ -21,11 +21,12 @@ MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),sonic)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
 MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
 
-MACHINE_OS=ubuntu-24.04
+MACHINE_OS=debian-12.0
 MAX_RETRIES := 30
 
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
+MACHINE_OS=ubuntu-24.04
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
 VRF=vrf20
