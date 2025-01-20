@@ -21,6 +21,7 @@ jobs:
         flavors:
           - name: cumulus
           - name: sonic
+          - name: gardener
 
     steps:
     - name: Gain back workspace permissions # https://github.com/actions/checkout/issues/211
@@ -75,6 +76,7 @@ jobs:
     - name: Run integration tests
       shell: bash
       run: |
+        eval $(make dev-env)
         ./test/ci-cleanup.sh
         ./test/integration.sh
       env:

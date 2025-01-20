@@ -7,6 +7,9 @@ YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:4
 KINDCONFIG := $(or $(KINDCONFIG),control-plane/kind.yaml)
 KUBECONFIG := $(shell pwd)/.kubeconfig
 
+METALCTL_HMAC := $(or $(METALCTL_HMAC),metal-admin)
+METALCTL_API_URL := $(or $(METALCTL_API_URL),http://api.172.17.0.1.nip.io:8080/metal)
+
 MKE2FS_CONFIG := $(shell pwd)/mke2fs.conf
 # Default values
 CONTAINERLAB=$(shell which containerlab)
@@ -18,11 +21,12 @@ MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),sonic)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
 MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
 
-MACHINE_OS=ubuntu-24.04
+MACHINE_OS=debian-12.0
 MAX_RETRIES := 30
 
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
+MACHINE_OS=ubuntu-24.04
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
 VRF=vrf20
@@ -33,6 +37,13 @@ VRF=Vrf20
 else ifeq ($(MINI_LAB_FLAVOR),capms)
 LAB_MACHINES=machine01,machine02,machine03
 LAB_TOPOLOGY=mini-lab.capms.yaml
+VRF=Vrf20
+else ifeq ($(MINI_LAB_FLAVOR),gardener)
+GARDENER_ENABLED=true
+# usually gardener restricts the maximum version for k8s:
+K8S_VERSION=1.30.8
+LAB_MACHINES=machine01,machine02
+LAB_TOPOLOGY=mini-lab.sonic.yaml
 VRF=Vrf20
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
@@ -50,7 +61,7 @@ else
 endif
 
 .PHONY: up
-up: env control-plane-bake partition-bake
+up: env gen-certs control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_rsa
 	docker compose up --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
@@ -66,6 +77,21 @@ restart: down up
 
 .PHONY: down
 down: cleanup
+
+.PHONY: gen-certs
+gen-certs:
+	@if ! [ -f "files/certs/ca.pem" ]; then \
+		echo "certificate generation required, running cfssl container"; \
+		docker run --rm \
+			--user $$(id -u):$$(id -g) \
+			--entrypoint bash \
+			-v ${PWD}:/work \
+			cfssl/cfssl /work/scripts/roll_certs.sh; fi
+
+.PHONY: roll-certs
+roll-certs:
+	rm files/certs/ca.pem
+	$(MAKE) gen-certs
 
 .PHONY: control-plane
 control-plane: control-plane-bake env
@@ -104,7 +130,7 @@ external_network:
 			--opt "com.docker.network.driver.mtu=9000" \
 			--opt "com.docker.network.bridge.name=mini_lab_ext" \
 			--opt "com.docker.network.bridge.enable_ip_masquerade=true" && \
-		sudo ip route add 203.0.113.128/25 via 203.0.113.2 dev mini_lab_ext; fi
+		sudo ip route add 203.0.113.128/25 via 203.0.113.128 dev mini_lab_ext; fi
 
 .PHONY: env
 env:
@@ -133,7 +159,7 @@ _privatenet: env
 
 .PHONY: machine
 machine: _privatenet
-	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --networks $(shell docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: firewall
 firewall: _privatenet
@@ -141,7 +167,7 @@ firewall: _privatenet
 
 .PHONY: public-ip
 public-ip:
-	@docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network ip list --name test --network internet-mini-lab -o template --template "{{ .ipaddress }}"
+	@docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network ip create --name test --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 -o template --template "{{ .ipaddress }}"
 
 .PHONY: ls
 ls: env
@@ -247,11 +273,10 @@ ssh-machine:
 	))
 	ssh -F files/ssh/config $(machine) $(COMMAND)
 
-.PHONY: connect-to-www
-connect-to-www:
-	@echo "Attempting to connect to container www..."
+.PHONY: test-connectivity-to-external-service
+test-connectivity-to-external-service:
 	@for i in $$(seq 1 $(MAX_RETRIES)); do \
-		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://203.0.113.3" > /dev/null 2>&1; then \
+		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://203.0.113.10" > /dev/null 2>&1; then \
 			echo "Connected successfully"; \
 			exit 0; \
 		else \
@@ -273,3 +298,20 @@ dev-env:
 	@echo "export METALCTL_API_URL=http://api.172.17.0.1.nip.io:8080/metal"
 	@echo "export METALCTL_HMAC=metal-admin"
 	@echo "export KUBECONFIG=$(KUBECONFIG)"
+
+## Gardener integration
+
+.PHONY: fetch-virtual-kubeconfig
+fetch-virtual-kubeconfig:
+	kubectl config unset users.virtual-garden
+	kubectl config unset contexts.virtual-garden
+	kubectl config unset clusters.virtual-garden
+	kubectl get secret -n garden garden-kubeconfig-for-admin -o jsonpath='{.data.kubeconfig}' | base64 -d > .virtual-kubeconfig
+	kubectl --kubeconfig=.virtual-kubeconfig config rename-context garden virtual-garden
+	sed -i 's/name: garden/name: virtual-garden/g' .virtual-kubeconfig
+	sed -i 's/name: admin/name: virtual-garden/g' .virtual-kubeconfig
+	kubectl --kubeconfig=.virtual-kubeconfig config set contexts.virtual-garden.cluster virtual-garden
+	kubectl --kubeconfig=.virtual-kubeconfig config set contexts.virtual-garden.user virtual-garden
+	KUBECONFIG=$$KUBECONFIG:.virtual-kubeconfig kubectl config view --flatten > .merged-kubeconfig
+	rm .virtual-kubeconfig
+	mv .merged-kubeconfig .kubeconfig
