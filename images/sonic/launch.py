@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import fcntl
 import glob
+import ipaddress
 import json
 import logging
 import os
@@ -226,6 +227,17 @@ def get_ip_address(iface: str) -> str:
     )[20:24])
 
 
+def get_netmask(iface: str) -> str:
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # Use ioctl to get the netmask
+    netmask = socket.inet_ntoa(fcntl.ioctl(
+        s.fileno(),
+        0x891b,  # SIOCGIFNETMASK
+        struct.pack('256s', iface.encode('utf-8'))
+    )[20:24])
+    return str(ipaddress.ip_network(f"0.0.0.0/{netmask}").prefixlen)
+
+
 def get_mac_address(iface: str) -> str:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     mac = fcntl.ioctl(
@@ -284,6 +296,7 @@ def parse_port_config() -> dict[str, dict]:
 
 
 def create_config_db(hwsku: str) -> dict:
+    mgmt_interface_cidr = get_ip_address("eth0") + "/" + get_netmask("eth0")
     return {
         'AUTO_TECHSUPPORT': {
             'GLOBAL': {
@@ -315,7 +328,7 @@ def create_config_db(hwsku: str) -> dict:
             }
         },
         'MGMT_INTERFACE': {
-            f'eth0|{get_ip_address("eth0")}/16': {
+            f'eth0|{mgmt_interface_cidr}': {
                 'gwaddr': get_default_gateway(),
             }
         },
