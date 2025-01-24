@@ -127,6 +127,7 @@ external_network:
 			--driver=bridge \
 			--gateway=203.0.113.1 \
 			--subnet=203.0.113.0/24 \
+			--ip-range=203.0.113.0/26 \
 			--opt "com.docker.network.driver.mtu=9000" \
 			--opt "com.docker.network.bridge.name=mini_lab_ext" \
 			--opt "com.docker.network.bridge.enable_ip_masquerade=true" && \
@@ -276,7 +277,7 @@ ssh-machine:
 .PHONY: test-connectivity-to-external-service
 test-connectivity-to-external-service:
 	@for i in $$(seq 1 $(MAX_RETRIES)); do \
-		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://203.0.113.10" > /dev/null 2>&1; then \
+		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://203.0.113.100" > /dev/null 2>&1; then \
 			echo "Connected successfully"; \
 			exit 0; \
 		else \
@@ -295,8 +296,8 @@ test-connectivity-to-external-service:
 
 .PHONY: dev-env
 dev-env:
-	@echo "export METALCTL_API_URL=http://api.172.17.0.1.nip.io:8080/metal"
-	@echo "export METALCTL_HMAC=metal-admin"
+	@echo "export METALCTL_API_URL=${METALCTL_API_URL}"
+	@echo "export METALCTL_HMAC=${METALCTL_HMAC}"
 	@echo "export KUBECONFIG=$(KUBECONFIG)"
 
 ## Gardener integration

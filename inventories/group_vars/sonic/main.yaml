@@ -15,10 +15,7 @@ sonic_mgmtif_gateway: "172.17.0.1"
 
 sonic_mgmt_vrf: false
 
-sonic_nameservers:
-  - "172.17.0.1"
-  - "1.1.1.1"
-  - "1.0.0.1"
+sonic_nameservers: "{{ router_nameservers }}"
 
 sonic_ip_masquerade: true
 

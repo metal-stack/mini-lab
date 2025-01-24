@@ -3,15 +3,10 @@ name: mini-lab
 prefix: ""
 
 mgmt:
-  network: bridge
+  network: mini_lab_ext
 
 topology:
   nodes:
-    metal-control-plane-control-plane:
-      kind: ext-container
-      exec:
-        - ip addr add 203.0.113.100/24 dev mini_lab_ext
-        - ip route add 203.0.113.128/25 via 203.0.113.128 dev mini_lab_ext
     exit:
       kind: linux
       image: quay.io/frrouting/frr:10.0.1
@@ -51,8 +46,6 @@ topology:
         QEMU_MACHINE_CPU_CORES: 2
         QEMU_MACHINE_DISK_SIZE: 20G
   links:
-    - endpoints: ["metal-control-plane-control-plane:mini_lab_ext", "mini_lab_ext:kind"]
-      mtu: 9000
     - endpoints: ["exit:mini_lab_ext", "mini_lab_ext:exit"]
       mtu: 9000
     - endpoints: ["leaf01:Ethernet0", "vms:lan0"]
