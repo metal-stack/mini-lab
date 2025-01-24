@@ -217,6 +217,8 @@ def wait_until_all_interfaces_are_connected(interfaces: int) -> None:
         time.sleep(1)
 
 
+# This function works only for IPv4 interfaces.
+# See: man 7 netdevice
 def get_ip_address(iface: str) -> str:
     # Source: https://bit.ly/3dROGBN
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -227,9 +229,10 @@ def get_ip_address(iface: str) -> str:
     )[20:24])
 
 
+# This function works only for IPv4 interfaces
+# See: man 7 netdevice
 def get_netmask(iface: str) -> str:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    # Use ioctl to get the netmask
     netmask = socket.inet_ntoa(fcntl.ioctl(
         s.fileno(),
         0x891b,  # SIOCGIFNETMASK
@@ -238,6 +241,8 @@ def get_netmask(iface: str) -> str:
     return str(ipaddress.ip_network(f"0.0.0.0/{netmask}").prefixlen)
 
 
+# This function works only for IPv4 interfaces
+# Set: man 7 netdevice
 def get_mac_address(iface: str) -> str:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     mac = fcntl.ioctl(
@@ -248,6 +253,7 @@ def get_mac_address(iface: str) -> str:
     return ':'.join('%02x' % b for b in mac)
 
 
+# This function works only for IPv4 interfaces
 def get_default_gateway() -> str:
     # Source: https://splunktool.com/python-get-default-gateway-for-a-local-interfaceip-address-in-linux
     with open("/proc/net/route") as fh:
