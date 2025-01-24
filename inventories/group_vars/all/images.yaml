@@ -11,7 +11,7 @@ setup_yaml:
 
 # metal_hammer_image_url: https://images.metal-stack.io/metal-hammer/pull-requests/<pr-number-and-title>/metal-hammer-initrd.img.lz4
 # metal_api_image_name:
-# metal_api_image_tag:
+metal_api_image_tag: auditing-timescaledb
 # metal_metalctl_image_name:
 # metal_metalctl_image_tag:
 # metal_masterdata_api_image_name:
@@ -28,5 +28,9 @@ setup_yaml:
 ##
 
 # ansible_common_version:
-# metal_roles_version:
+metal_roles_version: auditing-timescaledb
 # metal_ansible_modules_version:
+
+# helm charts
+metal_helm_chart_version: 0.4.8
+metal_helm_chart_repo: https://helm.metal-stack.io/pull_requests/auditing-timescaledb

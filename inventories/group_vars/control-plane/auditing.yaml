@@ -1,3 +1,6 @@
 ---
-auditing_meili_storage_size: 10Gi
-auditing_meili_resources: {}
+auditing_timescaledb_image_name: timescale/timescaledb
+auditing_timescaledb_image_tag: 2.18.0-pg17
+
+auditing_timescaledb_storage_size: 10Gi
+auditing_timescaledb_resources: {}

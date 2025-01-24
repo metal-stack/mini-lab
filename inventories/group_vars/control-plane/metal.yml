@@ -130,5 +130,4 @@ metal_api_grpc_certs_client_cert: "{{  lookup('file', 'certs/grpc/client.pem') }
 metal_api_grpc_certs_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
 
 # auditing
-metal_auditing_enabled: true
-metal_auditing_index_prefix: metal
+metal_auditing_timescaledb_enabled: true
