@@ -101,6 +101,18 @@ metal_api_networks:
   prefixes:
   - 10.1.0.0/24
 
+metal_api_ips:
+- name: "reserve v4"
+  description: "Reserve IPv4 (for testing purposes)"
+  networkid: internet-mini-lab
+  projectid: 00000000-0000-0000-0000-000000000000
+  ipaddress: "203.0.113.142"
+- name: "reserve v6"
+  description: "Reserve IPv6 (for testing purposes)"
+  networkid: internet-mini-lab
+  projectid: 00000000-0000-0000-0000-000000000000
+  ipaddress: "2001:db8:0:113::142"
+
 metal_masterdata_api_tls_ca: "{{ lookup('file', 'certs/ca.pem') }}"
 metal_masterdata_api_tls_cert: "{{ lookup('file', 'certs/masterdata-api/server.pem') }}"
 metal_masterdata_api_tls_cert_key: "{{ lookup('file', 'certs/masterdata-api/server-key.pem') }}"
