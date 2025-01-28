@@ -128,10 +128,15 @@ external_network:
 			--gateway=203.0.113.1 \
 			--subnet=203.0.113.0/24 \
 			--ip-range=203.0.113.0/26 \
+			--ipv6 \
+			--gateway=2001:db8::1 \
+			--subnet=2001:db8::/48 \
 			--opt "com.docker.network.driver.mtu=9000" \
 			--opt "com.docker.network.bridge.name=mini_lab_ext" \
 			--opt "com.docker.network.bridge.enable_ip_masquerade=true" && \
-		sudo ip route add 203.0.113.128/25 via 203.0.113.128 dev mini_lab_ext; fi
+		sudo ip route add 203.0.113.128/25 via 203.0.113.128 dev mini_lab_ext && \
+		sudo ip -6 route add 2001:db8:0:113::/64 via 2001:db8:0:1::1 dev mini_lab_ext; \
+	fi
 
 .PHONY: env
 env:
@@ -168,7 +173,11 @@ firewall: _privatenet
 
 .PHONY: public-ip
 public-ip:
-	@docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network ip create --name test --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 -o template --template "{{ .ipaddress }}"
+	@docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network ip create --name test --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --addressfamily IPv4 -o template --template "{{ .ipaddress }}"
+
+.PHONY: public-ipv6
+public-ipv6:
+	@docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network ip create --name test --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --addressfamily IPv6 -o template --template "{{ .ipaddress }}"
 
 .PHONY: ls
 ls: env
@@ -291,6 +300,25 @@ test-connectivity-to-external-service:
 			fi; \
 		fi; \
 	done
+
+.PHONY: test-connectivity-to-external-service-via-ipv6
+test-connectivity-to-external-service-via-ipv6:
+	@for i in $$(seq 1 $(MAX_RETRIES)); do \
+		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://[2001:db8::10]" > /dev/null 2>&1; then \
+			echo "Connected successfully"; \
+			exit 0; \
+		else \
+			echo "Connection failed"; \
+			if [ $$i -lt $(MAX_RETRIES) ]; then \
+				echo "Retrying in 2 seconds..."; \
+				sleep 2; \
+			else \
+				echo "Max retries reached"; \
+				exit 1; \
+			fi; \
+		fi; \
+	done
+
 
 ## DEV TARGETS ##
 
