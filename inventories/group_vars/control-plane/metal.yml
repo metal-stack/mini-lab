@@ -72,7 +72,7 @@ metal_api_networks:
   - 10.0.0.0/16
   - 2001:db8:0:10::/64
   additionalannouncablecidrs:
-  - 11.0.0.0/16
+  - 10.240.0.0/12
 - id: internet-mini-lab
   name: "Virtual Internet Network"
   description: "Virtual Internet Network for mini-lab"
