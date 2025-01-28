@@ -7,6 +7,10 @@ mgmt:
 
 topology:
   nodes:
+    metal-control-plane-control-plane:
+      kind: ext-container
+      exec:
+        - ip route add 203.0.113.128/25 via 203.0.113.128 dev eth0
     exit:
       kind: linux
       image: quay.io/frrouting/frr:10.0.1
