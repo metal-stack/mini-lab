@@ -15,7 +15,7 @@ metal_api_images:
 - id: firewall-ubuntu-3.0
   name: Firewall 3 Ubuntu
   description: Firewall 3 Ubuntu Latest Release
-  url: https://images.metal-stack.io/metal-os/stable/firewall/3.0-ubuntu/img.tar.lz4
+  url: https://images.metal-stack.io/metal-os/20241112/firewall/3.0-ubuntu/img.tar.lz4
   features:
     - firewall
 - id: ubuntu-24.04
