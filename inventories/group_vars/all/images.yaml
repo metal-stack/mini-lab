@@ -28,5 +28,5 @@ setup_yaml:
 ##
 
 # ansible_common_version:
-metal_roles_version: fix-vtep
+# metal_roles_version:
 # metal_ansible_modules_version:
