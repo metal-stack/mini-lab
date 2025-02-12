@@ -19,6 +19,10 @@
     - name: metal-roles/control-plane/roles/masterdata-db
       tags: masterdata-db
     - name: metal-roles/control-plane/roles/auditing-timescaledb
+      when: metal_auditing_timescaledb_enabled
+      tags: auditing
+    - name: metal-roles/control-plane/roles/auditing-meili
+      when: metal_auditing_meili_enabled
       tags: auditing
     - name: metal-roles/control-plane/roles/metal
       tags: metal
