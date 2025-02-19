@@ -11,9 +11,9 @@ setup_yaml:
 
 # metal_hammer_image_url: https://images.metal-stack.io/metal-hammer/pull-requests/<pr-number-and-title>/metal-hammer-initrd.img.lz4
 # metal_api_image_name: 
-metal_api_image_tag: dualstack-support
+# metal_api_image_tag: dualstack-support
 # metal_metalctl_image_name:
-metal_metalctl_image_tag: 256-dualstack-support
+# metal_metalctl_image_tag: 256-dualstack-support
 # metal_masterdata_api_image_name:
 # metal_masterdata_api_image_tag:
 # metal_console_image_name:

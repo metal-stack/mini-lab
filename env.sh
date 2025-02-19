@@ -10,7 +10,7 @@ yq_shell() {
 
 METAL_STACK_RELEASE_VERSION=$(yq_shell "yq r inventories/group_vars/all/images.yaml 'metal_stack_release_version'")
 RELEASE_YAML=$(curl -s https://raw.githubusercontent.com/metal-stack/releases/${METAL_STACK_RELEASE_VERSION}/release.yaml)
-METALCTL_IMAGE_TAG=256-dualstack-support
+METALCTL_IMAGE_TAG=$(yq_shell "echo \"${RELEASE_YAML}\" | yq r - docker-images.metal-stack.control-plane.metalctl.tag")
 DEPLOYMENT_BASE_IMAGE_TAG=$(yq_shell "echo \"${RELEASE_YAML}\" | yq r - docker-images.metal-stack.generic.deployment-base.tag")
 
 echo "{}" > .extra_vars.yaml
