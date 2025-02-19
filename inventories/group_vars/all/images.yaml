@@ -1,19 +1,16 @@
----
 metal_stack_release_version: develop
-
 setup_yaml:
   - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
     meta_var: metal_stack_release
-
 ##
 ## for development purposes, you can override releases from our image vector here
 ##
 
 # metal_hammer_image_url: https://images.metal-stack.io/metal-hammer/pull-requests/<pr-number-and-title>/metal-hammer-initrd.img.lz4
 # metal_api_image_name:
-metal_api_image_tag: auditing-timescaledb
+# metal_api_image_tag:
 # metal_metalctl_image_name:
-metal_metalctl_image_tag: 256-dualstack-support
+# metal_metalctl_image_tag:
 # metal_masterdata_api_image_name:
 # metal_masterdata_api_image_tag:
 # metal_console_image_name:
@@ -28,9 +25,9 @@ metal_metalctl_image_tag: 256-dualstack-support
 ##
 
 # ansible_common_version:
-metal_roles_version: auditing-timescaledb
+# metal_roles_version:
 # metal_ansible_modules_version:
 
 # helm charts
-metal_helm_chart_version: 0.4.8
-metal_helm_chart_repo: https://helm.metal-stack.io/pull_requests/auditing-timescaledb
+# metal_helm_chart_version:
+# metal_helm_chart_repo:
