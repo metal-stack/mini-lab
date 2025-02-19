@@ -65,9 +65,11 @@ metal_api_networks:
   underlay: false
   destinationprefixes: []
   partitionid: mini-lab
+  defaultchildprefixlength:
+    IPv4: 22
   prefixes:
   - 10.0.0.0/16
-  additionalAnnouncableCIDRs:
+  additionalannouncablecidrs:
   - 10.240.0.0/12
 - id: internet-mini-lab
   name: "Virtual Internet Network"

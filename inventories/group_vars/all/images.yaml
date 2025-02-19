@@ -13,7 +13,7 @@ setup_yaml:
 # metal_api_image_name:
 metal_api_image_tag: auditing-timescaledb
 # metal_metalctl_image_name:
-# metal_metalctl_image_tag:
+metal_metalctl_image_tag: 256-dualstack-support
 # metal_masterdata_api_image_name:
 # metal_masterdata_api_image_tag:
 # metal_console_image_name:
