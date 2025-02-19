@@ -65,8 +65,12 @@ metal_api_networks:
   underlay: false
   destinationprefixes: []
   partitionid: mini-lab
+  defaultchildprefixlength:
+    IPv4: 22
+    IPv6: 96
   prefixes:
   - 10.0.0.0/16
+  - 2001:db8:0:10::/64
   additionalAnnouncableCIDRs:
   - 10.240.0.0/12
 - id: internet-mini-lab
@@ -77,10 +81,12 @@ metal_api_networks:
   underlay: false
   destinationprefixes:
     - 0.0.0.0/0
+    - ::/0
   partitionid: "mini-lab"
   vrf: 104009
   prefixes:
   - 203.0.113.128/25
+  - 2001:db8:0:113::/64
   labels:
     network.metal-stack.io/default: ""
     network.metal-stack.io/default-external: ""
@@ -94,6 +100,18 @@ metal_api_networks:
   partitionid: "mini-lab"
   prefixes:
   - 10.1.0.0/24
+
+metal_api_ips:
+- name: "reserve v4"
+  description: "Reserve IPv4 (for testing purposes)"
+  networkid: internet-mini-lab
+  projectid: 00000000-0000-0000-0000-000000000000
+  ipaddress: "203.0.113.142"
+- name: "reserve v6"
+  description: "Reserve IPv6 (for testing purposes)"
+  networkid: internet-mini-lab
+  projectid: 00000000-0000-0000-0000-000000000000
+  ipaddress: "2001:db8:0:113::142"
 
 metal_masterdata_api_tls_ca: "{{ lookup('file', 'certs/ca.pem') }}"
 metal_masterdata_api_tls_cert: "{{ lookup('file', 'certs/masterdata-api/server.pem') }}"

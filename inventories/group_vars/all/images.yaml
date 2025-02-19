@@ -18,6 +18,7 @@ setup_yaml:
 # metal_masterdata_api_image_tag:
 # metal_console_image_name:
 # metal_console_image_tag:
+# metal_core_image_tag:
 # ...
 #
 # further overrides can be looked up in the metal-role projects where the mapping is defined:
