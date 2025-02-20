@@ -72,7 +72,6 @@ services:
       - METALCTL_API_URL=${METALCTL_API_URL}
     volumes:
       - ./files/ssh:/root/.ssh:ro
-      - ./files/ignition.json:/tmp/ignition.json
       - ./files/rules.yaml:/tmp/rules.yaml
     network_mode: host
     command: --version
