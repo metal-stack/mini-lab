@@ -25,3 +25,5 @@ bridge vlan del vid 1 untagged pvid dev vniInternet
 bridge vlan add vid 1000 dev vniInternet
 bridge vlan add vid 1000 untagged pvid dev vniInternet
 ip link set up dev vniInternet
+
+sysctl -w net.ipv6.conf.all.forwarding=1
