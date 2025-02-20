@@ -1,7 +1,10 @@
+---
 metal_stack_release_version: develop
+
 setup_yaml:
   - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
     meta_var: metal_stack_release
+
 ##
 ## for development purposes, you can override releases from our image vector here
 ##
@@ -15,11 +18,10 @@ setup_yaml:
 # metal_masterdata_api_image_tag:
 # metal_console_image_name:
 # metal_console_image_tag:
+# metal_core_image_name:
 # metal_core_image_tag:
 # ...
 #
-# further overrides can be looked up in the metal-role projects where the mapping is defined:
-# https://github.com/metal-stack/metal-roles/blob/master/defaults/main.yaml
 
 ##
 ## for ansible roles
@@ -29,6 +31,12 @@ setup_yaml:
 # metal_roles_version:
 # metal_ansible_modules_version:
 
-# helm charts
+##
+## helm charts
+##
+
 # metal_helm_chart_version:
 # metal_helm_chart_repo:
+
+# further overrides can be looked up in the metal-role projects where the mapping is defined:
+# https://github.com/metal-stack/metal-roles/blob/master/defaults/main.yaml
