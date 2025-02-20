@@ -22,6 +22,8 @@
       tags: auditing
     - name: metal-roles/control-plane/roles/metal
       tags: metal
+    - name: roles/dex
+      tags: auth
 
 - name: deploy gardener
   import_playbook: deploy_gardener.yaml

@@ -1,0 +1,145 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dex
+  namespace: {{ metal_auth_dex_namespace }}
+  labels:
+    app.kubernetes.io/name: dex
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dex
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: dex
+    spec:
+      containers:
+        - name: dex
+          image: ghcr.io/dexidp/dex
+          args:
+            - dex
+            - serve
+            - /dex-config/config.yaml
+          volumeMounts:
+            - name: configuration
+              readonly: true
+              mountPath: /dex-config
+            - name: data
+              mountPath: /data
+          ports:
+            - name: web
+              containerPort: 5556
+            - name: grpc
+              containerPort: 5557
+            - name: telemetry
+              containerPort: 5558
+
+      volumes:
+        - name: configuration
+          secret:
+            secretName: dex-config
+            items:
+              - key: config.yaml
+                path: config.yaml
+        - name: data
+          persistentVolumeClaim:
+            claimName: dex-db-pvc
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dex-config
+  namespace: {{ metal_auth_dex_namespace }}
+  labels:
+    app.kubernetes.io/part-of: dex
+stringData:
+  config.yaml: |
+    issuer: http://auth.172.17.0.1.nip.io:8080/dex
+
+    storage:
+      type: sqlite3
+      config:
+        file: /data/sqlite.db
+
+    web:
+      http: 0.0.0.0:5556
+    telemetry:
+      http: 0.0.0.0:5558
+    grpc:
+      addr: 0.0.0.0:5557
+    staticClients:
+      - id: metal-stack
+        public: true
+        name: "metal-stack"
+        secret: {{ metal_auth_dex_client_secret }}
+
+    enablePasswordDB: true
+
+    staticPasswords:
+      - email: "admin@metal-stack.io"
+        # password in bcrypt
+        hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+        username: "admin"
+        userID: "00000000-0000-0000-0000-000000000001"
+        groups:
+        - metal-stack_all-all-admin
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dex-db-pvc
+  namespace: {{ metal_auth_dex_namespace }}
+  labels:
+    app.kubernetes.io/part-of: dex
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dex
+  namespace: {{ metal_auth_dex_namespace }}
+  labels:
+    app.kubernetes.io/name: dex
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: dex
+  ports:
+    - name: web
+      port: 5556
+      targetPort: 5556
+    - name: grpc
+      port: 5557
+      targetPort: 5557
+    - name: telemetry
+      port: 5558
+      targetPort: 5558
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dex
+  namespace: {{ metal_auth_dex_namespace }}
+  labels:
+    app.kubernetes.io/name: dex
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: {{ metal_auth_dex_host }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: dex
+                port:
+                  name: web
+            path: /
+            pathType: Prefix

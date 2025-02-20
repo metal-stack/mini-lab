@@ -112,6 +112,13 @@ metal_masterdata_api_tenants:
     version: 0
   name: metal-stack
   iam_config:
+    issuer_config:
+      url: http://auth.{{ metal_control_plane_ingress_dns }}:8080
+      client_id: "metal-stack"
+    idm_config:
+      idm_type: "ldap"
+    group_config:
+      namespace_max_length: 20
   description: metal-stack tenant, which is provider
 
 metal_masterdata_api_projects:

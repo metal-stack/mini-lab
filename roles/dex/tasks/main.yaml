@@ -1,0 +1,7 @@
+---
+- name: Deploy dex
+  kubernetes.core.k8s:
+    apply: true
+    namespace: dex
+    template:
+      - path: dex.yaml.j2
