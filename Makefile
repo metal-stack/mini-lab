@@ -63,7 +63,7 @@ else
 endif
 
 .PHONY: up
-up: env gen-certs update-userdata control-plane-bake partition-bake
+up: env gen-certs control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_rsa
 	docker compose up --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
@@ -170,7 +170,7 @@ update-userdata:
 	cat files/ignition.yaml | docker run --rm -i ghcr.io/metal-stack/metal-deployment-base:$$DEPLOYMENT_BASE_IMAGE_TAG ct | jq > files/ignition.json
 
 .PHONY: machine
-machine: _privatenet _userdata
+machine: _privatenet update-userdata
 	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine create \
 		--description test \
 		--name test \
@@ -183,7 +183,7 @@ machine: _privatenet _userdata
 		--networks $(shell docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: firewall
-firewall: _privatenet _userdata
+firewall: _privatenet update-userdata
 	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl firewall create \
 		--description fw \
 		--name fw \
