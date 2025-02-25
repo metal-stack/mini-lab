@@ -1,9 +1,11 @@
 {
   "ignition": {
     "config": {},
-    "security": {},
+    "security": {
+      "tls": {}
+    },
     "timeouts": {},
-    "version": "2.3.0"
+    "version": "2.2.0"
   },
   "networkd": {},
   "passwd": {},
@@ -14,10 +16,10 @@
         "path": "/etc/hosts.allow",
         "append": true,
         "contents": {
-          "source": "data:,ALL%3A%20%5Bfe80%3A%3A%5D%2F10%0AALL%3A%20203.0.113.1%0AALL%3A%20%5B2001%3Adb8%3A%3A1%5D%0A%0A",
+          "source": "data:,ALL%3A%20%5Bfe80%3A%3A%5D%2F10%0AALL%3A%20203.0.113.1%0AALL%3A%20%5B2001%3Adb8%3A%3A1%5D%0A",
           "verification": {}
         },
-        "mode": 644
+        "mode": 420
       }
     ]
   },
