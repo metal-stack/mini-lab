@@ -232,7 +232,7 @@ ssh-leaf02:
 .PHONY: start-machines
 start-machines:
 	@for i in $$(docker container ps --filter label=clab-node-group=machines --quiet); do \
-		@$(MAKE) --no-print-directory _ipmi	VM=$i COMMAND='chassis power on'; \
+		$(MAKE) --no-print-directory _ipmi VM=$i COMMAND='chassis power on'; \
 	done
 
 .PHONY: _ipmi
