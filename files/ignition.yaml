@@ -1,0 +1,11 @@
+storage:
+  files:
+    - path: /etc/hosts.allow
+      filesystem: root
+      append: true
+      mode: 0644
+      contents:
+        inline: |
+          ALL: [fe80::]/10
+          ALL: 203.0.113.1
+          ALL: [2001:db8::1]
