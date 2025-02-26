@@ -6,13 +6,14 @@ mgmt:
   network: mini_lab_ext
 
 topology:
+  defaults:
+    kind: linux
   nodes:
     metal-control-plane-control-plane:
       kind: ext-container
       exec:
         - ip route add 203.0.113.128/25 via 203.0.113.128 dev eth0
     exit:
-      kind: linux
       image: quay.io/frrouting/frr:10.0.1
       network-mode: none
       binds:
@@ -25,7 +26,7 @@ topology:
     mini_lab_ext:
       kind: bridge
     leaf01:
-      kind: linux
+      group: leaves
       image: ${MINI_LAB_SONIC_IMAGE}
       labels:
         ansible-group: sonic
@@ -33,13 +34,34 @@ topology:
         - /dev:/dev
         - files/ssh/id_rsa.pub:/authorized_keys
     leaf02:
-      kind: linux
+      group: leaves
       image: ${MINI_LAB_SONIC_IMAGE}
       labels:
         ansible-group: sonic
       binds:
         - /dev:/dev
         - files/ssh/id_rsa.pub:/authorized_keys
+    machine01:
+      group: machines
+      image: ${MINI_LAB_VM_IMAGE}
+      env:
+        QEMU_CPU_CORES: 2
+        QEMU_DISK_SIZE: 20G
+        UUID: 00000000-0000-0000-0000-000000000001
+    machine02:
+      group: machines
+      image: ${MINI_LAB_VM_IMAGE}
+      env:
+        QEMU_CPU_CORES: 2
+        QEMU_DISK_SIZE: 20G
+        UUID: 00000000-0000-0000-0000-000000000002
+    machine03:
+      group: machines
+      image: ${MINI_LAB_VM_IMAGE}
+      env:
+        QEMU_CPU_CORES: 2
+        QEMU_DISK_SIZE: 20G
+        UUID: 00000000-0000-0000-0000-000000000003
     vms:
       kind: linux
       image: ${MINI_LAB_VM_IMAGE}
@@ -47,16 +69,14 @@ topology:
         - /dev:/dev
         - scripts:/mini-lab
       env:
-        QEMU_MACHINE_CPU_CORES: 2
-        QEMU_MACHINE_DISK_SIZE: 20G
   links:
     - endpoints: ["exit:mini_lab_ext", "mini_lab_ext:exit"]
       mtu: 9000
-    - endpoints: ["leaf01:Ethernet0", "vms:lan0"]
-    - endpoints: ["leaf02:Ethernet0", "vms:lan1"]
-    - endpoints: ["leaf01:Ethernet1", "vms:lan2"]
-    - endpoints: ["leaf02:Ethernet1", "vms:lan3"]
-    - endpoints: ["leaf01:Ethernet2", "vms:lan4"]
-    - endpoints: ["leaf02:Ethernet2", "vms:lan5"]
+    - endpoints: ["leaf01:Ethernet0", "machine01:lan0"]
+    - endpoints: ["leaf02:Ethernet0", "machine01:lan1"]
+    - endpoints: ["leaf01:Ethernet1", "machine02:lan0"]
+    - endpoints: ["leaf02:Ethernet1", "machine02:lan1"]
+    - endpoints: ["leaf01:Ethernet2", "machine03:lan0"]
+    - endpoints: ["leaf02:Ethernet2", "machine03:lan1"]
     - endpoints: ["leaf01:Ethernet120", "exit:eth1"]
     - endpoints: ["leaf02:Ethernet120", "exit:eth2"]
