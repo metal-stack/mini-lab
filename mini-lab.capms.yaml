@@ -31,7 +31,6 @@ topology:
       labels:
         ansible-group: sonic
       binds:
-        - /dev:/dev
         - files/ssh/id_rsa.pub:/authorized_keys
     leaf02:
       group: leaves
@@ -39,7 +38,6 @@ topology:
       labels:
         ansible-group: sonic
       binds:
-        - /dev:/dev
         - files/ssh/id_rsa.pub:/authorized_keys
     machine01:
       group: machines
@@ -62,13 +60,6 @@ topology:
         QEMU_CPU_CORES: 2
         QEMU_DISK_SIZE: 20G
         UUID: 00000000-0000-0000-0000-000000000003
-    vms:
-      kind: linux
-      image: ${MINI_LAB_VM_IMAGE}
-      binds:
-        - /dev:/dev
-        - scripts:/mini-lab
-      env:
   links:
     - endpoints: ["exit:mini_lab_ext", "mini_lab_ext:exit"]
       mtu: 9000
