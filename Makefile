@@ -231,7 +231,9 @@ ssh-leaf02:
 
 .PHONY: start-machines
 start-machines:
-	sudo $(CONTAINERLAB) exec --topo $(LAB_TOPOLOGY) --label clab-node-group=machines --cmd 'ipmitool -C 3 -I lanplus -U ADMIN -P ADMIN -H 127.0.0.1 chassis power on'
+	@for i in $$(docker container ps --filter label=clab-node-group=machines --quiet); do \
+		@$(MAKE) --no-print-directory _ipmi	VM=$i COMMAND='chassis power on'; \
+	done
 
 .PHONY: _ipmi
 _ipmi:
