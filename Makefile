@@ -228,64 +228,67 @@ ssh-leaf02:
 	ssh -F files/ssh/config leaf02
 
 ## MACHINE MANAGEMENT ##
+.PHONY: _ipmi_power
+_ipmi_power:
+	docker exec $(VM) ipmitool -C 3 -I lanplus -U ADMIN -P ADMIN -H 127.0.0.1 chassis power $(COMMAND)
 
 .PHONY: start-machines
 start-machines:
 	@for i in $$(docker container ps --filter label=clab-node-group=machines --quiet); do \
-		$(MAKE) --no-print-directory _ipmi VM=$$i COMMAND='chassis power on'; \
+		$(MAKE) --no-print-directory _ipmi_power VM=$$i COMMAND='on'; \
 	done
-
-.PHONY: _ipmi
-_ipmi:
-	docker exec -it $(VM) ipmitool -C 3 -I lanplus -U ADMIN -P ADMIN -H 127.0.0.1 $(COMMAND)
 
 .PHONY: power-on-machine01
 power-on-machine01:
-	@$(MAKE) --no-print-directory _ipmi	VM=machine01 COMMAND='chassis power on'
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine01 COMMAND=on
 
 .PHONY: power-on-machine02
 power-on-machine02:
-	@$(MAKE) --no-print-directory _ipmi	VM=machine02 COMMAND='chassis power on'
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine02 COMMAND=on
 
 .PHONY: power-on-machine03
 power-on-machine03:
-	@$(MAKE) --no-print-directory _ipmi	VM=machine03 COMMAND='chassis power on'
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=on
 
 .PHONY: power-reset-machine01
 power-reset-machine01:
-	@$(MAKE) --no-print-directory _ipmi	VM=machine01 COMMAND='chassis power reset'
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine01 COMMAND=reset
 
 .PHONY: power-reset-machine02
 power-reset-machine02:
-	@$(MAKE) --no-print-directory _ipmi	VM=machine02 COMMAND='chassis power reset'
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine02 COMMAND=reset
 
 .PHONY: power-reset-machine03
 power-reset-machine03:
-	@$(MAKE) --no-print-directory _ipmi	VM=machine03 COMMAND='chassis power reset'
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=reset
 
 .PHONY: power-off-machine01
 power-off-machine01:
-	@$(MAKE) --no-print-directory _ipmi	VM=machine01 COMMAND='chassis power off'
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine01 COMMAND=off
 
 .PHONY: power-off-machine02
 power-off-machine02:
-	@$(MAKE) --no-print-directory _ipmi	VM=machine02 COMMAND='chassis power off'
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine02 COMMAND=off
 
 .PHONY: power-off-machine03
 power-off-machine03:
-	@$(MAKE) --no-print-directory _ipmi	VM=machine03 COMMAND='chassis power off'
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=off
+
+.PHONY: _console
+_console:
+	docker exec --interactive --tty $(VM) ipmitool -C 3 -I lanplus -U ADMIN -P ADMIN -H 127.0.0.1 sol activate
 
 .PHONY: console-machine01
 console-machine01:
-	@$(MAKE) --no-print-directory _ipmi	VM=machine01 COMMAND='sol activate'
+	@$(MAKE) --no-print-directory _console VM=machine01
 
 .PHONY: console-machine02
 console-machine02:
-	@$(MAKE) --no-print-directory _ipmi	VM=machine02 COMMAND='sol activate'
+	@$(MAKE) --no-print-directory _console VM=machine02
 
 .PHONY: console-machine03
 console-machine03:
-	@$(MAKE) --no-print-directory _ipmi	VM=machine03 COMMAND='sol activate'
+	@$(MAKE) --no-print-directory _console VM=machine03
 
 .PHONY: _password
 _password: env
