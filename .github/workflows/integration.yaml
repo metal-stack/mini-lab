@@ -56,8 +56,7 @@ jobs:
     - name: Build and push mini-lab-vms container
       uses: docker/build-push-action@v5
       with:
-        context: ./images
-        file: ./images/Dockerfile.vms
+        context: ./images/machine
         push: true
         tags: ${{ env.MINI_LAB_VM_IMAGE }}
         cache-from: type=registry,ref=${{ env.MINI_LAB_VM_IMAGE }}
