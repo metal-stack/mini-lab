@@ -26,13 +26,13 @@ services:
       - /bin/bash
       - -ce
       - |
-          ansible-playbook \
-            -i inventories/control-plane.yaml \
-            obtain_role_requirements.yaml
-          ansible-galaxy install --ignore-errors -r requirements.yaml
-          ansible-playbook \
-            -i inventories/control-plane.yaml \
-            deploy_control_plane.yaml --extra-vars "@.extra_vars.yaml"
+        ansible-playbook \
+          -i inventories/control-plane.yaml \
+          obtain_role_requirements.yaml
+        ansible-galaxy install --ignore-errors -r requirements.yaml
+        ansible-playbook \
+          -i inventories/control-plane.yaml \
+          deploy_control_plane.yaml --extra-vars "@.extra_vars.yaml"
 
   partition:
     image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
@@ -56,21 +56,21 @@ services:
       - /bin/bash
       - -ce
       - |
-          ansible-playbook \
-            -i inventories/control-plane.yaml \
-            obtain_role_requirements.yaml
-          ansible-galaxy install --ignore-errors -r requirements.yaml
-          ansible-playbook \
-            -i inventories/partition.yaml \
-            -i clab-mini-lab/ansible-inventory.yml \
-            deploy_partition.yaml --extra-vars "@.extra_vars.yaml"
+        ansible-playbook \
+          -i inventories/control-plane.yaml \
+          obtain_role_requirements.yaml
+        ansible-galaxy install --ignore-errors -r requirements.yaml
+        ansible-playbook \
+          -i inventories/partition.yaml \
+          -i clab-mini-lab/ansible-inventory.yml \
+          deploy_partition.yaml --extra-vars "@.extra_vars.yaml"
 
   metalctl:
     image: ghcr.io/metal-stack/metalctl:${METALCTL_IMAGE_TAG}
     environment:
       - METALCTL_HMAC=${METALCTL_HMAC}
       - METALCTL_API_URL=${METALCTL_API_URL}
-      - METALCTL_HMAC_AUTH_TYPE=${METALCTL_HMAC_AUTH_TYPE}
+      - METALCTL_HMAC_AUTH_TYPE=${METALCTL_HMAC_AUTH_TYPE:-Metal-Admin}
     volumes:
       - ./files/ssh:/root/.ssh:ro
       - ./files/ignition.json:/tmp/ignition.json
