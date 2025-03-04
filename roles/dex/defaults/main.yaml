@@ -1,0 +1,4 @@
+metal_auth_dex_host: auth.{{ metal_control_plane_ingress_dns }}
+metal_auth_dex_issuer_url: http://auth.{{ metal_control_plane_ingress_dns }}:8080
+metal_auth_dex_client_secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+metal_auth_dex_namespace: "{{ metal_control_plane_namespace }}"
