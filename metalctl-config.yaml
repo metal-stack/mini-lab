@@ -1,0 +1,10 @@
+current: mini
+contexts:
+  mini:
+    url: http://api.172.17.0.1.nip.io:8080/metal
+    issuer_url: http://auth.172.17.0.1.nip.io:8080/dex
+    issuer_type: generic
+    custom_scopes: ""
+    client_id: metal-stack
+    client_secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+    hmac: null
