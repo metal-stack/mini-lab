@@ -1,0 +1,17 @@
+---
+auth_dex_ingress_dns: "auth.{{ metal_control_plane_ingress_dns }}"
+auth_dex_issuer_url: http://auth.{{ metal_control_plane_ingress_dns }}:8080/dex
+
+auth_dex_static_clients:
+- id: metal-stack
+  public: true
+  name: "metal-stack"
+  secret: secret
+  redirectURIs:
+  - 'http://v2.api.172.17.0.1.nip.io:8080/auth/oidc/callback'
+
+auth_dex_static_passwords:
+- email: admin@metal-stack.io
+  hash: "{{ 'change-me' | string | password_hash('bcrypt', salt='jKfnxzOP3oJPeZYXMOc00Y') }}"
+  username: "admin"
+  userID: "00000000-0000-0000-0000-000000000001"

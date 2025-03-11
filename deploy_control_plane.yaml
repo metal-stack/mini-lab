@@ -24,6 +24,12 @@
     - name: metal-roles/control-plane/roles/auditing-meili
       when: metal_auditing_meili_enabled
       tags: auditing
+    - name: metal-roles/control-plane/roles/valkey
+      tags: valkey
+    - name: metal-roles/control-plane/roles/auth-dex
+      tags: auth
+    # - name: metal-roles/control-plane/roles/logto
+    #   tags: auth
     - name: metal-roles/control-plane/roles/metal
       tags: metal
 
