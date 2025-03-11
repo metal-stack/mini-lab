@@ -96,8 +96,12 @@ roll-certs:
 	$(MAKE) gen-certs
 
 .PHONY: control-plane
-control-plane: control-plane-bake env
+control-plane: control-plane-bake create-proxy-registries env
 	docker compose up --remove-orphans --force-recreate control-plane
+
+.PHONY: create-proxy-registries
+create-proxy-registries:
+	docker compose up -d --force-recreate proxy-docker proxy-ghcr proxy-gcr proxy-k8s proxy-quay
 
 .PHONY: control-plane-bake
 control-plane-bake:
@@ -146,6 +150,15 @@ env:
 
 .PHONY: cleanup
 cleanup: cleanup-control-plane cleanup-partition
+
+.PHONY: cleanup-proxy-registries
+cleanup-registry:
+	@for volume in $(shell docker volume ls -q); do \
+		case $$volume in \
+		  mini-lab_proxy-*) \
+			docker volume rm $$volume;; \
+        esac; \
+	done;
 
 .PHONY: cleanup-control-plane
 cleanup-control-plane:
