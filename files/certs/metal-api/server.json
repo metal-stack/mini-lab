@@ -1,0 +1,19 @@
+{
+  "CN": "metal-api",
+  "hosts": [
+    "api.172.17.0.1.nip.io"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 4096
+  },
+  "names": [
+    {
+      "C":  "DE",
+      "L":  "Munich",
+      "O":  "metal-stack",
+      "OU": "DevOps",
+      "ST": "Bavaria"
+    }
+  ]
+}
