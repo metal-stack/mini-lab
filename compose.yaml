@@ -70,7 +70,7 @@ services:
     environment:
       - METALCTL_HMAC=${METALCTL_HMAC}
       - METALCTL_API_URL=${METALCTL_API_URL}
-      - METALCTL_HMAC_AUTH_TYPE=${METALCTL_HMAC_AUTH_TYPE}
+      - METALCTL_HMAC_AUTH_TYPE=${METALCTL_HMAC_AUTH_TYPE:-Metal-Admin}
     volumes:
       - ./files/ssh:/root/.ssh:ro
       - ./files/ignition.json:/tmp/ignition.json
