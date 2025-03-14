@@ -26,6 +26,8 @@ MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-la
 MACHINE_OS=debian-12.0
 MAX_RETRIES := 30
 
+CONTAINER_DIR=/etc/containerd/certs.d
+
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
 MACHINE_OS=ubuntu-24.04
@@ -96,12 +98,22 @@ roll-certs:
 	$(MAKE) gen-certs
 
 .PHONY: control-plane
-control-plane: control-plane-bake create-proxy-registries env
+control-plane: control-plane-bake create-proxy-registries attach-proxy-registries env
 	docker compose up --remove-orphans --force-recreate control-plane
 
 .PHONY: create-proxy-registries
 create-proxy-registries:
 	docker compose up -d --force-recreate proxy-docker proxy-ghcr proxy-gcr proxy-k8s proxy-quay
+
+.PHONY: attach-proxy-registries
+attach-proxy-registries:
+	@for node in $$(kind get nodes --name metal-control-plane); do \
+		echo "[host.\"http://proxy-docker:5000\"]" | docker exec -i "$${node}" sh -c 'mkdir -p $(CONTAINER_DIR)/docker.io && cat > $(CONTAINER_DIR)/docker.io/hosts.toml'; \
+		echo "[host.\"http://proxy-k8s:5000\"]" | docker exec -i "$${node}" sh -c 'mkdir -p $(CONTAINER_DIR)registry.k8s.io && cat > $(CONTAINER_DIR)/registry.k8s.io/hosts.toml'; \
+		echo "[host.\"http://proxy-ghcr:5000\"]" | docker exec -i "$${node}" sh -c 'mkdir -p $(CONTAINER_DIR)/ghcr.io> $(CONTAINER_DIR)/ghrc.io/hosts.toml'; \
+		echo "[host.\"http://proxy-gcr:5000\"]" | docker exec -i "$${node}" sh -c 'mkdir -p $(CONTAINER_DIR)/gcr.io && cat > $(CONTAINER_DIR)/gcr.io/hosts.toml'; \
+		echo "[host.\"http://proxy-quay:5000\"]" | docker exec -i "$${node}" sh -c 'mkdir -p $(CONTAINER_DIR)/quay.io && cat > $(CONTAINER_DIR)/quay.io/hosts.toml'; \
+	done
 
 .PHONY: control-plane-bake
 control-plane-bake:
@@ -152,7 +164,7 @@ env:
 cleanup: cleanup-control-plane cleanup-partition
 
 .PHONY: cleanup-proxy-registries
-cleanup-registry:
+cleanup-proxy-registries:
 	@for volume in $(shell docker volume ls -q); do \
 		case $$volume in \
 		  mini-lab_proxy-*) \
