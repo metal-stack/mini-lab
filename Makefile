@@ -27,6 +27,8 @@ MACHINE_OS=debian-12.0
 MAX_RETRIES := 30
 
 CONTAINER_DIR=/etc/containerd/certs.d
+# size in KiB
+REG_VOLUME_THRESHOLD=5242880
 
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
@@ -109,8 +111,8 @@ create-proxy-registries:
 attach-proxy-registries:
 	@for node in $$(kind get nodes --name metal-control-plane); do \
 		echo "[host.\"http://proxy-docker:5000\"]" | docker exec -i "$${node}" sh -c 'mkdir -p $(CONTAINER_DIR)/docker.io && cat > $(CONTAINER_DIR)/docker.io/hosts.toml'; \
-		echo "[host.\"http://proxy-k8s:5000\"]" | docker exec -i "$${node}" sh -c 'mkdir -p $(CONTAINER_DIR)registry.k8s.io && cat > $(CONTAINER_DIR)/registry.k8s.io/hosts.toml'; \
-		echo "[host.\"http://proxy-ghcr:5000\"]" | docker exec -i "$${node}" sh -c 'mkdir -p $(CONTAINER_DIR)/ghcr.io> $(CONTAINER_DIR)/ghrc.io/hosts.toml'; \
+		echo "[host.\"http://proxy-k8s:5000\"]" | docker exec -i "$${node}" sh -c 'mkdir -p $(CONTAINER_DIR)/registry.k8s.io && cat > $(CONTAINER_DIR)/registry.k8s.io/hosts.toml'; \
+		echo "[host.\"http://proxy-ghcr:5000\"]" | docker exec -i "$${node}" sh -c 'mkdir -p $(CONTAINER_DIR)/ghcr.io> $(CONTAINER_DIR)/ghcr.io/hosts.toml'; \
 		echo "[host.\"http://proxy-gcr:5000\"]" | docker exec -i "$${node}" sh -c 'mkdir -p $(CONTAINER_DIR)/gcr.io && cat > $(CONTAINER_DIR)/gcr.io/hosts.toml'; \
 		echo "[host.\"http://proxy-quay:5000\"]" | docker exec -i "$${node}" sh -c 'mkdir -p $(CONTAINER_DIR)/quay.io && cat > $(CONTAINER_DIR)/quay.io/hosts.toml'; \
 	done
@@ -161,7 +163,7 @@ env:
 	@./env.sh
 
 .PHONY: cleanup
-cleanup: cleanup-control-plane cleanup-partition
+cleanup: automatic-cleanup-proxy-registries cleanup-control-plane cleanup-partition
 
 .PHONY: cleanup-proxy-registries
 cleanup-proxy-registries:
@@ -171,6 +173,23 @@ cleanup-proxy-registries:
 			docker volume rm $$volume;; \
         esac; \
 	done;
+
+.PHONY: automatic-cleanup-proxy-registries
+automatic-cleanup-proxy-registries:
+	@REG_THRESHOLD=$(REG_VOLUME_THRESHOLD); \
+	for container in $$(docker ps -f name=proxy -q); do \
+		SIZE=$$(docker run --rm --volumes-from $$container alpine du -s /var/lib/registry | awk '{print $$1}'); \
+		if [ $$SIZE -gt $$REG_THRESHOLD ]; then \
+			VOLUME=$$(docker inspect --format='{{ range .Mounts }}{{ .Name }} {{ end }}' $$container); \
+			echo "Stopping and removing $$container (size: $$SIZE KiB, threshold: $$REG_THRESHOLD KiB)..."; \
+			docker stop $$container && docker rm $$container; \
+			if [ -n "$$VOLUME" ]; then \
+				docker volume rm $$VOLUME; \
+				echo "Removed volume: $$VOLUME"; \
+			fi; \
+		fi; \
+	done
+
 
 .PHONY: cleanup-control-plane
 cleanup-control-plane:
