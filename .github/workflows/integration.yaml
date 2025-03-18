@@ -71,7 +71,6 @@ jobs:
         tags: ${{ env.MINI_LAB_SONIC_IMAGE }}
         cache-from: type=registry,ref=${{ env.MINI_LAB_SONIC_IMAGE }}
         cache-to: type=inline
-      if: ${{ matrix.flavors.name == 'sonic' }}
 
     - name: Run integration tests
       shell: bash
