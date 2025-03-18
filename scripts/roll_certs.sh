@@ -20,6 +20,7 @@ for component in \
         grpc \
         masterdata-api \
         metal-admission-controller \
+        metal-api \
         virtual-admin \
         virtual-gardener-apiserver \
         virtual-kube-apiserver \
