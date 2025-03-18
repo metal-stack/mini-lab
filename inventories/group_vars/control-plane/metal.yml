@@ -18,7 +18,7 @@ metal_api_images:
   url: https://images.metal-stack.io/metal-os/stable/firewall/3.0-ubuntu/img.tar.lz4
   features:
     - firewall
-- id: ubuntu-24.04
+- id: ubuntu-24.4
   name: Ubuntu 24.04
   description: Ubuntu 24.04 Latest Release
   url: https://images.metal-stack.io/metal-os/stable/ubuntu/24.04/img.tar.lz4
