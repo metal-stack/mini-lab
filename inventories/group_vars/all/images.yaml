@@ -6,10 +6,10 @@ setup_yaml:
     meta_var: metal_stack_release
 
 # TODO: remove these overrides again.
-# see: https://github.com/metal-stack/metal-api/releases/tag/v0.40.5
-# and https://github.com/metal-stack/masterdata-api/releases/tag/v0.11.6
+# see: https://github.com/metal-stack/metal-api/pull/612
+# and https://github.com/metal-stack/masterdata-api/pull/112
 metal_api_image_tag: v0.40.4
-metal_masterdata_api_image_tag: v0.11.5
+metal_masterdata_api_image_tag: fix-workdir
 
 ##
 ## for development purposes, you can override releases from our image vector here
