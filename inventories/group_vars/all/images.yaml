@@ -5,6 +5,10 @@ setup_yaml:
   - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
     meta_var: metal_stack_release
 
+# TODO: remove these overrides again.
+# see: https://github.com/metal-stack/metal-api/pull/612
+metal_api_image_tag: v0.40.4
+
 ##
 ## for development purposes, you can override releases from our image vector here
 ##
