@@ -32,7 +32,7 @@ REG_VOLUME_THRESHOLD=5242880
 
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
-MACHINE_OS=ubuntu-24.04
+MACHINE_OS=ubuntu-24.4
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
 VRF=vrf20
