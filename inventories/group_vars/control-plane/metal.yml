@@ -20,7 +20,7 @@ metal_apiserver_oidc_client_id: metal-stack
 metal_apiserver_oidc_client_secret: secret
 
 metal_apiserver_redis_password: change-me-soon
-metal_apiserver_admin_subjects: ""
+metal_apiserver_admin_subjects: "CiQwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDESBWxvY2Fs@oidc"
 
 metal_api_images:
 - id: firewall-ubuntu-3.0

@@ -15,3 +15,11 @@ auth_dex_static_passwords:
   hash: "{{ 'change-me' | string | password_hash('bcrypt', salt='jKfnxzOP3oJPeZYXMOc00Y') }}"
   username: "admin"
   userID: "00000000-0000-0000-0000-000000000001"
+- email: editor@metal-stack.io
+  hash: "{{ 'change-me' | string | password_hash('bcrypt', salt='jKfnxzOP3oJPeZYXMOc00Y') }}"
+  username: "editor"
+  userID: "00000000-0000-0000-0000-000000000002"
+- email: viewer@metal-stack.io
+  hash: "{{ 'change-me' | string | password_hash('bcrypt', salt='jKfnxzOP3oJPeZYXMOc00Y') }}"
+  username: "viewer"
+  userID: "00000000-0000-0000-0000-000000000003"
