@@ -5,6 +5,9 @@ networking:
   apiServerAddress: 0.0.0.0
 nodes:
   - role: control-plane
+    extraMounts:
+      - hostPath: ./config-patches
+        containerPath: /etc/containerd/certs.d
     extraPortMappings:
       - containerPort: 4443
         hostPort: 4443
