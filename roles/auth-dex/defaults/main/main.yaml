@@ -1,0 +1,21 @@
+---
+auth_dex_namespace: "metal-control-plane"
+
+auth_dex_image_name: ghcr.io/dexidp/dex
+auth_dex_image_tag: latest
+
+auth_dex_ingress_dns: https://{{ auth_dex_issuer_url }}/dex
+auth_dex_issuer_url: "{{ auth_dex_ingress_dns }}"
+
+auth_dex_static_clients: []
+# - id: metal-stack
+#   public: true
+#   name: "metal-stack"
+#   secret: secret
+
+auth_dex_static_passwords: []
+# - email: "admin@metal-stack.io"
+#   # password in bcrypt
+#   hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+#   username: "admin"
+#   userID: "00000000-0000-0000-0000-000000000001"
