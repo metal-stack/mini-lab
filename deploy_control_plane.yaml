@@ -26,10 +26,8 @@
       tags: auditing
     - name: metal-roles/control-plane/roles/valkey
       tags: valkey
-    - name: metal-roles/control-plane/roles/auth-dex
+    - name: auth-dex
       tags: auth
-    # - name: metal-roles/control-plane/roles/logto
-    #   tags: auth
     - name: metal-roles/control-plane/roles/metal
       tags: metal
 
