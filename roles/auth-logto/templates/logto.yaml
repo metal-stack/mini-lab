@@ -1,0 +1,145 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: logto
+  name: logto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logto
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: logto
+    spec:
+      containers:
+      - command:
+          - sh
+          - -c
+          - npm run cli db seed -- --swe && npm start
+        env:
+          - name: TRUST_PROXY_HEADER
+            value: "1"
+          - name: DB_URL
+            value: "postgres://{{ logto_db_user }}:{{ logto_db_password }}@{{ logto_db_address }}:{{ logto_db_port }}/logto"
+          - name: ENDPOINT
+            value: http://{{ logto_ingress_dns }}:8080
+          - name: ADMIN_ENDPOINT
+            value: http://admin.{{ logto_ingress_dns }}:8080
+          #logto_ingress_dns
+        image: "{{ logto_image_name }}:{{ logto_image_tag }}"
+        imagePullPolicy: {{ metal_control_plane_image_pull_policy }}
+        # livenessProbe:
+        #   failureThreshold: 5
+        #   httpGet:
+        #     path: /health
+        #     port: 8080
+        #     scheme: HTTP
+        #   initialDelaySeconds: 60
+        #   periodSeconds: 10
+        #   successThreshold: 1
+        #   timeoutSeconds: 5
+        name: logto
+        ports:
+        - containerPort: 3001
+          name: endpoint
+          protocol: TCP
+        - containerPort: 3002
+          name: admin-endpoint
+          protocol: TCP
+
+        # readinessProbe:
+        #   failureThreshold: 1
+        #   httpGet:
+        #     path: /ready
+        #     port: 8181
+        #     scheme: HTTP
+        #   initialDelaySeconds: 30
+        #   periodSeconds: 10
+        #   successThreshold: 1
+        #   timeoutSeconds: 2
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 50m
+            memory: 50Mi
+        # securityContext:
+        #   allowPrivilegeEscalation: false
+        #   capabilities:
+        #     drop:
+        #     - all
+        #     add:
+        #     - NET_BIND_SERVICE
+        #   readOnlyRootFilesystem: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: logto
+  name: logto
+spec:
+  type: ClusterIP
+  ports:
+  - name: endpoint
+    port: 3001
+    targetPort: endpoint
+  - name: admin-endpoint
+    port: 3002
+    targetPort: admin-endpoint
+  selector:
+    app: logto
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app: logto
+  name: logto
+  annotations:
+{% if logto_tls %}
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+{% endif %}
+{% for key, value in logto_ingress_annotations.items() %}
+    {{ key }}: "{{ value }}"
+{% endfor %}
+spec:
+  ingressClassName: nginx
+{% if logto_tls %}
+  tls:
+    - hosts:
+      - {{ logto_ingress_dns }}
+      secretName: logto-tls
+{% endif %}
+  rules:
+    - host: {{ logto_ingress_dns }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: logto
+                port:
+                  number: 3001
+    - host: admin.{{ logto_ingress_dns }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: logto
+                port:
+                  number: 3002

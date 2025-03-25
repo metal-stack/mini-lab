@@ -1,0 +1,55 @@
+---
+- name: Deploy logto db
+  include_role:
+    name: metal-roles/control-plane/roles/postgres-backup-restore
+  vars:
+    postgres_name: "{{ logto_db_name }}"
+    postgres_namespace: "{{ logto_namespace }}"
+    postgres_image_name: "{{ logto_db_image_name }}"
+    postgres_image_tag: "{{ logto_db_image_tag }}"
+    postgres_storage_size: "{{ logto_db_storage_size }}"
+    postgres_storage_class: "{{ logto_db_storage_class }}"
+    postgres_db: "{{ logto_db_db }}"
+    postgres_user: "{{ logto_db_user }}"
+    postgres_password: "{{ logto_db_password }}"
+    postgres_max_connections: "{{ logto_db_max_connections }}"
+    postgres_backup_restore_sidecar_image_name: "{{ logto_db_backup_restore_sidecar_image_name }}"
+    postgres_backup_restore_sidecar_image_tag: "{{ logto_db_backup_restore_sidecar_image_tag }}"
+    postgres_backup_restore_sidecar_provider: "{{ logto_db_backup_restore_sidecar_provider }}"
+    postgres_backup_restore_sidecar_backup_cron_schedule: "{{ logto_db_backup_restore_sidecar_backup_cron_schedule }}"
+    postgres_backup_restore_sidecar_log_level: "{{ logto_db_backup_restore_sidecar_log_level }}"
+    postgres_backup_restore_sidecar_object_prefix: "{{ logto_db_backup_restore_sidecar_object_prefix }}"
+    postgres_backup_restore_sidecar_gcp_bucket_name: "{{ logto_db_backup_restore_sidecar_gcp_bucket_name }}"
+    postgres_backup_restore_sidecar_gcp_backup_location: "{{ logto_db_backup_restore_sidecar_gcp_backup_location }}"
+    postgres_backup_restore_sidecar_gcp_project_id: "{{ logto_db_backup_restore_sidecar_gcp_project_id }}"
+    postgres_backup_restore_sidecar_gcp_serviceaccount_json: "{{ logto_db_backup_restore_sidecar_gcp_serviceaccount_json }}"
+    postgres_backup_restore_sidecar_s3_bucket_name: "{{ logto_db_backup_restore_sidecar_s3_bucket_name }}"
+    postgres_backup_restore_sidecar_s3_region: "{{ logto_db_backup_restore_sidecar_s3_region }}"
+    postgres_backup_restore_sidecar_s3_endpoint: "{{ logto_db_backup_restore_sidecar_s3_endpoint }}"
+    postgres_backup_restore_sidecar_s3_access_key: "{{ logto_db_backup_restore_sidecar_s3_access_key }}"
+    postgres_backup_restore_sidecar_s3_secret_key: "{{ logto_db_backup_restore_sidecar_s3_secret_key }}"
+    postgres_backup_restore_sidecar_encryption_key: "{{ logto_db_backup_restore_sidecar_encryption_key }}"
+    postgres_resources: "{{ logto_db_resources }}"
+
+- name: Deploy Logto
+  k8s:
+    definition: "{{ lookup('template', 'logto.yaml') }}"
+    namespace: "{{ logto_namespace }}"
+    apply: true
+
+- name: Wait until Logto deployment is ready
+  command: echo
+  changed_when: false
+  retries: 20
+  delay: 12
+  until:
+    - lookup('k8s', api_version='apps/v1', kind='Deployment', namespace=logto_namespace, resource_name='logto').get('status', {}).get('readyReplicas', 0) >= 1
+
+- name: Create Logto admin user
+  kubernetes.core.k8s_exec:
+    namespace: "{{ logto_namespace }}"
+    pod: "{{ lookup('k8s', api_version='v1', namespace=logto_namespace, kind='Pod', label_selector='app=logto').get('metadata', {}).get('name') }}"
+    command: wget
+  register: headscale_api_key
+  when:
+    - not headscale_api_key_already_created

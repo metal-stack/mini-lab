@@ -1,0 +1,14 @@
+---
+logto_namespace: "{{ metal_control_plane_namespace }}"
+
+logto_image_name: svhd/logto
+logto_image_tag: latest
+
+logto_db_address: logto-db
+logto_db_port: 5432
+logto_db_user: postgres
+logto_db_password: change-me
+
+logto_ingress_dns:
+logto_tls:
+logto_ingress_annotations: {}

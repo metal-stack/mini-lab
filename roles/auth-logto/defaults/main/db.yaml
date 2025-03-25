@@ -1,0 +1,37 @@
+---
+logto_db_image_name: postgres
+logto_db_image_tag: 17-alpine
+
+logto_db_name: logto-db
+
+logto_db_storage_size: 5Gi
+logto_db_storage_class:
+logto_db_db: logto
+logto_db_user: postgres
+logto_db_password: change-me
+logto_db_max_connections: 250
+
+logto_db_backup_restore_sidecar_provider: local
+logto_db_backup_restore_sidecar_backup_cron_schedule: "0 0 * * *"
+logto_db_backup_restore_sidecar_log_level: debug
+logto_db_backup_restore_sidecar_object_prefix: "{{ logto_db_name }}"
+logto_db_backup_restore_sidecar_encryption_key:
+
+logto_db_backup_restore_sidecar_gcp_bucket_name:
+logto_db_backup_restore_sidecar_gcp_backup_location:
+logto_db_backup_restore_sidecar_gcp_project_id:
+logto_db_backup_restore_sidecar_gcp_serviceaccount_json:
+
+logto_db_backup_restore_sidecar_s3_bucket_name:
+logto_db_backup_restore_sidecar_s3_region:
+logto_db_backup_restore_sidecar_s3_endpoint:
+logto_db_backup_restore_sidecar_s3_access_key:
+logto_db_backup_restore_sidecar_s3_secret_key:
+
+logto_db_resources:
+  requests:
+    memory: "256Mi"
+    cpu: "100m"
+  limits:
+    memory: "2Gi"
+    cpu: "500m"
