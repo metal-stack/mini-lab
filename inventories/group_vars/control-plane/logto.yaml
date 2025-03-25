@@ -1,2 +1,0 @@
----
-logto_ingress_dns: oidc.{{ metal_control_plane_ingress_dns }}
