@@ -1,6 +1,7 @@
 ---
 metal_set_resource_limits: no
-metal_check_api_health_endpoint: http://api.{{ metal_control_plane_ingress_dns }}:8080/metal/v1/health
+metal_check_api_health_endpoint: https://api.{{ metal_control_plane_ingress_dns }}:4443/metal/v1/health
+metal_check_api_available: false
 
 # metal_helm_chart_local_path: /helm-charts/charts/metal-control-plane
 
@@ -163,3 +164,11 @@ metal_api_grpc_certs_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
 # auditing
 metal_auditing_timescaledb_enabled: true
 metal_auditing_meili_enabled: false
+
+# tls
+metal_ingress:
+  tls:
+    enabled: true
+
+metal_api_certs_server_cert: "{{ lookup('file', 'certs/metal-api/server.pem') }}"
+metal_api_certs_server_key: "{{ lookup('file', 'certs/metal-api/server-key.pem') }}"

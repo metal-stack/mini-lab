@@ -31,6 +31,20 @@
     - name: metal-roles/control-plane/roles/metal
       tags: metal
 
+  tasks:
+    - name: Deploy Ingress TLS secret
+      kubernetes.core.k8s:
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: control-plane-ingress-tls
+            namespace: metal-control-plane
+          type: kubernetes.io/tls
+          data:
+            tls.crt: "{{ metal_api_certs_server_cert | b64encode }}"
+            tls.key: "{{ metal_api_certs_server_key | b64encode }}"
+
 - name: deploy gardener
   import_playbook: deploy_gardener.yaml
   when: gardener_enabled
