@@ -1,0 +1,18 @@
+issuer: {{ auth_dex_issuer_url }}
+
+storage:
+  type: sqlite3
+  config:
+    file: /data/sqlite.db
+
+web:
+  http: 0.0.0.0:5556
+telemetry:
+  http: 0.0.0.0:5558
+grpc:
+  addr: 0.0.0.0:5557
+
+staticClients: {{ auth_dex_static_clients | to_json }}
+staticPasswords: {{ auth_dex_static_passwords | to_json }}
+
+enablePasswordDB: true

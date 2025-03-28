@@ -1,5 +1,6 @@
 .env
 .idea
+.vscode
 .kubeconfig
 **/*.pyc
 clab-mini-lab
@@ -16,3 +17,4 @@ sonic-vs.img
 files/certs/*.pem
 files/certs/**/*.pem
 files/certs/**/*.crt
+.vscode
