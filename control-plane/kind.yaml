@@ -6,7 +6,7 @@ networking:
 nodes:
   - role: control-plane
     extraMounts:
-      - hostPath: ./config-patches
+      - hostPath: ./control-plane/config-patches
         containerPath: /etc/containerd/certs.d
     extraPortMappings:
       - containerPort: 4443

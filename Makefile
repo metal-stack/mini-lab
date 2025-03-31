@@ -153,7 +153,7 @@ env:
 	@./env.sh
 
 .PHONY: cleanup
-cleanup: automatic-cleanup-proxy-registries cleanup-control-plane cleanup-partition
+cleanup: cleanup-control-plane cleanup-partition
 
 .PHONY: cleanup-proxy-registries
 cleanup-proxy-registries:
@@ -164,8 +164,8 @@ cleanup-proxy-registries:
         esac; \
 	done;
 
-.PHONY: automatic-cleanup-proxy-registries
-automatic-cleanup-proxy-registries:
+.PHONY: prune-proxy-registries
+prune-proxy-registries:
 	@REG_THRESHOLD=$(REG_VOLUME_THRESHOLD); \
 	for container in $$(docker ps -f name=proxy -q); do \
 		SIZE=$$(docker run --rm --volumes-from $$container alpine du -s /var/lib/registry | awk '{print $$1}'); \
