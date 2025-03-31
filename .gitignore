@@ -17,3 +17,4 @@ sonic-vs.img
 files/certs/*.pem
 files/certs/**/*.pem
 files/certs/**/*.crt
+.vscode
