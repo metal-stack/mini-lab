@@ -3,3 +3,5 @@ masterdata_db_storage_size: 200Mi
 masterdata_db_backup_restore_sidecar_provider: local
 
 masterdata_db_resources: {}
+
+masterdata_db_backup_restore_sidecar_object_max_keep: 10
