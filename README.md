@@ -133,7 +133,7 @@ docker compose run --rm metalctl machine create \
         --hostname machine \
         --project 00000000-0000-0000-0000-000000000000 \
         --partition mini-lab \
-        --image ubuntu-24.04 \
+        --image ubuntu-24.4 \
         --size v1-small-x86 \
         --networks <network-ID>
 
@@ -186,7 +186,7 @@ Reinstall a machine with
 
 ```bash
 docker compose run --rm metalctl machine reinstall \
-        --image ubuntu-24.04 \
+        --image ubuntu-24.4 \
         00000000-0000-0000-0000-000000000001
 ```
 

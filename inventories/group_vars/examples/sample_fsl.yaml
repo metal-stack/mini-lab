@@ -21,7 +21,7 @@ metal_api_filesystemlayouts:
       - c1-xlarge-x86
     images:
       debian: "<= 10.0.{{ fsl.legacy_image_patch_version }}"
-      ubuntu: "<= 20.04.{{ fsl.legacy_image_patch_version }}"
+      ubuntu: "<= 20.4.{{ fsl.legacy_image_patch_version }}"
       centos: "<= 7.0.{{ fsl.legacy_image_patch_version }}"
   filesystems:
     - path: "/boot/efi"
@@ -70,7 +70,7 @@ metal_api_filesystemlayouts:
       - s1-large-x86
     images:
         debian: ">= 10.0.{{ fsl.new_image_patch_version }}"
-        ubuntu: ">= 20.04.{{ fsl.new_image_patch_version }}"
+        ubuntu: ">= 20.4.{{ fsl.new_image_patch_version }}"
         centos: ">= 7.0.{{ fsl.new_image_patch_version }}"
   filesystems:
     - path: "/boot/efi"
@@ -130,7 +130,7 @@ metal_api_filesystemlayouts:
       - s2-xlarge-x86
     images:
       debian: "<= 10.0.{{ fsl.legacy_image_patch_version }}"
-      ubuntu: "<= 20.04.{{ fsl.legacy_image_patch_version }}"
+      ubuntu: "<= 20.4.{{ fsl.legacy_image_patch_version }}"
   filesystems:
     - path: "/boot/efi"
       device: "/dev/sde1"
