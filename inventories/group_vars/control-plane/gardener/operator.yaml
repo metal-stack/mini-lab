@@ -1,0 +1,18 @@
+---
+gardener_operator_backup_infrastructure:
+  provider: S3
+  region: us-east-1
+  bucket: gardener-operator
+  secretRef:
+   name: backup-secret
+   namespace: garden
+
+gardener_operator_backup_infrastructure_secret:
+  endpoint: "{{ ('http://' + minio_dns_name + ':8080' ) | b64encode }}"
+  accessKeyID: "{{ minio_root_user | b64encode }}"
+  secretAccessKey: "{{ minio_root_password | b64encode }}"
+  region: "{{ 'us-east-1' | b64encode }}"
+  s3ForcePathStyle: "{{ 'true' | b64encode }}"
+
+gardener_operator_patch_istio_ingress_gateway_service_ip: 172.17.0.1
+gardener_operator_deploy_local_gardenlet: true
