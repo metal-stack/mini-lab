@@ -11,8 +11,7 @@ The mini-lab is a small, virtual setup to locally run the metal-stack. It deploy
 - [Requirements](#requirements)
 - [Known Limitations](#known-limitations)
 - [Try it out](#try-it-out)
-    - [Reinstall machine](#reinstall-machine)
-    - [Free machine](#free-machine)
+    - [Power management](#power-management)
 - [Flavors](#flavors)
 - [Network Topology](#network-topology)
 
@@ -68,7 +67,7 @@ The following ports are used statically on your host machine:
 ## Known Limitations
 
 - to keep the demo small there is no EVPN
-- machine restart and destroy does not work because we cannot change the boot order via IPMI in the lab easily (virtual-bmc could, but it's buggy)
+- machines have to be restarted manually with `make power-reset-<machine>`
 - login to the machines is possible with virsh console, login to the firewall is possible with SSH from your local machine
 
 ## Try it out
@@ -180,22 +179,11 @@ To remove the kind cluster, the switches and machines, run:
 make cleanup
 ```
 
-### Reinstall machine
+### Power management
 
-Reinstall a machine with
-
-```bash
-docker compose run --rm metalctl machine reinstall \
-        --image ubuntu-24.4 \
-        00000000-0000-0000-0000-000000000001
+There are make targets to handle the power state of a machine:
 ```
-
-### Free machine
-
-Free a machine with `make free-machine01` or
-
-```bash
-docker compose run --rm metalctl machine rm 00000000-0000-0000-0000-000000000001
+make power-<on,reset,off>-<machine name>
 ```
 
 ## Flavors
