@@ -7,7 +7,8 @@ controller:
   hostNetwork: true
 
   # because of host network, which binds the host port during rolling upgrade
-  kind: StatefulSet
+  updateStrategy:
+    type: Recreate
 
   extraArgs:
     http-port: {{ ingress_http_port }}
