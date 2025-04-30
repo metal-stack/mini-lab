@@ -19,43 +19,14 @@
   roles:
     - name: ansible-common
       tags: always
-    # - name: minio
-    # - name: powerdns
-    #   tags: powerdns
-    # - name: metal-roles/control-plane/roles/gardener
-    #   tags: gardener
+    - name: minio
+      tags: minio
+    - name: powerdns
+      tags: powerdns
     - name: metal-roles/control-plane/roles/gardener-operator
       tags: gardener
   vars:
     metal_control_plane_host_provider: metal
-
-  post_tasks:
-    - name: Expose istio gateway through ingress-nginx
-      k8s:
-        definition:
-          apiVersion: networking.k8s.io/v1
-          kind: Ingress
-          metadata:
-            annotations:
-              nginx.ingress.kubernetes.io/ssl-passthrough: "true"
-            name: apiserver-ingress
-            namespace: virtual-garden-istio-ingress
-          spec:
-            ingressClassName: nginx
-            rules:
-            - host: gardener.{{ gardener_virtual_api_server_public_dns }}
-              http:
-                paths:
-                - path: /
-                  pathType: Prefix
-                  backend:
-                    service:
-                      name: istio-ingressgateway
-                      port:
-                        number: 443
-            tls:
-            - hosts:
-              - gardener.{{ gardener_virtual_api_server_public_dns }}
 
   #   - name: Wait until seed is ready
   #     kubernetes.core.k8s_info:

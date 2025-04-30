@@ -43,7 +43,7 @@ VRF=Vrf20
 else ifeq ($(MINI_LAB_FLAVOR),gardener)
 GARDENER_ENABLED=true
 # usually gardener restricts the maximum version for k8s:
-K8S_VERSION=1.32.3
+K8S_VERSION=1.31.6
 LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.sonic.yaml
 VRF=Vrf20

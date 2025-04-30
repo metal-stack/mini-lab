@@ -16,3 +16,6 @@ gardener_operator_backup_infrastructure_secret:
 
 gardener_operator_patch_istio_ingress_gateway_service_ip: 172.17.0.1
 gardener_operator_deploy_local_gardenlet: true
+
+# for local setups this should be sufficient:
+# gardener_virtual_api_high_availability_control_plane: false
