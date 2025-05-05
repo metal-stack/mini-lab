@@ -16,6 +16,8 @@
             nodeNetwork: 172.18.0.0/16
             podNetwork: 10.244.0.0/24
             serviceNetwork: 10.96.0.0/16
+      tags: gardener
+
   roles:
     - name: ansible-common
       tags: always
@@ -25,8 +27,84 @@
       tags: powerdns
     - name: metal-roles/control-plane/roles/gardener-operator
       tags: gardener
+    - name: metal-roles/control-plane/roles/gardener-cloud-profile
+      tags: gardener
+    - name: metal-roles/control-plane/roles/gardener-extensions
+      tags: gardener
+    - name: metal-roles/control-plane/roles/gardener-gardenlet
+      tags: gardener
   vars:
     metal_control_plane_host_provider: metal
+
+  post_tasks:
+      - name: Get kubeconfig for virtual garden access
+        virtual_garden_kubeconfig:
+          garden_name: "local"
+
+      - name: Wait Gardenlet to be reconciled
+        kubernetes.core.k8s_info:
+          api_version: seedmanagement.gardener.cloud/v1alpha1
+          kind: Gardenlet
+          name: "test"
+          namespace: garden
+          kubeconfig: "{{ virtual_garden_kubeconfig }}"
+          wait: yes
+          wait_condition:
+            reason: Reconciled
+            status: "True"
+            type: GardenletReconciled
+          wait_timeout: 60
+
+      - name: Patch istio ingress gateway service status
+        patch_service_status_k8s:
+          name: istio-ingressgateway
+          namespace: istio-ingress
+          body:
+            status:
+              loadBalancer:
+                ingress:
+                  - ip: "172.17.0.1"
+
+      - name: Expose istio gateway through ingress-nginx (for local environments)
+        k8s:
+          definition:
+            apiVersion: networking.k8s.io/v1
+            kind: Ingress
+            metadata:
+              annotations:
+                nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+              name: apiserver-ingress
+              namespace: istio-ingress
+            spec:
+              ingressClassName: nginx
+              rules:
+              - host: "local.{{ gardener_gardenlet_dns_domain }}"
+                http:
+                  paths:
+                  - path: /
+                    pathType: Prefix
+                    backend:
+                      service:
+                        name: istio-ingressgateway
+                        port:
+                          number: 443
+              tls:
+              - hosts:
+                - "local.{{ gardener_gardenlet_dns_domain }}"
+
+      - name: Wait until Garden is ready
+        kubernetes.core.k8s_info:
+          api_version: "operator.gardener.cloud/v1alpha1"
+          kind: Garden
+          name: "local"
+          wait: yes
+          wait_condition:
+            status: "True"
+            type: "{{ item }}"
+          wait_timeout: 900
+        loop:
+          - VirtualComponentsHealthy
+          - RuntimeComponentsHealthy
 
   #   - name: Wait until seed is ready
   #     kubernetes.core.k8s_info:

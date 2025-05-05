@@ -357,16 +357,13 @@ dev-env:
 
 .PHONY: fetch-virtual-kubeconfig
 fetch-virtual-kubeconfig:
-	@kubectl --kubeconfig=$(KUBECONFIG) get secret -n garden virtual-garden-access-kubeconfig-tpl -o jsonpath='{.data.kubeconfig}' | base64 -d > .virtual-kubeconfig
-	@kubectl --kubeconfig=$(KUBECONFIG) config unset users.virtual-garden
-	@kubectl --kubeconfig=$(KUBECONFIG) config unset contexts.virtual-garden
-	@kubectl --kubeconfig=$(KUBECONFIG) config unset clusters.virtual-garden
-	@kubectl --kubeconfig=.virtual-kubeconfig config rename-context default-context virtual-garden
-	@sed -i 's/name: default-cluster/name: virtual-garden/g' .virtual-kubeconfig
-	@sed -i 's/name: default-user/name: virtual-garden/g' .virtual-kubeconfig
-	@kubectl --kubeconfig=.virtual-kubeconfig config set contexts.virtual-garden.cluster virtual-garden
-	@kubectl --kubeconfig=.virtual-kubeconfig config set contexts.virtual-garden.user virtual-garden
-	@kubectl --kubeconfig=.virtual-kubeconfig config set-credentials virtual-garden --token=$(shell kubectl --kubeconfig=$(KUBECONFIG) get secret -n garden shoot-access-virtual-garden -o jsonpath='{.data.token}' | base64 -d)
+	# TODO: it's hard to get the latest issued generic kubeconfig secret... just take the first result for now
+	kubectl --kubeconfig=$(KUBECONFIG) get secret -n garden $(shell kubectl --kubeconfig=$(KUBECONFIG) get secret -n garden -l managed-by=secrets-manager,manager-identity=gardener-operator,name=generic-token-kubeconfig --no-headers | awk '{ print $$1 }') -o jsonpath='{.data.kubeconfig}' | base64 -d > .virtual-kubeconfig
+	@kubectl --kubeconfig=.virtual-kubeconfig config set-cluster garden --server=https://api.gardener-kube-apiserver.172.17.0.1.nip.io:4443
+	@kubectl --kubeconfig=.virtual-kubeconfig config set-credentials garden --token=$(shell kubectl --kubeconfig=$(KUBECONFIG) get secret -n garden shoot-access-virtual-garden -o jsonpath='{.data.token}' | base64 -d)
+	@kubectl --kubeconfig=$(KUBECONFIG) config unset users.garden
+	@kubectl --kubeconfig=$(KUBECONFIG) config unset contexts.garden
+	@kubectl --kubeconfig=$(KUBECONFIG) config unset clusters.garden
 	@KUBECONFIG=$(KUBECONFIG):.virtual-kubeconfig kubectl config view --flatten > .merged-kubeconfig
 	@rm .virtual-kubeconfig
 	@mv .merged-kubeconfig $(KUBECONFIG)

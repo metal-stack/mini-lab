@@ -1,4 +1,6 @@
 ---
+gardener_operator_ingress_dns_domain: "gardener.172.17.0.1.nip.io"
+
 gardener_operator_backup_infrastructure:
   provider: S3
   region: us-east-1
@@ -14,8 +16,12 @@ gardener_operator_backup_infrastructure_secret:
   region: "{{ 'us-east-1' | b64encode }}"
   s3ForcePathStyle: "{{ 'true' | b64encode }}"
 
+# enable mini-lab patches
 gardener_operator_patch_istio_ingress_gateway_service_ip: 172.17.0.1
-gardener_operator_deploy_local_gardenlet: true
+gardener_operator_expose_virtual_garden_through_ingress_nginx: true
 
-# for local setups this should be sufficient:
-# gardener_virtual_api_high_availability_control_plane: false
+# for local setups this should be sufficient
+gardener_operator_high_availability_control_plane: false
+
+gardener_operator_repo_url: "{{ gardener_repo_url }}"
+gardener_operator_repo_ref: "{{ gardener_repo_ref }}"
