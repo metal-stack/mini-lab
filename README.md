@@ -85,6 +85,12 @@ make
 # containerlab will ask you for root permissions (https://github.com/srl-labs/containerlab/issues/669)
 ```
 
+Before the upcoming steps, you need to bind some environment variables using the following command. This ensures `metalctl` `kubectl` are able to communicate with your mini-lab.
+
+```bash
+eval $(make dev-env)
+```
+
 After the deployment and waiting for a short amount of time, two machines in status `PXE booting` become visible through `metalctl machine ls`:
 
 ```bash
@@ -127,7 +133,7 @@ docker compose run --rm metalctl machine create \
         --hostname machine \
         --project 00000000-0000-0000-0000-000000000000 \
         --partition mini-lab \
-        --image ubuntu-24.04 \
+        --image ubuntu-24.4 \
         --size v1-small-x86 \
         --networks <network-ID>
 
@@ -146,7 +152,7 @@ docker compose run --rm metalctl machine create \
 See the installation process in action
 
 ```bash
-make console-machine01/02
+make console-machine01 # or console-machine02
 ...
 Ubuntu 24.04 machine ttyS0
 
@@ -180,7 +186,7 @@ Reinstall a machine with
 
 ```bash
 docker compose run --rm metalctl machine reinstall \
-        --image ubuntu-24.04 \
+        --image ubuntu-24.4 \
         00000000-0000-0000-0000-000000000001
 ```
 

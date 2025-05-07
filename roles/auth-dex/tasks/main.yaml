@@ -1,0 +1,6 @@
+---
+- name: Deploy dex
+  k8s:
+    definition: "{{ lookup('template', 'dex.yaml') }}"
+    namespace: "{{ auth_dex_namespace }}"
+    apply: true

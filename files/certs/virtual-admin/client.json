@@ -9,7 +9,7 @@
     {
       "C": "DE",
       "L": "Munich",
-      "O": "system:masters",
+      "O": "gardener.cloud:system:seeds",
       "OU": "DevOps",
       "ST": "Bavaria"
     }

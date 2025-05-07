@@ -3,3 +3,5 @@ ipam_db_storage_size: 200Mi
 ipam_db_backup_restore_sidecar_provider: local
 
 ipam_db_resources: {}
+
+ipam_db_backup_restore_sidecar_object_max_keep: 10
