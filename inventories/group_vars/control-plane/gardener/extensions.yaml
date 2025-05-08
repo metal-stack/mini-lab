@@ -1,4 +1,7 @@
 ---
-gardener_extension_provider_gcp_enabled: false
+# gardener_extension_provider_gcp_enabled: true
+# gardener_extension_csi_driver_lvm_enabled: true
 gardener_extension_backup_s3_enabled: true
 gardener_extension_dns_powerdns_enabled: true
+
+gardener_extension_dns_powerdns_additional_network_policies: true

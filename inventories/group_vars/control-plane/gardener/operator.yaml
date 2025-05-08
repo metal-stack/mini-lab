@@ -25,3 +25,10 @@ gardener_operator_high_availability_control_plane: false
 
 gardener_operator_repo_url: "{{ gardener_repo_url }}"
 gardener_operator_repo_ref: "{{ gardener_repo_ref }}"
+
+gardener_operator_dns_providers:
+  - name: powerdns
+    type: powerdns
+    secretData:
+      apiKey: "{{ powerdns_api_key | b64encode }}"
+      server: "{{ 'http://powerdns-api.powerdns.svc.cluster.local:8081' | b64encode }}"

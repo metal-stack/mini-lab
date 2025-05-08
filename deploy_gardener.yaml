@@ -27,9 +27,9 @@
       tags: powerdns
     - name: metal-roles/control-plane/roles/gardener-operator
       tags: gardener
-    - name: metal-roles/control-plane/roles/gardener-cloud-profile
-      tags: gardener
     - name: metal-roles/control-plane/roles/gardener-extensions
+      tags: gardener
+    - name: metal-roles/control-plane/roles/gardener-cloud-profile
       tags: gardener
     - name: metal-roles/control-plane/roles/gardener-gardenlet
       tags: gardener
@@ -40,6 +40,7 @@
       - name: Get kubeconfig for virtual garden access
         virtual_garden_kubeconfig:
           garden_name: "local"
+        tags: gardener
 
       - name: Wait Gardenlet to be reconciled
         kubernetes.core.k8s_info:
@@ -54,6 +55,7 @@
             status: "True"
             type: GardenletReconciled
           wait_timeout: 60
+        tags: gardener
 
       - name: Patch istio ingress gateway service status
         patch_service_status_k8s:
@@ -64,6 +66,7 @@
               loadBalancer:
                 ingress:
                   - ip: "172.17.0.1"
+        tags: gardener
 
       - name: Expose istio gateway through ingress-nginx (for local environments)
         k8s:
@@ -91,6 +94,7 @@
               tls:
               - hosts:
                 - "local.{{ gardener_gardenlet_dns_domain }}"
+        tags: gardener
 
       - name: Wait until Garden is ready
         kubernetes.core.k8s_info:
@@ -105,16 +109,18 @@
         loop:
           - VirtualComponentsHealthy
           - RuntimeComponentsHealthy
+        tags: gardener
 
-  #   - name: Wait until seed is ready
-  #     kubernetes.core.k8s_info:
-  #       api_version: "core.gardener.cloud/v1beta1"
-  #       kind: Seed
-  #       name: "{{ metal_control_plane_stage_name }}"
-  #       kubeconfig: "{{ gardener_kube_apiserver_kubeconfig_path }}"
-  #       wait: yes
-  #       wait_condition:
-  #         reason: GardenletReady
-  #         status: "True"
-  #         type: GardenletReady
-  #       wait_timeout: 300
+      - name: Wait until seed is ready
+        kubernetes.core.k8s_info:
+          api_version: "core.gardener.cloud/v1beta1"
+          kind: Seed
+          name: "{{ metal_control_plane_stage_name }}"
+          kubeconfig: "{{ virtual_garden_kubeconfig }}"
+          wait: yes
+          wait_condition:
+            reason: GardenletReady
+            status: "True"
+            type: GardenletReady
+          wait_timeout: 300
+        tags: gardener

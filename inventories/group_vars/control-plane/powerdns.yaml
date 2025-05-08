@@ -9,7 +9,12 @@ powerdns_load_balancer_dns_name: "ns.{{ metal_control_plane_ingress_dns }}"
 
 powerdns_api_dns_name: "powerdns-api.{{ metal_control_plane_ingress_dns }}"
 
-powerdns_zone_name: "gardener.172.17.0.1.nip.io."
-powerdns_zone_kind: Master
-powerdns_zone_nameservers:
-  - "{{ powerdns_load_balancer_dns_name }}."
+powerdns_zones:
+  - name: "gardener.172.17.0.1.nip.io."
+    kind: Master
+    nameservers:
+      - "{{ powerdns_load_balancer_dns_name }}."
+  - name: "gardener-kube-apiserver.172.17.0.1.nip.io."
+    kind: Master
+    nameservers:
+      - "{{ powerdns_load_balancer_dns_name }}."

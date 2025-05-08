@@ -6,6 +6,8 @@ setup_yaml:
     meta_var: metal_stack_release
 
 gardener_extension_provider_metal_image_tag: helm-oci-artifacts
+gardener_extension_backup_s3_image_tag: helm-oci-artifacts
+gardener_extension_dns_powerdns_image_tag: helm-oci-artifacts
 ansible_common_version: gardener-modules
 metal_roles_version: gardener-operator
 
