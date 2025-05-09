@@ -11,3 +11,17 @@
   delay: 3
   register: result
   until: result.rc == 0
+
+- name: Activate IP MASQUERADE on eth0
+  ansible.builtin.iptables:
+    chain: POSTROUTING
+    jump: MASQUERADE
+    out_interface: eth0
+    table: nat
+
+- name: Activate ipv4 forwarding on eth0
+  ansible.posix.sysctl:
+    name: net.ipv4.conf.eth0.forwarding
+    reload: no
+    sysctl_set: yes
+    value: "1"
