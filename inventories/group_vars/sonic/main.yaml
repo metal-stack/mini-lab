@@ -17,8 +17,6 @@ sonic_mgmt_vrf: false
 
 sonic_nameservers: "{{ router_nameservers }}"
 
-sonic_ip_masquerade: true
-
 sonic_vlans:
   - id: 4000
     ip: "{{ metal_core_cidr }}"
