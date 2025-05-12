@@ -30,7 +30,6 @@ services:
             -i inventories/control-plane.yaml \
             obtain_role_requirements.yaml
           ansible-galaxy install --ignore-errors -r requirements.yaml
-          tail -f /etc/hosts
           ansible-playbook \
             -i inventories/control-plane.yaml \
             deploy_control_plane.yaml --extra-vars "@.extra_vars.yaml"

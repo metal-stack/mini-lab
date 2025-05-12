@@ -8,6 +8,8 @@ setup_yaml:
 gardener_extension_provider_metal_image_tag: helm-oci-artifacts
 gardener_extension_backup_s3_image_tag: helm-oci-artifacts
 gardener_extension_dns_powerdns_image_tag: helm-oci-artifacts
+gardener_extension_shoot_dns_service_image_tag: v1.61.0 # required for gardener operator
+
 ansible_common_version: gardener-modules
 metal_roles_version: gardener-operator
 

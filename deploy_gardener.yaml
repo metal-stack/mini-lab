@@ -54,7 +54,7 @@
             reason: Reconciled
             status: "True"
             type: GardenletReconciled
-          wait_timeout: 60
+          wait_timeout: 900
         tags: gardener
 
       - name: Patch istio ingress gateway service status
@@ -105,7 +105,7 @@
           wait_condition:
             status: "True"
             type: "{{ item }}"
-          wait_timeout: 900
+          wait_timeout: 300
         loop:
           - VirtualComponentsHealthy
           - RuntimeComponentsHealthy
