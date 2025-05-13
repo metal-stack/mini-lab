@@ -13,6 +13,29 @@ gardener_extension_shoot_dns_service_image_tag: v1.61.0 # required for gardener 
 ansible_common_version: gardener-modules
 metal_roles_version: gardener-operator
 
+# TODO: move to release vector
+gardener_extension_backup_s3_helm_chart: ghcr.io/metal-stack/charts/gardener-extension-backup-s3:v0.0.0-pull-request.15
+gardener_extension_csi_driver_lvm_helm_chart: ghcr.io/metal-stack/charts/gardener-extension-csi-driver-lvm:v0.0.0-pull-request.12
+gardener_extension_dns_powerdns_helm_chart: ghcr.io/metal-stack/charts/gardener-extension-dns-powerdns:v0.0.0-pull-request.10
+gardener_extension_networking_calico_helm_chart: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/networking-calico:{{ gardener_extension_networking_calico_image_tag }}
+gardener_extension_admission_calico_helm_chart_runtime: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-calico-runtime:{{ gardener_extension_networking_calico_image_tag }}
+gardener_extension_admission_calico_helm_chart_application: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-calico-application:{{ gardener_extension_networking_calico_image_tag }}
+gardener_extension_networking_cilium_helm_chart: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/networking-cilium:{{ gardener_extension_networking_cilium_image_tag }}
+gardener_extension_admission_cilium_helm_chart_runtime: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-cilium-runtime:{{ gardener_extension_networking_cilium_image_tag }}
+gardener_extension_admission_cilium_helm_chart_application: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-cilium-application:{{ gardener_extension_networking_cilium_image_tag }}
+gardener_extension_os_metal_helm_chart: ghcr.io/metal-stack/charts/os-metal-extension:v0.0.0-pull-request.59
+gardener_extension_provider_gcp_helm_chart: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/provider-gcp:v1.43.2
+gardener_extension_admission_gcp_helm_chart_runtime: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-gcp-runtime:v1.43.2
+gardener_extension_admission_gcp_helm_chart_application: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-gcp-application:v1.43.2
+gardener_extension_provider_metal_helm_chart: ghcr.io/metal-stack/charts/gardener-extension-provider-metal:v0.0.0-pull-request.455
+gardener_extension_admission_metal_helm_chart_runtime: ghcr.io/metal-stack/charts/gardener-extension-admission-metal-runtime:v0.0.0-pull-request.455
+gardener_extension_admission_metal_helm_chart_application: ghcr.io/metal-stack/charts/gardener-extension-admission-metal-application:v0.0.0-pull-request.455
+gardener_extension_shoot_cert_service_helm_chart: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-cert-service:{{ gardener_extension_shoot_cert_service_image_tag }}
+gardener_extension_shoot_dns_service_helm_chart: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-dns-service:{{ gardener_extension_shoot_dns_service_image_tag }}
+gardener_extension_admission_shoot_dns_service_helm_chart_application: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-shoot-dns-service-application:{{ gardener_extension_shoot_dns_service_image_tag }}
+gardener_extension_admission_shoot_dns_service_helm_chart_runtime: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-shoot-dns-service-runtime:{{ gardener_extension_shoot_dns_service_image_tag }}
+gardener_gardenlet_helm_chart: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/gardenlet:{{ gardener_gardenlet_image_tag }}
+
 ##
 ## for development purposes, you can override releases from our image vector here
 ##

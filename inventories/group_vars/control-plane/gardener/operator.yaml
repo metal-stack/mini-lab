@@ -23,9 +23,6 @@ gardener_operator_expose_virtual_garden_through_ingress_nginx: true
 # for local setups this should be sufficient
 gardener_operator_high_availability_control_plane: false
 
-gardener_operator_repo_url: "{{ gardener_repo_url }}"
-gardener_operator_repo_ref: "{{ gardener_repo_ref }}"
-
 gardener_operator_dns_providers:
   - name: powerdns
     type: powerdns

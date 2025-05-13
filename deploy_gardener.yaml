@@ -57,6 +57,18 @@
           wait_timeout: 900
         tags: gardener
 
+      - name: Wait for istio ingress gateway service
+        kubernetes.core.k8s_info:
+          api_version: v1
+          kind: Service
+          name: istio-ingressgateway
+          namespace: istio-ingress
+        register: result
+        until: result.resources
+        retries: 30
+        delay: 10
+        tags: gardener
+
       - name: Patch istio ingress gateway service status
         patch_service_status_k8s:
           name: istio-ingressgateway
@@ -81,7 +93,7 @@
             spec:
               ingressClassName: nginx
               rules:
-              - host: "local.{{ gardener_gardenlet_dns_domain }}"
+              - host: "{{ metal_control_plane_stage_name }}.{{ gardener_gardenlet_default_dns_domain }}"
                 http:
                   paths:
                   - path: /
@@ -93,14 +105,14 @@
                           number: 443
               tls:
               - hosts:
-                - "local.{{ gardener_gardenlet_dns_domain }}"
+                - "{{ metal_control_plane_stage_name }}.{{ gardener_gardenlet_default_dns_domain }}"
         tags: gardener
 
       - name: Wait until Garden is ready
         kubernetes.core.k8s_info:
           api_version: "operator.gardener.cloud/v1alpha1"
           kind: Garden
-          name: "local"
+          name: "{{ metal_control_plane_stage_name }}"
           wait: yes
           wait_condition:
             status: "True"

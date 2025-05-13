@@ -1,23 +1,23 @@
 ---
 gardener_gardenlet_deploy_local: true
 
-gardener_gardenlet_backup_infrastructure:
-  provider: S3
-  region: us-east-1
-  bucket: mini-lab
-  secretRef:
-   name: backup-secret
-   namespace: garden
-
-gardener_gardenlet_backup_infrastructure_secret:
-  endpoint: "{{ ('http://' + minio_dns_name + ':8080' ) | b64encode }}"
-  accessKeyID: "{{ minio_root_user | b64encode }}"
-  secretAccessKey: "{{ minio_root_password | b64encode }}"
-  region: "{{ 'us-east-1' | b64encode }}"
-  s3ForcePathStyle: "{{ 'true' | b64encode }}"
-
-gardener_gardenlet_dns_credentials:
+gardener_gardenlet_default_dns_domain: "gardener.172.17.0.1.nip.io"
+gardener_gardenlet_default_dns_provider: powerdns
+gardener_gardenlet_default_dns_credentials:
   apiKey: "{{ powerdns_api_key | b64encode }}"
   server: "{{ 'http://powerdns-api.powerdns.svc.cluster.local:8081' | b64encode }}"
-gardener_gardenlet_dns_provider: powerdns
-gardener_gardenlet_dns_domain: "gardener.172.17.0.1.nip.io"
+
+gardener_gardenlet_local:
+  backup_infrastructure:
+    provider: S3
+    region: us-east-1
+    bucket: mini-lab
+    secretRef:
+      name: backup-secret
+      namespace: garden
+  backup_infrastructure_secret:
+    endpoint: "{{ ('http://' + minio_dns_name + ':8080' ) | b64encode }}"
+    accessKeyID: "{{ minio_root_user | b64encode }}"
+    secretAccessKey: "{{ minio_root_password | b64encode }}"
+    region: "{{ 'us-east-1' | b64encode }}"
+    s3ForcePathStyle: "{{ 'true' | b64encode }}"

@@ -1,4 +1,2 @@
 ---
 gardener_enabled: "{{ lookup('env', 'GARDENER_ENABLED') | default('', false) }}"
-
-gardener_cert_management_issuer_email: mini-lab@metal-stack.io
