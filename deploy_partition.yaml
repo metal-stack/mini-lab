@@ -1,7 +1,8 @@
 ---
 - name: Configure SONiC switches
   hosts: leaves:&sonic
-  gather_facts: no
+  any_errors_fatal: true
+  gather_facts: false
   pre_tasks:
     - name: Wait for system to become reachable
       ansible.builtin.wait_for_connection:
@@ -17,6 +18,7 @@
 
 - name: Configure Cumulus switches
   hosts: leaves:&cumulus
+  any_errors_fatal: true
   pre_tasks:
     # the following task is not required as long as we do not install something from the cumulus repositories, for which all the keys are expired now
     # the one from here has also expired on 9th Apr 2024: https://docs.nvidia.com/networking-ethernet-software/knowledge-base/Installing-and-Upgrading/Upgrading/Update-Expired-GPG-Keys/#package-upgrade-from-cumulus-linux-37x-to-3716
@@ -63,6 +65,7 @@
 
 - name: Deploy metal-core
   hosts: leaves
+  any_errors_fatal: true
   roles:
     - name: ansible-common
       tags: always
@@ -72,7 +75,7 @@
 - name: Wait for switches
   hosts: localhost
   connection: local
-  gather_facts: no
+  gather_facts: false
   roles:
     - name: ansible-common
       tags: always
