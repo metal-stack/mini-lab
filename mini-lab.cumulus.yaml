@@ -5,6 +5,8 @@ mgmt:
   network: bridge
 
 topology:
+  defaults:
+    kind: linux
   kinds:
     cvx:
       image: networkop/cx:3.7.0
@@ -17,7 +19,6 @@ topology:
         - files/ssh/id_rsa.pub:/root/.ssh/authorized_keys
   nodes:
     exit:
-      kind: linux
       image: quay.io/frrouting/frr:10.0.1
       network-mode: none
       binds:
@@ -28,7 +29,6 @@ topology:
       exec:
         - sh /root/network.sh
     external_service:
-      kind: linux
       image: docker.io/library/nginx:alpine-slim
       network-mode: none
       binds:
@@ -39,22 +39,28 @@ topology:
       kind: bridge
     leaf01:
       kind: cvx
+      group: leaves
     leaf02:
       kind: cvx
-    vms:
-      kind: linux
+      group: leaves
+    machine01:
+      group: machines
       image: ${MINI_LAB_VM_IMAGE}
-      binds:
-        - /dev:/dev
-        - scripts:/mini-lab
+      env:
+        UUID: 00000000-0000-0000-0000-000000000001
+    machine02:
+      group: machines
+      image: ${MINI_LAB_VM_IMAGE}
+      env:
+        UUID: 00000000-0000-0000-0000-000000000002
   links:
     - endpoints: ["exit:mini_lab_ext", "mini_lab_ext:exit"]
       mtu: 9000
     - endpoints: ["external_service:mini_lab_ext", "mini_lab_ext:external_service"]
       mtu: 9000
-    - endpoints: ["leaf01:swp1", "vms:lan0"]
-    - endpoints: ["leaf02:swp1", "vms:lan1"]
-    - endpoints: ["leaf01:swp2", "vms:lan2"]
-    - endpoints: ["leaf02:swp2", "vms:lan3"]
+    - endpoints: ["leaf01:swp1", "machine01:lan0"]
+    - endpoints: ["leaf02:swp1", "machine01:lan1"]
+    - endpoints: ["leaf01:swp2", "machine02:lan0"]
+    - endpoints: ["leaf02:swp2", "machine02:lan1"]
     - endpoints: ["leaf01:swp31", "exit:eth1"]
     - endpoints: ["leaf02:swp31", "exit:eth2"]
