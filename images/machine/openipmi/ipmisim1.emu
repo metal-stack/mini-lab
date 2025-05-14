@@ -35,5 +35,8 @@ sensor_set_event_support 0x20 0 2 enable scanning per-state \
 	000000000000011 000000000000011 \
 	000000000000011 000000000000011
 
+# add some fru data
+mc_add_fru_data 0x20 0 1024 file 0 "/openipmi/fru.bin"
+
 # Turn on the BMC
 mc_enable 0x20
