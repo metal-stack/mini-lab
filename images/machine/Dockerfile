@@ -1,8 +1,12 @@
 FROM docker.io/library/debian:bookworm-backports
 
-RUN apt update && \
+ENV QEMU_DISK_SIZE=5G
+
+RUN apt-get update && \
     apt-get --no-install-recommends install --yes \
+        ipmitool \
         iproute2 \
+        openipmi \
         procps \
         python3 \
         qemu-utils \
@@ -11,4 +15,6 @@ RUN apt update && \
 
 COPY --from=ghcr.io/metal-stack/mini-lab-ovmf:edk2-stable202408.01 /OVMF_*.fd /opt/OVMF/
 
-ENTRYPOINT ["/mini-lab/vms_entrypoint.sh"]
+COPY . /
+
+ENTRYPOINT ["/entrypoint.sh"]
