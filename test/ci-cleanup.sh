@@ -14,7 +14,6 @@ if [ ! -z "$running_containers" ]; then
     done
 fi
 
-make prune-proxy-registries
 make cleanup
 
 echo "Remove containers from previous runs"

@@ -79,7 +79,7 @@ services:
     command: --version
 
   proxy-docker:
-    image: registry:2
+    image: registry:3
     restart: always
     volumes:
       - proxy-docker:/var/lib/registry
@@ -88,8 +88,11 @@ services:
     container_name: proxy-docker
     environment:
       - REGISTRY_PROXY_REMOTEURL="https://registry-1.docker.io"
+      - REGISTRY_PROXY_TTL=168h
+      - REGISTRY_STORAGE_DELETE_ENABLED=true 
+      - OTEL_TRACES_EXPORTER=none
   proxy-gcr:
-    image: registry:2
+    image: registry:3
     restart: always
     volumes:
       - proxy-gcr:/var/lib/registry
@@ -98,8 +101,11 @@ services:
     container_name: proxy-gcr
     environment:
       - REGISTRY_PROXY_REMOTEURL="https://gcr.io"
+      - REGISTRY_PROXY_TTL=168h
+      - REGISTRY_STORAGE_DELETE_ENABLED=true 
+      - OTEL_TRACES_EXPORTER=none
   proxy-ghcr:
-    image: registry:2
+    image: registry:3
     restart: always
     volumes:
       - proxy-ghcr:/var/lib/registry
@@ -108,8 +114,11 @@ services:
     container_name: proxy-ghcr
     environment:
       - REGISTRY_PROXY_REMOTEURL="https://ghcr.io"
+      - REGISTRY_PROXY_TTL=168h
+      - REGISTRY_STORAGE_DELETE_ENABLED=true 
+      - OTEL_TRACES_EXPORTER=none
   proxy-k8s:
-    image: registry:2
+    image: registry:3
     restart: always
     volumes:
       - proxy-k8s:/var/lib/registry
@@ -118,8 +127,11 @@ services:
     container_name: proxy-k8s
     environment:
       - REGISTRY_PROXY_REMOTEURL="https://registry.k8s.io"
+      - REGISTRY_PROXY_TTL=168h
+      - REGISTRY_STORAGE_DELETE_ENABLED=true 
+      - OTEL_TRACES_EXPORTER=none
   proxy-quay:
-    image: registry:2
+    image: registry:3
     restart: always
     volumes:
       - proxy-quay:/var/lib/registry
@@ -128,7 +140,9 @@ services:
     container_name: proxy-quay
     environment:
       - REGISTRY_PROXY_REMOTEURL="https://quay.io"
-
+      - REGISTRY_PROXY_TTL=168h
+      - REGISTRY_STORAGE_DELETE_ENABLED=true 
+      - OTEL_TRACES_EXPORTER=none
 volumes:
   proxy-docker:
   proxy-gcr:
