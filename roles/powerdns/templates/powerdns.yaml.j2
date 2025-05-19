@@ -1,0 +1,171 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app: powerdns
+  name: powerdns
+data:
+  api_key: "{{ powerdns_api_key | b64encode }}"
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: powerdns
+  name: powerdns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: powerdns
+  template:
+    metadata:
+      labels:
+        app: powerdns
+    spec:
+      containers:
+        - name: server
+          image: {{ powerdns_image_name }}:{{ powerdns_image_tag }}
+          command:
+            - pdns_server-startup
+            - --api=yes
+            - --local-port=5053
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 200m
+              memory: 64Mi
+          ports:
+            - name: powerdns-api
+              containerPort: 8081
+              protocol: TCP
+            - name: powerdns-tcp
+              containerPort: 5053
+              protocol: TCP
+            - name: powerdns-udp
+              containerPort: 5053
+              protocol: UDP
+          env:
+            - name: PDNS_AUTH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: powerdns
+                  key: api_key
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/powerdns
+      terminationGracePeriodSeconds: 0
+      initContainers:
+        - name: sqlite
+          image: {{ powerdns_image_name }}:{{ powerdns_image_tag }}
+          command:
+          - bash
+          - -c
+          - if [ ! -f /powerdns/pdns.sqlite3 ]; then echo "copying startup db..."; cp /var/lib/powerdns/pdns.sqlite3 /powerdns; else echo "db already present"; fi
+          volumeMounts:
+            - name: data
+              mountPath: /powerdns
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: powerdns
+  name: powerdns
+spec:
+  ports:
+    - name: powerdns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: powerdns-tcp
+    - name: powerdns-udp
+      port: 53
+      protocol: UDP
+      targetPort: powerdns-udp
+  selector:
+    app: powerdns
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: powerdns
+  name: powerdns-api
+spec:
+  ports:
+    - name: powerdns-api
+      port: 8081
+      protocol: TCP
+      targetPort: powerdns-api
+  selector:
+    app: powerdns
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app: powerdns
+  name: powerdns-api
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "{{ powerdns_api_dns_name }}"
+    http:
+      paths:
+      - backend:
+          service:
+            name: powerdns-api
+            port:
+              name: powerdns-api
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - "{{ powerdns_api_dns_name }}"
+    secretName: powerdns-api-tls-secret
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: powerdns
+  name: powerdns-zone-initializer
+spec:
+  template:
+    spec:
+      containers:
+        - name: powerdns-zone-initializer
+          image: curlimages/curl:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              curl -X POST \
+                http://powerdns-api:8081/api/v1/servers/localhost/zones \
+                -H "Content-Type: application/json" \
+                -H "X-API-Key: $API_KEY" \
+                -d '{"name": "{{ powerdns_zone_name }}","kind": "{{ powerdns_zone_kind }}", "nameservers": {{ powerdns_zone_nameservers | to_json }} }'
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: powerdns
+                  key: api_key
+      restartPolicy: OnFailure
+  backoffLimit: 10

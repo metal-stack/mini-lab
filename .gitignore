@@ -1,5 +1,6 @@
 .env
 .idea
+.vscode
 .kubeconfig
 **/*.pyc
 clab-mini-lab
@@ -14,3 +15,8 @@ sonic-vs.img
 *.bak
 server_pid.txt
 .kubeconfig_insecure
+.ansible
+files/certs/*.pem
+files/certs/**/*.pem
+files/certs/**/*.crt
+.vscode

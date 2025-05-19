@@ -5,63 +5,60 @@ mgmt:
   network: bridge
 
 topology:
+  defaults:
+    kind: linux
   nodes:
+    exit:
+      image: quay.io/frrouting/frr:10.0.1
+      network-mode: none
+      binds:
+        - files/exit/daemons:/etc/frr/daemons
+        - files/exit/frr.conf:/etc/frr/frr.conf
+        - files/exit/vtysh.conf:/etc/frr/vtysh.conf
+        - files/exit/network.sh:/root/network.sh
+      exec:
+        - sh /root/network.sh
+    external_service:
+      image: docker.io/library/nginx:alpine-slim
+      network-mode: none
+      binds:
+        - files/external_service/network.sh:/root/network.sh
+      exec:
+        - sh /root/network.sh
     mini_lab_ext:
       kind: bridge
     leaf01:
-      kind: linux
+      group: leaves
       image: ${MINI_LAB_SONIC_IMAGE}
       labels:
         ansible-group: sonic
       binds:
-        - /dev:/dev
         - files/ssh/id_rsa.pub:/authorized_keys
     leaf02:
-      kind: linux
+      group: leaves
       image: ${MINI_LAB_SONIC_IMAGE}
       labels:
         ansible-group: sonic
       binds:
-        - /dev:/dev
         - files/ssh/id_rsa.pub:/authorized_keys
-    inet:
-      kind: linux
-      image: quay.io/frrouting/frr:10.0.1
-      binds:
-        - files/inet/daemons:/etc/frr/daemons
-        - files/inet/frr.conf:/etc/frr/frr.conf
-        - files/inet/vtysh.conf:/etc/frr/vtysh.conf
-        - files/inet/network.sh:/root/network.sh
-      exec:
-        - sh /root/network.sh
-    vms:
-      kind: linux
+    machine01:
+      group: machines
       image: ${MINI_LAB_VM_IMAGE}
-      binds:
-        - /dev:/dev
-        - scripts:/mini-lab
-    test_vm:
-      kind: linux
+      env:
+        UUID: 00000000-0000-0000-0000-000000000001
+    machine02:
+      group: machines
       image: ${MINI_LAB_VM_IMAGE}
-      binds:
-        - /dev:/dev
-        - scripts:/mini-lab
-    www:
-      kind: linux
-      image: docker.io/library/nginx:alpine-slim
-      network-mode: none
-      exec:
-        - ip addr add 203.0.113.3/24 dev ext
-        - ip route add 203.0.113.128/25 via 203.0.113.2 dev ext
+      env:
+        UUID: 00000000-0000-0000-0000-000000000002
   links:
-    - endpoints: ['inet:ext', 'mini_lab_ext:inet']
+    - endpoints: ["exit:mini_lab_ext", "mini_lab_ext:exit"]
       mtu: 9000
-    - endpoints: ['www:ext', 'mini_lab_ext:www']
-    - endpoints: ['leaf01:eth1', 'vms:lan0']
-    - endpoints: ['leaf02:eth1', 'vms:lan1']
-    - endpoints: ['leaf01:eth2', 'vms:lan2']
-    - endpoints: ['leaf02:eth2', 'vms:lan3']
-    - endpoints: ['test_vm:lan0', 'vms:lan4']
-    - endpoints: ['test_vm:lan1', 'vms:lan5']
-    - endpoints: ['leaf01:eth3', 'inet:eth1']
-    - endpoints: ['leaf02:eth3', 'inet:eth2']
+    - endpoints: ["external_service:mini_lab_ext", "mini_lab_ext:external_service"]
+      mtu: 9000
+    - endpoints: ["leaf01:Ethernet0", "machine01:lan0"]
+    - endpoints: ["leaf02:Ethernet0", "machine01:lan1"]
+    - endpoints: ["leaf01:Ethernet1", "machine02:lan0"]
+    - endpoints: ["leaf02:Ethernet1", "machine02:lan1"]
+    - endpoints: ["leaf01:Ethernet120", "exit:eth1"]
+    - endpoints: ["leaf02:Ethernet120", "exit:eth2"]

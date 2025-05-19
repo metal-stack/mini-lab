@@ -1,11 +1,16 @@
 .DEFAULT_GOAL := up
 .EXPORT_ALL_VARIABLES:
 
+-include .env
+
 # Commands
 YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:4
 
 KINDCONFIG := $(or $(KINDCONFIG),control-plane/kind.yaml)
 KUBECONFIG := $(shell pwd)/.kubeconfig
+
+METALCTL_HMAC := $(or $(METALCTL_HMAC),metal-admin)
+METALCTL_API_URL := $(or $(METALCTL_API_URL),http://api.172.17.0.1.nip.io:8080/metal)
 
 MKE2FS_CONFIG := $(shell pwd)/mke2fs.conf
 # Default values
@@ -18,7 +23,7 @@ MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),sonic)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
 MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
 
-MACHINE_OS=ubuntu-24.04
+MACHINE_OS=debian-12.0
 MAX_RETRIES := 30
 
 
@@ -29,12 +34,20 @@ HOSTNAME_IP := $(shell hostname -I | awk '{print $$1}')
 
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
-LAB_MACHINES=machine01,machine02
+MACHINE_OS=ubuntu-24.4
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
 VRF=vrf20
 VM_ARGS=
 else ifeq ($(MINI_LAB_FLAVOR),sonic)
-LAB_MACHINES=machine01,machine02
+LAB_TOPOLOGY=mini-lab.sonic.yaml
+VRF=Vrf20
+else ifeq ($(MINI_LAB_FLAVOR),capms)
+LAB_TOPOLOGY=mini-lab.capms.yaml
+VRF=Vrf20
+else ifeq ($(MINI_LAB_FLAVOR),gardener)
+GARDENER_ENABLED=true
+# usually gardener restricts the maximum version for k8s:
+K8S_VERSION=1.30.8
 LAB_TOPOLOGY=mini-lab.sonic.yaml
 VRF=Vrf20
 VM_ARGS=
@@ -59,9 +72,9 @@ else
 endif
 
 .PHONY: up
-up: env control-plane-bake partition-bake
+up: env gen-certs control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_rsa
-	docker compose up --remove-orphans --force-recreate control-plane partition
+	docker compose up --abort-on-container-failure --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
 # for some reason an allocated machine will not be able to phone home
 # without restarting the metal-core
@@ -75,6 +88,21 @@ restart: down up
 
 .PHONY: down
 down: cleanup
+
+.PHONY: gen-certs
+gen-certs:
+	@if ! [ -f "files/certs/ca.pem" ]; then \
+		echo "certificate generation required, running cfssl container"; \
+		docker run --rm \
+			--user $$(id -u):$$(id -g) \
+			--entrypoint bash \
+			-v ${PWD}:/work \
+			cfssl/cfssl /work/scripts/roll_certs.sh; fi
+
+.PHONY: roll-certs
+roll-certs:
+	rm files/certs/ca.pem
+	$(MAKE) gen-certs
 
 .PHONY: control-plane
 control-plane: control-plane-bake env
@@ -96,7 +124,7 @@ partition: partition-bake
 .PHONY: partition-bake
 partition-bake: external_network
 	docker pull $(MINI_LAB_VM_IMAGE)
-ifeq ($(MINI_LAB_FLAVOR),sonic)
+ifneq ($(MINI_LAB_FLAVOR),cumulus)
 	docker pull $(MINI_LAB_SONIC_IMAGE)
 endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
@@ -110,10 +138,16 @@ external_network:
 			--driver=bridge \
 			--gateway=203.0.113.1 \
 			--subnet=203.0.113.0/24 \
+			--ip-range=203.0.113.0/26 \
+			--ipv6 \
+			--gateway=2001:db8::1 \
+			--subnet=2001:db8::/48 \
 			--opt "com.docker.network.driver.mtu=9000" \
 			--opt "com.docker.network.bridge.name=mini_lab_ext" \
 			--opt "com.docker.network.bridge.enable_ip_masquerade=true" && \
-		sudo ip route add 203.0.113.128/25 via 203.0.113.2 dev mini_lab_ext; fi
+		sudo ip route add 203.0.113.128/25 via 203.0.113.128 dev mini_lab_ext && \
+		sudo ip -6 route add 2001:db8:0:113::/64 via 2001:db8:0:1::1 dev mini_lab_ext; \
+	fi
 
 .PHONY: env
 env:
@@ -203,17 +237,44 @@ cleanup-partition:
 _privatenet: env
 	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network list --name user-private-network | grep user-private-network || docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network allocate --partition mini-lab --project 00000000-0000-0000-0000-000000000001 --name user-private-network
 
+.PHONY: update-userdata
+update-userdata:
+	cat files/ignition.yaml | docker run --rm -i ghcr.io/metal-stack/metal-deployment-base:$$DEPLOYMENT_BASE_IMAGE_TAG ct | jq > files/ignition.json
+
 .PHONY: machine
-machine: _privatenet
-	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine create --description test --name test --hostname test --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image $(MACHINE_OS) --size v1-small-x86 --userdata "@/tmp/ignition.json" --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+machine: _privatenet update-userdata
+	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine create \
+		--description test \
+		--name test \
+		--hostname test \
+		--project 00000000-0000-0000-0000-000000000001 \
+		--partition mini-lab \
+		--image $(MACHINE_OS) \
+		--size v1-small-x86 \
+		--userdata "@/tmp/ignition.json" \
+		--networks $(shell docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: firewall
-firewall: _privatenet
-	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl firewall create --description fw --name fw --hostname fw --project 00000000-0000-0000-0000-000000000001 --partition mini-lab --image firewall-ubuntu-3.0 --size v1-small-x86 --userdata "@/tmp/ignition.json" --firewall-rules-file=/tmp/rules.yaml --networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
+firewall: _privatenet update-userdata
+	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl firewall create \
+		--description fw \
+		--name fw \
+		--hostname fw \
+		--project 00000000-0000-0000-0000-000000000001 \
+		--partition mini-lab \
+		--image firewall-ubuntu-3.0 \
+		--size v1-small-x86 \
+		--userdata "@/tmp/ignition.json" \
+		--firewall-rules-file=/tmp/rules.yaml \
+		--networks internet-mini-lab,$(shell docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network list --name user-private-network -o template --template '{{ .id }}')
 
 .PHONY: public-ip
 public-ip:
-	@docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network ip list --name test --network internet-mini-lab -o template --template "{{ .ipaddress }}"
+	@docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network ip create --name test --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --addressfamily IPv4 -o template --template "{{ .ipaddress }}"
+
+.PHONY: public-ipv6
+public-ipv6:
+	@docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network ip create --name test --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --addressfamily IPv6 -o template --template "{{ .ipaddress }}"
 
 .PHONY: ls
 ls: env
@@ -243,14 +304,67 @@ ssh-leaf02:
 	ssh -F files/ssh/config leaf02
 
 ## MACHINE MANAGEMENT ##
+.PHONY: _ipmi_power
+_ipmi_power:
+	docker exec $(VM) ipmitool -C 3 -I lanplus -U ADMIN -P ADMIN -H 127.0.0.1 chassis power $(COMMAND)
 
 .PHONY: start-machines
 start-machines:
-	docker exec $(VM_ARGS) vms /mini-lab/manage_vms.py --names $(LAB_MACHINES) create
+	@for i in $$(docker container ps --filter label=clab-node-group=machines --quiet); do \
+		$(MAKE) --no-print-directory _ipmi_power VM=$$i COMMAND='on'; \
+	done
 
-.PHONY: kill-machines
-kill-machines:
-	docker exec $(VM_ARGS) vms /mini-lab/manage_vms.py --names $(LAB_MACHINES) kill
+.PHONY: power-on-machine01
+power-on-machine01:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine01 COMMAND=on
+
+.PHONY: power-on-machine02
+power-on-machine02:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine02 COMMAND=on
+
+.PHONY: power-on-machine03
+power-on-machine03:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=on
+
+.PHONY: power-reset-machine01
+power-reset-machine01:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine01 COMMAND=reset
+
+.PHONY: power-reset-machine02
+power-reset-machine02:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine02 COMMAND=reset
+
+.PHONY: power-reset-machine03
+power-reset-machine03:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=reset
+
+.PHONY: power-off-machine01
+power-off-machine01:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine01 COMMAND=off
+
+.PHONY: power-off-machine02
+power-off-machine02:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine02 COMMAND=off
+
+.PHONY: power-off-machine03
+power-off-machine03:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=off
+
+.PHONY: _console
+_console:
+	docker exec --interactive --tty $(VM) ipmitool -C 3 -I lanplus -U ADMIN -P ADMIN -H 127.0.0.1 sol activate
+
+.PHONY: console-machine01
+console-machine01:
+	@$(MAKE) --no-print-directory _console VM=machine01
+
+.PHONY: console-machine02
+console-machine02:
+	@$(MAKE) --no-print-directory _console VM=machine02
+
+.PHONY: console-machine03
+console-machine03:
+	@$(MAKE) --no-print-directory _console VM=machine03
 
 .PHONY: _password
 _password: env
@@ -258,50 +372,15 @@ _password: env
 
 .PHONY: password-machine01
 password-machine01:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine01 MACHINE_UUID=00000000-0000-0000-0000-000000000001
+	@$(MAKE) --no-print-directory _password	MACHINE_NAME=machine01 MACHINE_UUID=00000000-0000-0000-0000-000000000001
 
 .PHONY: password-machine02
 password-machine02:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine02 MACHINE_UUID=00000000-0000-0000-0000-000000000002
+	@$(MAKE) --no-print-directory _password	MACHINE_NAME=machine02 MACHINE_UUID=00000000-0000-0000-0000-000000000002
 
 .PHONY: password-machine0%
 password-machine0%:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine0$* MACHINE_UUID=00000000-0000-0000-0000-00000000000$*
-
-.PHONY: _free-machine
-_free-machine: env
-	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine rm $(MACHINE_UUID)
-	docker exec vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) kill --with-disks
-	docker exec vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) create
-
-.PHONY: free-machine01
-free-machine01:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine01 MACHINE_UUID=00000000-0000-0000-0000-000000000001
-
-.PHONY: free-machine02
-free-machine02:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine02 MACHINE_UUID=00000000-0000-0000-0000-000000000002
-
-.PHONY: free-machine0%
-free-machine0%:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine0$* MACHINE_UUID=00000000-0000-0000-0000-00000000000$*
-
-.PHONY: _console-machine
-_console-machine:
-	@echo "exit console with CTRL+5 and then quit telnet through q + ENTER"
-	@docker exec -it vms telnet 127.0.0.1 $(CONSOLE_PORT)
-
-.PHONY: console-machine01
-console-machine01:
-	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4001
-
-.PHONY: console-machine02
-console-machine02:
-	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4002
-
-.PHONY: console-machine0%
-console-machine0%:
-	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=400$*
+	@$(MAKE) --no-print-directory _password	MACHINE_NAME=machine0$* MACHINE_UUID=00000000-0000-0000-0000-00000000000$*
 
 ## SSH TARGETS FOR MACHINES ##
 # Python code could be replaced by jq, but it is not preinstalled on Cumulus
@@ -319,11 +398,10 @@ ssh-machine:
 	))
 	ssh -F files/ssh/config $(machine) $(COMMAND)
 
-.PHONY: connect-to-www
-connect-to-www:
-	@echo "Attempting to connect to container www..."
+.PHONY: test-connectivity-to-external-service
+test-connectivity-to-external-service:
 	@for i in $$(seq 1 $(MAX_RETRIES)); do \
-		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://203.0.113.3" > /dev/null 2>&1; then \
+		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://203.0.113.100" > /dev/null 2>&1; then \
 			echo "Connected successfully"; \
 			exit 0; \
 		else \
@@ -338,10 +416,46 @@ connect-to-www:
 		fi; \
 	done
 
+.PHONY: test-connectivity-to-external-service-via-ipv6
+test-connectivity-to-external-service-via-ipv6:
+	@for i in $$(seq 1 $(MAX_RETRIES)); do \
+		if $(MAKE) ssh-machine COMMAND="sudo curl --connect-timeout 1 --fail --silent http://[2001:db8::10]" > /dev/null 2>&1; then \
+			echo "Connected successfully"; \
+			exit 0; \
+		else \
+			echo "Connection failed"; \
+			if [ $$i -lt $(MAX_RETRIES) ]; then \
+				echo "Retrying in 2 seconds..."; \
+				sleep 2; \
+			else \
+				echo "Max retries reached"; \
+				exit 1; \
+			fi; \
+		fi; \
+	done
+
+
 ## DEV TARGETS ##
 
 .PHONY: dev-env
 dev-env:
-	@echo "export METALCTL_API_URL=http://api.172.17.0.1.nip.io:8080/metal"
-	@echo "export METALCTL_HMAC=metal-admin"
+	@echo "export METALCTL_API_URL=${METALCTL_API_URL}"
+	@echo "export METALCTL_HMAC=${METALCTL_HMAC}"
 	@echo "export KUBECONFIG=$(KUBECONFIG)"
+
+## Gardener integration
+
+.PHONY: fetch-virtual-kubeconfig
+fetch-virtual-kubeconfig:
+	kubectl config unset users.virtual-garden
+	kubectl config unset contexts.virtual-garden
+	kubectl config unset clusters.virtual-garden
+	kubectl get secret -n garden garden-kubeconfig-for-admin -o jsonpath='{.data.kubeconfig}' | base64 -d > .virtual-kubeconfig
+	kubectl --kubeconfig=.virtual-kubeconfig config rename-context garden virtual-garden
+	sed -i 's/name: garden/name: virtual-garden/g' .virtual-kubeconfig
+	sed -i 's/name: admin/name: virtual-garden/g' .virtual-kubeconfig
+	kubectl --kubeconfig=.virtual-kubeconfig config set contexts.virtual-garden.cluster virtual-garden
+	kubectl --kubeconfig=.virtual-kubeconfig config set contexts.virtual-garden.user virtual-garden
+	KUBECONFIG=$$KUBECONFIG:.virtual-kubeconfig kubectl config view --flatten > .merged-kubeconfig
+	rm .virtual-kubeconfig
+	mv .merged-kubeconfig .kubeconfig

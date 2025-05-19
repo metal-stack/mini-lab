@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 import fcntl
+import glob
+import ipaddress
 import json
 import logging
 import os
@@ -15,13 +17,14 @@ from guestfs import GuestFS
 
 BASE_IMG = '/sonic-vs.img'
 
+VS_DEVICES_PATH = '/usr/share/sonic/device/x86_64-kvm_x86_64-r0/'
+
 
 class Qemu:
-    def __init__(self, name: str, smp: str, memory: str, interfaces: int):
+    def __init__(self, name: str, smp: str, memory: str):
         self._name = name
         self._smp = smp
         self._memory = memory
-        self._interfaces = interfaces
         self._p = None
         self._disk = '/overlay.img'
 
@@ -58,13 +61,21 @@ class Qemu:
             '-serial', 'telnet:127.0.0.1:5000,server,nowait',
         ]
 
-        for i in range(self._interfaces):
-            with open(f'/sys/class/net/eth{i}/address', 'r') as f:
+        with open(f'/sys/class/net/eth0/address', 'r') as f:
+            mac = f.read().strip()
+        cmd.append('-device')
+        cmd.append(f'virtio-net-pci,netdev=hn0,mac={mac}')
+        cmd.append(f'-netdev')
+        cmd.append(f'tap,id=hn0,ifname=tap0,script=/mirror_tap_to_eth.sh,downscript=no')
+
+        ifaces = get_ethernet_interfaces()
+        for i, iface in enumerate(ifaces, start=1):
+            with open(f'/sys/class/net/{iface}/address', 'r') as f:
                 mac = f.read().strip()
             cmd.append('-device')
             cmd.append(f'virtio-net-pci,netdev=hn{i},mac={mac}')
             cmd.append(f'-netdev')
-            cmd.append(f'tap,id=hn{i},ifname=tap{i},script=/mirror_tap_to_eth.sh,downscript=no')
+            cmd.append(f'tap,id=hn{i},ifname=tap{i},script=/mirror_tap_to_front_panel.sh,downscript=no')
 
         self._p = subprocess.Popen(cmd)
 
@@ -72,7 +83,7 @@ class Qemu:
         self._p.wait()
 
 
-def initial_configuration(g: GuestFS) -> None:
+def initial_configuration(g: GuestFS, hwsku: str) -> None:
     image = g.glob_expand('/image-*')[0]
 
     g.rm(image + 'platform/firsttime')
@@ -105,31 +116,49 @@ def initial_configuration(g: GuestFS) -> None:
     g.ln_s(linkname=systemd_system + 'system-health.service', target='/dev/null')
     g.ln_s(linkname=systemd_system + 'watchdog-control.service', target='/dev/null')
 
+    sonic_share = image + 'rw/usr/share/sonic/'
+    hwsku_dir = image + 'rw' + VS_DEVICES_PATH + hwsku
+    g.mkdir_p(hwsku_dir)
+
+    g.write(path=image + 'rw' + VS_DEVICES_PATH + 'default_sku', content=f'{hwsku} empty'.encode('utf-8'))
+    g.ln_s(linkname=sonic_share + 'hwsku', target=VS_DEVICES_PATH + hwsku)
+    g.ln_s(linkname=sonic_share + 'platform', target=VS_DEVICES_PATH)
+
+    ifaces = get_ethernet_interfaces()
+    # The port_config.ini file contains the assignment of front panels to lanes.
+    port_config = parse_port_config()
+    # The lanemap.ini file is used by the virtual switch image to assign front panels to the Linux interfaces ethX.
+    # This assignment will later also be used by the script mirror_tap_to_front_panel.sh.
+    lanemap = create_lanemap(port_config, ifaces)
+    with open('/lanemap.ini', 'w') as f:
+        f.write('\n'.join(lanemap))
+
+    g.copy_in(localpath='/lanemap.ini', remotedir=hwsku_dir)
+    g.copy_in(localpath='/port_config.ini', remotedir=hwsku_dir)
+
     etc_sonic = image + 'rw/etc/sonic/'
     g.mkdir_p(etc_sonic)
     sonic_version = image.removeprefix('/image-').removesuffix('/')
     sonic_environment = f'''
         SONIC_VERSION=${sonic_version}
         PLATFORM=x86_64-kvm_x86_64-r0
-        HWSKU=Force10-S6000
+        HWSKU={hwsku}
         DEVICE_TYPE=LeafRouter
         ASIC_TYPE=vs
         '''.encode('utf-8')
     g.write(path=etc_sonic + 'sonic-environment', content=sonic_environment)
 
-    with open('/config_db.json') as f:
-        config_db = json.load(f)
-
-    config_db['DEVICE_METADATA']['localhost']['hostname'] = socket.gethostname()
-    config_db['DEVICE_METADATA']['localhost']['mac'] = get_mac_address('eth0')
-    cidr = get_ip_address('eth0') + '/16'
-    config_db['MGMT_INTERFACE'] = {
-        f'eth0|{cidr}': {
-            'gwaddr': get_default_gateway()
+    config_db = create_config_db(hwsku)
+    ports = {}
+    for iface in ifaces:
+        ports[iface] = {
+            **port_config[iface],
+            'admin_status': 'up',
+            'mtu': '9100'
         }
-    }
-
+    config_db['PORT'] = ports
     config_db_json = json.dumps(config_db, indent=4, sort_keys=True)
+
     g.write(path=etc_sonic + 'config_db.json', content=config_db_json.encode('utf-8'))
 
     if os.path.exists('/authorized_keys'):
@@ -150,20 +179,21 @@ def main():
     smp = os.getenv('QEMU_SMP', default='2')
     memory = os.getenv('QEMU_MEMORY', default='2048')
     interfaces = int(os.getenv('CLAB_INTFS', 0)) + 1
+    hwsku = os.getenv('HWSKU', default='Accton-AS7726-32X')
 
-    vm = Qemu(name, smp, memory, interfaces)
+    vm = Qemu(name, smp, memory)
 
     logger.info('Prepare disk')
     vm.prepare_overlay(BASE_IMG)
 
-    logger.info('Deploy initial config')
-    g = vm.guestfs()
-    initial_configuration(g)
-    g.shutdown()
-    g.close()
-
     logger.info(f'Waiting for {interfaces} interfaces to be connected')
     wait_until_all_interfaces_are_connected(interfaces)
+
+    logger.info('Deploy initial config')
+    g = vm.guestfs()
+    initial_configuration(g, hwsku)
+    g.shutdown()
+    g.close()
 
     logger.info('Start QEMU')
     vm.start()
@@ -180,13 +210,15 @@ def wait_until_all_interfaces_are_connected(interfaces: int) -> None:
     while True:
         i = 0
         for iface in os.listdir('/sys/class/net/'):
-            if iface.startswith('eth'):
+            if iface.startswith('eth') or iface.startswith('Ethernet'):
                 i += 1
         if i == interfaces:
             break
         time.sleep(1)
 
 
+# This function works only for IPv4 interfaces.
+# See: man 7 netdevice
 def get_ip_address(iface: str) -> str:
     # Source: https://bit.ly/3dROGBN
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -197,6 +229,20 @@ def get_ip_address(iface: str) -> str:
     )[20:24])
 
 
+# This function works only for IPv4 interfaces
+# See: man 7 netdevice
+def get_netmask(iface: str) -> str:
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    netmask = socket.inet_ntoa(fcntl.ioctl(
+        s.fileno(),
+        0x891b,  # SIOCGIFNETMASK
+        struct.pack('256s', iface.encode('utf-8'))
+    )[20:24])
+    return str(ipaddress.ip_network(f"0.0.0.0/{netmask}").prefixlen)
+
+
+# This function works only for IPv4 interfaces
+# Set: man 7 netdevice
 def get_mac_address(iface: str) -> str:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     mac = fcntl.ioctl(
@@ -207,6 +253,7 @@ def get_mac_address(iface: str) -> str:
     return ':'.join('%02x' % b for b in mac)
 
 
+# This function works only for IPv4 interfaces
 def get_default_gateway() -> str:
     # Source: https://splunktool.com/python-get-default-gateway-for-a-local-interfaceip-address-in-linux
     with open("/proc/net/route") as fh:
@@ -216,6 +263,93 @@ def get_default_gateway() -> str:
                 # If not default route or not RTF_GATEWAY, skip it
                 continue
             return socket.inet_ntoa(struct.pack("<L", int(fields[2], 16)))
+
+
+def get_ethernet_interfaces() -> list[str]:
+    ethernet_dirs = glob.glob('/sys/class/net/Ethernet*')
+    ifaces = [os.path.basename(dir) for dir in ethernet_dirs]
+    ifaces.sort()
+    return ifaces
+
+
+def create_lanemap(port_config: dict[str, dict], ifaces: list[str]) -> list[str]:
+    lanemap = []
+
+    for i, iface in enumerate(ifaces, start=1):
+        lanes = port_config[iface]['lanes']
+        lanemap.append(f'eth{i}:{lanes}')
+
+    return lanemap
+
+
+def parse_port_config() -> dict[str, dict]:
+    with open('/port_config.ini', 'r') as file:
+        lines = file.readlines()
+
+    port_config = {}
+
+    for line in lines[1:]:
+        columns = line.split()
+        name = columns[0]
+        port_config[name] = {
+            "lanes": columns[1],
+            "alias": columns[2],
+            "index": columns[3],
+            "speed": columns[4],
+        }
+
+    return port_config
+
+
+def create_config_db(hwsku: str) -> dict:
+    mgmt_interface_cidr = get_ip_address("eth0") + "/" + get_netmask("eth0")
+    return {
+        'AUTO_TECHSUPPORT': {
+            'GLOBAL': {
+                'state': 'disabled'
+            }
+        },
+        'DEVICE_METADATA': {
+            'localhost': {
+                'docker_routing_config_mode': 'split-unified',
+                'hostname': socket.gethostname(),
+                'hwsku': hwsku,
+                'mac': get_mac_address('eth0'),
+                'platform': 'x86_64-kvm_x86_64-r0',
+                'type': 'LeafRouter',
+            }
+        },
+        'FEATURE': {
+            'gnmi': {
+                'state': 'disabled'
+            },
+            'mgmt-framework': {
+                'state': 'disabled'
+            },
+            'snmp': {
+                'state': 'disabled'
+            },
+            'teamd': {
+                'state': 'disabled'
+            }
+        },
+        'MGMT_INTERFACE': {
+            f'eth0|{mgmt_interface_cidr}': {
+                'gwaddr': get_default_gateway(),
+            }
+        },
+        'MGMT_PORT': {
+            'eth0': {
+                'alias': 'eth0',
+                'admin_status': 'up'
+            }
+        },
+        'VERSIONS': {
+            'DATABASE': {
+                'VERSION': 'version_202311_03'
+            }
+        }
+    }
 
 
 if __name__ == '__main__':

@@ -1,8 +1,20 @@
 ---
 egress:
+  - comment: allow outgoing http and https
+    ports:
+      - 80
+    protocol: TCP
+    to:
+      - 0.0.0.0/0
   - comment: allow outgoing http
     ports:
       - 80
+    protocol: TCP
+    to:
+      - ::/0
+  - comment: allow outgoing https
+    ports:
+      - 443
     protocol: TCP
     to:
       - 0.0.0.0/0
@@ -11,7 +23,7 @@ egress:
       - 443
     protocol: TCP
     to:
-      - 0.0.0.0/0
+      - ::/0
   - comment: allow outgoing dns via tcp
     ports:
       - 53
@@ -31,6 +43,23 @@ ingress:
       - 22
     protocol: TCP
     from:
-      - 203.0.113.1/25
+      - 203.0.113.0/24
     to:
       - 203.0.113.128/25
+  - comment: allow incoming http and https
+    ports:
+      - 80
+      - 443
+    protocol: TCP
+    from:
+      - 203.0.113.0/24
+    to:
+      - 203.0.113.128/25
+  - comment: allow incoming ssh
+    ports:
+      - 22
+    protocol: TCP
+    from:
+      - 2001:db8::1/128
+    to:
+      - 2001:db8:0:113::/64

@@ -1,6 +1,6 @@
 ---
 metal_set_resource_limits: no
-metal_check_api_health_endpoint: http://api.172.17.0.1.nip.io:8080/metal/v1/health
+metal_check_api_health_endpoint: http://api.{{ metal_control_plane_ingress_dns }}:8080/metal/v1/health
 
 # metal_helm_chart_local_path: /helm-charts/charts/metal-control-plane
 
@@ -11,19 +11,34 @@ metal_api_admin_key: metal-admin
 
 metal_api_nsq_tcp_address: nsqd:4150
 
-metal_api_latest_os_image_release_name: "{{ (lookup('url', 'https://api.github.com/repos/metal-stack/metal-images/releases/latest', headers=({'authorization': 'Bearer ' + github_runner_token} if github_runner_token else {})) | from_json).get('name') }}"
+metal_apiserver_enabled: true
+metal_apiserver_url: http://v2.api.{{ metal_control_plane_ingress_dns }}:8080
+
+metal_apiserver_oidc_discovery_url: http://auth.{{ metal_control_plane_ingress_dns }}:8080/dex/.well-known/openid-configuration
+metal_apiserver_oidc_end_session_url: ""
+metal_apiserver_oidc_client_id: metal-stack
+metal_apiserver_oidc_client_secret: secret
+
+metal_apiserver_redis_password: change-me-soon
+metal_apiserver_admin_subjects: "CiQwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDESBWxvY2Fs@oidc"
 
 metal_api_images:
 - id: firewall-ubuntu-3.0
   name: Firewall 3 Ubuntu
   description: Firewall 3 Ubuntu Latest Release
-  url: https://images.metal-stack.io/metal-os/{{ metal_api_latest_os_image_release_name }}/firewall/3.0-ubuntu/img.tar.lz4
+  url: https://images.metal-stack.io/metal-os/stable/firewall/3.0-ubuntu/img.tar.lz4
   features:
     - firewall
-- id: ubuntu-24.04
+- id: ubuntu-24.4
   name: Ubuntu 24.04
   description: Ubuntu 24.04 Latest Release
-  url: https://images.metal-stack.io/metal-os/{{ metal_api_latest_os_image_release_name }}/ubuntu/24.04/img.tar.lz4
+  url: https://images.metal-stack.io/metal-os/stable/ubuntu/24.04/img.tar.lz4
+  features:
+    - machine
+- id: debian-12.0
+  name: Debian 12
+  description: Debian 12 Latest Release
+  url: https://images.metal-stack.io/metal-os/stable/debian/12/img.tar.lz4
   features:
     - machine
 
@@ -61,8 +76,14 @@ metal_api_networks:
   underlay: false
   destinationprefixes: []
   partitionid: mini-lab
+  defaultchildprefixlength:
+    IPv4: 22
+    IPv6: 96
   prefixes:
   - 10.0.0.0/16
+  - 2001:db8:0:10::/64
+  additionalAnnouncableCIDRs:
+  - 10.240.0.0/12
 - id: internet-mini-lab
   name: "Virtual Internet Network"
   description: "Virtual Internet Network for mini-lab"
@@ -71,10 +92,12 @@ metal_api_networks:
   underlay: false
   destinationprefixes:
     - 0.0.0.0/0
+    - ::/0
   partitionid: "mini-lab"
   vrf: 104009
   prefixes:
   - 203.0.113.128/25
+  - 2001:db8:0:113::/64
   labels:
     network.metal-stack.io/default: ""
     network.metal-stack.io/default-external: ""
@@ -88,6 +111,18 @@ metal_api_networks:
   partitionid: "mini-lab"
   prefixes:
   - 10.1.0.0/24
+
+metal_api_ips:
+- name: "reserve v4"
+  description: "Reserve IPv4 (for testing purposes)"
+  networkid: internet-mini-lab
+  projectid: 00000000-0000-0000-0000-000000000000
+  ipaddress: "203.0.113.142"
+- name: "reserve v6"
+  description: "Reserve IPv6 (for testing purposes)"
+  networkid: internet-mini-lab
+  projectid: 00000000-0000-0000-0000-000000000000
+  ipaddress: "2001:db8:0:113::142"
 
 metal_masterdata_api_tls_ca: "{{ lookup('file', 'certs/ca.pem') }}"
 metal_masterdata_api_tls_cert: "{{ lookup('file', 'certs/masterdata-api/server.pem') }}"
@@ -126,5 +161,5 @@ metal_api_grpc_certs_client_cert: "{{  lookup('file', 'certs/grpc/client.pem') }
 metal_api_grpc_certs_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
 
 # auditing
-metal_auditing_enabled: true
-metal_auditing_index_prefix: metal
+metal_auditing_timescaledb_enabled: true
+metal_auditing_meili_enabled: false

@@ -1,3 +1,10 @@
 ---
+auditing_timescaledb_storage_size: 10Gi
+auditing_timescaledb_resources: {}
+
+auditing_timescaledb_backup_restore_sidecar_object_max_keep: 10
+
 auditing_meili_storage_size: 10Gi
 auditing_meili_resources: {}
+
+auditing_meili_backup_restore_sidecar_object_max_keep: 10

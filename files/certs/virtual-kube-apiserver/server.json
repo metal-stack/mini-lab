@@ -1,0 +1,28 @@
+{
+  "CN": "garden-kube-apiserver",
+  "hosts": [
+    "localhost",
+    "127.0.0.1",
+    "garden-kube-apiserver",
+    "garden-kube-apiserver.garden",
+    "garden-kube-apiserver.garden.svc",
+    "garden-kube-apiserver.garden.svc.cluster",
+    "garden-kube-apiserver.garden.svc.cluster.local",
+    "172.17.0.1",
+    "172.17.0.1.nip.io",
+    "gardener-kube-apiserver.172.17.0.1.nip.io"
+  ],
+  "key": {
+    "algo": "ecdsa",
+    "size": 256
+  },
+  "names": [
+    {
+      "C":  "DE",
+      "L":  "Munich",
+      "O":  "metal-stack",
+      "OU": "DevOps",
+      "ST": "Bavaria"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+---
+powerdns_image_name: powerdns/pdns-auth-49
+powerdns_image_tag: 4.9.3
+
+powerdns_api_key: change-me
+
+powerdns_api_dns_name:
+
+powerdns_zone_name:
+powerdns_zone_kind:
+powerdns_zone_nameservers: []
