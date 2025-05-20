@@ -26,8 +26,6 @@ MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-la
 MACHINE_OS=debian-12.0
 MAX_RETRIES := 30
 
-CONTAINER_DIR=/etc/containerd/certs.d
-
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
 MACHINE_OS=ubuntu-24.4
@@ -94,7 +92,7 @@ roll-certs:
 	$(MAKE) gen-certs
 
 .PHONY: control-plane
-control-plane: control-plane-bake create-proxy-registries env
+control-plane: control-plane-bake
 	docker compose up --remove-orphans --force-recreate control-plane
 
 .PHONY: create-proxy-registries
