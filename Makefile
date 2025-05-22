@@ -29,22 +29,18 @@ MAX_RETRIES := 30
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
 MACHINE_OS=ubuntu-24.4
-LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
 VRF=vrf20
 else ifeq ($(MINI_LAB_FLAVOR),sonic)
-LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.sonic.yaml
 VRF=Vrf20
 else ifeq ($(MINI_LAB_FLAVOR),capms)
-LAB_MACHINES=machine01,machine02,machine03
 LAB_TOPOLOGY=mini-lab.capms.yaml
 VRF=Vrf20
 else ifeq ($(MINI_LAB_FLAVOR),gardener)
 GARDENER_ENABLED=true
 # usually gardener restricts the maximum version for k8s:
 K8S_VERSION=1.31.6
-LAB_MACHINES=machine01,machine02
 LAB_TOPOLOGY=mini-lab.sonic.yaml
 VRF=Vrf20
 else
@@ -65,7 +61,7 @@ endif
 .PHONY: up
 up: env gen-certs control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_rsa
-	docker compose up --remove-orphans --force-recreate control-plane partition
+	docker compose up --abort-on-container-failure --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
 # for some reason an allocated machine will not be able to phone home
 # without restarting the metal-core
@@ -232,14 +228,67 @@ ssh-leaf02:
 	ssh -F files/ssh/config leaf02
 
 ## MACHINE MANAGEMENT ##
+.PHONY: _ipmi_power
+_ipmi_power:
+	docker exec $(VM) ipmitool -C 3 -I lanplus -U ADMIN -P ADMIN -H 127.0.0.1 chassis power $(COMMAND)
 
 .PHONY: start-machines
 start-machines:
-	docker exec vms /mini-lab/manage_vms.py --names $(LAB_MACHINES) create
+	@for i in $$(docker container ps --filter label=clab-node-group=machines --quiet); do \
+		$(MAKE) --no-print-directory _ipmi_power VM=$$i COMMAND='on'; \
+	done
 
-.PHONY: kill-machines
-kill-machines:
-	docker exec vms /mini-lab/manage_vms.py --names $(LAB_MACHINES) kill
+.PHONY: power-on-machine01
+power-on-machine01:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine01 COMMAND=on
+
+.PHONY: power-on-machine02
+power-on-machine02:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine02 COMMAND=on
+
+.PHONY: power-on-machine03
+power-on-machine03:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=on
+
+.PHONY: power-reset-machine01
+power-reset-machine01:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine01 COMMAND=reset
+
+.PHONY: power-reset-machine02
+power-reset-machine02:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine02 COMMAND=reset
+
+.PHONY: power-reset-machine03
+power-reset-machine03:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=reset
+
+.PHONY: power-off-machine01
+power-off-machine01:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine01 COMMAND=off
+
+.PHONY: power-off-machine02
+power-off-machine02:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine02 COMMAND=off
+
+.PHONY: power-off-machine03
+power-off-machine03:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=off
+
+.PHONY: _console
+_console:
+	docker exec --interactive --tty $(VM) ipmitool -C 3 -I lanplus -U ADMIN -P ADMIN -H 127.0.0.1 sol activate
+
+.PHONY: console-machine01
+console-machine01:
+	@$(MAKE) --no-print-directory _console VM=machine01
+
+.PHONY: console-machine02
+console-machine02:
+	@$(MAKE) --no-print-directory _console VM=machine02
+
+.PHONY: console-machine03
+console-machine03:
+	@$(MAKE) --no-print-directory _console VM=machine03
 
 .PHONY: _password
 _password: env
@@ -256,41 +305,6 @@ password-machine02:
 .PHONY: password-machine0%
 password-machine0%:
 	@$(MAKE) --no-print-directory _password	MACHINE_NAME=machine0$* MACHINE_UUID=00000000-0000-0000-0000-00000000000$*
-
-.PHONY: _free-machine
-_free-machine: env
-	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine rm $(MACHINE_UUID)
-	docker exec vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) kill --with-disks
-	docker exec vms /mini-lab/manage_vms.py --names $(MACHINE_NAME) create
-
-.PHONY: free-machine01
-free-machine01:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine01 MACHINE_UUID=00000000-0000-0000-0000-000000000001
-
-.PHONY: free-machine02
-free-machine02:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine02 MACHINE_UUID=00000000-0000-0000-0000-000000000002
-
-.PHONY: free-machine0%
-free-machine0%:
-	@$(MAKE) --no-print-directory _free-machine	MACHINE_NAME=machine0$* MACHINE_UUID=00000000-0000-0000-0000-00000000000$*
-
-.PHONY: _console-machine
-_console-machine:
-	@echo "exit console with CTRL+5 and then quit telnet through q + ENTER"
-	@docker exec -it vms telnet 127.0.0.1 $(CONSOLE_PORT)
-
-.PHONY: console-machine01
-console-machine01:
-	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4001
-
-.PHONY: console-machine02
-console-machine02:
-	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=4002
-
-.PHONY: console-machine0%
-console-machine0%:
-	@$(MAKE) --no-print-directory _console-machine	CONSOLE_PORT=400$*
 
 ## SSH TARGETS FOR MACHINES ##
 # Python code could be replaced by jq, but it is not preinstalled on Cumulus
