@@ -92,7 +92,7 @@ roll-certs:
 	$(MAKE) gen-certs
 
 .PHONY: control-plane
-control-plane: control-plane-bake
+control-plane: control-plane-bake env
 	docker compose up --remove-orphans --force-recreate control-plane
 
 .PHONY: create-proxy-registries
