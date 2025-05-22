@@ -4,17 +4,24 @@ networking:
   apiServerPort: 6443
   apiServerAddress: 0.0.0.0
 nodes:
-- role: control-plane
-  extraPortMappings:
-  - containerPort: 4443
-    hostPort: 4443
-    listenAddress: 0.0.0.0
-  - containerPort: 8080
-    hostPort: 8080
-    listenAddress: 0.0.0.0
-  - containerPort: 4150
-    hostPort: 4150
-    listenAddress: 0.0.0.0
-  - containerPort: 50051
-    hostPort: 50051
-    listenAddress: 0.0.0.0
+  - role: control-plane
+    extraMounts:
+      - hostPath: ./control-plane/config-patches
+        containerPath: /etc/containerd/certs.d
+    extraPortMappings:
+      - containerPort: 4443
+        hostPort: 4443
+        listenAddress: 0.0.0.0
+      - containerPort: 8080
+        hostPort: 8080
+        listenAddress: 0.0.0.0
+      - containerPort: 4150
+        hostPort: 4150
+        listenAddress: 0.0.0.0
+      - containerPort: 50051
+        hostPort: 50051
+        listenAddress: 0.0.0.0
+containerdConfigPatches:
+  - |-
+    [plugins."io.containerd.grpc.v1.cri".registry]
+      config_path = "/etc/containerd/certs.d"

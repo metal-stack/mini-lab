@@ -26,13 +26,13 @@ services:
       - /bin/bash
       - -ce
       - |
-          ansible-playbook \
-            -i inventories/control-plane.yaml \
-            obtain_role_requirements.yaml
-          ansible-galaxy install --ignore-errors -r requirements.yaml
-          ansible-playbook \
-            -i inventories/control-plane.yaml \
-            deploy_control_plane.yaml --extra-vars "@.extra_vars.yaml"
+        ansible-playbook \
+          -i inventories/control-plane.yaml \
+          obtain_role_requirements.yaml
+        ansible-galaxy install --ignore-errors -r requirements.yaml
+        ansible-playbook \
+          -i inventories/control-plane.yaml \
+          deploy_control_plane.yaml --extra-vars "@.extra_vars.yaml"
 
   partition:
     image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
@@ -56,14 +56,14 @@ services:
       - /bin/bash
       - -ce
       - |
-          ansible-playbook \
-            -i inventories/control-plane.yaml \
-            obtain_role_requirements.yaml
-          ansible-galaxy install --ignore-errors -r requirements.yaml
-          ansible-playbook \
-            -i inventories/partition.yaml \
-            -i clab-mini-lab/ansible-inventory.yml \
-            deploy_partition.yaml --extra-vars "@.extra_vars.yaml"
+        ansible-playbook \
+          -i inventories/control-plane.yaml \
+          obtain_role_requirements.yaml
+        ansible-galaxy install --ignore-errors -r requirements.yaml
+        ansible-playbook \
+          -i inventories/partition.yaml \
+          -i clab-mini-lab/ansible-inventory.yml \
+          deploy_partition.yaml --extra-vars "@.extra_vars.yaml"
 
   metalctl:
     image: ghcr.io/metal-stack/metalctl:${METALCTL_IMAGE_TAG}
@@ -77,3 +77,80 @@ services:
       - ./files/rules.yaml:/tmp/rules.yaml
     network_mode: host
     command: --version
+
+  proxy-docker:
+    image: registry:3
+    restart: always
+    volumes:
+      - proxy-docker:/var/lib/registry
+    networks:
+      - kind
+    container_name: proxy-docker
+    environment:
+      - REGISTRY_PROXY_REMOTEURL="https://registry-1.docker.io"
+      - REGISTRY_PROXY_TTL=168h
+      - REGISTRY_STORAGE_DELETE_ENABLED=true 
+      - OTEL_TRACES_EXPORTER=none
+  proxy-gcr:
+    image: registry:3
+    restart: always
+    volumes:
+      - proxy-gcr:/var/lib/registry
+    networks:
+      - kind
+    container_name: proxy-gcr
+    environment:
+      - REGISTRY_PROXY_REMOTEURL="https://gcr.io"
+      - REGISTRY_PROXY_TTL=168h
+      - REGISTRY_STORAGE_DELETE_ENABLED=true 
+      - OTEL_TRACES_EXPORTER=none
+  proxy-ghcr:
+    image: registry:3
+    restart: always
+    volumes:
+      - proxy-ghcr:/var/lib/registry
+    networks:
+      - kind
+    container_name: proxy-ghcr
+    environment:
+      - REGISTRY_PROXY_REMOTEURL="https://ghcr.io"
+      - REGISTRY_PROXY_TTL=168h
+      - REGISTRY_STORAGE_DELETE_ENABLED=true 
+      - OTEL_TRACES_EXPORTER=none
+  proxy-k8s:
+    image: registry:3
+    restart: always
+    volumes:
+      - proxy-k8s:/var/lib/registry
+    networks:
+      - kind
+    container_name: proxy-k8s
+    environment:
+      - REGISTRY_PROXY_REMOTEURL="https://registry.k8s.io"
+      - REGISTRY_PROXY_TTL=168h
+      - REGISTRY_STORAGE_DELETE_ENABLED=true 
+      - OTEL_TRACES_EXPORTER=none
+  proxy-quay:
+    image: registry:3
+    restart: always
+    volumes:
+      - proxy-quay:/var/lib/registry
+    networks:
+      - kind
+    container_name: proxy-quay
+    environment:
+      - REGISTRY_PROXY_REMOTEURL="https://quay.io"
+      - REGISTRY_PROXY_TTL=168h
+      - REGISTRY_STORAGE_DELETE_ENABLED=true 
+      - OTEL_TRACES_EXPORTER=none
+volumes:
+  proxy-docker:
+  proxy-gcr:
+  proxy-ghcr:
+  proxy-k8s:
+  proxy-quay:
+
+networks:
+  kind:
+    name: kind
+    external: true
