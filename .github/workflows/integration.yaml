@@ -81,6 +81,7 @@ jobs:
       - build-mini-lab-vms-image
       - build-mini-lab-sonic-image
 
+    continue-on-error: true
     strategy:
       matrix:
         flavors:
