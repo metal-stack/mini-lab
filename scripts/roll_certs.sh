@@ -12,19 +12,8 @@ cfssl genkey -initca ca-csr.json | cfssljson -bare ca
 rm *.csr
 
 for component in \
-        gardener-admission-controller \
-        gardener-apiserver \
-        gardener-controller-manager \
-        gardener-etcd \
-        gardener-kube-aggregator \
         grpc \
-        masterdata-api \
-        metal-admission-controller \
-        virtual-admin \
-        virtual-gardener-apiserver \
-        virtual-kube-apiserver \
-        virtual-kube-controller-manager \
-        virtual-service-account-token; do
+        masterdata-api; do
     pushd $component
 
     echo "generating $component certs"

@@ -21,6 +21,13 @@ nodes:
       - containerPort: 50051
         hostPort: 50051
         listenAddress: 0.0.0.0
+    # if you want to run gardener operator + metal-stack, you need more pods
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            max-pods: "256"
 containerdConfigPatches:
   - |-
     [plugins."io.containerd.grpc.v1.cri".registry]
