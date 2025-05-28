@@ -162,4 +162,3 @@ metal_api_grpc_certs_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
 
 # auditing
 metal_auditing_timescaledb_enabled: true
-metal_auditing_meili_enabled: false
