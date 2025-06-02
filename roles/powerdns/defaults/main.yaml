@@ -6,6 +6,7 @@ powerdns_api_key: change-me
 
 powerdns_api_dns_name:
 
-powerdns_zone_name:
-powerdns_zone_kind:
-powerdns_zone_nameservers: []
+powerdns_zones: []
+  # - name:
+  #   kind:
+  #   nameservers: []

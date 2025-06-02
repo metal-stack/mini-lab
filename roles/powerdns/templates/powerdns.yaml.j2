@@ -156,11 +156,13 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
+{% for zone in powerdns_zones %}
               curl -X POST \
                 http://powerdns-api:8081/api/v1/servers/localhost/zones \
                 -H "Content-Type: application/json" \
                 -H "X-API-Key: $API_KEY" \
-                -d '{"name": "{{ powerdns_zone_name }}","kind": "{{ powerdns_zone_kind }}", "nameservers": {{ powerdns_zone_nameservers | to_json }} }'
+                -d '{"name": "{{ zone.name }}","kind": "{{ zone.kind }}", "nameservers": {{ zone.nameservers | to_json }} }'
+{% endfor %}
           env:
             - name: API_KEY
               valueFrom:
