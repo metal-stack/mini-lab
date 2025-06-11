@@ -34,11 +34,15 @@ jobs:
         echo "MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:${IMAGE_TAG}" >> $GITHUB_ENV
         echo "MINI_LAB_SONIC_IMAGE=ghcr.io/metal-stack/mini-lab-sonic:${IMAGE_TAG}" >> $GITHUB_ENV
 
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
     - name: Build and push mini-lab-vms container
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: ./images/machine
         push: true
+        sbom: true
         tags: ${{ env.MINI_LAB_VM_IMAGE }}
         cache-from: type=registry,ref=${{ env.MINI_LAB_VM_IMAGE }}
         cache-to: type=inline
@@ -65,11 +69,15 @@ jobs:
         echo "MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:${IMAGE_TAG}" >> $GITHUB_ENV
         echo "MINI_LAB_SONIC_IMAGE=ghcr.io/metal-stack/mini-lab-sonic:${IMAGE_TAG}" >> $GITHUB_ENV
 
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
     - name: Build and push mini-lab-sonic container
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: ./images/sonic
         push: true
+        sbom: true
         tags: ${{ env.MINI_LAB_SONIC_IMAGE }}
         cache-from: type=registry,ref=${{ env.MINI_LAB_SONIC_IMAGE }}
         cache-to: type=inline
