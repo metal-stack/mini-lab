@@ -29,6 +29,8 @@
       tags: gardener
     - name: metal-roles/control-plane/roles/gardener-extensions
       tags: gardener
+    - name: metal-roles/control-plane/roles/gardener-virtual-garden-access
+      tags: gardener
     - name: metal-roles/control-plane/roles/gardener-cloud-profile
       tags: gardener
     - name: metal-roles/control-plane/roles/gardener-gardenlet
@@ -42,11 +44,11 @@
           garden_name: "local"
         tags: gardener
 
-      - name: Wait Gardenlet to be reconciled
+      - name: Wait for Gardenlet to be reconciled
         kubernetes.core.k8s_info:
           api_version: seedmanagement.gardener.cloud/v1alpha1
           kind: Gardenlet
-          name: "test"
+          name: "local"
           namespace: garden
           kubeconfig: "{{ virtual_garden_kubeconfig }}"
           wait: yes
