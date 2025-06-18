@@ -5,20 +5,6 @@ setup_yaml:
   - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
     meta_var: metal_stack_release
 
-gardener_extension_provider_metal_image_tag: helm-oci-artifacts
-gardener_extension_provider_metal_helm_chart_tag: v0.0.0-pull-request.455
-gardener_extension_admission_metal_helm_chart_runtime_tag: v0.0.0-pull-request.455
-gardener_extension_admission_metal_helm_chart_application_tag: v0.0.0-pull-request.455
-gardener_extension_backup_s3_image_tag: helm-oci-artifacts
-gardener_extension_backup_s3_helm_chart_tag: v0.0.0-pull-request.15
-gardener_extension_dns_powerdns_image_tag: helm-oci-artifacts
-gardener_extension_dns_powerdns_helm_chart_tag: v0.0.0-pull-request.10
-gardener_extension_os_metal_helm_chart_tag: v0.0.0-pull-request.59
-gardener_extension_csi_driver_lvm_helm_chart_tag: v0.0.0-pull-request.12
-
-ansible_common_version: gardener-modules
-metal_roles_version: gardener-operator
-
 ##
 ## for development purposes, you can override releases from our image vector here
 ##

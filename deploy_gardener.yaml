@@ -41,7 +41,7 @@
   post_tasks:
       - name: Get kubeconfig for virtual garden access
         virtual_garden_kubeconfig:
-          garden_name: "local"
+          garden_name: "{{ metal_control_plane_stage_name }}"
         tags: gardener
 
       - name: Wait for Gardenlet to be reconciled
