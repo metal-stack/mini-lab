@@ -1,4 +1,11 @@
 ---
-gardener_extension_provider_gcp_enabled: false
+# gardener_extension_acl_enabled: true
+# gardener_extension_audit_enabled: true
+# gardener_extension_provider_gcp_enabled: true
+# gardener_extension_csi_driver_lvm_enabled: true
 gardener_extension_backup_s3_enabled: true
 gardener_extension_dns_powerdns_enabled: true
+
+gardener_extension_dns_powerdns_additional_network_policies: true
+
+gardener_extension_shoot_cert_service_issuer_email: mini-lab@metal-stack.io
