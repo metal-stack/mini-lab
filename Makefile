@@ -40,7 +40,7 @@ VRF=Vrf20
 else ifeq ($(MINI_LAB_FLAVOR),gardener)
 GARDENER_ENABLED=true
 # usually gardener restricts the maximum version for k8s:
-K8S_VERSION=1.30.8
+K8S_VERSION=1.32.5
 LAB_TOPOLOGY=mini-lab.sonic.yaml
 VRF=Vrf20
 else
@@ -375,15 +375,13 @@ dev-env:
 
 .PHONY: fetch-virtual-kubeconfig
 fetch-virtual-kubeconfig:
-	kubectl config unset users.virtual-garden
-	kubectl config unset contexts.virtual-garden
-	kubectl config unset clusters.virtual-garden
-	kubectl get secret -n garden garden-kubeconfig-for-admin -o jsonpath='{.data.kubeconfig}' | base64 -d > .virtual-kubeconfig
-	kubectl --kubeconfig=.virtual-kubeconfig config rename-context garden virtual-garden
-	sed -i 's/name: garden/name: virtual-garden/g' .virtual-kubeconfig
-	sed -i 's/name: admin/name: virtual-garden/g' .virtual-kubeconfig
-	kubectl --kubeconfig=.virtual-kubeconfig config set contexts.virtual-garden.cluster virtual-garden
-	kubectl --kubeconfig=.virtual-kubeconfig config set contexts.virtual-garden.user virtual-garden
-	KUBECONFIG=$$KUBECONFIG:.virtual-kubeconfig kubectl config view --flatten > .merged-kubeconfig
-	rm .virtual-kubeconfig
-	mv .merged-kubeconfig .kubeconfig
+	# TODO: it's hard to get the latest issued generic kubeconfig secret... just take the first result for now
+	kubectl --kubeconfig=$(KUBECONFIG) get secret -n garden $(shell kubectl --kubeconfig=$(KUBECONFIG) get secret -n garden -l managed-by=secrets-manager,manager-identity=gardener-operator,name=generic-token-kubeconfig --no-headers | awk '{ print $$1 }') -o jsonpath='{.data.kubeconfig}' | base64 -d > .virtual-kubeconfig
+	@kubectl --kubeconfig=.virtual-kubeconfig config set-cluster garden --server=https://api.gardener-kube-apiserver.172.17.0.1.nip.io:4443
+	@kubectl --kubeconfig=.virtual-kubeconfig config set-credentials garden --token=$(shell kubectl --kubeconfig=$(KUBECONFIG) get secret -n garden shoot-access-virtual-garden -o jsonpath='{.data.token}' | base64 -d)
+	@kubectl --kubeconfig=$(KUBECONFIG) config unset users.garden
+	@kubectl --kubeconfig=$(KUBECONFIG) config unset contexts.garden
+	@kubectl --kubeconfig=$(KUBECONFIG) config unset clusters.garden
+	@KUBECONFIG=$(KUBECONFIG):.virtual-kubeconfig kubectl config view --flatten > .merged-kubeconfig
+	@rm .virtual-kubeconfig
+	@mv .merged-kubeconfig $(KUBECONFIG)

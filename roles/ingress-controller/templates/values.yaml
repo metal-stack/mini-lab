@@ -6,10 +6,14 @@ controller:
 
   hostNetwork: true
 
+  # because of host network, which binds the host port during rolling upgrade
+  updateStrategy:
+    type: Recreate
+
   extraArgs:
     http-port: {{ ingress_http_port }}
     https-port: {{ ingress_https_port }}
-  # required for gardener virtual garden
+    # required for gardener virtual garden
     enable-ssl-passthrough: ""
 
   daemonset:
