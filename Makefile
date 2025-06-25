@@ -26,11 +26,18 @@ MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-la
 MACHINE_OS=debian-12.0
 MAX_RETRIES := 30
 
+
+HOSTNAME_IP := $(shell hostname -I | awk '{print $$1}')
+
+
+
+
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),cumulus)
 MACHINE_OS=ubuntu-24.4
 LAB_TOPOLOGY=mini-lab.cumulus.yaml
 VRF=vrf20
+VM_ARGS=
 else ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_TOPOLOGY=mini-lab.sonic.yaml
 VRF=Vrf20
@@ -43,6 +50,12 @@ GARDENER_ENABLED=true
 K8S_VERSION=1.32.5
 LAB_TOPOLOGY=mini-lab.sonic.yaml
 VRF=Vrf20
+VM_ARGS=
+else ifeq ($(MINI_LAB_FLAVOR),capms)
+LAB_MACHINES=machine01,machine02,machine03
+LAB_TOPOLOGY=mini-lab.capms.yaml
+VRF=Vrf20
+VM_ARGS=-e QEMU_MACHINE_CPU_CORES=2 -e QEMU_MACHINE_DISK_SIZE=20G
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
@@ -143,6 +156,69 @@ external_network:
 .PHONY: env
 env:
 	@./env.sh
+
+configure-bgp:
+	@docker exec -it $$(docker ps -qf "name=inet") bash -c "\
+		vtysh -c 'configure terminal' \
+		      -c 'router bgp 4200000021' \
+		      -c 'network 172.17.0.0/16' \
+		      -c 'end' \
+		      -c 'write memory' \
+		      -c 'show run'"
+
+
+
+deploy-fc: configure-bgp _privatenet insecure-kubeconfig deploy-firewall-controller-manager build-firewall-controller create-firewall-image
+
+deploy-firewall-controller-manager:
+	@echo "Deploying firewall-controller-manager"
+	$(MAKE) -C ../firewall-controller-manager deploy
+
+build-firewall-controller:
+	@echo "Building firewall-controller docker image"
+	$(MAKE) -C ../firewall-controller docker
+
+firewall-metal-images:
+	@echo "Building firewall image in ../metal-images"
+	$(MAKE) -C ../metal-images firewall
+
+create-firewall-image: firewall-metal-images
+	@echo "Starting HTTP server in ../metal-images on port 8000"
+	@cd ../metal-images && python3 -m http.server 8000 &
+	@echo $$! > server_pid.txt
+	@sleep 5 # Wait for the server to start
+	@echo "Using URL: http://$(HOSTNAME_IP):8000/images/firewall/3.0-ubuntu/img.tar.lz4"
+	@metalctl image create \
+		--id firewall-ubuntu-4.0 \
+		--url http://$(HOSTNAME_IP):8000/images/firewall/3.0-ubuntu/img.tar.lz4 \
+		--features "firewall"
+
+start-server:
+	@echo "Starting HTTP server on port 8000"
+	@cd ../metal-images && python3 -m http.server 8000 & echo $$! > server_pid.txt
+	@echo "HTTP server started with PID: $$(cat server_pid.txt)"
+
+shut-down-server:
+	@if [ -f server_pid.txt ]; then \
+		PID=$$(cat server_pid.txt); \
+		if [ -n "$$PID" ] && ps -p $$PID > /dev/null 2>&1; then \
+			echo "Shutting down HTTP server with PID: $$PID"; \
+			kill $$PID && rm server_pid.txt; \
+		else \
+			echo "No running process found for PID: $$PID. Cleaning up."; \
+			rm -f server_pid.txt; \
+		fi; \
+	else \
+		echo "Error: server_pid.txt not found."; \
+	fi
+
+
+
+insecure-kubeconfig:
+	@sed -e 's/certificate-authority-data: .*/insecure-skip-tls-verify: true/' \
+	    -e 's/server: https:\/\/0.0.0.0:6443/server: https:\/\/172.17.0.1:6443/' \
+	    .kubeconfig > .kubeconfig_insecure
+	@echo "Exporting insecure kubeconfig into .kubeconfig_insecure"
 
 .PHONY: cleanup
 cleanup: cleanup-control-plane cleanup-partition
