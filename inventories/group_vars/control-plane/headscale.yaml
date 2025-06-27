@@ -1,8 +1,10 @@
 ---
 headscale_tls: no
 
-headscale_private_key: privkey:b0eedc448ddf269e8adfab6d57ccbb522c5dba3c920ebf339d375c9515e69069
-headscale_noise_private_key: privkey:b0eedc448ddf269e8adfab6d57ccbb522c5dba3c920ebf339d375c9515e69068
+# only hexadecimal passwords are allowed and need to be prefixed with "privkey:"
+# should be 64 characters long
+headscale_private_key: privkey:38f1186d8c9d468379f1143282ae37f4259cb617b7aa52de223d90f605983c58
+headscale_noise_private_key: privkey:38f1186d8c9d468379f1143282ae37f4259cb617b7aa52de223d90f605983c58
 
 headscale_db_storage_size: 200Mi
 headscale_db_password: a-secure-password
