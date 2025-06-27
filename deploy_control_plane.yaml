@@ -16,6 +16,8 @@
       tags: metal-db
     - name: metal-roles/control-plane/roles/ipam-db
       tags: ipam-db
+    - name: metal-roles/control-plane/roles/headscale
+      tags: headscale
     - name: metal-roles/control-plane/roles/masterdata-db
       tags: masterdata-db
     - name: metal-roles/control-plane/roles/auditing-timescaledb
