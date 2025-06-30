@@ -29,6 +29,8 @@
       tags: gardener
     - name: metal-roles/control-plane/roles/gardener-extensions
       tags: gardener
+    - name: gardener-istio-patch
+      tags: gardener
     - name: metal-roles/control-plane/roles/gardener-virtual-garden-access
       tags: gardener
     - name: metal-roles/control-plane/roles/gardener-cloud-profile
@@ -129,7 +131,7 @@
         kubernetes.core.k8s_info:
           api_version: "core.gardener.cloud/v1beta1"
           kind: Seed
-          name: "{{ metal_control_plane_stage_name }}"
+          name: "local"
           kubeconfig: "{{ virtual_garden_kubeconfig }}"
           wait: yes
           wait_condition:

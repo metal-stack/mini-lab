@@ -1,0 +1,58 @@
+---
+# the following tasks are only for local environments, not for production environments
+# gardener exposes the istio ingress gateway through service type load balancer
+# we can fake the exposal by patching the status field, which is also what's
+# done in the gardener local environment
+
+- name: Patch istio ingress gateway service to allow the seed to get ready (for local environments)
+  block:
+    - name: Wait for istio ingress gateway service
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Service
+        name: istio-ingressgateway
+        namespace: virtual-garden-istio-ingress
+      register: result
+      until: result.resources
+      retries: 30
+      delay: 10
+
+    - name: Patch istio ingress gateway service status
+      patch_service_status_k8s:
+        name: istio-ingressgateway
+        namespace: virtual-garden-istio-ingress
+        body:
+          status:
+            loadBalancer:
+              ingress:
+                - ip: "{{ gardener_operator_patch_istio_ingress_gateway_service_ip }}"
+  when: gardener_operator_patch_istio_ingress_gateway_service_ip
+
+# as we do not have service type load balancer in the local environment, this is optional for those setups
+- name: Expose istio gateway through ingress-nginx (for local environments)
+  k8s:
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        annotations:
+          nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+        name: apiserver-ingress
+        namespace: virtual-garden-istio-ingress
+      spec:
+        ingressClassName: nginx
+        rules:
+        - host: "api.{{ gardener_operator_virtual_garden_public_dns }}"
+          http:
+            paths:
+            - path: /
+              pathType: Prefix
+              backend:
+                service:
+                  name: istio-ingressgateway
+                  port:
+                    number: 443
+        tls:
+        - hosts:
+          - "api.{{ gardener_operator_virtual_garden_public_dns }}"
+  when: gardener_operator_expose_virtual_garden_through_ingress_nginx
