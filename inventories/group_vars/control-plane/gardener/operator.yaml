@@ -1,0 +1,31 @@
+---
+gardener_operator_ingress_dns_domain: "gardener.172.17.0.1.nip.io"
+
+gardener_operator_backup_infrastructure:
+  provider: S3
+  region: us-east-1
+  bucket: gardener-operator
+  secretRef:
+   name: backup-secret
+   namespace: garden
+
+gardener_operator_backup_infrastructure_secret:
+  endpoint: "{{ ('http://' + minio_dns_name + ':8080' ) | b64encode }}"
+  accessKeyID: "{{ minio_root_user | b64encode }}"
+  secretAccessKey: "{{ minio_root_password | b64encode }}"
+  region: "{{ 'us-east-1' | b64encode }}"
+  s3ForcePathStyle: "{{ 'true' | b64encode }}"
+
+# enable mini-lab patches
+gardener_operator_patch_istio_ingress_gateway_service_ip: 172.17.0.1
+gardener_operator_expose_virtual_garden_through_ingress_nginx: true
+
+# for local setups this should be sufficient
+gardener_operator_high_availability_control_plane: false
+
+gardener_operator_dns_providers:
+  - name: powerdns
+    type: powerdns
+    secretData:
+      apiKey: "{{ powerdns_api_key | b64encode }}"
+      server: "{{ 'http://powerdns-api.powerdns.svc.cluster.local:8081' | b64encode }}"

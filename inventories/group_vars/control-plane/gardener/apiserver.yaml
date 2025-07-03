@@ -1,3 +1,0 @@
----
-gardener_apiserver_replicas: 1
-gardener_apiserver_vpa: false
