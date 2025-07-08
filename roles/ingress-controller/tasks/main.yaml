@@ -1,20 +1,11 @@
 ---
-- name: Create namespace ingress controller
-  k8s:
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: ingress-nginx
-        labels:
-          name: ingress-nginx
-
 - name: Deploy nginx-ingress
-  include_role:
-    name: ansible-common/roles/helm-chart
-  vars:
-    helm_repo: "https://kubernetes.github.io/ingress-nginx"
-    helm_chart: ingress-nginx
-    helm_target_namespace: ingress-nginx
-    helm_release_name: ingress-nginx
-    helm_value_file_template: "values.yaml"
+  kubernetes.core.helm:
+    chart_repo_url: "https://kubernetes.github.io/ingress-nginx"
+    chart_version: "{{ ingress_controller_chart_version | default(omit) }}"
+    name: ingress-nginx
+    chart_ref: ingress-nginx
+    release_namespace: ingress-nginx
+    create_namespace: true
+    values: "{{ lookup('template', 'values.yaml') | from_yaml }}"
+    wait: true
