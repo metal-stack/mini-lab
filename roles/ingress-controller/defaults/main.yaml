@@ -5,3 +5,7 @@ ingress_https_port: 4443
 ingress_additional_config: {}
 ingress_tcp_service_exposals: {}
 ingress_udp_service_exposals: {}
+
+# TODO: can be removed again
+# currently there seems to be a regression: https://github.com/kubernetes/ingress-nginx/issues/13598
+ingress_controller_chart_version: 4.12.4
