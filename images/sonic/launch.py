@@ -11,9 +11,14 @@ import struct
 import subprocess
 import sys
 import time
+from typing import Callable
 
 import guestfs
 from guestfs import GuestFS
+
+from scapy.all import sniff
+from scapy.contrib.lldp import LLDPDU, LLDPDUManagementAddress
+from scapy.packet import Packet
 
 BASE_IMG = '/sonic-vs.img'
 
@@ -198,6 +203,14 @@ def main():
     logger.info('Start QEMU')
     vm.start()
 
+    # SONiC will start sending LLDP packets after PortConfigDone is set in APPL database
+    logger.info('Wait until eth0 has an IPv4 address')
+    sniff(iface='eth0', filter='ether proto 0x88cc', stop_filter=has_an_IPv4_address('eth0'), store=0)
+
+    logger.info('eth0 has a configured IPv4 address')
+    with open('/healthy', 'w'):
+        pass
+
     logger.info('Wait until QEMU is terminated')
     vm.wait()
 
@@ -350,6 +363,19 @@ def create_config_db(hwsku: str) -> dict:
             }
         }
     }
+
+
+def has_an_IPv4_address(iface: str) -> Callable[[Packet], bool]:
+    address = socket.inet_aton(get_ip_address(iface))
+
+    def func(packet: Packet) -> bool:
+        if LLDPDUManagementAddress in packet:
+            mgmt = packet[LLDPDUManagementAddress]
+            return mgmt.management_address_subtype == LLDPDUManagementAddress.SUBTYPE_MANAGEMENT_ADDRESS_IPV4 and \
+                mgmt.management_address == address
+        return False
+
+    return func
 
 
 if __name__ == '__main__':
