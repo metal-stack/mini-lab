@@ -30,15 +30,11 @@ topology:
     leaf01:
       group: leaves
       image: ${MINI_LAB_SONIC_IMAGE}
-      labels:
-        ansible-group: sonic
       binds:
         - files/ssh/id_rsa.pub:/authorized_keys
     leaf02:
       group: leaves
       image: ${MINI_LAB_SONIC_IMAGE}
-      labels:
-        ansible-group: sonic
       binds:
         - files/ssh/id_rsa.pub:/authorized_keys
     machine01:
