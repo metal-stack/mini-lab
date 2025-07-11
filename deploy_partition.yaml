@@ -1,6 +1,6 @@
 ---
-- name: Configure SONiC switches
-  hosts: leaves:&sonic
+- name: Configure leaves
+  hosts: leaves
   any_errors_fatal: true
   gather_facts: false
   pre_tasks:
@@ -15,43 +15,6 @@
       tags: sonic
     - name: sonic
       tags: sonic
-
-- name: Configure Cumulus switches
-  hosts: leaves:&cumulus
-  any_errors_fatal: true
-  pre_tasks:
-    # the following task is not required as long as we do not install something from the cumulus repositories, for which all the keys are expired now
-    # the one from here has also expired on 9th Apr 2024: https://docs.nvidia.com/networking-ethernet-software/knowledge-base/Installing-and-Upgrading/Upgrading/Update-Expired-GPG-Keys/#package-upgrade-from-cumulus-linux-37x-to-3716
-    # - name: update cumulus repo key
-    #   apt_key:
-    #     url: http://repo3.cumulusnetworks.com/public-key/repo3-2023-key
-    #     validate_certs: false
-    #     state: present
-    - name: unpack jessie fixes
-      command: tar xf /root/jessie-apt-transport-fix.tar.gz
-    - name: install apt-transport
-      shell: dpkg -i /root/https-deps/*.deb && apt-get install -fy
-    - name: use own repo mirrors (old ones are 404)
-      copy:
-        dest: /etc/apt/sources.list
-        content: |
-          deb https://cumulus-3.apt.metal-stack.io/cumulus CumulusLinux-3 main
-          deb-src https://cumulus-3.apt.metal-stack.io/cumulus CumulusLinux-3 main
-
-          deb https://cumulus-3.apt.metal-stack.io/cumulus-updates CumulusLinux-3-updates main
-          deb-src https://cumulus-3.apt.metal-stack.io/cumulus-updates CumulusLinux-3-updates main
-
-          deb https://cumulus-3.apt.metal-stack.io/cumulus-security-updates CumulusLinux-3-security-updates main
-          deb-src https://cumulus-3.apt.metal-stack.io/cumulus-security-updates CumulusLinux-3-security-updates main
-    - name: set resolv.conf
-      shell: rm /etc/resolv.conf && echo 'nameserver 8.8.8.8' > /etc/resolv.conf
-    - name: use own repo key
-      shell: curl -fsSL https://cumulus-3.apt.metal-stack.io/cumulus-3-repo.gpg | apt-key add -
-  roles:
-    - name: cumulus
-      tags: cumulus
-    - name: metal-roles/partition/roles/docker-on-cumulus
-      tags: docker-on-cumulus
 
 - name: Deploy dhcp server and pixiecore on leaf01
   hosts: leaf01
