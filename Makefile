@@ -100,13 +100,14 @@ create-proxy-registries:
 	docker compose up -d --force-recreate proxy-docker proxy-ghcr proxy-gcr proxy-k8s proxy-quay
 
 .PHONY: control-plane-bake
-control-plane-bake: create-proxy-registries
+control-plane-bake:
 	@if ! which kind > /dev/null; then echo "kind needs to be installed"; exit 1; fi
 	@if ! kind get clusters | grep metal-control-plane > /dev/null; then \
 		kind create cluster $(KIND_ARGS) \
 			--name metal-control-plane \
 			--config $(KINDCONFIG) \
 			--kubeconfig $(KUBECONFIG); fi
+	$(MAKE) create-proxy-registries
 
 .PHONY: partition
 partition: partition-bake
