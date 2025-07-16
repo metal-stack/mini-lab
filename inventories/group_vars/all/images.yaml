@@ -34,7 +34,7 @@ setup_yaml:
 ## for ansible roles
 ##
 
-# ansible_common_version:
+ansible_common_version: setup-yaml-refactor
 # metal_roles_version:
 # metal_ansible_modules_version:
 
