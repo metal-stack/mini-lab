@@ -10,4 +10,4 @@ Host *
     PubkeyAcceptedKeyTypes +ssh-rsa
 
 Host fe80::*
-    ProxyJump leaf01
+    ProxyCommand ssh -q -F files/ssh/config leaf01 'bash -c "exec 3<>/dev/tcp/%h/%p; cat<&0 >&3 & cat<&3 >&1"'
