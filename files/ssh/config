@@ -10,5 +10,4 @@ Host *
     PubkeyAcceptedKeyTypes +ssh-rsa
 
 Host fe80::*
-    # bash could be replaced with ncat, but it is not preinstalled on Cumulus
-    ProxyCommand ssh -q -F files/ssh/config leaf01 'sudo ip vrf exec default bash -c "exec 3<>/dev/tcp/%h/%p; cat<&0 >&3 & cat<&3 >&1"'
+    ProxyCommand ssh -q -F files/ssh/config leaf01 'bash -c "exec 3<>/dev/tcp/%h/%p; cat<&0 >&3 & cat<&3 >&1"'

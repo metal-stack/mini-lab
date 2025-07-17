@@ -27,22 +27,15 @@ MACHINE_OS=debian-12.0
 MAX_RETRIES := 30
 
 # Machine flavors
-ifeq ($(MINI_LAB_FLAVOR),cumulus)
-MACHINE_OS=ubuntu-24.4
-LAB_TOPOLOGY=mini-lab.cumulus.yaml
-VRF=vrf20
-else ifeq ($(MINI_LAB_FLAVOR),sonic)
+ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_TOPOLOGY=mini-lab.sonic.yaml
-VRF=Vrf20
 else ifeq ($(MINI_LAB_FLAVOR),capms)
 LAB_TOPOLOGY=mini-lab.capms.yaml
-VRF=Vrf20
 else ifeq ($(MINI_LAB_FLAVOR),gardener)
 GARDENER_ENABLED=true
 # usually gardener restricts the maximum version for k8s:
 K8S_VERSION=1.32.5
 LAB_TOPOLOGY=mini-lab.sonic.yaml
-VRF=Vrf20
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
@@ -116,9 +109,7 @@ partition: partition-bake
 .PHONY: partition-bake
 partition-bake: external_network
 	docker pull $(MINI_LAB_VM_IMAGE)
-ifneq ($(MINI_LAB_FLAVOR),cumulus)
 	docker pull $(MINI_LAB_SONIC_IMAGE)
-endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
 		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
@@ -157,7 +148,6 @@ cleanup-control-plane:
 .PHONY: cleanup-partition
 cleanup-partition:
 	mkdir -p clab-mini-lab
-	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.cumulus.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.capms.yaml
 	docker network rm --force mini_lab_ext
@@ -316,14 +306,14 @@ password-machine0%:
 .PHONY: ssh-firewall
 ssh-firewall:
 	$(eval fw = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp neighbors fw json' | \
-		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
+		jq -r 'to_entries[0] | .value.bgpNeighborAddr + \"%\" + .key'" \
 	))
 	ssh -F files/ssh/config $(fw) $(COMMAND)
 
 .PHONY: ssh-machine
 ssh-machine:
-	$(eval machine = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp vrf $(VRF) neighbors test json' | \
-		python3 -c 'import sys, json; data = json.load(sys.stdin); key = next(iter(data)); print(data[key][\"bgpNeighborAddr\"] + \"%\" + key)'" \
+	$(eval machine = $(shell ssh -F files/ssh/config leaf01 "vtysh -c 'show bgp vrf Vrf20 neighbors test json' | \
+		jq -r 'to_entries[0] | .value.bgpNeighborAddr + \"%\" + .key'" \
 	))
 	ssh -F files/ssh/config $(machine) $(COMMAND)
 
