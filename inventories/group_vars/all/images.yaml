@@ -2,8 +2,10 @@
 metal_stack_release_version: develop
 
 setup_yaml:
-  - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
+  - url: oci://ghcr.io/metal-stack/releases:{{ metal_stack_release_version }}
     meta_var: metal_stack_release
+    from_role_defaults:
+      - metal-roles/common/roles/defaults
 
 ##
 ## for development purposes, you can override releases from our image vector here
