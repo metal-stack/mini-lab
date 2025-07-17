@@ -101,6 +101,7 @@ control-plane-bake:
 			--config $(KINDCONFIG) \
 			--kubeconfig $(KUBECONFIG); fi
 	$(MAKE) create-proxy-registries
+	docker pull ghcr.io/metal-stack/metal-deployment-base:$$DEPLOYMENT_BASE_IMAGE_TAG
 
 .PHONY: partition
 partition: partition-bake
