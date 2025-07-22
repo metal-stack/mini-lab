@@ -8,7 +8,7 @@ yq_shell() {
   docker run --rm -i -v ${PWD}:/workdir mikefarah/yq:3 /bin/sh -c "$@"
 }
 
-METAL_STACK_RELEASE_VERSION=$(yq_shell "yq r inventories/group_vars/all/images.yaml 'metal_stack_release_version'")
+METAL_STACK_RELEASE_VERSION=$(yq_shell "yq r inventories/group_vars/all/release_vector.yaml 'metal_stack_release_version'")
 RELEASE_YAML=$(curl -s https://raw.githubusercontent.com/metal-stack/releases/${METAL_STACK_RELEASE_VERSION}/release.yaml)
 METALCTL_IMAGE_TAG=$(yq_shell "echo \"${RELEASE_YAML}\" | yq r - docker-images.metal-stack.control-plane.metalctl.tag")
 DEPLOYMENT_BASE_IMAGE_TAG=$(yq_shell "echo \"${RELEASE_YAML}\" | yq r - docker-images.metal-stack.generic.deployment-base.tag")
@@ -20,7 +20,7 @@ fi
 
 cat << EOF > .env
 METALCTL_IMAGE_TAG=${METALCTL_IMAGE_TAG}
-DEPLOYMENT_BASE_IMAGE_TAG=updates-minimal
+DEPLOYMENT_BASE_IMAGE_TAG=metal-stack-release-vector-minimal
 CI=${CI:=false}
 DOCKER_HUB_USER=${DOCKER_HUB_USER:=}
 DOCKER_HUB_TOKEN=${DOCKER_HUB_TOKEN:=}
