@@ -1,7 +1,7 @@
 # Check: https://sonic-build.azurewebsites.net/ui/sonic/pipelines
-ARG SONIC_BASE_URL=https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=202311&platform=vs
+ARG SONIC_BASE_URL=https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=202411&platform=vs
 ARG SONIC_IMG_URL=${SONIC_BASE_URL}&target=target%2Fsonic-vs.img.gz
-ARG FRR_RELOAD_URL=${SONIC_BASE_URL}&target=target%2Fdebs%2Fbullseye%2Ffrr-pythontools_8.5.1-sonic-0_all.deb
+ARG FRR_RELOAD_URL=${SONIC_BASE_URL}&target=target%2Fdebs%2Fbookworm%2Ffrr-pythontools_10.0.1-sonic-0_all.deb
 
 FROM docker.io/library/busybox:stable AS download
 
