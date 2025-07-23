@@ -27,7 +27,7 @@ services:
       - /bin/bash
       - -ce
       - |
-        ansible localhost -o -c local -m metalstack.base.metal_stack_release_vector
+        ansible-playbook resolve_release_vector.yaml --extra-vars "@.extra_vars.yaml"
         ansible-playbook deploy_control_plane.yaml --extra-vars "@.extra_vars.yaml"
 
   partition:
@@ -53,7 +53,7 @@ services:
       - /bin/bash
       - -ce
       - |
-        ansible localhost -o -c local -m metalstack.base.metal_stack_release_vector
+        ansible-playbook resolve_release_vector.yaml --extra-vars "@.extra_vars.yaml"
         ansible-playbook deploy_partition.yaml --extra-vars "@.extra_vars.yaml"
 
   metalctl:
