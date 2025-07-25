@@ -23,7 +23,8 @@ jobs:
 
     - name: Make tag
       run: |
-        [ "${GITHUB_EVENT_NAME}" == 'workflow_dispatch' ] && echo "tag=${GITHUB_HEAD_REF##*/}" >> $GITHUB_ENV 
+        git fetch --tags
+        echo "tag=$(git describe --tags --exact-match 2> /dev/null || git symbolic-ref -q --short HEAD || git rev-parse --short HEAD)" >> $GITHUB_ENV
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
