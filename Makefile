@@ -353,6 +353,9 @@ test-connectivity-to-external-service-via-ipv6:
 		fi; \
 	done
 
+.PHONY: build-sonic-base
+build-sonic-base:
+	cd images/sonic/base && docker build -t ghcr.io/metal-stack/mini-lab-sonic:base .
 
 ## DEV TARGETS ##
 
