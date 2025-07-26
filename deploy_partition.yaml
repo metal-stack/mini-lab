@@ -18,6 +18,12 @@
 
 - name: Deploy dhcp server and pixiecore on leaf01
   hosts: leaf01
+  pre_tasks:
+    - name: Temporary workaround for EOL debian bullseye backports repository (using archive.debian.org)
+      lineinfile:
+        path: /etc/apt/sources.list
+        search_string: deb [arch=amd64] http://deb.debian.org/debian/ bullseye-backports main contrib non-free
+        line: deb [arch=amd64] http://archive.debian.org/debian/ bullseye-backports main contrib non-free
   roles:
     - name: ansible-common
       tags: always
