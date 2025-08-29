@@ -7,6 +7,7 @@
 YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:4
 
 KINDCONFIG := $(or $(KINDCONFIG),control-plane/kind.yaml)
+K3DCONFIG := $(or $(K3DCONFIG),control-plane/k3d.yaml)
 KUBECONFIG := $(shell pwd)/.kubeconfig
 
 METALCTL_HMAC := $(or $(METALCTL_HMAC),metal-admin)
@@ -43,6 +44,11 @@ endif
 KIND_ARGS=
 ifneq ($(K8S_VERSION),)
 KIND_ARGS=--image kindest/node:v$(K8S_VERSION)
+endif
+
+K3D_ARGS=
+ifneq ($(K8S_VERSION),)
+K3D_ARGS=--image rancher/k3s:v$(K8S_VERSION)-k3s1
 endif
 
 ifeq ($(CI),true)
@@ -94,12 +100,21 @@ create-proxy-registries:
 
 .PHONY: control-plane-bake
 control-plane-bake:
-	@if ! which kind > /dev/null; then echo "kind needs to be installed"; exit 1; fi
-	@if ! kind get clusters | grep metal-control-plane > /dev/null; then \
-		kind create cluster $(KIND_ARGS) \
-			--name metal-control-plane \
-			--config $(KINDCONFIG) \
-			--kubeconfig $(KUBECONFIG); fi
+	@if [ -n "$(USE_K3D)" ]; then \
+		if ! which k3d > /dev/null; then echo "k3d needs to be installed"; exit 1; fi; \
+		if ! k3d cluster list | grep metal-control-plane > /dev/null; then \
+			k3d cluster create metal-control-plane $(K3D_ARGS) \
+				--config $(K3DCONFIG); \
+		fi; \
+	else \
+		if ! which kind > /dev/null; then echo "kind needs to be installed"; exit 1; fi; \
+		if ! kind get clusters | grep metal-control-plane > /dev/null; then \
+			kind create cluster $(KIND_ARGS) \
+				--name metal-control-plane \
+				--config $(KINDCONFIG) \
+				--kubeconfig $(KUBECONFIG); \
+		fi; \
+	fi;
 	$(MAKE) create-proxy-registries
 
 .PHONY: partition
@@ -142,6 +157,7 @@ cleanup: cleanup-control-plane cleanup-partition
 .PHONY: cleanup-control-plane
 cleanup-control-plane:
 	kind delete cluster --name metal-control-plane
+	k3d cluster delete metal-control-plane
 	docker compose down
 	rm -f $(KUBECONFIG)
 
