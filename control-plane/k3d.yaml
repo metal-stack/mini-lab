@@ -1,34 +1,55 @@
 apiVersion: k3d.io/v1alpha5
 kind: Simple
 servers: 1
-agents: 0
+agents: 1
 kubeAPI:
   hostIP: 0.0.0.0
   hostPort: "6443"
 ports:
   - port: 4443:4443
     nodeFilters:
-      - loadbalancer
+      - server:*
+      - agents:*
   - port: 8080:8080
     nodeFilters:
-      - loadbalancer
+      - server:*
+      - agents:*
   - port: 4150:4150
     nodeFilters:
-      - loadbalancer
+      - server:*
+      - agents:*
   - port: 50051:50051
     nodeFilters:
-      - loadbalancer
-volumes:
-  - volume: ${PWD}/control-plane/config-patches:/etc/containerd/certs.d
-    nodeFilters:
-      - server:0
+      - server:*
+      - agents:*
 options:
   k3s:
     extraArgs:
-      - arg: "--kubelet-arg=max-pods=256"
+      - arg: "--disable=traefik"
         nodeFilters:
-          - server:0
+          - server:*
+      - arg: "--disable=servicelb"
+        nodeFilters:
+          - server:*
   k3d:
     wait: true
     timeout: 60s
     disableLoadbalancer: false
+registries:
+  config: |
+    mirrors:
+      "docker.io":
+        endpoint:
+          - http://proxy-docker:5000
+      "gcr.io":
+        endpoint:
+          - http://proxy-gcr:5000
+      "ghcr.io":
+        endpoint:
+          - http://proxy-ghcr:5000
+      "quay.io":
+        endpoint:
+          - http://proxy-quay:5000
+      "registry.k8s.io":
+        endpoint:
+          - http://proxy-k8s:5000
