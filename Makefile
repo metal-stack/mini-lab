@@ -37,6 +37,12 @@ GARDENER_ENABLED=true
 # usually gardener restricts the maximum version for k8s:
 K8S_VERSION=1.32.5
 LAB_TOPOLOGY=mini-lab.sonic.yaml
+else ifeq ($(MINI_LAB_FLAVOR),k3s)
+GARDENER_ENABLED=true
+# usually gardener restricts the maximum version for k8s:
+K8S_VERSION=1.32.5
+LAB_TOPOLOGY=mini-lab.sonic.yaml
+USE_K3D=true
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
