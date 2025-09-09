@@ -95,6 +95,7 @@ jobs:
         flavors:
           - name: sonic
           - name: gardener
+          - name: k3s
 
     steps:
     - name: Gain back workspace permissions # https://github.com/actions/checkout/issues/211
@@ -108,6 +109,10 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # set if required:
         # DESIRED_VERSION: v0.59.0
+
+    - name: Setup k3d
+      run: |
+        curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 
     - name: Checkout
       uses: actions/checkout@v4
