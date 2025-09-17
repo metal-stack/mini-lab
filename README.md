@@ -137,7 +137,7 @@ docker compose run --rm metalctl machine create \
         --networks <network-ID>
 
 # create a firewall that is also connected to the virtual internet-mini-lab network
-docker compose run --rm metalctl machine create \
+docker compose run --rm metalctl firewall create \
         --description fw \
         --name fw \
         --hostname fw \
@@ -145,7 +145,7 @@ docker compose run --rm metalctl machine create \
         --partition mini-lab \
         --image firewall-ubuntu-3.0 \
         --size v1-small-x86 \
-        --networks internet-mini-lab,$(privatenet)
+        --networks internet-mini-lab,<network-ID>
 ```
 
 See the installation process in action
