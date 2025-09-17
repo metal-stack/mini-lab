@@ -35,8 +35,8 @@ Here is some code that should help you to set up most of the requirements:
 sudo ufw status
 sudo ufw allow from 172.17.0.0/16
 
-# Install kvm
-sudo apt install -y git curl qemu qemu-kvm haveged
+# Install required tools / kvm
+sudo apt install -y git curl qemu qemu-kvm haveged jq
 
 # Install Docker
 curl -fsSL https://get.docker.com | sh
