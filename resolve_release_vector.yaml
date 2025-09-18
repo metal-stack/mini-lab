@@ -1,0 +1,7 @@
+---
+- name: Resolve metal-stack release vector
+  gather_facts: no
+  hosts: localhost
+  connection: local
+  tasks:
+    - metalstack.base.metal_stack_release_vector:
