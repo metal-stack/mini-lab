@@ -35,8 +35,8 @@ Here is some code that should help you to set up most of the requirements:
 sudo ufw status
 sudo ufw allow from 172.17.0.0/16
 
-# Install kvm
-sudo apt install -y git curl qemu qemu-kvm haveged
+# Install required tools / kvm
+sudo apt install -y git curl qemu qemu-kvm haveged jq
 
 # Install Docker
 curl -fsSL https://get.docker.com | sh
@@ -137,7 +137,7 @@ docker compose run --rm metalctl machine create \
         --networks <network-ID>
 
 # create a firewall that is also connected to the virtual internet-mini-lab network
-docker compose run --rm metalctl machine create \
+docker compose run --rm metalctl firewall create \
         --description fw \
         --name fw \
         --hostname fw \
@@ -145,7 +145,7 @@ docker compose run --rm metalctl machine create \
         --partition mini-lab \
         --image firewall-ubuntu-3.0 \
         --size v1-small-x86 \
-        --networks internet-mini-lab,$(privatenet)
+        --networks internet-mini-lab,<network-ID>
 ```
 
 See the installation process in action
