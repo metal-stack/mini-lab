@@ -21,7 +21,7 @@ setup_yaml:
 # metal_console_image_name:
 # metal_console_image_tag:
 # metal_core_image_name:
-metal_core_image_tag: vni-filter-fix
+# metal_core_image_tag:
 # headscale_image_tag: v0.26.1
 # headscale_db_backup_restore_sidecar_image_tag: latest
 # headscale_db_backup_restore_sidecar_image_name: ghcr.io/metal-stack/backup-restore-sidecar
