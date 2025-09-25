@@ -41,6 +41,7 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         context: ./images/machine
+        pull: true
         push: true
         sbom: true
         tags: ${{ env.MINI_LAB_VM_IMAGE }}
@@ -76,6 +77,7 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         context: ./images/sonic
+        pull: true
         push: true
         sbom: true
         tags: ${{ env.MINI_LAB_SONIC_IMAGE }}
