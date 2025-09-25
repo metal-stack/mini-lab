@@ -15,6 +15,7 @@ jobs:
         versions:
           - name: 202311
           - name: 202411
+          - name: 202505
 
     steps:
     - name: Log in to the container registry
