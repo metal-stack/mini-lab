@@ -1,0 +1,37 @@
+name: mini-lab
+prefix: ""
+
+mgmt:
+  network: bridge
+
+topology:
+  nodes:
+    leaf01:
+      group: leaves
+      image: ${MINI_LAB_SONIC_IMAGE}
+      binds:
+        - files/ssh/id_rsa.pub:/authorized_keys
+    leaf02:
+      group: leaves
+      image: ${MINI_LAB_SONIC_IMAGE}
+      binds:
+        - files/ssh/id_rsa.pub:/authorized_keys
+    machine01:
+      group: machines
+      image: ${MINI_LAB_VM_IMAGE}
+      env:
+        UUID: 00000000-0000-0000-0000-000000000001
+    machine02:
+      group: machines
+      image: ${MINI_LAB_VM_IMAGE}
+      env:
+        UUID: 00000000-0000-0000-0000-000000000002
+  links:
+    - endpoints: ["exit:mini_lab_ext", "mini_lab_ext:exit"]
+      mtu: 9000
+    - endpoints: ["external_service:mini_lab_ext", "mini_lab_ext:external_service"]
+      mtu: 9000
+    - endpoints: ["leaf01:Ethernet0", "machine01:lan0"]
+    - endpoints: ["leaf02:Ethernet0", "machine01:lan1"]
+    - endpoints: ["leaf01:Ethernet1", "machine02:lan0"]
+    - endpoints: ["leaf02:Ethernet1", "machine02:lan1"]

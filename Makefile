@@ -29,6 +29,9 @@ MAX_RETRIES := 30
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_TOPOLOGY=mini-lab.sonic.yaml
+else ifeq ($(MINI_LAB_FLAVOR),broadcom)
+LAB_TOPOLOGY=mini-lab.sonic.yaml
+MINI_LAB_SONIC_IMAGE=mini-lab-sonic:latest
 else ifeq ($(MINI_LAB_FLAVOR),capms)
 LAB_TOPOLOGY=mini-lab.capms.yaml
 else ifeq ($(MINI_LAB_FLAVOR),gardener)
@@ -109,10 +112,15 @@ partition: partition-bake
 .PHONY: partition-bake
 partition-bake: external_network
 	docker pull $(MINI_LAB_VM_IMAGE)
-	docker pull $(MINI_LAB_SONIC_IMAGE)
+	# docker pull $(MINI_LAB_SONIC_IMAGE)
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
 		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
+
+.PHONY: build-local
+build-local:
+	docker buildx build -t mini-lab-sonic:base -f images/broadcom-sonic/base/Dockerfile .
+	cd images/broadcom-sonic &&  docker buildx build -t mini-lab-sonic:latest .
 
 .PHONY: external_network
 external_network:
