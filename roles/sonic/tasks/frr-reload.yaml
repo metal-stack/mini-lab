@@ -1,6 +1,7 @@
 ---
 - name: Wait until the bgpd is up
   ansible.builtin.wait_for:
+    # this it the zebra port - it changed in version 202505 from 2605 to 2601
     port: 2601
     state: started
 
