@@ -28,3 +28,6 @@ sonic_vteps:
   vni: 103999
 
 metal_core_cidr_mask: 25
+
+metal_api_bmc_superuser_enabled: false
+metal_api_bmc_superuser_pwd: change-me

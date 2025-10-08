@@ -1,0 +1,25 @@
+
+Hier war, was ich mir aufgeschrieben hatte:
+- metal-api logs not scrapable (some others work though?) -> metal-api is scrapable
+- Thanos does not appear in data source, is it normal?    -> prometheus/default datasource is thanos frontend
+- Gardener dashboards are partially outdated
+- Targets in the partition are almost down everywhere (except for mgmt-servers and some targets on the leaves)
+- We do not see any alerts from the partition? Also SONIC exporter not reachable does not seem to work
+  - mgmtserver02 was not able to send metrics anymore because of a full drive, but no alerts
+- Promtails on the mgmtserver do not run: "/etc/promtail/promtail.yaml: yaml: line 10: did not find expected key"
+
+
+
+Fixes:
+
+Grafana:
+- updated helm-chart version
+- added plugin to for alertmanager-query
+- adjusted alerts dashboards
+
+Promtheus on leafs:
+- prometheus couldn't scrap pixiecore
+- prometheus was trying to reach with 127.0.0.1:2113 from inside docker container -> changed network to host
+
+Exporter:
+- targets sind hier leer?

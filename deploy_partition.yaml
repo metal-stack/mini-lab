@@ -41,6 +41,28 @@
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
 
+- name: Deploy logging
+  hosts: leaves
+  any_errors_fatal: true
+  roles:
+    - name: ansible-common
+      tags: always
+    - name: metal-roles/partition/roles/promtail
+      tags: promtail
+
+- name: Deploy monitoring
+  hosts: leaves
+  any_errors_fatal: true
+  roles:
+    - name: ansible-common
+      tags: always
+    - name: metal-roles/partition/roles/monitoring/prometheus
+      tags: monitoring-prometheus
+    - name: metal-roles/partition/roles/monitoring/node-exporter
+      tags: monitoring-node
+    - name: metal-roles/partition/roles/monitoring/blackbox-exporter
+      tags: monitoring-blackbox
+
 - name: Wait for switches
   hosts: localhost
   connection: local
