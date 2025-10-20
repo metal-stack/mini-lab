@@ -31,6 +31,8 @@
       tags: dhcp
     - name: metal-roles/partition/roles/pixiecore
       tags: pixiecore
+    - name: metal-roles/partition/roles/image-cache
+      tags: image-cache
 
 - name: Deploy metal-core
   hosts: leaves

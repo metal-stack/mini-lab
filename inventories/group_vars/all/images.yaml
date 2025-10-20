@@ -10,8 +10,8 @@ setup_yaml:
 ##
 
 # metal_hammer_image_url: https://images.metal-stack.io/metal-hammer/pull-requests/<pr-number-and-title>/metal-hammer-initrd.img.lz4
-# metal_api_image_name:
-# metal_api_image_tag:
+# metal_api_image_name: ghcr.io/metal-stack/metal-api
+# metal_api_image_tag: mep-4-network-migration
 # metal_apiserver_image_name:
 # metal_apiserver_image_tag:
 # metal_metalctl_image_name:
@@ -25,17 +25,22 @@ setup_yaml:
 # headscale_image_tag: v0.26.1
 # headscale_db_backup_restore_sidecar_image_tag: latest
 # headscale_db_backup_restore_sidecar_image_name: ghcr.io/metal-stack/backup-restore-sidecar
-# headscale_db_image_tag: 17-alpine
+# headscale_db_image_tag: 16-alpine
+ipam_db_image_tag: 18.0-alpine
+masterdata_db_image_tag: 18.0-alpine
 # headscale_db_image_name: postgres
 # ...
 #
+
+image_cache_sync_image_tag: migrate-to-metal-apiserver
+image_cache_sync_image_name: ghcr.io/metal-stack/metal-image-cache-sync
 
 ##
 ## for ansible roles
 ##
 
-# ansible_common_version:
-# metal_roles_version:
+# ansible_common_version: support-systemd-credentials
+metal_roles_version: migrate-metal-image-cache-sync-to-metal-apiserver
 # metal_ansible_modules_version:
 
 ##
