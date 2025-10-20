@@ -1,0 +1,75 @@
+{
+  "DEVICE_METADATA": {
+    "localhost": {
+      "docker_routing_config_mode": "split",
+      "hostname": "leaf01"
+    }
+  },
+  "DNS": {
+    "global": {
+      "src_intf": "eth0"
+    }
+  },
+  "DNS_SERVER": {
+    "172.17.0.1": {},
+    "1.1.1.1": {},
+    "1.0.0.1": {}
+  },
+  "LOOPBACK": {
+    "Loopback0": {
+      "admin_status": "up"
+    }
+  },
+  "LOOPBACK_INTERFACE": {
+    "Loopback0": {},
+    "Loopback0|10.0.0.11/32": {}
+  },
+  "MGMT_PORT": {
+    "eth0": {
+      "alias": "eth0",
+      "admin_status": "up"
+    }
+  },
+  "NTP": {
+    "global": {
+      "auth_enabled": "false",
+      "src_intf": [
+        "eth0"
+      ]
+    }
+  },
+  "VERSIONS": {
+    "DATABASE": {
+      "VERSION": "version_4_4_2"
+    }
+  },
+  "VLAN": {
+    "Vlan3900": {
+      "admin_status": "up",
+      "autostate": "enable",
+      "dhcp_relay_link_select": "enable",
+      "dhcp_relay_src_intf": "Loopback0",
+      "dhcp_servers": [
+        "10.0.0.21"
+      ],
+      "vlanid": "3900"
+    }
+  },
+  "VLAN_INTERFACE": {
+    "Vlan3900": {},
+    "Vlan3900|10.0.1.1/25": {}
+  },
+  "VXLAN_EVPN_NVO": {
+    "nvo1": {
+      "source_vtep": "vtep0"
+    }
+  },
+  "VXLAN_TUNNEL": {
+    "vtep0": {
+      "dscp": "0",
+      "qos-mode": "pipe",
+      "src_intf": "Loopback0",
+      "src_ip": "10.0.0.11"
+    }
+  }
+}

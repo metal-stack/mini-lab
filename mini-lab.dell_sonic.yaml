@@ -1,0 +1,72 @@
+name: mini-lab
+prefix: ""
+
+mgmt:
+  network: bridge
+
+topology:
+  defaults:
+    kind: linux
+  kinds:
+    dell_sonic:
+      image: ${MINI_LAB_SONIC_IMAGE}
+      group: leaves
+      enforce-startup-config: true
+      stages:
+        healthy:
+          exec:
+            - command: date
+              phase: on-exit
+  nodes:
+    exit:
+      image: quay.io/frrouting/frr:10.3.0
+      network-mode: none
+      binds:
+        - files/exit/daemons:/etc/frr/daemons
+        - files/exit/frr.conf:/etc/frr/frr.conf
+        - files/exit/vtysh.conf:/etc/frr/vtysh.conf
+        - files/exit/network.sh:/root/network.sh
+      exec:
+        - sh /root/network.sh
+    kea:
+      kind: linux
+      network-mode: container:exit # join the network namespace of inet
+      image: docker.cloudsmith.io/isc/docker/kea-dhcp4:2.6.0
+      binds:
+        - files/kea.json:/etc/kea/kea-dhcp4.conf
+    external_service:
+      image: docker.io/library/nginx:alpine-slim
+      network-mode: none
+      binds:
+        - files/external_service/network.sh:/root/network.sh
+      exec:
+        - sh /root/network.sh
+    mini_lab_ext:
+      kind: bridge
+    leaf01:
+      kind: dell_sonic
+      startup-config: files/startup-config/leaf01.json
+    leaf02:
+      kind: dell_sonic
+      startup-config: files/startup-config/leaf02.json
+    machine01:
+      group: machines
+      image: ${MINI_LAB_VM_IMAGE}
+      env:
+        UUID: 00000000-0000-0000-0000-000000000001
+    machine02:
+      group: machines
+      image: ${MINI_LAB_VM_IMAGE}
+      env:
+        UUID: 00000000-0000-0000-0000-000000000002
+  links:
+    - endpoints: ["exit:mini_lab_ext", "mini_lab_ext:exit"]
+      mtu: 9000
+    - endpoints: ["external_service:mini_lab_ext", "mini_lab_ext:external_service"]
+      mtu: 9000
+    - endpoints: ["leaf01:eth1", "machine01:lan0"] # Ethernet0
+    - endpoints: ["leaf02:eth1", "machine01:lan1"] # Ethernet0
+    - endpoints: ["leaf01:eth2", "machine02:lan0"] # Ethernet1
+    - endpoints: ["leaf02:eth2", "machine02:lan1"] # Ethernet1
+    - endpoints: ["leaf01:eth11", "exit:eth1"] # Ethernet10
+    - endpoints: ["leaf02:eth11", "exit:eth2"] # Ethernet10

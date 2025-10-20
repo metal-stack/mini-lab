@@ -1,6 +1,6 @@
 ---
-- name: Configure leaves
-  hosts: leaves
+- name: Configure leaves with Community SONiC
+  hosts: leaves:!dell_sonic
   any_errors_fatal: true
   gather_facts: false
   pre_tasks:
@@ -16,8 +16,8 @@
     - name: sonic
       tags: sonic
 
-- name: Deploy dhcp server and pixiecore on leaf01
-  hosts: leaf01
+- name: Deploy dhcp server on leaf01 with Community SONiC
+  hosts: leaf01:!dell_sonic
   pre_tasks:
     - name: Temporary workaround for EOL debian bullseye backports repository (using archive.debian.org)
       lineinfile:
@@ -29,12 +29,20 @@
       tags: always
     - name: metal-roles/partition/roles/dhcp
       tags: dhcp
+
+- name: Deploy pixiecore on leaf01
+  hosts: leaf01
+  become: true
+  roles:
+    - name: ansible-common
+      tags: always
     - name: metal-roles/partition/roles/pixiecore
       tags: pixiecore
 
 - name: Deploy metal-core
   hosts: leaves
   any_errors_fatal: true
+  become: true
   roles:
     - name: ansible-common
       tags: always

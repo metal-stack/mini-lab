@@ -29,6 +29,9 @@ MAX_RETRIES := 30
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_TOPOLOGY=mini-lab.sonic.yaml
+else ifeq ($(MINI_LAB_FLAVOR),dell_sonic)
+LAB_TOPOLOGY=mini-lab.dell_sonic.yaml
+MINI_LAB_SONIC_IMAGE=vrnetlab/dell_sonic:4.4.3
 else ifeq ($(MINI_LAB_FLAVOR),capms)
 LAB_TOPOLOGY=mini-lab.capms.yaml
 else ifeq ($(MINI_LAB_FLAVOR),gardener)
@@ -113,7 +116,9 @@ partition: partition-bake
 .PHONY: partition-bake
 partition-bake: external_network
 	docker pull $(MINI_LAB_VM_IMAGE)
+ifneq ($(MINI_LAB_FLAVOR),dell_sonic)
 	docker pull $(MINI_LAB_SONIC_IMAGE)
+endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
 		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
@@ -152,6 +157,7 @@ cleanup-control-plane:
 .PHONY: cleanup-partition
 cleanup-partition:
 	mkdir -p clab-mini-lab
+	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.dell_sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.capms.yaml
 	docker network rm --force mini_lab_ext

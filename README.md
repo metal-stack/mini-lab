@@ -190,7 +190,8 @@ make power-<on,reset,off>-<machine name>
 
 There are two versions, or flavors, of the mini-lab environment which differ in regards to the NOS running on the leaves:
 
-- `sonic`: runs 2 SONiC switches
+- `sonic`: runs two SONiC switches
+- `dell_sonic`: runs two Enterprise SONiC switches with a [local build vrnetlab image](https://github.com/srl-labs/vrnetlab/tree/master/dell/dell_sonic)
 - `capms`: runs the SONiC flavor but with three instead of two machines (this is used for  [cluster-provider-metal-stack](https://github.com/metal-stack/cluster-api-provider-metal-stack) in order to have dedicated hosts for control plane / worker / firewall)
 - `gardener`: installs the [Gardener](https://gardener.cloud) in the mini-lab
 
