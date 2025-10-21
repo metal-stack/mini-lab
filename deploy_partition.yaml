@@ -32,6 +32,12 @@
         state: restarted
       when: bgpd_conf_stat.stat.exists
 
+    - name: Ensure root has authorized_key
+      ansible.builtin.authorized_key:
+        user: root
+        state: present
+        key: "{{ lookup('file', 'ssh/id_rsa.pub') }}"
+
 - name: Deploy dhcp server on leaf01 with Community SONiC
   hosts: leaf01:!dell_sonic
   pre_tasks:
