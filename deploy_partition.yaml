@@ -38,6 +38,20 @@
         state: present
         key: "{{ lookup('file', 'ssh/id_rsa.pub') }}"
 
+    - name: Activate IP MASQUERADE on eth0
+      ansible.builtin.iptables:
+        chain: POSTROUTING
+        jump: MASQUERADE
+        out_interface: eth0
+        table: nat
+
+    - name: Activate IPv4 forwarding on eth0
+      ansible.posix.sysctl:
+        name: net.ipv4.conf.eth0.forwarding
+        reload: no
+        sysctl_set: yes
+        value: "1"
+
 - name: Deploy dhcp server on leaf01 with Community SONiC
   hosts: leaf01:!dell_sonic
   pre_tasks:
