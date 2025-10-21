@@ -14,7 +14,7 @@ topology:
       exec:
         - ip route add 203.0.113.128/25 via 203.0.113.128 dev eth0
     exit:
-      image: quay.io/frrouting/frr:10.0.1
+      image: quay.io/frrouting/frr:10.3.0
       network-mode: none
       binds:
         - files/exit/daemons:/etc/frr/daemons
