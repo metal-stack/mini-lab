@@ -7,6 +7,10 @@ mgmt:
 topology:
   defaults:
     kind: linux
+  kinds:
+    sonic-vm:
+      kind: dell_sonic
+      image: ${MINI_LAB_SONIC_IMAGE}
   nodes:
     exit:
       image: quay.io/frrouting/frr:10.3.0
@@ -29,16 +33,10 @@ topology:
       kind: bridge
     leaf01:
       group: leaves
-      kind: dell_sonic
-      image: ${MINI_LAB_SONIC_IMAGE}
-      binds:
-        - files/ssh/id_rsa.pub:/authorized_keys
+      kind: sonic-vm
     leaf02:
       group: leaves
-      kind: dell_sonic
-      image: ${MINI_LAB_SONIC_IMAGE}
-      binds:
-        - files/ssh/id_rsa.pub:/authorized_keys
+      kind: sonic-vm
     machine01:
       group: machines
       image: ${MINI_LAB_VM_IMAGE}

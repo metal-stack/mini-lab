@@ -57,6 +57,12 @@ endif
 .PHONY: up
 up: env gen-certs control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_rsa
+ifeq ($(MINI_LAB_FLAVOR),broadcom)
+	# waiting for leaves to come up before connecting...
+	sleep 120
+	python3 images/broadcom-sonic/init.py leaf01
+	python3 images/broadcom-sonic/init.py leaf02
+endif
 	docker compose up --abort-on-container-failure --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
 # for some reason an allocated machine will not be able to phone home
@@ -116,8 +122,9 @@ partition: partition-bake
 .PHONY: partition-bake
 partition-bake: external_network
 	docker pull $(MINI_LAB_VM_IMAGE)
-	# FIXME: check if image needs to be pulled
-	# docker pull $(MINI_LAB_SONIC_IMAGE)
+ifneq ($(MINI_LAB_FLAVOR),broadcom)
+	docker pull $(MINI_LAB_SONIC_IMAGE)
+endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
 		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
