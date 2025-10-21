@@ -68,5 +68,5 @@ topology:
     - endpoints: ["leaf02:eth1", "machine01:lan1"] # Ethernet0
     - endpoints: ["leaf01:eth2", "machine02:lan0"] # Ethernet1
     - endpoints: ["leaf02:eth2", "machine02:lan1"] # Ethernet1
-    - endpoints: ["leaf01:eth11", "exit:eth1"] # Ethernet10
-    - endpoints: ["leaf02:eth11", "exit:eth2"] # Ethernet10
+    - endpoints: ["leaf01:eth10", "exit:eth1"] # Ethernet9
+    - endpoints: ["leaf02:eth10", "exit:eth2"] # Ethernet9
