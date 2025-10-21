@@ -16,6 +16,22 @@
     - name: sonic
       tags: sonic
 
+- name: Configure leaves with Enterprise SONiC
+  hosts: dell_sonic
+  any_errors_fatal: true
+  become: true
+  tasks:
+    - name: Check for bgpd.conf presence
+      ansible.builtin.stat:
+        path: /etc/sonic/frr/bgpd.conf
+      register: bgpd_conf_stat
+
+    - name: Restart bgp service when non-split docker_routing_config_mode is still active
+      ansible.builtin.service:
+        name: bgp
+        state: restarted
+      when: bgpd_conf_stat.stat.exists
+
 - name: Deploy dhcp server on leaf01 with Community SONiC
   hosts: leaf01:!dell_sonic
   pre_tasks:
