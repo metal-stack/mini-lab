@@ -15,6 +15,12 @@
     "1.1.1.1": {},
     "1.0.0.1": {}
   },
+  "LLDP": {
+    "GLOBAL": {
+      "enabled": "true",
+      "hello_time": "10"
+    }
+  },
   "LOOPBACK": {
     "Loopback0": {
       "admin_status": "up"
