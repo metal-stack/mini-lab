@@ -1,5 +1,5 @@
 ---
-- name: Configure leaves with Community SONiC
+- name: Configure leaves (Community SONiC)
   hosts: leaves:!dell_sonic
   any_errors_fatal: true
   gather_facts: false
@@ -16,7 +16,7 @@
     - name: sonic
       tags: sonic
 
-- name: Configure leaves with Enterprise SONiC
+- name: Configure leaves (Enterprise SONiC)
   hosts: dell_sonic
   any_errors_fatal: true
   become: true
@@ -52,7 +52,7 @@
         sysctl_set: yes
         value: "1"
 
-- name: Deploy dhcp server on leaf01 with Community SONiC
+- name: Deploy dhcp server on leaf01 (Community SONiC)
   hosts: leaf01:!dell_sonic
   pre_tasks:
     - name: Temporary workaround for EOL debian bullseye backports repository (using archive.debian.org)
