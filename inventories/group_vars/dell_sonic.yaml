@@ -4,4 +4,5 @@ dhcp_listening_interfaces:
 
 metal_core_log_driver: local
 metal_core_pxe_vlan_id: 3900
-metal_core_spine_uplinks: Ethernet10
+metal_core_spine_uplinks:
+  - Ethernet10
