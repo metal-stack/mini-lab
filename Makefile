@@ -31,7 +31,7 @@ ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_TOPOLOGY=mini-lab.sonic.yaml
 else ifeq ($(MINI_LAB_FLAVOR),dell_sonic)
 LAB_TOPOLOGY=mini-lab.dell_sonic.yaml
-MINI_LAB_SONIC_IMAGE=vrnetlab/dell_sonic:4.4.3
+MINI_LAB_SONIC_IMAGE=r.metal-stack.io/sonic-broadcom/vrnetlab/dell_sonic:4.4.3
 else ifeq ($(MINI_LAB_FLAVOR),capms)
 LAB_TOPOLOGY=mini-lab.capms.yaml
 else ifeq ($(MINI_LAB_FLAVOR),gardener)
