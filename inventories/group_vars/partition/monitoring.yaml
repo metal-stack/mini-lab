@@ -1,0 +1,4 @@
+monitoring_node_exporter_port: 9100
+prometheus_node_exporter_targets:
+  - "{{ hostvars['leaf01'].ansible_host }}:{{ monitoring_node_exporter_port }}"
+  - "{{ hostvars['leaf02'].ansible_host }}:{{ monitoring_node_exporter_port }}"

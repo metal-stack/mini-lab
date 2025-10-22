@@ -47,6 +47,8 @@
       tags: always
     - name: metal-roles/partition/roles/promtail
       tags: promtail
+    - name: metal-roles/partition/roles/monitoring/node-exporter
+      tags: node-exporter
 
 - name: Deploy metal-core
   hosts: leaves
