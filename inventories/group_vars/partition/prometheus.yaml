@@ -1,0 +1,2 @@
+prometheus_remote_write:
+  - url: "http://{{ metal_control_plane_ingress_dns }}:9090/api/v1/write"
