@@ -7,3 +7,13 @@ metal_control_plane_image_pull_policy: Always
 
 helm_additional_params:
   - '--debug'
+
+monitoring_grafana_github_oauth:
+  enabled: false
+monitoring_grafana_extra_secret_mounts: []
+monitoring_thanos_receive_enabled: false
+monitoring_thanos_receive_ingress_enabled: false
+
+monitoring_thanos_receive_ingress_basic_auth: {}
+monitoring_thanos_receive_ingress_annotations: []
+monitoring_thanos_receive_ingress_tls: {}

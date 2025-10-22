@@ -1,0 +1,14 @@
+promtail_clients:
+  - url: http://{{ metal_control_plane_ingress_dns }}:3100/loki/api/v1/push
+
+promtail_scrape_configs:
+  - job_name: leave-node-docker 
+    docker_sd_configs: 
+    - host: 'unix:///var/run/docker.sock'
+      refresh_interval: 5s
+    relabel_configs: 
+      - regex: /(.*) 
+        source_labels: [__meta_docker_container_name] 
+        target_label: container 
+      - replacement: "{{ inventory_hostname }}"
+        target_label: node_name 

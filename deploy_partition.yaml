@@ -32,6 +32,22 @@
     - name: metal-roles/partition/roles/pixiecore
       tags: pixiecore
 
+- name: Deploy monitoring on leaf01
+  hosts: leaf01
+  roles:
+    - name: ansible-common
+      tags: always
+    - name: metal-roles/partition/roles/monitoring/prometheus
+      tags: prometheus
+
+- name: Deploy monitoring on leaves
+  hosts: leaves
+  roles:
+    - name: ansible-common
+      tags: always
+    - name: metal-roles/partition/roles/promtail
+      tags: promtail
+
 - name: Deploy metal-core
   hosts: leaves
   any_errors_fatal: true
