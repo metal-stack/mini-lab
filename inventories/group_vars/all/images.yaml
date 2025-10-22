@@ -21,8 +21,8 @@ setup_yaml:
 # metal_console_image_name:
 # metal_console_image_tag:
 # See https://github.com/metal-stack/metal-core/pull/112
-metal_core_image_name: ghcr.io/metal-stack/metal-core@sha256
-metal_core_image_tag: ee8aaa1b94bd72bb6e3a53bef201da0e88581812cd2ce39052f0e9d4538c9ac9
+metal_core_image_name: ghcr.io/metal-stack/metal-core
+metal_core_image_tag: vtep-name
 # headscale_image_tag: v0.26.1
 # headscale_db_backup_restore_sidecar_image_tag: latest
 # headscale_db_backup_restore_sidecar_image_name: ghcr.io/metal-stack/backup-restore-sidecar

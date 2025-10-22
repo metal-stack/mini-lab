@@ -66,6 +66,18 @@
     - name: metal-roles/partition/roles/dhcp
       tags: dhcp
 
+# FIXME: For some reason, the first docker pull always fails on dell_sonic but succeeds on second attempt.
+# Investigate the cause and remove this play
+- name: Intentionally fail on first docker pull
+  hosts: dell_sonic
+  tasks:
+    - community.docker.docker_container:
+        name: hello-world
+        image: library/hello-world:latest
+        cleanup: true
+        pull: true
+      failed_when: false
+
 - name: Deploy pixiecore on leaf01
   hosts: leaf01
   become: true
@@ -108,3 +120,14 @@
         - lookup('metal', 'search', 'switch', api_url=metal_partition_metal_api_protocol+'://'+metal_partition_metal_api_addr+':'+metal_partition_metal_api_port|string+metal_partition_metal_api_basepath, api_hmac=metal_partition_metal_api_hmac_edit_key) | length == 2
         - lookup('metal', 'search', 'switch', api_url=metal_partition_metal_api_protocol+'://'+metal_partition_metal_api_addr+':'+metal_partition_metal_api_port|string+metal_partition_metal_api_basepath, api_hmac=metal_partition_metal_api_hmac_edit_key)[0]["last_sync"] != None
         - lookup('metal', 'search', 'switch', api_url=metal_partition_metal_api_protocol+'://'+metal_partition_metal_api_addr+':'+metal_partition_metal_api_port|string+metal_partition_metal_api_basepath, api_hmac=metal_partition_metal_api_hmac_edit_key)[1]["last_sync"] != None
+
+- name: Configure LLDP ports on Enterprise SONiC
+  hosts: dell_sonic
+  any_errors_fatal: true
+  become: true
+  tasks:
+    - name: Configure LLDP port IDs and descriptions
+      ansible.builtin.command: "{{ item }}"
+      with_items:
+        - lldpcli configure ports Ethernet0 lldp portidsubtype local Eth1/1
+        - lldpcli configure ports Ethernet1 lldp portidsubtype local Eth1/2
