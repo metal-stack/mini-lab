@@ -13,3 +13,9 @@ monitoring_sonic_exporter_port: 9101
 prometheus_sonic_exporter_targets:
   - "{{ hostvars['leaf01'].ansible_host }}:{{ monitoring_sonic_exporter_port }}"
   - "{{ hostvars['leaf02'].ansible_host }}:{{ monitoring_sonic_exporter_port }}"
+
+prometheus_ipmi_exporter_targets:
+  - "{{ hostvars['machine01'].ansible_host }}"
+  - "{{ hostvars['machine02'].ansible_host }}"
+
+metal_api_bmc_superuser_enabled: false
