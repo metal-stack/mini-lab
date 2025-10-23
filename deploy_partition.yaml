@@ -49,6 +49,8 @@
       tags: promtail
     - name: metal-roles/partition/roles/monitoring/node-exporter
       tags: node-exporter
+    - name: metal-roles/partition/roles/monitoring/blackbox-exporter
+      tags: blackbox-exporter
 
 - name: Deploy metal-core
   hosts: leaves
