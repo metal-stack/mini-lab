@@ -8,3 +8,8 @@ monitoring_blackbox_exporter_port: 9115
 prometheus_blackbox_exporter_targets:
   - "{{ hostvars['leaf01'].ansible_host }}:{{ monitoring_blackbox_exporter_port }}"
   - "{{ hostvars['leaf02'].ansible_host }}:{{ monitoring_blackbox_exporter_port }}"
+
+monitoring_sonic_exporter_port: 9101
+prometheus_sonic_exporter_targets:
+  - "{{ hostvars['leaf01'].ansible_host }}:{{ monitoring_sonic_exporter_port }}"
+  - "{{ hostvars['leaf02'].ansible_host }}:{{ monitoring_sonic_exporter_port }}"

@@ -51,6 +51,8 @@
       tags: node-exporter
     - name: metal-roles/partition/roles/monitoring/blackbox-exporter
       tags: blackbox-exporter
+    - name: metal-roles/partition/roles/monitoring/sonic-exporter
+      tags: sonic-exporter
 
 - name: Deploy metal-core
   hosts: leaves
