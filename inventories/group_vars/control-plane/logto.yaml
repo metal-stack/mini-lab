@@ -1,0 +1,3 @@
+---
+auth_logto_ingress_dns: "logto.{{ metal_control_plane_ingress_dns }}"
+auth_logto_issuer_url: http://logto.{{ metal_control_plane_ingress_dns }}
