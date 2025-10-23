@@ -8,6 +8,7 @@ metal_api_filesystemlayouts:
     images:
       debian: "*"
       ubuntu: "*"
+      capms-ubuntu: "*"
       firewall-ubuntu: "*"
   filesystems:
     - path: "/boot/efi"

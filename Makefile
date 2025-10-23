@@ -54,7 +54,7 @@ endif
 .PHONY: up
 up: env gen-certs control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_rsa
-	docker compose up --abort-on-container-failure --remove-orphans --force-recreate control-plane partition
+	docker compose up --pull=always --abort-on-container-failure --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
 # for some reason an allocated machine will not be able to phone home
 # without restarting the metal-core
@@ -62,6 +62,10 @@ up: env gen-certs control-plane-bake partition-bake
 	sleep 10
 	ssh -F files/ssh/config leaf01 'systemctl restart metal-core'
 	ssh -F files/ssh/config leaf02 'systemctl restart metal-core'
+# TODO: for community SONiC versions > 202311 a bgp restart is needed in the virtual environment
+	sleep 15
+	ssh -F files/ssh/config leaf01 'systemctl restart bgp'
+	ssh -F files/ssh/config leaf02 'systemctl restart bgp'
 
 .PHONY: restart
 restart: down up
@@ -353,6 +357,11 @@ test-connectivity-to-external-service-via-ipv6:
 		fi; \
 	done
 
+.PHONY: build-sonic-base
+build-sonic-base:
+	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202311 images/sonic/base-202311
+	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202411 images/sonic/base-202411
+	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202505 images/sonic/base-202505
 
 ## DEV TARGETS ##
 
