@@ -116,6 +116,9 @@ partition: partition-bake
 .PHONY: partition-bake
 partition-bake: external_network
 	docker pull $(MINI_LAB_VM_IMAGE)
+ifeq ($(CI),true)
+	docker pull $(MINI_LAB_SONIC_IMAGE)
+endif
 ifneq ($(MINI_LAB_FLAVOR),dell_sonic)
 	docker pull $(MINI_LAB_SONIC_IMAGE)
 endif
