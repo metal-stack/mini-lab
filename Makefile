@@ -380,6 +380,17 @@ dev-env:
 	@echo "export METALCTL_HMAC=${METALCTL_HMAC}"
 	@echo "export KUBECONFIG=$(KUBECONFIG)"
 
+build-dell-sonic:
+	if [ ! -f "sonic-vs.img" ]; then \
+	    @echo "sonic-vs.img is expected in this directory"; exit; fi
+
+	@git clone https://github.com/srl-labs/vrnetlab.git
+	@cd vrnetlab && git checkout e41f48bc5cae777b56b71b67e3c5642fdbd8f315
+	@cp ./sonic-vs.img vrnetlab/dell/dell_sonic/dell-sonic-4.4.3.qcow2
+	@cd vrnetlab/dell/dell_sonic && make
+	docker tag vrnetlab/dell_sonic:4.4.3 r.metal-stack.io/vrnetlab/dell_sonic:4.4.3
+	@rm -rf ./vrnetlab
+
 ## Gardener integration
 
 .PHONY: fetch-virtual-kubeconfig
