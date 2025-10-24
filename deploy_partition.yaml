@@ -1,4 +1,14 @@
 ---
+- name: Install python client and generate deployment token
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+    - name: ansible-common
+      tags: always
+    - name: metal-roles/control-plane/roles/metal-python
+    - name: metal-roles/control-plane/roles/metal-deployment-token
+
 - name: Configure leaves
   hosts: leaves
   any_errors_fatal: true
@@ -54,8 +64,6 @@
       tags: always
     - name: metal-ansible-modules
       tags: always
-    - name: metal-roles/control-plane/roles/metal-python
-      tags: metal-python
   post_tasks:
     - name: Wait for switches to register
       command: echo

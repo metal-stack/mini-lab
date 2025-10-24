@@ -41,7 +41,7 @@ image_cache_sync_image_name: ghcr.io/metal-stack/metal-image-cache-sync
 
 # ansible_common_version: support-systemd-credentials
 metal_roles_version: migrate-metal-image-cache-sync-to-metal-apiserver
-# metal_ansible_modules_version:
+metal_ansible_modules_version: v2-modules
 
 ##
 ## helm charts
