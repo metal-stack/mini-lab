@@ -27,6 +27,8 @@
       tags: valkey
     - name: auth-dex
       tags: auth
+    - name: logto
+      tags: auth
     - name: metal-roles/control-plane/roles/metal
       tags: metal
 
