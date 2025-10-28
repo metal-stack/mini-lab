@@ -6,6 +6,7 @@ partition:
   hosts:
     localhost:
       ansible_python_interpreter: "{{ ansible_playbook_python }}"
+      ansible_connection: local
   children:
     leaves:
 

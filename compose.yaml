@@ -47,6 +47,8 @@ services:
       # - ${HOME}/.ansible/roles/metal-ansible-modules:/root/.ansible/roles/metal-ansible-modules:ro
     environment:
       - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
+      - KUBECONFIG=/mini-lab/.kubeconfig
+      - K8S_AUTH_KUBECONFIG=/mini-lab/.kubeconfig
       - CI=${CI}
       - DOCKER_HUB_USER=${DOCKER_HUB_USER}
       - DOCKER_HUB_TOKEN=${DOCKER_HUB_TOKEN}
