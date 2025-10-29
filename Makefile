@@ -59,13 +59,10 @@ up: env gen-certs control-plane-bake partition-bake
 # for some reason an allocated machine will not be able to phone home
 # without restarting the metal-core
 # TODO: should be investigated and fixed if possible
+# check that underlay gets working
 	sleep 10
 	ssh -F files/ssh/config leaf01 'systemctl restart metal-core'
 	ssh -F files/ssh/config leaf02 'systemctl restart metal-core'
-# TODO: for community SONiC versions > 202311 a bgp restart is needed in the virtual environment
-	sleep 15
-	ssh -F files/ssh/config leaf01 'systemctl restart bgp'
-	ssh -F files/ssh/config leaf02 'systemctl restart bgp'
 
 .PHONY: restart
 restart: down up
