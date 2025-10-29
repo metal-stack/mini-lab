@@ -6,6 +6,12 @@
     single_branch: yes
     version: use-official-kubectl-image
 
+- name: Deploy tls secret for logto admin ingress
+  k8s:
+    definition: "{{ lookup('template', 'logto-admin-tls.yaml') }}"
+    namespace: "{{ logto_namespace }}"
+    apply: true
+
 - name: Setup logto at {{ auth_logto_ingress_dns }}
   kubernetes.core.helm:
     name: logto
@@ -17,27 +23,60 @@
         tag: edge
       replicaCount: 1
       logto:
-        endpoint: "http://{{ auth_logto_ingress_dns }}:8080/api"
-        adminEndpoint: "http://{{ auth_logto_ingress_dns }}:8080/admin"
+        endpoint: "https://{{ auth_logto_ingress_dns }}:4443"
+        adminEndpoint: "https://{{ auth_logto_admin_ingress_dns }}:4443"
       postgresql:
         enabled: true
         image:
           tag: 17-alpine
       ingress:
+        tls:
+          - hosts:
+              - "{{ auth_logto_admin_ingress_dns }}"
+              - "{{ auth_logto_ingress_dns }}"
+            secretName: logto-admin-tls
         enabled: true    
         className: nginx
         annotations:
           kubernetes.io/ingress.class: nginx
-          nginx.ingress.kubernetes.io/rewrite-target: /
         hosts:
           - host: "{{ auth_logto_ingress_dns }}"
+            backend:
+              service:
+                name: logto
+                port:
+                  name: http-main
             paths:
-              - path: /api
+              - path: /
                 pathType: ImplementationSpecific
-              - path: /admin
+          - host: "{{ auth_logto_admin_ingress_dns }}"
+            backend:
+              service:
+                name: logto
+                port:
+                  name: http-admin
+            paths:
+            paths:
+              - path: /
                 pathType: ImplementationSpecific
       secretExtractor:
         enabled: true
         image:
           repository: registry.k8s.io/kubectl
           tag: v1.32.0
+
+- name: Get logto secret
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: logto-application-secrets
+    namespace: metal-control-plane
+  register: logto_secret
+
+- name: Decode m-admin-secret from base64
+  set_fact:
+    logto_m_admin_secret: "{{ logto_secret.resources[0].data['m-admin-secret'] | b64decode | trim }}"
+
+- name: Show access token
+  debug:
+    msg: "Access Token: {{ logto_m_admin_secret }}"

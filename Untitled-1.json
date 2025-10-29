@@ -1,0 +1,18 @@
+{
+    "name": "mini-lab",
+    "description": "mini-lab IdP",
+    "type": "Traditional",
+    "oidcClientMetadata": {
+        "redirectUris": [
+            {
+                "postLogoutRedirectUris": [
+                    "http://v2.api.172.17.0.1.nip.io:8080/auth/oidc/callback"
+                ]
+            }
+        ],
+        "postLogoutRedirectUris": [
+            "http://v2.api.172.17.0.1.nip.io:8080/auth/oidc/callback"
+        ]
+    },
+    "isThirdParty": true
+}

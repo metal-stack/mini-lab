@@ -13,6 +13,7 @@ rm *.csr
 
 for component in \
         grpc \
+        logto-admin \
         masterdata-api; do
     pushd $component
 

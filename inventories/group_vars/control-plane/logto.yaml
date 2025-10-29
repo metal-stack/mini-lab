@@ -1,3 +1,9 @@
 ---
+auth_logto_admin_ingress_dns: "logto-admin.{{ metal_control_plane_ingress_dns }}"
 auth_logto_ingress_dns: "logto.{{ metal_control_plane_ingress_dns }}"
 auth_logto_issuer_url: http://logto.{{ metal_control_plane_ingress_dns }}
+
+
+logto_admin_certs_server_key: "{{ lookup('file', 'certs/logto-admin/server-key.pem') }}"
+logto_admin_certs_server_cert: "{{ lookup('file', 'certs/logto-admin/server.pem') }}"
+logto_admin_certs_ca: "{{ lookup('file', 'certs/ca.pem') }}"
