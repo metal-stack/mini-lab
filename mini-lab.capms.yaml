@@ -49,13 +49,6 @@ topology:
         QEMU_CPU_CORES: 2
         QEMU_DISK_SIZE: 20G
         UUID: 00000000-0000-0000-0000-000000000002
-    machine03:
-      group: machines
-      image: ${MINI_LAB_VM_IMAGE}
-      env:
-        QEMU_CPU_CORES: 2
-        QEMU_DISK_SIZE: 20G
-        UUID: 00000000-0000-0000-0000-000000000003
   links:
     - endpoints: ["exit:mini_lab_ext", "mini_lab_ext:exit"]
       mtu: 9000
@@ -63,7 +56,5 @@ topology:
     - endpoints: ["leaf02:Ethernet0", "machine01:lan1"]
     - endpoints: ["leaf01:Ethernet1", "machine02:lan0"]
     - endpoints: ["leaf02:Ethernet1", "machine02:lan1"]
-    - endpoints: ["leaf01:Ethernet2", "machine03:lan0"]
-    - endpoints: ["leaf02:Ethernet2", "machine03:lan1"]
     - endpoints: ["leaf01:Ethernet120", "exit:eth1"]
     - endpoints: ["leaf02:Ethernet120", "exit:eth2"]

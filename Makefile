@@ -245,10 +245,6 @@ power-on-machine01:
 power-on-machine02:
 	@$(MAKE) --no-print-directory _ipmi_power VM=machine02 COMMAND=on
 
-.PHONY: power-on-machine03
-power-on-machine03:
-	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=on
-
 .PHONY: power-reset-machine01
 power-reset-machine01:
 	@$(MAKE) --no-print-directory _ipmi_power VM=machine01 COMMAND=reset
@@ -257,10 +253,6 @@ power-reset-machine01:
 power-reset-machine02:
 	@$(MAKE) --no-print-directory _ipmi_power VM=machine02 COMMAND=reset
 
-.PHONY: power-reset-machine03
-power-reset-machine03:
-	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=reset
-
 .PHONY: power-off-machine01
 power-off-machine01:
 	@$(MAKE) --no-print-directory _ipmi_power VM=machine01 COMMAND=off
@@ -268,10 +260,6 @@ power-off-machine01:
 .PHONY: power-off-machine02
 power-off-machine02:
 	@$(MAKE) --no-print-directory _ipmi_power VM=machine02 COMMAND=off
-
-.PHONY: power-off-machine03
-power-off-machine03:
-	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=off
 
 .PHONY: _console
 _console:
@@ -284,10 +272,6 @@ console-machine01:
 .PHONY: console-machine02
 console-machine02:
 	@$(MAKE) --no-print-directory _console VM=machine02
-
-.PHONY: console-machine03
-console-machine03:
-	@$(MAKE) --no-print-directory _console VM=machine03
 
 .PHONY: _password
 _password: env
