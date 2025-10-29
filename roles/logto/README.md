@@ -3,6 +3,27 @@ Role Name
 
 A brief description of the role goes here.
 
+## Notes
+
+Well known config for the apiserver
+# http://localhost:3001/oidc/.well-known/openid-configuration
+
+
+Machine2Machine Account
+https://docs.logto.io/integrate-logto/interact-with-management-api
+
+```bash
+curl --location \
+  --request POST 'http://logto.172.17.0.1.nip.io:8080' \
+  --header 'Authorization: Basic a3FxNm5tWmpRdVZkQzJPOHpWOUozR2dqRnF2Y09aWUEK' \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --data-urlencode 'grant_type=client_credentials' \
+  --data-urlencode 'resource=https://default.logto.app/api' \
+  --data-urlencode 'scope=all'
+```
+
+Does not work yet
+
 Requirements
 ------------
 

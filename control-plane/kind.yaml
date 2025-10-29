@@ -21,12 +21,6 @@ nodes:
       - containerPort: 50051
         hostPort: 50051
         listenAddress: 0.0.0.0
-      - containerPort: 3001
-        hostPort: 3001
-        listenAddress: 0.0.0.0
-      - containerPort: 3002
-        hostPort: 3002
-        listenAddress: 0.0.0.0
     # if you want to run gardener operator + metal-stack, you need more pods
     kubeadmConfigPatches:
       - |

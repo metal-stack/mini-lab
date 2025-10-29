@@ -17,8 +17,8 @@
         tag: edge
       replicaCount: 1
       logto:
-        endpoint: "http://{{ auth_logto_ingress_dns }}/api"
-        adminEndpoint: "http://{{ auth_logto_ingress_dns }}/admin"
+        endpoint: "http://{{ auth_logto_ingress_dns }}:8080/api"
+        adminEndpoint: "http://{{ auth_logto_ingress_dns }}:8080/admin"
       postgresql:
         enabled: true
         image:
@@ -41,4 +41,3 @@
         image:
           repository: registry.k8s.io/kubectl
           tag: v1.32.0
-
