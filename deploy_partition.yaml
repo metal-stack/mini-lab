@@ -142,3 +142,4 @@
       with_items:
         - lldpcli configure ports Ethernet0 lldp portidsubtype local Eth1/1
         - lldpcli configure ports Ethernet1 lldp portidsubtype local Eth1/2
+        - lldpcli configure ports Ethernet2 lldp portidsubtype local Eth1/3
