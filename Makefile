@@ -34,6 +34,7 @@ LAB_TOPOLOGY=mini-lab.dell_sonic.yaml
 MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:4.4.3
 else ifeq ($(MINI_LAB_FLAVOR),capms)
 LAB_TOPOLOGY=mini-lab.capms.yaml
+MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:4.4.3
 else ifeq ($(MINI_LAB_FLAVOR),gardener)
 GARDENER_ENABLED=true
 # usually gardener restricts the maximum version for k8s:
@@ -116,7 +117,7 @@ partition-bake: external_network
 ifeq ($(CI),true)
 	docker pull $(MINI_LAB_SONIC_IMAGE)
 endif
-ifneq ($(MINI_LAB_FLAVOR),dell_sonic)
+ifneq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms),$(MINI_LAB_FLAVOR))
 	docker pull $(MINI_LAB_SONIC_IMAGE)
 endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \

@@ -8,13 +8,23 @@ mgmt:
 topology:
   defaults:
     kind: linux
+  kinds:
+    dell_sonic:
+      image: ${MINI_LAB_SONIC_IMAGE}
+      group: leaves
+      enforce-startup-config: true
+      stages:
+        healthy:
+          exec:
+            - command: date
+              phase: on-exit
   nodes:
     metal-control-plane-control-plane:
       kind: ext-container
       exec:
         - ip route add 203.0.113.128/25 via 203.0.113.128 dev eth0
     exit:
-      image: quay.io/frrouting/frr:10.0.1
+      image: quay.io/frrouting/frr:10.3.0
       network-mode: none
       binds:
         - files/exit/daemons:/etc/frr/daemons
@@ -23,47 +33,43 @@ topology:
         - files/exit/network.sh:/root/network.sh
       exec:
         - sh /root/network.sh
+    kea:
+      kind: linux
+      network-mode: container:exit # join the network namespace of inet
+      image: docker.cloudsmith.io/isc/docker/kea-dhcp4:2.6.0
+      binds:
+        - files/kea.json:/etc/kea/kea-dhcp4.conf
     mini_lab_ext:
       kind: bridge
     leaf01:
-      group: leaves
-      image: ${MINI_LAB_SONIC_IMAGE}
-      binds:
-        - files/ssh/id_rsa.pub:/authorized_keys
+      kind: dell_sonic
+      startup-config: files/startup-config/leaf01.json
     leaf02:
-      group: leaves
-      image: ${MINI_LAB_SONIC_IMAGE}
-      binds:
-        - files/ssh/id_rsa.pub:/authorized_keys
+      kind: dell_sonic
+      startup-config: files/startup-config/leaf02.json
     machine01:
       group: machines
       image: ${MINI_LAB_VM_IMAGE}
       env:
-        QEMU_CPU_CORES: 2
-        QEMU_DISK_SIZE: 20G
         UUID: 00000000-0000-0000-0000-000000000001
     machine02:
       group: machines
       image: ${MINI_LAB_VM_IMAGE}
       env:
-        QEMU_CPU_CORES: 2
-        QEMU_DISK_SIZE: 20G
         UUID: 00000000-0000-0000-0000-000000000002
     machine03:
       group: machines
       image: ${MINI_LAB_VM_IMAGE}
       env:
-        QEMU_CPU_CORES: 2
-        QEMU_DISK_SIZE: 20G
         UUID: 00000000-0000-0000-0000-000000000003
   links:
     - endpoints: ["exit:mini_lab_ext", "mini_lab_ext:exit"]
       mtu: 9000
-    - endpoints: ["leaf01:Ethernet0", "machine01:lan0"]
-    - endpoints: ["leaf02:Ethernet0", "machine01:lan1"]
-    - endpoints: ["leaf01:Ethernet1", "machine02:lan0"]
-    - endpoints: ["leaf02:Ethernet1", "machine02:lan1"]
-    - endpoints: ["leaf01:Ethernet2", "machine03:lan0"]
-    - endpoints: ["leaf02:Ethernet2", "machine03:lan1"]
-    - endpoints: ["leaf01:Ethernet120", "exit:eth1"]
-    - endpoints: ["leaf02:Ethernet120", "exit:eth2"]
+    - endpoints: ["leaf01:eth1", "machine01:lan0"] # Ethernet0
+    - endpoints: ["leaf02:eth1", "machine01:lan1"] # Ethernet0
+    - endpoints: ["leaf01:eth2", "machine02:lan0"] # Ethernet1
+    - endpoints: ["leaf02:eth2", "machine02:lan1"] # Ethernet1
+    - endpoints: ["leaf01:eth3", "machine03:lan0"] # Ethernet2
+    - endpoints: ["leaf02:eth3", "machine03:lan1"] # Ethernet2
+    - endpoints: ["leaf01:eth10", "exit:eth1"] # Ethernet9
+    - endpoints: ["leaf02:eth10", "exit:eth2"] # Ethernet9
