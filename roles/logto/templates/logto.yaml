@@ -101,7 +101,11 @@ metadata:
     app.kubernetes.io/name: logto
 spec:
   ingressClassName: nginx
-  # tls:
+  tls:
+    - hosts:
+        - logto.172.17.0.1.nip.io
+        - logto-admin.172.17.0.1.nip.io
+      secretName: logto-admin-tls
   rules:
     - host: logto.172.17.0.1.nip.io
       http:
