@@ -29,6 +29,9 @@ MAX_RETRIES := 30
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_TOPOLOGY=mini-lab.sonic.yaml
+else ifeq ($(MINI_LAB_FLAVOR),dell_sonic)
+LAB_TOPOLOGY=mini-lab.dell_sonic.yaml
+MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:4.4.3
 else ifeq ($(MINI_LAB_FLAVOR),capms)
 LAB_TOPOLOGY=mini-lab.capms.yaml
 else ifeq ($(MINI_LAB_FLAVOR),gardener)
@@ -110,7 +113,12 @@ partition: partition-bake
 .PHONY: partition-bake
 partition-bake: external_network
 	docker pull $(MINI_LAB_VM_IMAGE)
+ifeq ($(CI),true)
 	docker pull $(MINI_LAB_SONIC_IMAGE)
+endif
+ifneq ($(MINI_LAB_FLAVOR),dell_sonic)
+	docker pull $(MINI_LAB_SONIC_IMAGE)
+endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
 		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
@@ -149,6 +157,7 @@ cleanup-control-plane:
 .PHONY: cleanup-partition
 cleanup-partition:
 	mkdir -p clab-mini-lab
+	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.dell_sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.capms.yaml
 	docker network rm --force mini_lab_ext
@@ -367,6 +376,17 @@ dev-env:
 	@echo "export METALCTL_API_URL=${METALCTL_API_URL}"
 	@echo "export METALCTL_HMAC=${METALCTL_HMAC}"
 	@echo "export KUBECONFIG=$(KUBECONFIG)"
+
+build-dell-sonic:
+	if [ ! -f "sonic-vs.img" ]; then \
+	    @echo "sonic-vs.img is expected in this directory"; exit; fi
+
+	@git clone https://github.com/srl-labs/vrnetlab.git
+	@cd vrnetlab && git checkout e41f48bc5cae777b56b71b67e3c5642fdbd8f315
+	@cp ./sonic-vs.img vrnetlab/dell/dell_sonic/dell-sonic-4.4.3.qcow2
+	@cd vrnetlab/dell/dell_sonic && make
+	docker tag vrnetlab/dell_sonic:4.4.3 r.metal-stack.io/vrnetlab/dell_sonic:4.4.3
+	@rm -rf ./vrnetlab
 
 ## Gardener integration
 
