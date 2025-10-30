@@ -12,58 +12,34 @@
     namespace: "{{ logto_namespace }}"
     apply: true
 
-- name: Setup logto at {{ auth_logto_ingress_dns }}
-  kubernetes.core.helm:
-    name: logto
-    chart_ref: /tmp/helm/logto/charts/logto
-    release_namespace: "{{ logto_namespace }}"
-    values:
-      image:
-        repository: ghcr.io/logto-io/logto
-        tag: edge
-      replicaCount: 1
-      logto:
-        endpoint: "https://{{ auth_logto_ingress_dns }}:4443"
-        adminEndpoint: "https://{{ auth_logto_admin_ingress_dns }}:4443"
-      postgresql:
-        enabled: true
-        image:
-          tag: 17-alpine
-      ingress:
-        tls:
-          - hosts:
-              - "{{ auth_logto_admin_ingress_dns }}"
-              - "{{ auth_logto_ingress_dns }}"
-            secretName: logto-admin-tls
-        enabled: true    
-        className: nginx
-        annotations:
-          kubernetes.io/ingress.class: nginx
-        hosts:
-          - host: "{{ auth_logto_ingress_dns }}"
-            backend:
-              service:
-                name: logto
-                port:
-                  name: http-main
-            paths:
-              - path: /
-                pathType: ImplementationSpecific
-          - host: "{{ auth_logto_admin_ingress_dns }}"
-            backend:
-              service:
-                name: logto
-                port:
-                  name: http-admin
-            paths:
-            paths:
-              - path: /
-                pathType: ImplementationSpecific
-      secretExtractor:
-        enabled: true
-        image:
-          repository: registry.k8s.io/kubectl
-          tag: v1.32.0
+- name: Deploy postgres
+  k8s:
+    definition: "{{ lookup('template', 'postgres.yaml') }}"
+    namespace: "{{ logto_namespace }}"
+    apply: true
+
+- name: Deploy logto
+  k8s:
+    definition: "{{ lookup('template', 'logto.yaml') }}"
+    namespace: "{{ logto_namespace }}"
+    apply: true
+  
+- name: Deploy secret-extractor
+  k8s:
+    definition: "{{ lookup('template', 'secret-extractor.yaml') }}"
+    namespace: "{{ logto_namespace }}"
+    apply: true
+
+- name: Wait for logto secret-extractor job to complete
+  kubernetes.core.k8s_info:
+    api_version: batch/v1
+    kind: Job
+    name: logto-secret-extractor
+    namespace: "{{ logto_namespace }}"
+  register: logto_job_info
+  until: logto_job_info.resources[0].status.succeeded | default(0) > 0
+  retries: 30
+  delay: 10
 
 - name: Get logto secret
   kubernetes.core.k8s_info:

@@ -1,0 +1,125 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: logto
+  labels:
+    app.kubernetes.io/name: logto
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logto
+  labels:
+    app.kubernetes.io/name: logto
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: http-main
+    - port: 3002
+      targetPort: 3002
+      protocol: TCP
+      name: http-admin
+  selector:
+    app.kubernetes.io/name: logto
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logto
+  labels:
+        app.kubernetes.io/name: logto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+        app.kubernetes.io/name: logto
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: logto
+    spec:
+      serviceAccountName: logto
+      initContainers:
+        - name: wait-for-db
+          image: postgres:17-alpine
+          command: ['sh', '-c', 'until pg_isready -h logto-postgresql -p 5432; do echo waiting for postgresql; sleep 2; done;']
+      containers:
+        - name: logto
+          image: svhd/logto:latest
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c", "npm run cli db seed -- --swe && npm start"]
+          ports:
+            - name: http-main
+              containerPort: 3001
+              protocol: TCP
+            - name: http-admin
+              containerPort: 3002
+              protocol: TCP
+          env:
+            - name: TRUST_PROXY_HEADER
+              value: "true"
+            - name: DB_URL
+              value: postgres://postgres:postgres@logto-postgresql:5432/logto
+            - name: ENDPOINT
+              value: http://logto.172.17.0.1.nip.io:8080
+            - name: ADMIN_ENDPOINT
+              value: http://logto-admin.172.17.0.1.nip.io:8080
+          # Changed health check path to /api/health which is more common
+          livenessProbe:
+            httpGet:
+              path: /api/status
+              port: 3001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          readinessProbe:
+            httpGet:
+              path: /api/status
+              port: 3001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1024Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: logto
+  labels:
+    app.kubernetes.io/name: logto
+spec:
+  ingressClassName: nginx
+  # tls:
+  rules:
+    - host: logto.172.17.0.1.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: logto
+              port:
+                name: http-main
+          path: /
+          pathType: ImplementationSpecific
+    - host: logto-admin.172.17.0.1.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: logto
+              port:
+                name: http-admin
+          path: /
+          pathType: ImplementationSpecific
