@@ -69,7 +69,7 @@
 # FIXME: For some reason, the first docker pull always fails on dell_sonic but succeeds on second attempt.
 # Investigate the cause and remove this play
 - name: Intentionally fail on first docker pull
-  hosts: dell_sonic
+  hosts: leaves:dell_sonic
   tasks:
     - community.docker.docker_container:
         name: hello-world
@@ -114,18 +114,24 @@
     - name: Wait for switches to register
       command: echo
       changed_when: false
-      retries: 60
+      retries: 100
       delay: 3
       until:
         - lookup('metal', 'search', 'switch', api_url=metal_partition_metal_api_protocol+'://'+metal_partition_metal_api_addr+':'+metal_partition_metal_api_port|string+metal_partition_metal_api_basepath, api_hmac=metal_partition_metal_api_hmac_edit_key) | length == 2
         - lookup('metal', 'search', 'switch', api_url=metal_partition_metal_api_protocol+'://'+metal_partition_metal_api_addr+':'+metal_partition_metal_api_port|string+metal_partition_metal_api_basepath, api_hmac=metal_partition_metal_api_hmac_edit_key)[0]["last_sync"] != None
         - lookup('metal', 'search', 'switch', api_url=metal_partition_metal_api_protocol+'://'+metal_partition_metal_api_addr+':'+metal_partition_metal_api_port|string+metal_partition_metal_api_basepath, api_hmac=metal_partition_metal_api_hmac_edit_key)[1]["last_sync"] != None
 
-- name: Configure LLDP ports on Enterprise SONiC
+- name: Configure IPv6 and LLDP ports (Enterprise SONiC)
   hosts: dell_sonic
   any_errors_fatal: true
   become: true
   tasks:
+    - name: Enable IPv6 to also have LLA at VLAN interfaces
+      sysctl:
+        name: net.ipv6.conf.default.disable_ipv6
+        value: '0'
+        state: present
+        sysctl_file: /etc/sysctl.conf
     - name: Configure LLDP port IDs and descriptions
       ansible.builtin.command: "{{ item }}"
       with_items:
