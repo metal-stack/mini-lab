@@ -256,6 +256,10 @@ power-on-machine02:
 power-on-machine03:
 	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=on
 
+.PHONY: power-on-machine04
+power-on-machine04:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine04 COMMAND=on
+
 .PHONY: power-reset-machine01
 power-reset-machine01:
 	@$(MAKE) --no-print-directory _ipmi_power VM=machine01 COMMAND=reset
@@ -268,6 +272,10 @@ power-reset-machine02:
 power-reset-machine03:
 	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=reset
 
+.PHONY: power-reset-machine04
+power-reset-machine04:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine04 COMMAND=reset
+
 .PHONY: power-off-machine01
 power-off-machine01:
 	@$(MAKE) --no-print-directory _ipmi_power VM=machine01 COMMAND=off
@@ -279,6 +287,10 @@ power-off-machine02:
 .PHONY: power-off-machine03
 power-off-machine03:
 	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=off
+
+.PHONY: power-off-machine04
+power-off-machine04:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine04 COMMAND=off
 
 .PHONY: _console
 _console:
@@ -296,6 +308,10 @@ console-machine02:
 console-machine03:
 	@$(MAKE) --no-print-directory _console VM=machine03
 
+.PHONY: console-machine04
+console-machine04:
+	@$(MAKE) --no-print-directory _console VM=machine04
+
 .PHONY: _password
 _password: env
 	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine consolepassword $(MACHINE_UUID)
@@ -307,6 +323,14 @@ password-machine01:
 .PHONY: password-machine02
 password-machine02:
 	@$(MAKE) --no-print-directory _password	MACHINE_NAME=machine02 MACHINE_UUID=00000000-0000-0000-0000-000000000002
+
+.PHONY: password-machine03
+password-machine03:
+	@$(MAKE) --no-print-directory _password	MACHINE_NAME=machine03 MACHINE_UUID=00000000-0000-0000-0000-000000000003
+
+.PHONY: password-machine04
+password-machine04:
+	@$(MAKE) --no-print-directory _password	MACHINE_NAME=machine04 MACHINE_UUID=00000000-0000-0000-0000-000000000004
 
 .PHONY: password-machine0%
 password-machine0%:
