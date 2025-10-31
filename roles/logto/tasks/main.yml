@@ -1,0 +1,58 @@
+---
+- name: Git clone logto repo
+  ansible.builtin.git:
+    repo: "https://github.com/majst01/logto-helm.git"
+    dest: /tmp/helm/logto
+    single_branch: yes
+    version: use-official-kubectl-image
+
+- name: Deploy tls secret for logto admin ingress
+  k8s:
+    definition: "{{ lookup('template', 'logto-admin-tls.yaml') }}"
+    namespace: "{{ logto_namespace }}"
+    apply: true
+
+- name: Deploy postgres
+  k8s:
+    definition: "{{ lookup('template', 'postgres.yaml') }}"
+    namespace: "{{ logto_namespace }}"
+    apply: true
+
+- name: Deploy logto
+  k8s:
+    definition: "{{ lookup('template', 'logto.yaml') }}"
+    namespace: "{{ logto_namespace }}"
+    apply: true
+  
+- name: Deploy secret-extractor
+  k8s:
+    definition: "{{ lookup('template', 'secret-extractor.yaml') }}"
+    namespace: "{{ logto_namespace }}"
+    apply: true
+
+- name: Wait for logto secret-extractor job to complete
+  kubernetes.core.k8s_info:
+    api_version: batch/v1
+    kind: Job
+    name: logto-secret-extractor
+    namespace: "{{ logto_namespace }}"
+  register: logto_job_info
+  until: logto_job_info.resources[0].status.succeeded | default(0) > 0
+  retries: 30
+  delay: 10
+
+- name: Get logto secret
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: logto-application-secrets
+    namespace: metal-control-plane
+  register: logto_secret
+
+- name: Decode m-admin-secret from base64
+  set_fact:
+    logto_m_admin_secret: "{{ logto_secret.resources[0].data['m-admin-secret'] | b64decode | trim }}"
+
+- name: Show access token
+  debug:
+    msg: "Access Token: {{ logto_m_admin_secret }}"

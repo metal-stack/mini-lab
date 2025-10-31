@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: logto-admin-tls
+type: kubernetes.io/tls
+data:
+  tls.key: {{ logto_admin_certs_server_key | b64encode }}
+  tls.crt: {{ logto_admin_certs_server_cert | b64encode }}
+  ca.crt: {{ logto_admin_certs_ca | b64encode }}

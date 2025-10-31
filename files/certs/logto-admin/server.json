@@ -1,0 +1,24 @@
+{
+  "CN": "logto",
+  "hosts": [
+    "localhost",
+    "logto",
+    "logto.metal-control-plane.svc",
+    "logto.metal-control-plane.svc.cluster.local",
+    "logto-admin.172.17.0.1.nip.io",
+    "logto.172.17.0.1.nip.io"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 4096
+  },
+  "names": [
+    {
+      "C":  "DE",
+      "L":  "Muenchen",
+      "O":  "metal-stack",
+      "OU": "DevOps",
+      "ST": "Bayern"
+    }
+  ]
+}
