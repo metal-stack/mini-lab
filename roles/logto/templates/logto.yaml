@@ -59,15 +59,22 @@ spec:
             - name: http-admin
               containerPort: 3002
               protocol: TCP
+          volumeMounts:
+            - name: logto-admin-ca
+              mountPath: /etc/ssl/certs/ca.crt
+              subPath: ca.crt
+              readOnly: true
           env:
+            - name: NODE_TLS_REJECT_UNAUTHORIZED
+              value: "0"
             - name: TRUST_PROXY_HEADER
               value: "true"
             - name: DB_URL
               value: postgres://postgres:postgres@logto-postgresql:5432/logto
             - name: ENDPOINT
-              value: http://logto.172.17.0.1.nip.io:8080
+              value: https://logto.172.17.0.1.nip.io:4443
             - name: ADMIN_ENDPOINT
-              value: http://logto-admin.172.17.0.1.nip.io:8080
+              value: https://logto-admin.172.17.0.1.nip.io:4443
           # Changed health check path to /api/health which is more common
           livenessProbe:
             httpGet:
