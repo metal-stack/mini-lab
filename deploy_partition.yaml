@@ -125,15 +125,16 @@
         - lookup('metal', 'search', 'switch', api_url=metal_partition_metal_api_protocol+'://'+metal_partition_metal_api_addr+':'+metal_partition_metal_api_port|string+metal_partition_metal_api_basepath, api_hmac=metal_partition_metal_api_hmac_edit_key)[0]["last_sync"] != None
         - lookup('metal', 'search', 'switch', api_url=metal_partition_metal_api_protocol+'://'+metal_partition_metal_api_addr+':'+metal_partition_metal_api_port|string+metal_partition_metal_api_basepath, api_hmac=metal_partition_metal_api_hmac_edit_key)[1]["last_sync"] != None
 
-# - name: Wait for underlay
-#   hosts: leaves
-#   any_errors_fatal: true
-#   gather_facts: false
-#   pre_tasks:
-#   - name: Wait until no route entries have "queued"
-#     include_tasks: tasks/check_queued.yaml
+- name: Wait for underlay (Community SONiC)
+  hosts: leaves:!dell_sonic
+  any_errors_fatal: true
+  gather_facts: false
+  pre_tasks:
+  - name: Wait until no route entries have "queued"
+    include_tasks: tasks/check_queued.yaml
+
 - name: Configure LLDP ports on Enterprise SONiC
-  hosts: dell_sonic
+  hosts: leaves:dell_sonic
   any_errors_fatal: true
   become: true
   tasks:
