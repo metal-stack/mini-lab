@@ -69,7 +69,7 @@
 # FIXME: For some reason, the first docker pull always fails on dell_sonic but succeeds on second attempt.
 # Investigate the cause and remove this play
 - name: Intentionally fail on first docker pull
-  hosts: leaves:dell_sonic
+  hosts: dell_sonic
   tasks:
     - community.docker.docker_container:
         name: hello-world
@@ -134,7 +134,7 @@
     include_tasks: tasks/check_queued.yaml
 
 - name: Configure IPv6 and LLDP ports (Enterprise SONiC)
-  hosts: leaves:dell_sonic
+  hosts: dell_sonic
   any_errors_fatal: true
   become: true
   tasks:
