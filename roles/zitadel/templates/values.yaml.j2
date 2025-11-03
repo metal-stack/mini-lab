@@ -1,0 +1,39 @@
+---
+zitadel:
+  masterkey: x123456789012345678901234567891y
+  secretConfig:
+    Database:
+      Postgres:
+        User:
+          Password: postgres
+        Admin:
+          Password: postgres
+  configmapConfig:
+    ExternalDomain: zitadel.172.17.0.1.nip.io
+    ExternalPort: 80
+    TLS:
+      Enabled: false
+    Database:
+      Postgres:
+        Host: zitadel-postgresql
+        Port: 5432
+        Database: zitadel
+        MaxOpenConns: 20
+        MaxIdleConns: 10
+        MaxConnLifetime: 30m
+        MaxConnIdleTime: 5m
+        User:
+          Username: postgres
+          SSL:
+            Mode: disable
+        Admin:
+          Username: postgres
+          SSL:
+            Mode: disable
+ingress:
+  enabled: true
+  className: nginx
+login:
+  ingress:
+    enabled: true
+    className: nginx

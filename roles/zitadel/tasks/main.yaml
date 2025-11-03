@@ -1,0 +1,22 @@
+---
+
+- name: Add stable Zitadel Helm repository
+  kubernetes.core.helm_repository:
+    name: zitadel
+    repo_url: https://charts.zitadel.com/
+
+- name: Deploy postgresql for Zitadel
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'postgres.yaml') }}"
+    namespace: zitadel
+
+- name: Deploy Zitadel
+  kubernetes.core.helm:
+    chart_ref: zitadel/zitadel
+    chart_version: "{{ zitadel_chart_version }}"
+    release_name: zitadel
+    release_namespace: zitadel
+    create_namespace: true
+    values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+    wait: true
