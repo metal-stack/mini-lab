@@ -20,3 +20,5 @@
     create_namespace: true
     values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
     wait: true
+
+# TODO: Create initial OIDC app and admin user via API call or CLI
