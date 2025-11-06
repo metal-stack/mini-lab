@@ -8,12 +8,17 @@ import (
 
 	"github.com/zitadel/zitadel-go/v3/pkg/client"
 	app "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/app/v2beta"
+	project "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/project/v2beta"
 	"github.com/zitadel/zitadel-go/v3/pkg/zitadel"
 )
 
 func main() {
 	domain := "zitadel.172.17.0.1.nip.io"
-	token := "6YQZnz9sHSqCuWfPw620E3g3NqutTSXmEc_C1kBX6e4vuWTY2TD6DRPCks8Pn23g9ZQiaLo"
+	token := os.Args[1]
+	if token == "" {
+		slog.Error("personal access token not provided")
+		os.Exit(1)
+	}
 
 	ctx := context.Background()
 
@@ -25,14 +30,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	// resp, err := api.ManagementService().GetMyOrg(ctx, &management.GetMyOrgRequest{})
-	// if err != nil {
-	// 	slog.Error("gRPC call failed", "error", err)
-	// 	os.Exit(1)
-	// }
+	projectResp, err := api.ProjectServiceV2Beta().ListProjects(ctx, &project.ListProjectsRequest{})
+	if err != nil {
+		slog.Error("gRPC call failed", "error", err)
+		os.Exit(1)
+	}
+
+	slog.Info("Projects", slog.Int("count", len(projectResp.Projects)))
+
+	projectId := projectResp.Projects[0].Id
 
 	resp, err := api.AppServiceV2Beta().CreateApplication(ctx, &app.CreateApplicationRequest{
-		ProjectId: "345345430017671203",
+		ProjectId: projectId,
 		Name:      "metal-stack",
 		Id:        "metal-stack",
 		CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
@@ -61,4 +70,8 @@ func main() {
 	}
 
 	log.Printf("Successfully called API: Your application is %s", resp.AppId)
+
+	// Get client_id and client_secret
+	log.Printf("Client ID: %s", resp.GetApiResponse().ClientId)
+	log.Printf("Client Secret: %s", resp.GetApiResponse().ClientSecret)
 }
