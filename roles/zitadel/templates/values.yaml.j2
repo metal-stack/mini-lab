@@ -5,17 +5,29 @@ zitadel:
     Database:
       Postgres:
         User:
-          Password: postgres
+          Password: {{ zitadel_db_password }}
         Admin:
-          Password: postgres
+          Password: {{ zitadel_db_password }}
   configmapConfig:
+    FirstInstance:
+      InstanceName: MetalStack
+      Org:
+        Name: MetalStack
+        Human:
+          Username: admin
+          FirstName: Metal
+          LastName: Stack
+          NickName: 
+          DisplayName: MetalStack Admin
+          Password: Password1!
+          PasswordChangeRequired: false
     ExternalDomain: zitadel.172.17.0.1.nip.io
     ExternalPort: 80
     TLS:
       Enabled: false
     Database:
       Postgres:
-        Host: zitadel-postgresql
+        Host: {{ zitadel_db_address }}
         Port: 5432
         Database: zitadel
         MaxOpenConns: 20
@@ -33,7 +45,17 @@ zitadel:
 ingress:
   enabled: true
   className: nginx
+env:
+  - name: ZITADEL_API_URL
+    value: https://zitadel.172.17.0.1.nip.io:4443
+image:
+  tag: v4.6.4
 login:
+  image:
+    tag: v4.6.4
+  env:
+    - name: ZITADEL_API_URL
+      value: https://zitadel.172.17.0.1.nip.io:4443
   ingress:
     enabled: true
     className: nginx

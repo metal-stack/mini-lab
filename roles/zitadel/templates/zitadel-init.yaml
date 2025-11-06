@@ -1,0 +1,54 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: zitadel-init
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: zitadel-init
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: zitadel-init
+subjects:
+  - kind: ServiceAccount
+    name: zitadel-init
+roleRef:
+  kind: Role
+  name: zitadel-init
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: zitadel-init-job
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      serviceAccountName: zitadel-init
+      restartPolicy: Never
+      containers:
+        - name: zitadel-init
+          image: ghcr.io/metal-stack/zitadel-init:pr-1
+          pullPolicy: Always
+          args:
+            - "zitadel-init"
+            - "--zitadel-endpoint=zitadel.172.17.0.1.nip.io"
+            - "--zitadel-port=4443"
+            - "--zitadel-pat=$(ZITADEL_PAT)"
+            - "--namespace=metal-control-plane"
+            - "--secret=zitadel-client-credentials"
+          env:
+          - name: ZITADEL_PAT
+            valueFrom:
+              secretKeyRef:
+                name: iam-admin-pat
+                key: pat

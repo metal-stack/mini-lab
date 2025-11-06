@@ -1,6 +1,9 @@
 ---
 zitadel_chart_version: "9.12.3"
 
+zitadel_db_address: zitadel-db
+zitadel_db_password: change-me
+
 zitadel_app:
   - projectId: metal-stack
     id: metal-stack

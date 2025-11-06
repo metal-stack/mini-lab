@@ -1,4 +1,6 @@
 ---
+metal_helm_chart_local_path: /helm-charts/charts/metal-control-plane
+
 metal_set_resource_limits: no
 metal_check_api_health_endpoint: http://api.{{ metal_control_plane_ingress_dns }}:8080/metal/v1/health
 metal_api_headscale_control_plane_address: "http://headscale.{{ metal_control_plane_ingress_dns }}:8080"
@@ -15,10 +17,9 @@ metal_api_nsq_tcp_address: nsqd:4150
 metal_apiserver_enabled: true
 metal_apiserver_url: http://v2.api.{{ metal_control_plane_ingress_dns }}:8080
 
-metal_apiserver_oidc_discovery_url: http://auth.{{ metal_control_plane_ingress_dns }}:8080/dex/.well-known/openid-configuration
+metal_apiserver_oidc_secret_name: zitadel-client-credentials
+metal_apiserver_oidc_discovery_url: https://zitadel.{{ metal_control_plane_ingress_dns }}:4443/.well-known/openid-configuration
 metal_apiserver_oidc_end_session_url: ""
-metal_apiserver_oidc_client_id: metal-stack
-metal_apiserver_oidc_client_secret: secret
 
 metal_apiserver_redis_password: change-me-soon
 metal_apiserver_admin_subjects: "CiQwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDESBWxvY2Fs@oidc"
