@@ -42,8 +42,8 @@ metal_apiserver_image_tag: pr-89
 ## helm charts
 ##
 
-# metal_helm_chart_version:
-# metal_helm_chart_repo:
+metal_helm_chart_version: 0.7.0
+metal_helm_chart_repo: https://helm.metal-stack.io/pull_requests/make-oidc-secret-configurable
 
 # further overrides can be looked up in the metal-role projects where the mapping is defined:
 # https://github.com/metal-stack/metal-roles/blob/master/defaults/main.yaml
