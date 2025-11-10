@@ -3,18 +3,3 @@ zitadel_chart_version: "9.12.3"
 
 zitadel_db_address: zitadel-db
 zitadel_db_password: change-me
-
-zitadel_app:
-  - projectId: metal-stack
-    id: metal-stack
-    name: metal-stack
-    oidcConfig:
-      appType: OIDC_APP_TYPE_WEB # WEB
-      responseType: # CODE
-      - OIDC_RESPONSE_TYPE_CODE
-      grantTypes: # AUTHORIZATION_CODE
-      - OIDC_GRANT_TYPE_AUTHORIZATION_CODE
-      authMethod: OIDC_AUTH_METHOD_TYPE_POST # Post
-      accessTokenType: OIDC_TOKEN_TYPE_BEARER # Bearer
-      redirectUris:
-      - http://v2.api.172.17.0.1.nip.io:8080/auth/openid-connect/callback
