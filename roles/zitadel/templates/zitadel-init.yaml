@@ -41,10 +41,10 @@ spec:
           pullPolicy: Always
           args:
             - "zitadel-init"
-            - "--zitadel-endpoint=zitadel.172.17.0.1.nip.io"
+            - "--zitadel-endpoint={{ zitadel_domain }}"
             - "--zitadel-port=4443"
             - "--zitadel-pat=$(ZITADEL_PAT)"
-            - "--namespace=metal-control-plane"
+            - "--namespace={{ metal_control_plane_namespace }}"
             - "--secret=zitadel-client-credentials"
           env:
           - name: ZITADEL_PAT

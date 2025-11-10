@@ -1,6 +1,6 @@
 ---
 zitadel:
-  masterkey: x123456789012345678901234567891y
+  masterkey: {{ zitadel_master_key}}
   secretConfig:
     Database:
       Postgres:
@@ -19,9 +19,9 @@ zitadel:
           LastName: Stack
           NickName: 
           DisplayName: MetalStack Admin
-          Password: Password1!
+          Password: {{ zitadel_admin_password }}
           PasswordChangeRequired: false
-    ExternalDomain: zitadel.172.17.0.1.nip.io
+    ExternalDomain: {{ zitadel_domain }}
     ExternalPort: 80
     TLS:
       Enabled: false
@@ -47,7 +47,7 @@ ingress:
   className: nginx
 env:
   - name: ZITADEL_API_URL
-    value: https://zitadel.172.17.0.1.nip.io:4443
+    value: {{ zitadel_ingress_dns }}
 image:
   tag: v4.6.4
 login:
@@ -55,7 +55,7 @@ login:
     tag: v4.6.4
   env:
     - name: ZITADEL_API_URL
-      value: https://zitadel.172.17.0.1.nip.io:4443
+      value: {{ zitadel_ingress_dns }}
   ingress:
     enabled: true
     className: nginx

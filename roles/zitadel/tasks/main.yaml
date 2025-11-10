@@ -10,13 +10,13 @@
     chart_ref: zitadel/zitadel
     chart_version: "{{ zitadel_chart_version }}"
     release_name: zitadel
-    release_namespace: metal-control-plane
+    release_namespace: "{{ metal_control_plane_namespace }}"
     create_namespace: true
     values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
     wait: true
 
-- name: Create initial application
+- name: Create init job
   kubernetes.core.k8s:
     state: present
     definition: "{{ lookup('template', 'zitadel-init.yaml') }}"
-    namespace: metal-control-plane
+    namespace: "{{ metal_control_plane_namespace }}"
