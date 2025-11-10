@@ -35,7 +35,7 @@ metal_apiserver_image_tag: pr-89
 ##
 
 # ansible_common_version:
-# metal_roles_version:
+metal_roles_version: 3e4b2f14bffef0685b8e2d4d195a895489c4cd0e
 # metal_ansible_modules_version:
 
 ##
