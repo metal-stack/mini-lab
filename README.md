@@ -2,7 +2,7 @@
 
 The mini-lab is a small, virtual setup to locally run the metal-stack. It deploys the metal control plane and a metal-stack partition with two simulated leaf switches. The lab can be used for trying out metal-stack, demonstration purposes or development.
 
-![overview components](docs/overview.svg)
+![overview components](docs/overview.drawio.svg)
 
 > Figure 1: Simplified illustration of the mini-lab.
 
