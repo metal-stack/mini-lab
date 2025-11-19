@@ -10,15 +10,15 @@ zitadel:
           Password: {{ zitadel_db_password }}
   configmapConfig:
     FirstInstance:
-      InstanceName: MetalStack
+      InstanceName: metal-stack
       Org:
-        Name: MetalStack
+        Name: metal-stack
         Human:
           Username: admin
           FirstName: Metal
           LastName: Stack
           NickName: 
-          DisplayName: MetalStack Admin
+          DisplayName: metal-stack admin
           Password: {{ zitadel_admin_password }}
           PasswordChangeRequired: false
     ExternalDomain: {{ zitadel_domain }}
@@ -48,11 +48,11 @@ ingress:
 env:
   - name: ZITADEL_API_URL
     value: {{ zitadel_ingress_dns }}
-image:
-  tag: v4.6.4
+# image:
+#   tag: v4.6.4
 login:
-  image:
-    tag: v4.6.4
+  # image:
+  #   tag: v4.6.4
   env:
     - name: ZITADEL_API_URL
       value: {{ zitadel_ingress_dns }}

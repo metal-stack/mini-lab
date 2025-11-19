@@ -37,7 +37,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: zitadel-init
-          image: ghcr.io/metal-stack/zitadel-init:pr-1
+          image: "{{ zitadel_init_image }}:{{ zitadel_init_image_tag }}"
           pullPolicy: Always
           args:
             - "zitadel-init"
