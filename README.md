@@ -2,9 +2,11 @@
 
 The mini-lab is a small, virtual setup to locally run the metal-stack. It deploys the metal control plane and a metal-stack partition with two simulated leaf switches. The lab can be used for trying out metal-stack, demonstration purposes or development.
 
-![overview components](docs/overview.png)
+![overview components](docs/overview.drawio.svg)
 
-ℹ This project can also be used as a template for writing your own metal-stack deployments.
+> Figure 1: Simplified illustration of the mini-lab.
+
+This project can also be used as a template for writing your own metal-stack deployments.
 
 <!-- TOC depthfrom:2 depthto:6 withlinks:true updateonsave:false orderedlist:false -->
 
@@ -206,3 +208,5 @@ make
 An Nginx is running inside of the www container to allow automatic testing of outgoing connections.
 
 ![Network topology](docs/network.svg)
+
+> Figure 2: mini-lab network topology illustration.
