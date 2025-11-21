@@ -27,7 +27,7 @@ services:
       - /bin/bash
       - -ce
       - |
-        cosign verify ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG} --certificate-oidc-issuer https://accounts.google.com --certificate-identity keyless@metal-stack.iam.gserviceaccount.com
+        cosign verify --key files/cosign.pub ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
         ansible -m metalstack.base.metal_stack_release_vector localhost --extra-vars "@.extra_vars.yaml"
         ansible-playbook deploy_control_plane.yaml --extra-vars "@.extra_vars.yaml"
 
@@ -54,7 +54,7 @@ services:
       - /bin/bash
       - -ce
       - |
-        cosign verify ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG} --certificate-oidc-issuer https://accounts.google.com --certificate-identity keyless@metal-stack.iam.gserviceaccount.com
+        cosign verify --key files/cosign.pub ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
         ansible -m metalstack.base.metal_stack_release_vector localhost --extra-vars "@.extra_vars.yaml"
         ansible-playbook deploy_partition.yaml --extra-vars "@.extra_vars.yaml"
 
