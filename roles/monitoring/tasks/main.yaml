@@ -1,0 +1,10 @@
+---
+- name: Add leaf hosts to /etc/hosts
+  become: yes
+  lineinfile:
+    path: /etc/hosts
+    regexp: "^{{ hostvars[item].ansible_host }}\\s+{{ item }}$"
+    line: "{{ hostvars[item].ansible_host }} {{ item }}"
+  loop:
+    - leaf01
+    - leaf02

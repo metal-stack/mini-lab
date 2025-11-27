@@ -37,6 +37,8 @@
   roles:
     - name: ansible-common
       tags: always
+    - name: monitoring
+      tags: monitoring
     - name: metal-roles/partition/roles/monitoring/prometheus
       tags: prometheus
     - name: metal-roles/partition/roles/monitoring/ipmi-exporter
