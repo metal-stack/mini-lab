@@ -3,7 +3,6 @@ prometheus_node_exporter_targets:
   - "{{ hostvars['leaf01'].ansible_host }}:{{ monitoring_node_exporter_port }}"
   - "{{ hostvars['leaf02'].ansible_host }}:{{ monitoring_node_exporter_port }}"
 
-
 monitoring_blackbox_exporter_port: 9115
 prometheus_blackbox_exporter_targets:
   - "{{ hostvars['leaf01'].ansible_host }}:{{ monitoring_blackbox_exporter_port }}"
@@ -19,3 +18,7 @@ prometheus_ipmi_exporter_targets:
   - "{{ hostvars['machine02'].ansible_host }}"
 
 metal_api_bmc_superuser_enabled: false
+metal_api_bmc_superuser_pwd: change-me
+
+prometheus_blackbox_exporter_metal_api_probe_url: "{{ metal_partition_metal_api_protocol }}://{{ metal_control_plane_ip }}:{{ metal_partition_metal_api_port }}{{ metal_partition_metal_api_basepath }}v1/version"
+prometheus_blackbox_exporter_dns: 8.8.8.8
