@@ -31,10 +31,10 @@ ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_TOPOLOGY=mini-lab.sonic.yaml
 else ifeq ($(MINI_LAB_FLAVOR),dell_sonic)
 LAB_TOPOLOGY=mini-lab.dell_sonic.yaml
-MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:4.4.3
+MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:4.5.1
 else ifeq ($(MINI_LAB_FLAVOR),capms)
 LAB_TOPOLOGY=mini-lab.capms.yaml
-MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:4.4.3
+MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:4.5.1
 else ifeq ($(MINI_LAB_FLAVOR),gardener)
 GARDENER_ENABLED=true
 # usually gardener restricts the maximum version for k8s:
@@ -408,9 +408,9 @@ build-dell-sonic:
 
 	@git clone https://github.com/srl-labs/vrnetlab.git
 	@cd vrnetlab && git checkout e41f48bc5cae777b56b71b67e3c5642fdbd8f315
-	@cp ./sonic-vs.img vrnetlab/dell/dell_sonic/dell-sonic-4.4.3.qcow2
+	@cp ./sonic-vs.img vrnetlab/dell/dell_sonic/dell-sonic-4.5.1.qcow2
 	@cd vrnetlab/dell/dell_sonic && make
-	docker tag vrnetlab/dell_sonic:4.4.3 r.metal-stack.io/vrnetlab/dell_sonic:4.4.3
+	docker tag vrnetlab/dell_sonic:4.5.1 r.metal-stack.io/vrnetlab/dell_sonic:4.5.1
 	@rm -rf ./vrnetlab
 
 ## Gardener integration
