@@ -22,6 +22,7 @@ ANSIBLE_EXTRA_VARS_FILE := $(or $(ANSIBLE_EXTRA_VARS_FILE),)
 MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),sonic)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
 MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
+MINI_LAB_DELL_SONIC_VERSION := $(or $(MINI_LAB_DELL_SONIC_VERSION),4.5.1)
 
 MACHINE_OS=debian-12.0
 MAX_RETRIES := 30
@@ -31,10 +32,10 @@ ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_TOPOLOGY=mini-lab.sonic.yaml
 else ifeq ($(MINI_LAB_FLAVOR),dell_sonic)
 LAB_TOPOLOGY=mini-lab.dell_sonic.yaml
-MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:4.5.1
+MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_VERSION)
 else ifeq ($(MINI_LAB_FLAVOR),capms)
 LAB_TOPOLOGY=mini-lab.capms.yaml
-MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:4.5.1
+MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_VERSION)
 else ifeq ($(MINI_LAB_FLAVOR),gardener)
 GARDENER_ENABLED=true
 # usually gardener restricts the maximum version for k8s:
@@ -408,9 +409,9 @@ build-dell-sonic:
 
 	@git clone https://github.com/srl-labs/vrnetlab.git
 	@cd vrnetlab && git checkout e41f48bc5cae777b56b71b67e3c5642fdbd8f315
-	@cp ./sonic-vs.img vrnetlab/dell/dell_sonic/dell-sonic-4.5.1.qcow2
+	@cp ./sonic-vs.img vrnetlab/dell/dell_sonic/dell-sonic-$(MINI_LAB_DELL_SONIC_VERSION).qcow2
 	@cd vrnetlab/dell/dell_sonic && make
-	docker tag vrnetlab/dell_sonic:4.5.1 r.metal-stack.io/vrnetlab/dell_sonic:4.5.1
+	docker tag vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_VERSION) r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_VERSION)
 	@rm -rf ./vrnetlab
 
 ## Gardener integration

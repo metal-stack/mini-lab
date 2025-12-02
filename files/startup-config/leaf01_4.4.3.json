@@ -2,7 +2,7 @@
   "DEVICE_METADATA": {
     "localhost": {
       "docker_routing_config_mode": "split",
-      "hostname": "leaf02"
+      "hostname": "leaf01"
     }
   },
   "DNS": {
@@ -28,7 +28,7 @@
   },
   "LOOPBACK_INTERFACE": {
     "Loopback0": {},
-    "Loopback0|10.0.0.12/32": {}
+    "Loopback0|10.0.0.11/32": {}
   },
   "MGMT_PORT": {
     "eth0": {
@@ -46,19 +46,24 @@
   },
   "VERSIONS": {
     "DATABASE": {
-      "VERSION": "version_4_5_1"
+      "VERSION": "version_4_4_3"
     }
   },
   "VLAN": {
     "Vlan3900": {
       "admin_status": "up",
       "autostate": "enable",
+      "dhcp_relay_link_select": "enable",
+      "dhcp_relay_src_intf": "Loopback0",
+      "dhcp_servers": [
+        "10.0.0.21"
+      ],
       "vlanid": "3900"
     }
   },
   "VLAN_INTERFACE": {
     "Vlan3900": {},
-    "Vlan3900|10.0.1.128/25": {}
+    "Vlan3900|10.0.1.1/25": {}
   },
   "VXLAN_EVPN_NVO": {
     "nvo1": {
@@ -70,7 +75,7 @@
       "dscp": "0",
       "qos-mode": "pipe",
       "src_intf": "Loopback0",
-      "src_ip": "10.0.0.12"
+      "src_ip": "10.0.0.11"
     }
   }
 }

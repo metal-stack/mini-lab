@@ -43,10 +43,10 @@ topology:
       kind: bridge
     leaf01:
       kind: dell_sonic
-      startup-config: files/startup-config/leaf01.json
+      startup-config: files/startup-config/leaf01_${MINI_LAB_DELL_SONIC_VERSION}.json
     leaf02:
       kind: dell_sonic
-      startup-config: files/startup-config/leaf02.json
+      startup-config: files/startup-config/leaf02_${MINI_LAB_DELL_SONIC_VERSION}.json
     machine01:
       group: machines
       image: ${MINI_LAB_VM_IMAGE}
