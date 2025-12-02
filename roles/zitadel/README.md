@@ -9,7 +9,7 @@ Because `ExternalSecure: true` is set by default, Zitadel will be available over
 UI will be available at `https://zitadel.172.17.0.1.nip.io:4443`.
 
 Admin:
-- Username: `admin@metalstack.zitadel.172.17.0.1.nip.io`
+- Username: `admin@metal-stack.zitadel.172.17.0.1.nip.io`
 - Password: `Password1!`
 
 

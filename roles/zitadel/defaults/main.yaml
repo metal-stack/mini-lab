@@ -1,5 +1,5 @@
 ---
-zitadel_chart_version: "9.12.3"
+zitadel_chart_version: "9.13.0"
 
 zitadel_domain: zitadel.{{ metal_control_plane_ingress_dns }}
 zitadel_ingress_dns: https://{{ zitadel_domain }}:4443
