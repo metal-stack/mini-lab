@@ -24,7 +24,7 @@ metal_stack_release_vectors:
 # metal_console_image_tag:
 # See https://github.com/metal-stack/metal-core/pull/112
 metal_core_image_name: ghcr.io/metal-stack/metal-core
-metal_core_image_tag: fix-ethernet-packet-overflow
+metal_core_image_tag: v0.14.1
 # headscale_image_tag: v0.26.1
 # headscale_db_backup_restore_sidecar_image_tag: latest
 # headscale_db_backup_restore_sidecar_image_name: ghcr.io/metal-stack/backup-restore-sidecar
