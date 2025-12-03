@@ -27,7 +27,7 @@
       tags: auditing
     - name: metal-roles/control-plane/roles/valkey
       tags: valkey
-    - name: zitadel
+    - name: metal-roles/control-plane/roles/zitadel
       tags: auth
     - name: metal-roles/control-plane/roles/metal
       tags: metal

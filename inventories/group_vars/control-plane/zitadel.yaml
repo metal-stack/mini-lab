@@ -1,0 +1,6 @@
+---
+zitadel_ingress_dns: https://{{ zitadel_domain }}:4443
+
+zitadel_admin_password: Password1!
+zitadel_master_key: x123456789012345678901234567891y
+zitadel_db_password: change-me
