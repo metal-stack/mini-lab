@@ -4,3 +4,22 @@ zitadel_ingress_dns: https://{{ zitadel_domain }}:4443
 zitadel_admin_password: Password1!
 zitadel_master_key: x123456789012345678901234567891y
 zitadel_db_password: change-me
+
+zitadel_config:
+  static_users:
+    - first_name: Olli
+      last_name: Owner
+      email: olli.owner@metal-stack.io
+      password: Olli.Owner123!
+    - first_name: Gerrit
+      last_name: Guest
+      email: gerrit.guest@metal-stack.io
+      password: Gerrit.Guest123!
+  project:
+    id: metal-stack
+    name: metal-stack
+  application:
+    # later id will be added but currently not possible with zitadel
+    id: metal-stack
+    name: metal-stack
+    redirect_uri: http://v2.api.172.17.0.1.nip.io:8080/auth/openid-connect/callback
