@@ -7,7 +7,12 @@ partition:
     localhost:
       ansible_python_interpreter: "{{ ansible_playbook_python }}"
   children:
+    dell_sonic:
     leaves:
+
+dell_sonic:
+  vars:
+    ansible_group_priority: 10
 
 leaves:
   hosts:
