@@ -1,11 +1,12 @@
 ---
-zitadel_ingress_dns: https://{{ zitadel_domain }}:4443
+zitadel_endpoint: zitadel.{{ metal_control_plane_namespace }}.svc.cluster.local
+zitadel_external_domain: zitadel.{{ metal_control_plane_ingress_dns }}
+zitadel_ingress_dns: https://{{ zitadel_external_domain }}:4443
+zitadel_port: 8080
+zitadel_skip_verify_tls: true
+zitadel_insecure: true
 
-zitadel_admin_password: Password1!
-zitadel_master_key: x123456789012345678901234567891y
-zitadel_db_password: change-me
-
-zitadel_config:
+zitadel_init_config:
   static_users:
     - first_name: Olli
       last_name: Owner
