@@ -1,6 +1,6 @@
 ---
-- name: Configure leaves
-  hosts: leaves
+- name: Configure leaves (Community SONiC)
+  hosts: leaves:!dell_sonic
   any_errors_fatal: true
   gather_facts: false
   pre_tasks:
@@ -16,8 +16,44 @@
     - name: sonic
       tags: sonic
 
-- name: Deploy dhcp server and pixiecore on leaf01
-  hosts: leaf01
+- name: Configure leaves (Enterprise SONiC)
+  hosts: dell_sonic
+  any_errors_fatal: true
+  become: true
+  tasks:
+    - name: Check for bgpd.conf presence
+      ansible.builtin.stat:
+        path: /etc/sonic/frr/bgpd.conf
+      register: bgpd_conf_stat
+
+    - name: Restart bgp service when non-split docker_routing_config_mode is still active
+      ansible.builtin.service:
+        name: bgp
+        state: restarted
+      when: bgpd_conf_stat.stat.exists
+
+    - name: Ensure root has authorized_key
+      ansible.builtin.authorized_key:
+        user: root
+        state: present
+        key: "{{ lookup('file', 'ssh/id_rsa.pub') }}"
+
+    - name: Activate IP MASQUERADE on eth0
+      ansible.builtin.iptables:
+        chain: POSTROUTING
+        jump: MASQUERADE
+        out_interface: eth0
+        table: nat
+
+    - name: Activate IPv4 forwarding on eth0
+      ansible.posix.sysctl:
+        name: net.ipv4.conf.eth0.forwarding
+        reload: no
+        sysctl_set: yes
+        value: "1"
+
+- name: Deploy dhcp server on leaf01 (Community SONiC)
+  hosts: leaf01:!dell_sonic
   pre_tasks:
     - name: Temporary workaround for EOL debian bullseye backports repository (using archive.debian.org)
       lineinfile:
@@ -29,12 +65,36 @@
       tags: always
     - name: metal-roles/partition/roles/dhcp
       tags: dhcp
+
+# FIXME: For some reason, the first docker pull always fails on dell_sonic but succeeds on second attempt.
+# Investigate the cause and remove this play
+- name: Intentionally fail on first docker pull
+  hosts: dell_sonic
+  tasks:
+    - community.docker.docker_container:
+        name: hello-world
+        image: library/hello-world:latest
+        cleanup: true
+        pull: true
+      failed_when: false
+
+- name: Deploy pixiecore on leaf01
+  hosts: leaf01
+  become: true
+  roles:
+    - name: ansible-common
+      tags: always
     - name: metal-roles/partition/roles/pixiecore
       tags: pixiecore
 
 - name: Deploy metal-core
   hosts: leaves
   any_errors_fatal: true
+  become: true
+  pre_tasks:
+  - name: Wait some time
+    pause:
+      seconds: 120
   roles:
     - name: ansible-common
       tags: always
@@ -58,9 +118,36 @@
     - name: Wait for switches to register
       command: echo
       changed_when: false
-      retries: 60
+      retries: 100
       delay: 3
       until:
         - lookup('metal', 'search', 'switch', api_url=metal_partition_metal_api_protocol+'://'+metal_partition_metal_api_addr+':'+metal_partition_metal_api_port|string+metal_partition_metal_api_basepath, api_hmac=metal_partition_metal_api_hmac_edit_key) | length == 2
         - lookup('metal', 'search', 'switch', api_url=metal_partition_metal_api_protocol+'://'+metal_partition_metal_api_addr+':'+metal_partition_metal_api_port|string+metal_partition_metal_api_basepath, api_hmac=metal_partition_metal_api_hmac_edit_key)[0]["last_sync"] != None
         - lookup('metal', 'search', 'switch', api_url=metal_partition_metal_api_protocol+'://'+metal_partition_metal_api_addr+':'+metal_partition_metal_api_port|string+metal_partition_metal_api_basepath, api_hmac=metal_partition_metal_api_hmac_edit_key)[1]["last_sync"] != None
+
+- name: Wait for underlay (Community SONiC)
+  hosts: leaves:!dell_sonic
+  any_errors_fatal: true
+  gather_facts: false
+  pre_tasks:
+  - name: Wait until no route entries have "queued"
+    include_tasks: tasks/check_queued.yaml
+
+- name: Configure IPv6 and LLDP ports (Enterprise SONiC)
+  hosts: dell_sonic
+  any_errors_fatal: true
+  become: true
+  tasks:
+    - name: Enable IPv6 to also have LLA at VLAN interfaces
+      sysctl:
+        name: net.ipv6.conf.default.disable_ipv6
+        value: '0'
+        state: present
+        sysctl_file: /etc/sysctl.conf
+    - name: Configure LLDP port IDs and descriptions
+      ansible.builtin.command: "{{ item }}"
+      with_items:
+        - lldpcli configure ports Ethernet0 lldp portidsubtype local Eth1/1
+        - lldpcli configure ports Ethernet1 lldp portidsubtype local Eth1/2
+        - lldpcli configure ports Ethernet2 lldp portidsubtype local Eth1/3
+        - lldpcli configure ports Ethernet3 lldp portidsubtype local Eth1/4

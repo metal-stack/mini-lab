@@ -1,9 +1,8 @@
-# flavor for mini-lab cluster-api-provider-metal-stack
 name: mini-lab
 prefix: ""
 
 mgmt:
-  network: mini_lab_ext
+  network: bridge
 
 topology:
   defaults:
@@ -19,10 +18,6 @@ topology:
             - command: date
               phase: on-exit
   nodes:
-    metal-control-plane-control-plane:
-      kind: ext-container
-      exec:
-        - ip route add 203.0.113.128/25 via 203.0.113.128 dev eth0
     exit:
       image: quay.io/frrouting/frr:10.3.0
       network-mode: none
@@ -39,6 +34,13 @@ topology:
       image: docker.cloudsmith.io/isc/docker/kea-dhcp4:2.6.0
       binds:
         - files/kea.json:/etc/kea/kea-dhcp4.conf
+    external_service:
+      image: docker.io/library/nginx:alpine-slim
+      network-mode: none
+      binds:
+        - files/external_service/network.sh:/root/network.sh
+      exec:
+        - sh /root/network.sh
     mini_lab_ext:
       kind: bridge
     leaf01:
@@ -51,40 +53,20 @@ topology:
       group: machines
       image: ${MINI_LAB_VM_IMAGE}
       env:
-        QEMU_CPU_CORES: 2
-        QEMU_DISK_SIZE: 20G
         UUID: 00000000-0000-0000-0000-000000000001
     machine02:
       group: machines
       image: ${MINI_LAB_VM_IMAGE}
       env:
-        QEMU_CPU_CORES: 2
-        QEMU_DISK_SIZE: 20G
         UUID: 00000000-0000-0000-0000-000000000002
-    machine03:
-      group: machines
-      image: ${MINI_LAB_VM_IMAGE}
-      env:
-        QEMU_CPU_CORES: 2
-        QEMU_DISK_SIZE: 20G
-        UUID: 00000000-0000-0000-0000-000000000003
-    machine04:
-      group: machines
-      image: ${MINI_LAB_VM_IMAGE}
-      env:
-        QEMU_CPU_CORES: 2
-        QEMU_DISK_SIZE: 20G
-        UUID: 00000000-0000-0000-0000-000000000004
   links:
     - endpoints: ["exit:mini_lab_ext", "mini_lab_ext:exit"]
+      mtu: 9000
+    - endpoints: ["external_service:mini_lab_ext", "mini_lab_ext:external_service"]
       mtu: 9000
     - endpoints: ["leaf01:eth1", "machine01:lan0"] # Ethernet0
     - endpoints: ["leaf02:eth1", "machine01:lan1"] # Ethernet0
     - endpoints: ["leaf01:eth2", "machine02:lan0"] # Ethernet1
     - endpoints: ["leaf02:eth2", "machine02:lan1"] # Ethernet1
-    - endpoints: ["leaf01:eth3", "machine03:lan0"] # Ethernet2
-    - endpoints: ["leaf02:eth3", "machine03:lan1"] # Ethernet2
-    - endpoints: ["leaf01:eth4", "machine04:lan0"] # Ethernet3
-    - endpoints: ["leaf02:eth4", "machine04:lan1"] # Ethernet3
     - endpoints: ["leaf01:eth10", "exit:eth1"] # Ethernet9
     - endpoints: ["leaf02:eth10", "exit:eth2"] # Ethernet9

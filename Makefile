@@ -22,6 +22,7 @@ ANSIBLE_EXTRA_VARS_FILE := $(or $(ANSIBLE_EXTRA_VARS_FILE),)
 MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),sonic)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
 MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
+MINI_LAB_DELL_SONIC_VERSION := $(or $(MINI_LAB_DELL_SONIC_VERSION),4.5.1)
 
 MACHINE_OS=debian-12.0
 MAX_RETRIES := 30
@@ -29,8 +30,12 @@ MAX_RETRIES := 30
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_TOPOLOGY=mini-lab.sonic.yaml
+else ifeq ($(MINI_LAB_FLAVOR),dell_sonic)
+LAB_TOPOLOGY=mini-lab.dell_sonic.yaml
+MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_VERSION)
 else ifeq ($(MINI_LAB_FLAVOR),capms)
 LAB_TOPOLOGY=mini-lab.capms.yaml
+MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_VERSION)
 else ifeq ($(MINI_LAB_FLAVOR),gardener)
 GARDENER_ENABLED=true
 # usually gardener restricts the maximum version for k8s:
@@ -59,13 +64,10 @@ up: env gen-certs control-plane-bake partition-bake
 # for some reason an allocated machine will not be able to phone home
 # without restarting the metal-core
 # TODO: should be investigated and fixed if possible
+# check that underlay gets working
 	sleep 10
 	ssh -F files/ssh/config leaf01 'systemctl restart metal-core'
 	ssh -F files/ssh/config leaf02 'systemctl restart metal-core'
-# TODO: for community SONiC versions > 202311 a bgp restart is needed in the virtual environment
-	sleep 15
-	ssh -F files/ssh/config leaf01 'systemctl restart bgp'
-	ssh -F files/ssh/config leaf02 'systemctl restart bgp'
 
 .PHONY: restart
 restart: down up
@@ -113,7 +115,12 @@ partition: partition-bake
 .PHONY: partition-bake
 partition-bake: external_network
 	docker pull $(MINI_LAB_VM_IMAGE)
+ifeq ($(CI),true)
 	docker pull $(MINI_LAB_SONIC_IMAGE)
+endif
+ifneq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms),$(MINI_LAB_FLAVOR))
+	docker pull $(MINI_LAB_SONIC_IMAGE)
+endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
 		sudo --preserve-env $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
@@ -152,6 +159,7 @@ cleanup-control-plane:
 .PHONY: cleanup-partition
 cleanup-partition:
 	mkdir -p clab-mini-lab
+	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.dell_sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.capms.yaml
 	docker network rm --force mini_lab_ext
@@ -249,6 +257,10 @@ power-on-machine02:
 power-on-machine03:
 	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=on
 
+.PHONY: power-on-machine04
+power-on-machine04:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine04 COMMAND=on
+
 .PHONY: power-reset-machine01
 power-reset-machine01:
 	@$(MAKE) --no-print-directory _ipmi_power VM=machine01 COMMAND=reset
@@ -261,6 +273,10 @@ power-reset-machine02:
 power-reset-machine03:
 	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=reset
 
+.PHONY: power-reset-machine04
+power-reset-machine04:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine04 COMMAND=reset
+
 .PHONY: power-off-machine01
 power-off-machine01:
 	@$(MAKE) --no-print-directory _ipmi_power VM=machine01 COMMAND=off
@@ -272,6 +288,10 @@ power-off-machine02:
 .PHONY: power-off-machine03
 power-off-machine03:
 	@$(MAKE) --no-print-directory _ipmi_power VM=machine03 COMMAND=off
+
+.PHONY: power-off-machine04
+power-off-machine04:
+	@$(MAKE) --no-print-directory _ipmi_power VM=machine04 COMMAND=off
 
 .PHONY: _console
 _console:
@@ -289,6 +309,10 @@ console-machine02:
 console-machine03:
 	@$(MAKE) --no-print-directory _console VM=machine03
 
+.PHONY: console-machine04
+console-machine04:
+	@$(MAKE) --no-print-directory _console VM=machine04
+
 .PHONY: _password
 _password: env
 	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine consolepassword $(MACHINE_UUID)
@@ -300,6 +324,14 @@ password-machine01:
 .PHONY: password-machine02
 password-machine02:
 	@$(MAKE) --no-print-directory _password	MACHINE_NAME=machine02 MACHINE_UUID=00000000-0000-0000-0000-000000000002
+
+.PHONY: password-machine03
+password-machine03:
+	@$(MAKE) --no-print-directory _password	MACHINE_NAME=machine03 MACHINE_UUID=00000000-0000-0000-0000-000000000003
+
+.PHONY: password-machine04
+password-machine04:
+	@$(MAKE) --no-print-directory _password	MACHINE_NAME=machine04 MACHINE_UUID=00000000-0000-0000-0000-000000000004
 
 .PHONY: password-machine0%
 password-machine0%:
@@ -370,6 +402,17 @@ dev-env:
 	@echo "export METALCTL_API_URL=${METALCTL_API_URL}"
 	@echo "export METALCTL_HMAC=${METALCTL_HMAC}"
 	@echo "export KUBECONFIG=$(KUBECONFIG)"
+
+build-dell-sonic:
+	if [ ! -f "sonic-vs.img" ]; then \
+	    @echo "sonic-vs.img is expected in this directory"; exit; fi
+
+	@git clone https://github.com/srl-labs/vrnetlab.git
+	@cd vrnetlab && git checkout e41f48bc5cae777b56b71b67e3c5642fdbd8f315
+	@cp ./sonic-vs.img vrnetlab/dell/dell_sonic/dell-sonic-$(MINI_LAB_DELL_SONIC_VERSION).qcow2
+	@cd vrnetlab/dell/dell_sonic && make
+	docker tag vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_VERSION) r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_VERSION)
+	@rm -rf ./vrnetlab
 
 ## Gardener integration
 
