@@ -92,8 +92,6 @@
   roles:
     - name: ansible-common
       tags: always
-    - name: monitoring
-      tags: monitoring
     - name: metal-roles/partition/roles/monitoring/prometheus
       tags: prometheus
     - name: metal-roles/partition/roles/monitoring/ipmi-exporter
@@ -118,9 +116,9 @@
   any_errors_fatal: true
   become: true
   pre_tasks:
-  - name: Wait some time
-    pause:
-      seconds: 120
+    - name: Wait some time
+      pause:
+        seconds: 120
   roles:
     - name: ansible-common
       tags: always
@@ -156,8 +154,8 @@
   any_errors_fatal: true
   gather_facts: false
   pre_tasks:
-  - name: Wait until no route entries have "queued"
-    include_tasks: tasks/check_queued.yaml
+    - name: Wait until no route entries have "queued"
+      include_tasks: tasks/check_queued.yaml
 
 - name: Configure IPv6 and LLDP ports (Enterprise SONiC)
   hosts: dell_sonic
@@ -167,7 +165,7 @@
     - name: Enable IPv6 to also have LLA at VLAN interfaces
       sysctl:
         name: net.ipv6.conf.default.disable_ipv6
-        value: '0'
+        value: "0"
         state: present
         sysctl_file: /etc/sysctl.conf
     - name: Configure LLDP port IDs and descriptions

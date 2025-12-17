@@ -1,21 +1,15 @@
 monitoring_node_exporter_port: 9100
 prometheus_node_exporter_targets:
-  # - "{{ hostvars['leaf01'].ansible_host }}:{{ monitoring_node_exporter_port }}"
-  # - "{{ hostvars['leaf02'].ansible_host }}:{{ monitoring_node_exporter_port }}"
   - "leaf01:{{ monitoring_node_exporter_port }}"
   - "leaf02:{{ monitoring_node_exporter_port }}"
 
 monitoring_blackbox_exporter_port: 9115
 prometheus_blackbox_exporter_targets:
-  # - "{{ hostvars['leaf01'].ansible_host }}:{{ monitoring_blackbox_exporter_port }}"
-  # - "{{ hostvars['leaf02'].ansible_host }}:{{ monitoring_blackbox_exporter_port }}"
   - "leaf01:{{ monitoring_blackbox_exporter_port }}"
   - "leaf02:{{ monitoring_blackbox_exporter_port }}"
 
 monitoring_sonic_exporter_port: 9101
 prometheus_sonic_exporter_targets:
-  # - "{{ hostvars['leaf01'].ansible_host }}:{{ monitoring_sonic_exporter_port }}"
-  # - "{{ hostvars['leaf02'].ansible_host }}:{{ monitoring_sonic_exporter_port }}"
   - "leaf01:{{ monitoring_sonic_exporter_port }}"
   - "leaf02:{{ monitoring_sonic_exporter_port }}"
 
@@ -23,8 +17,8 @@ prometheus_ipmi_exporter_targets:
   - "{{ hostvars['machine01'].ansible_host }}"
   - "{{ hostvars['machine02'].ansible_host }}"
 
-metal_api_bmc_superuser_enabled: false
-metal_api_bmc_superuser_pwd: change-me
+# IPMI should use the same credentials as metal-api
+monitoring_ipmi_bmc_superuser_pwd: "{{ metal_api_bmc_superuser_pwd }}"
 
 prometheus_blackbox_exporter_metal_api_probe_url: "{{ metal_partition_metal_api_protocol }}://{{ metal_control_plane_ip }}:{{ metal_partition_metal_api_port }}{{ metal_partition_metal_api_basepath }}v1/version"
 prometheus_blackbox_exporter_dns: 8.8.8.8

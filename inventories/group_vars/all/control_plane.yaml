@@ -6,6 +6,8 @@ metal_control_plane_stage_name: test
 metal_control_plane_namespace: metal-control-plane
 metal_control_plane_image_pull_policy: Always
 
+metal_api_bmc_superuser_pwd: change-me
+
 helm_additional_params:
   - "--debug"
 
