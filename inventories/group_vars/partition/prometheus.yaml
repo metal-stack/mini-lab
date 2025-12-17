@@ -4,5 +4,5 @@ prometheus_remote_write:
 prometheus_hosts_content: |
   127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
   ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-  "{{ hostvars['leaf01'].ansible_host }}" leaf01
-  "{{ hostvars['leaf02'].ansible_host }}" leaf02
+  {{ hostvars['leaf01'].ansible_host }} leaf01
+  {{ hostvars['leaf02'].ansible_host }} leaf02
