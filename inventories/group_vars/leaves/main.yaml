@@ -28,3 +28,9 @@ sonic_vteps:
   vni: 103999
 
 metal_core_cidr_mask: 25
+
+sonic_ntpservers:
+- 0.europe.pool.ntp.org
+- 1.europe.pool.ntp.org
+- 2.europe.pool.ntp.org
+- 3.europe.pool.ntp.org

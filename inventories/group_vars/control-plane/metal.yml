@@ -5,7 +5,7 @@ metal_api_headscale_control_plane_address: "http://headscale.{{ metal_control_pl
 
 # metal_helm_chart_local_path: /helm-charts/charts/metal-control-plane
 
-metal_api_replicas: 1
+metal_api_replicas: 2
 metal_api_view_key: metal-view
 metal_api_edit_key: metal-edit
 metal_api_admin_key: metal-admin

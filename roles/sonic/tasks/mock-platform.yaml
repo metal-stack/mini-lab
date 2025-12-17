@@ -1,0 +1,17 @@
+---
+- name: Check if CHASSIS_INFO exists
+  shell: sonic-db-cli STATE_DB exists 'CHASSIS_INFO|chassis0'
+  register: chassis_exists
+  changed_when: false
+
+- name: Set chassis info in STATE_DB (only if missing)
+  shell: |
+    sonic-db-cli STATE_DB hmset 'CHASSIS_INFO|chassis0' \
+      part_num 'PN-MINI-LAB' \
+      serial_num '{{ inventory_hostname }}' \
+      base_mac_addr 'aa:bb:cc:dd:ee:ff' \
+      onie_version 'unknown' \
+      platform_name 'kvm_x86_64' \
+      hardware_revision '0' \
+      product_name 'SONiC-KVM'
+  when: chassis_exists.stdout.strip() == "0"

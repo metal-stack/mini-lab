@@ -2,3 +2,6 @@
 ingress_tcp_service_exposals:
   "4150": "{{ metal_control_plane_namespace }}/nsqd:4150"
   "50051": "{{ metal_control_plane_namespace }}/metal-api:50051"
+  "3000": "{{ monitoring_namespace }}/kube-prometheus-stack-grafana:80"
+  "3100": "{{ monitoring_namespace }}/loki:3100"
+  "9090": "{{ monitoring_namespace }}/kube-prometheus-stack-prometheus:9090"

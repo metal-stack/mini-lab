@@ -25,3 +25,7 @@
     reload: no
     sysctl_set: yes
     value: "1"
+
+# We need to fill some values for the sonic-exporter (uses the STATE_DB)
+- name: Mock sonic platform for kvm
+  ansible.builtin.import_tasks: mock-platform.yaml
