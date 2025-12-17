@@ -1,9 +1,11 @@
 ---
 metal_stack_release_version: develop
 
-setup_yaml:
-  - url: https://raw.githubusercontent.com/metal-stack/releases/{{ metal_stack_release_version }}/release.yaml
-    meta_var: metal_stack_release
+metal_stack_release_vectors:
+  - url: oci://ghcr.io/metal-stack/releases:{{ metal_stack_release_version }}
+    variable_mapping_path: metal_stack_release.mapping
+    include_role_defaults: metal-roles/common/roles/defaults
+    oci_cosign_verify_key: "{{ lookup('file', 'cosign.pub') }}"
 
 ##
 ## for development purposes, you can override releases from our image vector here

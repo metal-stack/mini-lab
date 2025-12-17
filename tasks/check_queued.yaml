@@ -1,0 +1,33 @@
+---
+
+
+- name: wait for more than one route
+  shell: |
+    set -euo pipefail
+    vtysh -c 'show bgp ipv4 unicast json' | jq -r '.routes | to_entries | length > 1'
+  args:
+    executable: /bin/bash
+  register: routes_check
+  until: routes_check.stdout == "true"
+  retries: 10
+  delay: 5
+  changed_when: false
+
+- name: check for queued routes
+  shell: |
+    vtysh -c 'show ip route json' | jq -r '[.[] | .[] | .queued == true] | any'
+  args:
+    executable: /bin/bash
+  register: queued_check
+  delay: 5
+  changed_when: false
+
+- name: restart bgp
+  ansible.builtin.systemd:
+    name: bgp
+    state: restarted
+  when: queued_check.stdout == "true"
+
+- name: recheck for queued routes
+  include_tasks: tasks/check_queued.yaml
+  when: queued_check.stdout == "true"

@@ -2,9 +2,11 @@
 
 The mini-lab is a small, virtual setup to locally run the metal-stack. It deploys the metal control plane and a metal-stack partition with two simulated leaf switches. The lab can be used for trying out metal-stack, demonstration purposes or development.
 
-![overview components](docs/overview.png)
+![overview components](docs/overview.drawio.svg)
 
-ℹ This project can also be used as a template for writing your own metal-stack deployments.
+> Figure 1: Simplified illustration of the mini-lab.
+
+This project can also be used as a template for writing your own metal-stack deployments.
 
 <!-- TOC depthfrom:2 depthto:6 withlinks:true updateonsave:false orderedlist:false -->
 
@@ -188,11 +190,12 @@ make power-<on,reset,off>-<machine name>
 
 ## Flavors
 
-There are two versions, or flavors, of the mini-lab environment which differ in regards to the NOS running on the leaves:
+There are four flavors of the mini-lab environment:
 
-- `sonic`: runs 2 SONiC switches
-- `capms`: runs the SONiC flavor but with three instead of two machines (this is used for  [cluster-provider-metal-stack](https://github.com/metal-stack/cluster-api-provider-metal-stack) in order to have dedicated hosts for control plane / worker / firewall)
-- `gardener`: installs the [Gardener](https://gardener.cloud) in the mini-lab
+- `sonic`: runs two Community SONiC switches
+- `dell_sonic`: runs two Enterprise SONiC switches with a [locally built vrnetlab image](https://github.com/srl-labs/vrnetlab/tree/master/dell/dell_sonic)
+- `capms`: runs the `dell_sonic` flavor but with four instead of two machines (this is used for [cluster-provider-metal-stack](https://github.com/metal-stack/cluster-api-provider-metal-stack) in order to have dedicated hosts for control plane / worker / firewall)
+- `gardener`: runs the `sonic` flavor and installs the [Gardener](https://gardener.cloud) in the mini-lab
 
 In order to start specific flavor, you can define the flavor as follows:
 
@@ -206,3 +209,5 @@ make
 An Nginx is running inside of the www container to allow automatic testing of outgoing connections.
 
 ![Network topology](docs/network.svg)
+
+> Figure 2: mini-lab network topology illustration.
