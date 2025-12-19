@@ -11,7 +11,7 @@
   roles:
     - name: ansible-common
       tags: always
-    - name: metal-roles/partition/roles/sonic
+    - name: metal-roles/partition/roles/sonic-config
       tags: sonic
     - name: sonic
       tags: sonic
