@@ -2,8 +2,10 @@
 dhcp_listening_interfaces:
   - Vlan4000
 
+sonic_config_bgp_ports:
+  - Ethernet120
+
 sonic_config_docker_routing_config_mode: split-unified
-sonic_config_frr_mgmt_framework_config: false
 sonic_config_frr_render: false
 
 sonic_config_loopback_address: "{{ lo }}"
