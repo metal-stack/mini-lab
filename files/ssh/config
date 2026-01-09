@@ -4,6 +4,7 @@ Host leaf*
 Host *
     User metal
     IdentityFile files/ssh/id_rsa
+    IdentitiesOnly yes
     PasswordAuthentication no
     StrictHostKeyChecking no
     UserKnownHostsFile /dev/null
