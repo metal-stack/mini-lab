@@ -2,7 +2,7 @@
 dhcp_listening_interfaces:
   - Vlan4000
 
-sonic_config_bgp_ports:
+metal_core_spine_uplinks:
   - Ethernet120
 
 sonic_config_docker_routing_config_mode: split-unified
@@ -24,5 +24,3 @@ sonic_config_vtep:
   enabled: true
 
 metal_core_cidr_mask: 25
-metal_core_spine_uplinks:
-  - Ethernet120
