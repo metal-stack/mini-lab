@@ -20,5 +20,4 @@ prometheus_ipmi_exporter_targets:
 # IPMI should use the same credentials as metal-api
 monitoring_ipmi_bmc_superuser_pwd: "{{ metal_api_bmc_superuser_pwd }}"
 
-prometheus_blackbox_exporter_metal_api_probe_url: "{{ metal_partition_metal_api_protocol }}://{{ metal_control_plane_ip }}:{{ metal_partition_metal_api_port }}{{ metal_partition_metal_api_basepath }}v1/version"
-prometheus_blackbox_exporter_dns: 8.8.8.8
+prometheus_blackbox_exporter_metal_api_probe_url: "{{ metal_partition_metal_api_protocol }}://{{ metal_partition_metal_api_addr }}:{{ metal_partition_metal_api_port }}{{ metal_partition_metal_api_basepath }}v1/version"
