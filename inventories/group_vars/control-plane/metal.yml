@@ -15,48 +15,47 @@ metal_api_nsq_tcp_address: nsqd:4150
 metal_apiserver_enabled: true
 metal_apiserver_url: http://v2.api.{{ metal_control_plane_ingress_dns }}:8080
 
-metal_apiserver_oidc_discovery_url: http://auth.{{ metal_control_plane_ingress_dns }}:8080/dex/.well-known/openid-configuration
-metal_apiserver_oidc_end_session_url: ""
-metal_apiserver_oidc_client_id: metal-stack
-metal_apiserver_oidc_client_secret: secret
+metal_apiserver_oidc_secret_name: zitadel-client-credentials
+metal_apiserver_oidc_discovery_url: https://zitadel.{{ metal_control_plane_ingress_dns }}:4443/.well-known/openid-configuration
+metal_apiserver_oidc_end_session_url: "https://zitadel.{{ metal_control_plane_ingress_dns }}:4443/oidc/v1/end_session"
 
 metal_apiserver_redis_password: change-me-soon
-metal_apiserver_admin_subjects: "CiQwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDESBWxvY2Fs@oidc"
+metal_apiserver_admin_subjects: "admin@metal-stack.zitadel.172.17.0.1.nip.io@openid-connect"
 
 metal_api_images:
-- id: firewall-ubuntu-3.0
-  name: Firewall 3 Ubuntu
-  description: Firewall 3 Ubuntu Latest Release
-  url: https://images.metal-stack.io/metal-os/stable/firewall/3.0-ubuntu/img.tar.lz4
-  features:
-    - firewall
-- id: ubuntu-24.4
-  name: Ubuntu 24.04
-  description: Ubuntu 24.04 Latest Release
-  url: https://images.metal-stack.io/metal-os/stable/ubuntu/24.04/img.tar.lz4
-  features:
-    - machine
-- id: debian-12.0
-  name: Debian 12
-  description: Debian 12 Latest Release
-  url: https://images.metal-stack.io/metal-os/stable/debian/12/img.tar.lz4
-  features:
-    - machine
+  - id: firewall-ubuntu-3.0
+    name: Firewall 3 Ubuntu
+    description: Firewall 3 Ubuntu Latest Release
+    url: https://images.metal-stack.io/metal-os/stable/firewall/3.0-ubuntu/img.tar.lz4
+    features:
+      - firewall
+  - id: ubuntu-24.4
+    name: Ubuntu 24.04
+    description: Ubuntu 24.04 Latest Release
+    url: https://images.metal-stack.io/metal-os/stable/ubuntu/24.04/img.tar.lz4
+    features:
+      - machine
+  - id: debian-12.0
+    name: Debian 12
+    description: Debian 12 Latest Release
+    url: https://images.metal-stack.io/metal-os/stable/debian/12/img.tar.lz4
+    features:
+      - machine
 
 metal_api_sizes:
-- id: v1-small-x86
-  name: v1-small-x86
-  description: The Tiny Virtual
-  constraints:
-  - type: cores
-    min: 1
-    max: 4
-  - type: memory
-    min: "{{ '500MB' | humanfriendly }}"
-    max: "{{ '4GB' | humanfriendly }}"
-  - type: storage
-    min: "{{ '1GB' | humanfriendly }}"
-    max: "{{ '100GB' | humanfriendly }}"
+  - id: v1-small-x86
+    name: v1-small-x86
+    description: The Tiny Virtual
+    constraints:
+      - type: cores
+        min: 1
+        max: 4
+      - type: memory
+        min: "{{ '500MB' | humanfriendly }}"
+        max: "{{ '4GB' | humanfriendly }}"
+      - type: storage
+        min: "{{ '1GB' | humanfriendly }}"
+        max: "{{ '100GB' | humanfriendly }}"
 
 metal_api_partitions:
   - id: mini-lab
@@ -69,61 +68,61 @@ metal_api_partitions:
     privatenetworkprefixlength: 22
 
 metal_api_networks:
-- id: tenant-super-network-mini-lab
-  name: "Project Super Network"
-  description: "Super network of all project networks"
-  nat: false
-  privatesuper: true
-  underlay: false
-  destinationprefixes: []
-  partitionid: mini-lab
-  defaultchildprefixlength:
-    IPv4: 22
-    IPv6: 96
-  prefixes:
-  - 10.0.0.0/16
-  - 2001:db8:0:10::/64
-  additionalAnnouncableCIDRs:
-  - 10.240.0.0/12
-- id: internet-mini-lab
-  name: "Virtual Internet Network"
-  description: "Virtual Internet Network for mini-lab"
-  nat: true
-  privatesuper: false
-  underlay: false
-  destinationprefixes:
-    - 0.0.0.0/0
-    - ::/0
-  partitionid: "mini-lab"
-  vrf: 104009
-  prefixes:
-  - 203.0.113.128/25
-  - 2001:db8:0:113::/64
-  labels:
-    network.metal-stack.io/default: ""
-    network.metal-stack.io/default-external: ""
-- id: underlay-mini-lab
-  name: "Underlay Network"
-  description: "Underlay Network for mini-lab"
-  nat: false
-  privatesuper: false
-  underlay: true
-  destinationprefixes: []
-  partitionid: "mini-lab"
-  prefixes:
-  - 10.1.0.0/24
+  - id: tenant-super-network-mini-lab
+    name: "Project Super Network"
+    description: "Super network of all project networks"
+    nat: false
+    privatesuper: true
+    underlay: false
+    destinationprefixes: []
+    partitionid: mini-lab
+    defaultchildprefixlength:
+      IPv4: 22
+      IPv6: 96
+    prefixes:
+      - 10.0.0.0/16
+      - 2001:db8:0:10::/64
+    additionalAnnouncableCIDRs:
+      - 10.240.0.0/12
+  - id: internet-mini-lab
+    name: "Virtual Internet Network"
+    description: "Virtual Internet Network for mini-lab"
+    nat: true
+    privatesuper: false
+    underlay: false
+    destinationprefixes:
+      - 0.0.0.0/0
+      - ::/0
+    partitionid: "mini-lab"
+    vrf: 104009
+    prefixes:
+      - 203.0.113.128/25
+      - 2001:db8:0:113::/64
+    labels:
+      network.metal-stack.io/default: ""
+      network.metal-stack.io/default-external: ""
+  - id: underlay-mini-lab
+    name: "Underlay Network"
+    description: "Underlay Network for mini-lab"
+    nat: false
+    privatesuper: false
+    underlay: true
+    destinationprefixes: []
+    partitionid: "mini-lab"
+    prefixes:
+      - 10.1.0.0/24
 
 metal_api_ips:
-- name: "reserve v4"
-  description: "Reserve IPv4 (for testing purposes)"
-  networkid: internet-mini-lab
-  projectid: 00000000-0000-0000-0000-000000000000
-  ipaddress: "203.0.113.142"
-- name: "reserve v6"
-  description: "Reserve IPv6 (for testing purposes)"
-  networkid: internet-mini-lab
-  projectid: 00000000-0000-0000-0000-000000000000
-  ipaddress: "2001:db8:0:113::142"
+  - name: "reserve v4"
+    description: "Reserve IPv4 (for testing purposes)"
+    networkid: internet-mini-lab
+    projectid: 00000000-0000-0000-0000-000000000000
+    ipaddress: "203.0.113.142"
+  - name: "reserve v6"
+    description: "Reserve IPv6 (for testing purposes)"
+    networkid: internet-mini-lab
+    projectid: 00000000-0000-0000-0000-000000000000
+    ipaddress: "2001:db8:0:113::142"
 
 metal_masterdata_api_tls_ca: "{{ lookup('file', 'certs/ca.pem') }}"
 metal_masterdata_api_tls_cert: "{{ lookup('file', 'certs/masterdata-api/server.pem') }}"
@@ -135,23 +134,23 @@ metal_masterdata_api_tls_client_key: "{{ lookup('file', 'certs/masterdata-api/cl
 metal_masterdata_api_port: 8445
 
 metal_masterdata_api_tenants:
-- meta:
-    id: metal-stack
-    kind: Tenant
-    apiversion: v1
-    version: 0
-  name: metal-stack
-  iam_config:
-  description: metal-stack tenant, which is provider
+  - meta:
+      id: metal-stack
+      kind: Tenant
+      apiversion: v1
+      version: 0
+    name: metal-stack
+    iam_config:
+    description: metal-stack tenant, which is provider
 
 metal_masterdata_api_projects:
-- meta:
-    id: 00000000-0000-0000-0000-000000000001
-    kind: Project
-    apiversion: v1
-    version: 0
-  name: sample-project
-  description: Sample project with static id
+  - meta:
+      id: 00000000-0000-0000-0000-000000000001
+      kind: Project
+      apiversion: v1
+      version: 0
+    name: sample-project
+    description: Sample project with static id
 
 metal_console_enabled: false
 

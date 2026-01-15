@@ -211,3 +211,22 @@ An Nginx is running inside of the www container to allow automatic testing of ou
 ![Network topology](docs/network.svg)
 
 > Figure 2: mini-lab network topology illustration.
+
+## V2 Quickstart
+
+Login with [cli](https://github.com/metal-stack/cli):
+
+```bash
+$ metalctlv2 login --provider openid-connect
+```
+
+User: olli.owner@metal-stack.io
+Password: Olli.Owner123!
+ 
+User: gerrit.guest@metal-stack.io
+Password: Gerrit.Guest123!
+
+Zitadel Admin:
+
+User: admin@metal-stack.zitadel.172.17.0.1.nip.io
+Password: Password1!
