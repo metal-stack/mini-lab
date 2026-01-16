@@ -31,6 +31,10 @@
       tags: auth
     - name: metal-roles/control-plane/roles/metal
       tags: metal
+    - name: metal-roles/control-plane/roles/logging
+      tags: logging
+    - name: metal-roles/control-plane/roles/monitoring
+      tags: monitoring
 
 - name: deploy gardener
   import_playbook: deploy_gardener.yaml
