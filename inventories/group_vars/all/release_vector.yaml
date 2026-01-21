@@ -29,6 +29,8 @@ metal_stack_release_vectors:
 # headscale_db_backup_restore_sidecar_image_name:
 # headscale_db_image_tag: 17-alpine
 # headscale_db_image_name: postgres
+# sonic_configdb_utils_image_name:
+# sonic_configdb_utils_image_tag:
 # ...
 #
 
