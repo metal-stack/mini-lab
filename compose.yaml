@@ -21,6 +21,7 @@ services:
       - DOCKER_HUB_USER=${DOCKER_HUB_USER}
       - DOCKER_HUB_TOKEN=${DOCKER_HUB_TOKEN}
       - GARDENER_ENABLED=${GARDENER_ENABLED:-}
+      - MONITORING_ENABLED=${MONITORING_ENABLED:-}
     network_mode: host
     working_dir: /mini-lab
     entrypoint:
@@ -48,6 +49,7 @@ services:
       - CI=${CI}
       - DOCKER_HUB_USER=${DOCKER_HUB_USER}
       - DOCKER_HUB_TOKEN=${DOCKER_HUB_TOKEN}
+      - MONITORING_ENABLED=${MONITORING_ENABLED:-}
     network_mode: host
     working_dir: /mini-lab
     entrypoint:
