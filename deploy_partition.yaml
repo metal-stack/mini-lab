@@ -89,6 +89,7 @@
 
 - name: Deploy monitoring on leaf01
   hosts: leaf01
+  become: true
   roles:
     - name: ansible-common
       tags: always
@@ -101,6 +102,7 @@
 
 - name: Deploy monitoring on leaves
   hosts: leaves
+  become: true
   roles:
     - name: ansible-common
       tags: always
