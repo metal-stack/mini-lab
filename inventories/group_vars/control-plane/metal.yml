@@ -3,14 +3,15 @@ metal_set_resource_limits: no
 metal_check_api_health_endpoint: http://api.{{ metal_control_plane_ingress_dns }}:8080/metal/v1/health
 metal_api_headscale_control_plane_address: "http://headscale.{{ metal_control_plane_ingress_dns }}:8080"
 
-# metal_helm_chart_local_path: /helm-charts/charts/metal-control-plane
-
-metal_api_replicas: 2
+metal_api_pdb_min_available: 1
+metal_api_replicas: 1
 metal_api_view_key: metal-view
 metal_api_edit_key: metal-edit
 metal_api_admin_key: metal-admin
 
 metal_api_nsq_tcp_address: nsqd:4150
+
+metal_apiserver_pdb_min_available: 1
 
 metal_apiserver_enabled: true
 metal_apiserver_url: http://v2.api.{{ metal_control_plane_ingress_dns }}:8080
@@ -21,6 +22,8 @@ metal_apiserver_oidc_end_session_url: "https://zitadel.{{ metal_control_plane_in
 
 metal_apiserver_redis_password: change-me-soon
 metal_apiserver_admin_subjects: "admin@metal-stack.zitadel.172.17.0.1.nip.io@openid-connect"
+
+metal_api_bmc_superuser_pwd: change-me
 
 metal_api_images:
   - id: firewall-ubuntu-3.0
