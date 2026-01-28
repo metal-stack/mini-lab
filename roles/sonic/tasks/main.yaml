@@ -29,3 +29,9 @@
 # We need to fill some values for the sonic-exporter (uses the STATE_DB)
 - name: Mock sonic platform for kvm
   ansible.builtin.import_tasks: mock-platform.yaml
+
+# ntp restarting for monitoring -> otherwise some NodeTimeOutOfSync error
+- name: restart chrony
+  systemd:
+    name: chrony
+    state: restarted

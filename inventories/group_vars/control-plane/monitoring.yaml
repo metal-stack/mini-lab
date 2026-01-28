@@ -1,3 +1,4 @@
+---
 monitoring_ingress_grafana_tls: no
 
 monitoring_grafana_github_oauth:
@@ -7,3 +8,5 @@ monitoring_grafana_extra_secret_mounts: []
 monitoring_thanos_receive_enabled: true
 monitoring_thanos_receive_ingress_enabled: true
 monitoring_thanos_receive_size: 5Gi
+
+monitoring_prometheus_core_dns_enabled: true
