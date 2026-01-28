@@ -2,6 +2,7 @@
 dhcp_listening_interfaces:
   - Vlan4000
 
+metal_core_cidr_mask: 25
 metal_core_spine_uplinks:
   - Ethernet120
 
@@ -23,14 +24,12 @@ sonic_vlans:
 
 # Dummy VTEP so that basic VXLAN config will be deployed by sonic role:
 sonic_vteps:
-- comment: Dummy
-  vlan: Vlan3999
-  vni: 103999
-
-metal_core_cidr_mask: 25
+  - comment: Dummy
+    vlan: Vlan3999
+    vni: 103999
 
 sonic_ntpservers:
-- 0.europe.pool.ntp.org
-- 1.europe.pool.ntp.org
-- 2.europe.pool.ntp.org
-- 3.europe.pool.ntp.org
+  - 0.europe.pool.ntp.org
+  - 1.europe.pool.ntp.org
+  - 2.europe.pool.ntp.org
+  - 3.europe.pool.ntp.org
