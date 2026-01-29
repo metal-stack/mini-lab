@@ -1,0 +1,31 @@
+---
+# exporters
+
+prometheus_sonic_exporter_targets:
+  - "leaf01:{{ monitoring_sonic_exporter_port }}"
+  - "leaf02:{{ monitoring_sonic_exporter_port }}"
+
+prometheus_blackbox_exporter_targets:
+  - "leaf01:{{ monitoring_blackbox_exporter_port }}"
+  - "leaf02:{{ monitoring_blackbox_exporter_port }}"
+
+prometheus_node_exporter_targets:
+  - "leaf01:{{ monitoring_node_exporter_port }}"
+  - "leaf02:{{ monitoring_node_exporter_port }}"
+
+prometheus_ipmi_exporter_targets:
+  - "{{ hostvars['machine01'].ansible_host }}"
+  - "{{ hostvars['machine02'].ansible_host }}"
+
+prometheus_blackbox_exporter_metal_api_probe_url: "{{ metal_partition_metal_api_protocol }}://{{ metal_partition_metal_api_addr }}:{{ metal_partition_metal_api_port }}{{ metal_partition_metal_api_basepath }}v1/version"
+
+prometheus_remote_write:
+  - url: "http://thanos-receive.{{ metal_control_plane_ingress_dns }}:8080/api/v1/receive"
+
+prometheus_hosts_content: |
+  127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+  ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+  {{ hostvars['leaf01'].ansible_host }} leaf01
+  {{ hostvars['leaf02'].ansible_host }} leaf02
+
+prometheus_haproxy_enabled: false

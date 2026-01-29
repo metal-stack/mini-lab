@@ -2,6 +2,7 @@
 dhcp_listening_interfaces:
   - Vlan4000
 
+metal_core_cidr_mask: 25
 metal_core_spine_uplinks:
   - Ethernet120
 
@@ -23,4 +24,9 @@ sonic_config_vlans:
 sonic_config_vtep:
   enabled: true
 
-metal_core_cidr_mask: 25
+sonic_config_ntp:
+  servers:
+    - 0.europe.pool.ntp.org
+    - 1.europe.pool.ntp.org
+    - 2.europe.pool.ntp.org
+    - 3.europe.pool.ntp.org

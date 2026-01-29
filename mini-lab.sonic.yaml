@@ -32,11 +32,15 @@ topology:
       image: ${MINI_LAB_SONIC_IMAGE}
       binds:
         - files/ssh/id_rsa.pub:/authorized_keys
+      env:
+        QEMU_MEMORY: 4096
     leaf02:
       group: leaves
       image: ${MINI_LAB_SONIC_IMAGE}
       binds:
         - files/ssh/id_rsa.pub:/authorized_keys
+      env:
+        QEMU_MEMORY: 4096
     machine01:
       group: machines
       image: ${MINI_LAB_VM_IMAGE}

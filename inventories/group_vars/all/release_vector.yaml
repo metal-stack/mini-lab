@@ -6,7 +6,6 @@ metal_stack_release_vectors:
     variable_mapping_path: metal_stack_release.mapping
     include_role_defaults: metal-roles/common/roles/defaults
     oci_cosign_verify_key: "{{ lookup('file', 'cosign.pub') }}"
-
 ##
 ## for development purposes, you can override releases from our image vector here
 ##
