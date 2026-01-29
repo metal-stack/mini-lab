@@ -21,8 +21,8 @@ metal_stack_release_vectors:
 # metal_masterdata_api_image_tag:
 # metal_console_image_name:
 # metal_console_image_tag:
-metal_core_image_name: ghcr.io/metal-stack/metal-core
-metal_core_image_tag: v0.15.0
+# metal_core_image_name:
+# metal_core_image_tag:
 # headscale_image_tag:
 # headscale_db_backup_restore_sidecar_image_tag:
 # headscale_db_backup_restore_sidecar_image_name:
