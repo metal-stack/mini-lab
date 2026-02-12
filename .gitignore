@@ -17,3 +17,4 @@ files/certs/*.pem
 files/certs/**/*.pem
 files/certs/**/*.crt
 .vscode
+vrnetlab

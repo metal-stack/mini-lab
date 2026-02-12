@@ -97,6 +97,7 @@ jobs:
         flavors:
           - name: sonic
           - name: gardener
+          - name: dell_sonic
 
     steps:
     - name: Gain back workspace permissions # https://github.com/actions/checkout/issues/211
@@ -110,6 +111,13 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # set if required:
         # DESIRED_VERSION: v0.59.0
+
+    - name: Log in to the container registry
+      uses: docker/login-action@v3
+      with:
+        registry: r.metal-stack.io
+        username: ${{ secrets.R_METALSTACK_IO_READ_USER }}
+        password: ${{ secrets.R_METALSTACK_IO_READ_PASSWORD }}
 
     - name: Checkout
       uses: actions/checkout@v4
