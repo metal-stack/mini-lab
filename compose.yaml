@@ -8,10 +8,10 @@ services:
       - .:/mini-lab
       # for developing role dependencies
       # TODO: make this a switch
-      - ${HOME}/.ansible/roles/ansible-common:/root/.ansible/roles/ansible-common:ro
+      # - ${HOME}/.ansible/roles/ansible-common:/root/.ansible/roles/ansible-common:ro
       # - ${HOME}/.ansible/roles/metal-roles:/root/.ansible/roles/metal-roles:ro
       # - ${HOME}/.ansible/roles/metal-ansible-modules:/root/.ansible/roles/metal-ansible-modules:ro
-      - ${HOME}/git/github.com/metal-stack/helm-charts:/helm-charts:ro
+      # - ${HOME}/git/github.com/metal-stack/helm-charts:/helm-charts:ro
     environment:
       - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
       - ANSIBLE_INVENTORY=inventories/control-plane.yaml
@@ -40,8 +40,8 @@ services:
       - .:/mini-lab
       # for developing role dependencies
       # TODO: make this a switch
-      - ${HOME}/.ansible/roles/ansible-common:/root/.ansible/roles/ansible-common:ro
-      - ${HOME}/.ansible/roles/metal-roles:/root/.ansible/roles/metal-roles:ro
+      # - ${HOME}/.ansible/roles/ansible-common:/root/.ansible/roles/ansible-common:ro
+      # - ${HOME}/.ansible/roles/metal-roles:/root/.ansible/roles/metal-roles:ro
       # - ${HOME}/.ansible/roles/metal-ansible-modules:/root/.ansible/roles/metal-ansible-modules:ro
     environment:
       - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
@@ -60,8 +60,7 @@ services:
       - |
         cosign verify --key files/cosign.pub ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
         ansible -m metalstack.base.metal_stack_release_vector localhost --extra-vars "@.extra_vars.yaml"
-        #ansible-playbook deploy_partition.yaml --extra-vars "@.extra_vars.yaml"
-        tail -f /etc/hosts
+        ansible-playbook deploy_partition.yaml --extra-vars "@.extra_vars.yaml"
 
   metalctl:
     image: ghcr.io/metal-stack/metalctl:${METALCTL_IMAGE_TAG}
