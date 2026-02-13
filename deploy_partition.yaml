@@ -6,8 +6,8 @@
   roles:
     - name: ansible-common
       tags: always
-    - name: metal-roles/control-plane/roles/metal-python
-    - name: metal-roles/control-plane/roles/metal-deployment-token
+    - name: metal-roles/common/roles/metal-v2-client
+    - name: metal-roles/common/roles/metal-deployment-token
 
 - name: Configure leaves (Community SONiC)
   hosts: leaves:!dell_sonic
