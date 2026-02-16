@@ -1,14 +1,4 @@
 ---
-- name: Install python client and generate deployment token
-  hosts: localhost
-  connection: local
-  gather_facts: false
-  roles:
-    - name: ansible-common
-      tags: always
-    - name: metal-roles/common/roles/metal-v2-client
-    - name: metal-roles/common/roles/metal-deployment-token
-
 - name: Configure leaves (Community SONiC)
   hosts: leaves:!dell_sonic
   any_errors_fatal: true
@@ -87,6 +77,25 @@
         cleanup: true
         pull: true
       failed_when: false
+
+- name: Install python client and generate deployment token
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  pre_tasks:
+    - name: Wait until the metal-apiserver is running
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        name: metal-apiserver
+        namespace: "{{ metal_control_plane_namespace }}"
+        wait: true
+        wait_sleep: 1
+        wait_timeout: 600
+  roles:
+    - name: ansible-common
+      tags: always
+    - name: metal-roles/common/roles/metal-v2-client
+    - name: metal-roles/common/roles/metal-deployment-token
 
 - name: Deploy pixiecore on leaf01
   hosts: leaf01
