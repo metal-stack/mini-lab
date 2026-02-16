@@ -165,6 +165,8 @@
       tags: always
     - name: metal-ansible-modules
       tags: always
+    - name: metal-roles/control-plane/roles/metal-python
+      tags: metal-python
   post_tasks:
     - name: Wait for switches to register
       command: echo
