@@ -24,9 +24,3 @@
     wait: true
     set_values:
       - image.tag: latest
-#
-# - name: Deploy tenant control plane
-#   kubernetes.core.k8s:
-#     state: present
-#     template: "{{ lookup('template', 'tenant-control-plane.yaml.j2') | from_yaml }}"
-#     wait: true
