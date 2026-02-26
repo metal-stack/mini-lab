@@ -6,4 +6,7 @@ metal_control_plane_namespace: metal-control-plane
 metal_control_plane_image_pull_policy: Always
 
 helm_additional_params:
-  - '--debug'
+  - "--debug"
+
+# needs to be in all -> paritition and control-plane
+metal_api_bmc_superuser_pwd: change-me
