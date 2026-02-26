@@ -1,0 +1,13 @@
+---
+- name: deploy kamaji
+  hosts: control-plane
+  connection: local
+  gather_facts: false
+
+  roles:
+    - name: ansible-common
+      tags: always
+    - name: kamaji
+      tags: kamaji
+  # vars:
+  #   metal_control_plane_host_provider: metal
