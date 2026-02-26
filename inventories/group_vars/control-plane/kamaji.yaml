@@ -1,2 +1,2 @@
 ---
-kamaji_enabled: "{{ lookup('env', 'KAMAAJI_ENABLED') | default('', false) }}"
+kamaji_enabled: "{{ lookup('env', 'KAMAJI_ENABLED') | default('', false) }}"
