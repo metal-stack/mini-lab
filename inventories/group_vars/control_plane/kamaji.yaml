@@ -1,9 +1,2 @@
 ---
-kamaaji_enabled: "{{ lookup('env', 'KAMAAJI_ENABLED') | default('', false) }}"
-
-tenant_name: kamaji-tenant-control-plane
-tenant_namespace: kamaji-tenant
-tenant_version: v1.33.0
-
-tenant_port: 6443
-tenant_proxy_port: 8132
+kamaji_enabled: "{{ lookup('env', 'KAMAAJI_ENABLED') | default('', false) }}"
