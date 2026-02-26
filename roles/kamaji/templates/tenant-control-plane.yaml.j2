@@ -1,0 +1,35 @@
+---
+apiVersion: kamaji.clastix.io/v1alpha1
+kind: TenantControlPlane
+metadata:
+  name: {{ tenant_name }}
+  labels:
+   tenant.clastix.io: {{ tenant_name }}
+spec:
+  controlPlane:
+    deployment:
+      replicas: 2
+    service:
+      serviceType: LoadBalancer
+  kubernetes:
+    version: {{ tenant_version }}
+    kubelet:
+      configurationJSONPatches:
+        - op: add
+          path: /featureGates
+          value:
+            KubeletCrashLoopBackOffMax: false
+            KubeletEnsureSecretPulledImages: false
+        - op: replace
+          path: /cgroupDriver
+          value: systemd
+  networkProfile:
+    port: {{ tenant_port }}
+  addons:
+    coreDNS: {}
+    kubeProxy: {}
+    konnectivity:
+      server:
+        port: {{ tenant_proxy_port }}
+      agent:
+        mode: DaemonSet
