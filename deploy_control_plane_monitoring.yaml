@@ -1,0 +1,11 @@
+---
+- name: Deploy control plane monitoring
+  hosts: control-plane
+  connection: local
+  gather_facts: false
+  roles:
+    - name: metal-roles/control-plane/roles/logging
+      tags: logging
+
+    - name: metal-roles/control-plane/roles/monitoring
+      tags: monitoring

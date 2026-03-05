@@ -10,3 +10,13 @@ monitoring_thanos_receive_ingress_enabled: true
 monitoring_thanos_receive_size: 5Gi
 
 monitoring_prometheus_core_dns_enabled: true
+
+monitoring_thanos_object_store_config: |-
+  type: s3
+  config:
+    bucket: thanos
+    endpoint: "{{ minio_dns_name + ':8080' }}"
+    access_key: "{{ minio_root_user }}"
+    secret_key: "{{ minio_root_password }}"
+    insecure: true
+    region: us-east-1
