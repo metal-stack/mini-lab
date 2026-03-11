@@ -9,7 +9,6 @@
     name: metallb
     repo_url: https://metallb.github.io/metallb
 
-
 - name: Add clastix repo
   kubernetes.core.helm_repository:
     name: clastix
@@ -45,8 +44,8 @@
 
 - name: Find node InternalIP
   ansible.builtin.set_fact:
-    kind_node_ip: "{{ item.address }}"
-  loop: "{{ cluster_nodes.resources[0].status.addresses }}"
+    kind_node_ip: '{{ item.address }}'
+  loop: '{{ cluster_nodes.resources[0].status.addresses }}'
   when: item.type == 'InternalIP'
 
 - name: Derive MetalLB network prefix
@@ -55,7 +54,7 @@
 
 - name: Debug MetalLB network prefix
   ansible.builtin.debug:
-    msg: "kind_node_ip={{ kind_node_ip }} metallb_kind_net_prefix={{ metallb_kind_net_prefix }}"
+    msg: 'kind_node_ip={{ kind_node_ip }} metallb_kind_net_prefix={{ metallb_kind_net_prefix }}'
 
 - name: Apply MetalLB IP address pool
   kubernetes.core.k8s:
@@ -74,3 +73,10 @@
     set_values:
       - value: image.tag=latest
       - value: resources=null
+
+- name: Create kamaji tenant cluster namespace
+  kubernetes.core.k8s:
+    name: kamaji-tenants
+    api_version: v1
+    kind: Namespace
+    state: present
