@@ -192,12 +192,12 @@ make power-<on,reset,off>-<machine name>
 
 ## Flavors
 
-There are five flavors of the mini-lab environment:
+All available mini-lab flavors are listed below:
 
 - `sonic`: runs two Community SONiC switches
 - `dell_sonic`: runs two Enterprise SONiC switches with a [locally built vrnetlab image](https://github.com/srl-labs/vrnetlab/tree/master/dell/dell_sonic)
 - `capms`: runs the `dell_sonic` flavor but with four instead of two machines (this is used for [cluster-provider-metal-stack](https://github.com/metal-stack/cluster-api-provider-metal-stack) in order to have dedicated hosts for control plane / worker / firewall)
-- `kamaji`: runs the `sonic` flavor. The working example is available at the [cluster-provider-metal-stack](https://github.com/metal-stack/cluster-api-provider-metal-stack)'s `capi-lab`.
+- `kamaji`: runs a variation of the `sonic` flavor. The working example is available at the [cluster-provider-metal-stack](https://github.com/metal-stack/cluster-api-provider-metal-stack)'s `capi-lab`.
 - `gardener`: runs the `sonic` flavor and installs the [Gardener](https://gardener.cloud) in the mini-lab
 
 In order to start specific flavor, you can define the flavor as follows:
