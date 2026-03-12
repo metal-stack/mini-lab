@@ -52,10 +52,6 @@
   ansible.builtin.set_fact:
     metallb_kind_net_prefix: "{{ kind_node_ip | regex_replace('^([0-9]+\\.[0-9]+)\\..*$', '\\1') }}"
 
-- name: Debug MetalLB network prefix
-  ansible.builtin.debug:
-    msg: 'kind_node_ip={{ kind_node_ip }} metallb_kind_net_prefix={{ metallb_kind_net_prefix }}'
-
 - name: Apply MetalLB IP address pool
   kubernetes.core.k8s:
     state: present
