@@ -18,6 +18,8 @@ CONTAINERLAB=$(shell which containerlab)
 
 # extra vars can be used by projects that built on the mini-lab, which want to override default configuration
 ANSIBLE_EXTRA_VARS_FILE := $(or $(ANSIBLE_EXTRA_VARS_FILE),)
+# do not show skipped ansible tasks
+ANSIBLE_DISPLAY_SKIPPED_HOSTS=false
 
 MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),sonic)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
