@@ -15,7 +15,8 @@ This project can also be used as a template for writing your own metal-stack dep
 - [Try it out](#try-it-out)
     - [Power management](#power-management)
 - [Flavors](#flavors)
-- [Network Topology](#network-topology)
+- [Network topology](#network-topology)
+- [V2 Quickstart](#v2-quickstart)
 
 <!-- /TOC -->
 
@@ -82,8 +83,9 @@ cd mini-lab
 Start the mini-lab with a kind cluster, a metal-api instance as well as two containers wrapping leaf switches and another container that hosts two user-allocatable machines:
 
 ```bash
-make
+make MONITORING_ENABLED=false
 # containerlab will ask you for root permissions (https://github.com/srl-labs/containerlab/issues/669)
+# if you explicitly want to see the monitoring stack you can also run "make" without passing any params
 ```
 
 Before the upcoming steps, you need to bind some environment variables using the following command. This ensures `metalctl` `kubectl` are able to communicate with your mini-lab.
@@ -222,7 +224,7 @@ $ metalctlv2 login --provider openid-connect
 
 User: olli.owner@metal-stack.io
 Password: Olli.Owner123!
- 
+
 User: gerrit.guest@metal-stack.io
 Password: Gerrit.Guest123!
 

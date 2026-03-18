@@ -1,2 +1,2 @@
 ---
-monitoring_enabled: "{{ lookup('env', 'MONITORING_ENABLED') | default('', false) }}"
+monitoring_enabled: "{{ lookup('env', 'MONITORING_ENABLED') | default('', false) | bool }}"
