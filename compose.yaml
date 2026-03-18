@@ -14,6 +14,7 @@ services:
       # - ${HOME}/git/github.com/metal-stack/helm-charts:/helm-charts:ro
     environment:
       - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
+      - ANSIBLE_DISPLAY_SKIPPED_HOSTS=${ANSIBLE_DISPLAY_SKIPPED_HOSTS}
       - ANSIBLE_INVENTORY=inventories/control-plane.yaml
       - KUBECONFIG=/mini-lab/.kubeconfig
       - K8S_AUTH_KUBECONFIG=/mini-lab/.kubeconfig
@@ -45,6 +46,7 @@ services:
       # - ${HOME}/.ansible/roles/metal-ansible-modules:/root/.ansible/roles/metal-ansible-modules:ro
     environment:
       - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
+      - ANSIBLE_DISPLAY_SKIPPED_HOSTS=${ANSIBLE_DISPLAY_SKIPPED_HOSTS}
       - ANSIBLE_INVENTORY=inventories/partition.yaml,clab-mini-lab/ansible-inventory.yml
       - CI=${CI}
       - DOCKER_HUB_USER=${DOCKER_HUB_USER}
