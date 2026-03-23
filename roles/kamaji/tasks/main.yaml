@@ -24,10 +24,6 @@
     set_values:
       - value: installCRDs=true
 
-# <ai>
-# Claude Opus 4.6 was used to generate the following Ansible tasks based on the provided code snippets and context of
-# the Getting Started guide for Kamaji with kind: https://kamaji.clastix.io/getting-started/kamaji-kind/
-# They are intended to install metallb with an address pool that matches the kind network.
 - name: Deploy metallb
   kubernetes.core.helm:
     chart_ref: metallb/metallb
@@ -36,27 +32,10 @@
     create_namespace: true
     wait: true
 
-- name: Read cluster nodes
-  kubernetes.core.k8s_info:
-    api_version: v1
-    kind: Node
-  register: cluster_nodes
-
-- name: Find node InternalIP
-  ansible.builtin.set_fact:
-    kind_node_ip: '{{ item.address }}'
-  loop: '{{ cluster_nodes.resources[0].status.addresses }}'
-  when: item.type == 'InternalIP'
-
-- name: Derive MetalLB network prefix
-  ansible.builtin.set_fact:
-    metallb_kind_net_prefix: "{{ kind_node_ip | regex_replace('^([0-9]+\\.[0-9]+)\\..*$', '\\1') }}"
-
 - name: Apply MetalLB IP address pool
   kubernetes.core.k8s:
     state: present
     template: metallb-kind-ip-pool.yaml
-# </ai>
 
 - name: Deploy kamaji
   kubernetes.core.helm:
