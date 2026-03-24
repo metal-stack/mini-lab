@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Script is taken from https://netdevops.me/2021/transparently-redirecting-packetsframes-between-interfaces/
 # Read it for better understanding
