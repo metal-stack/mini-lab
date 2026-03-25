@@ -49,9 +49,10 @@
       - value: image.tag=latest
       - value: resources=null
 
-- name: Create kamaji tenant cluster namespace
-  kubernetes.core.k8s:
-    name: kamaji-tenants
-    api_version: v1
-    kind: Namespace
-    state: present
+# TODO: use configured namespace of capi-lab as soon as it's implemented
+# - name: Create kamaji tenant cluster namespace
+#   kubernetes.core.k8s:
+#     name: kamaji-tenants
+#     api_version: v1
+#     kind: Namespace
+#     state: present
