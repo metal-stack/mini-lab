@@ -78,6 +78,25 @@
         pull: true
       failed_when: false
 
+- name: Install python client and generate deployment token
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  pre_tasks:
+    - name: Wait until the metal-apiserver is running
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        name: metal-apiserver
+        namespace: "{{ metal_control_plane_namespace }}"
+        wait: true
+        wait_sleep: 1
+        wait_timeout: 600
+  roles:
+    - name: ansible-common
+      tags: always
+    - name: metal-roles/common/roles/metal-v2-client
+    - name: metal-roles/common/roles/metal-deployment-token
+
 - name: Deploy pixiecore on leaf01
   hosts: leaf01
   become: true
@@ -86,6 +105,8 @@
       tags: always
     - name: metal-roles/partition/roles/pixiecore
       tags: pixiecore
+    - name: metal-roles/partition/roles/image-cache
+      tags: image-cache
 
 - name: Deploy monitoring on leaf01
   hosts: leaf01
