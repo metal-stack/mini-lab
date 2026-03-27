@@ -1,0 +1,5 @@
+---
+providers:
+  kubernetesGateway:
+    enabled: true
+    experimentalChannel: true # TODO: just for testing - disable again

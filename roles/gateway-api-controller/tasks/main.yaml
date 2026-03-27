@@ -1,0 +1,17 @@
+---
+- name: Add traefik repo
+  kubernetes.core.helm_repository:
+    name: traefik
+    repo_url: https://traefik.github.io/charts
+    force_update: true
+
+- name: Deploy traefik gateway-api controller
+  kubernetes.core.helm:
+    chart_version: 39.0.6
+    chart_ref: traefik/traefik
+    name: traefik
+    release_namespace: gateway-api-traefik
+    create_namespace: true
+    values: "{{ lookup('template', 'values.yaml') | from_yaml }}"
+    wait: true
+    wait_timeout: 10m
