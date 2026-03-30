@@ -61,7 +61,7 @@ endif
 
 .PHONY: up
 up: env gen-certs control-plane-bake partition-bake
-	@chmod 600 files/ssh/id_rsa
+	@chmod 600 files/ssh/id_ed25519
 	docker compose up --pull=always --abort-on-container-failure --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
 # for some reason an allocated machine will not be able to phone home
@@ -218,8 +218,8 @@ ls: env
 
 .PHONY: ssh-leafconfig
 ssh-leafconfig:
-	@grep "Host leaf01" ~/.ssh/config || echo -e "Host leaf01\n    StrictHostKeyChecking no\n    IdentityFile $(shell pwd)/files/ssh/id_rsa\n" >>~/.ssh/config
-	@grep "Host leaf02" ~/.ssh/config || echo -e "Host leaf02\n    StrictHostKeyChecking no\n    IdentityFile $(shell pwd)/files/ssh/id_rsa\n" >>~/.ssh/config
+	@grep "Host leaf01" ~/.ssh/config || echo -e "Host leaf01\n    StrictHostKeyChecking no\n    IdentityFile $(shell pwd)/files/ssh/id_ed25519\n" >>~/.ssh/config
+	@grep "Host leaf02" ~/.ssh/config || echo -e "Host leaf02\n    StrictHostKeyChecking no\n    IdentityFile $(shell pwd)/files/ssh/id_ed25519\n" >>~/.ssh/config
 
 .PHONY: docker-leaf01
 docker-leaf01:

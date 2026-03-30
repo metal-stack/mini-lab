@@ -13,7 +13,6 @@ services:
       # - ${HOME}/.ansible/roles/metal-ansible-modules:/root/.ansible/roles/metal-ansible-modules:ro
       # - ${HOME}/git/github.com/metal-stack/helm-charts:/helm-charts:ro
     environment:
-      - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
       - ANSIBLE_DISPLAY_SKIPPED_HOSTS=${ANSIBLE_DISPLAY_SKIPPED_HOSTS}
       - ANSIBLE_INVENTORY=inventories/control-plane.yaml
       - KUBECONFIG=/mini-lab/.kubeconfig
@@ -45,7 +44,6 @@ services:
       # - ${HOME}/.ansible/roles/metal-roles:/root/.ansible/roles/metal-roles:ro
       # - ${HOME}/.ansible/roles/metal-ansible-modules:/root/.ansible/roles/metal-ansible-modules:ro
     environment:
-      - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
       - ANSIBLE_DISPLAY_SKIPPED_HOSTS=${ANSIBLE_DISPLAY_SKIPPED_HOSTS}
       - ANSIBLE_INVENTORY=inventories/partition.yaml,clab-mini-lab/ansible-inventory.yml
       - CI=${CI}

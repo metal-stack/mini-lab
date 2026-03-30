@@ -3,12 +3,11 @@ Host leaf*
 
 Host *
     User metal
-    IdentityFile files/ssh/id_rsa
+    IdentityFile files/ssh/id_ed25519
     IdentitiesOnly yes
     PasswordAuthentication no
     StrictHostKeyChecking no
     UserKnownHostsFile /dev/null
-    PubkeyAcceptedKeyTypes +ssh-rsa
 
 Host fe80::*
     ProxyCommand ssh -q -F files/ssh/config leaf01 'bash -c "exec 3<>/dev/tcp/%h/%p; cat<&0 >&3 & cat<&3 >&1"'
