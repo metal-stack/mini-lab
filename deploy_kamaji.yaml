@@ -9,5 +9,3 @@
       tags: always
     - name: kamaji
       tags: kamaji
-  # vars:
-  #   metal_control_plane_host_provider: metal
