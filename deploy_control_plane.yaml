@@ -1,6 +1,6 @@
 ---
 - name: deploy control plane
-  hosts: control-plane
+  hosts: control_plane
   connection: local
   gather_facts: false
   roles:

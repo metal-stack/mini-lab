@@ -1,6 +1,6 @@
 ---
 - name: deploy gardener
-  hosts: control-plane
+  hosts: control_plane
   connection: local
   gather_facts: false
   pre_tasks:
