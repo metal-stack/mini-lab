@@ -39,6 +39,9 @@ MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_
 else ifeq ($(MINI_LAB_FLAVOR),capms)
 LAB_TOPOLOGY=mini-lab.capms.yaml
 MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_VERSION)
+else ifeq ($(MINI_LAB_FLAVOR),kamaji)
+LAB_TOPOLOGY=mini-lab.kamaji.yaml
+KAMAJI_ENABLED=true
 else ifeq ($(MINI_LAB_FLAVOR),gardener)
 GARDENER_ENABLED=true
 # usually gardener restricts the maximum version for k8s:
@@ -165,6 +168,7 @@ cleanup-partition:
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.dell_sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.capms.yaml
+	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.kamaji.yaml
 	docker network rm --force mini_lab_ext
 
 .PHONY: _privatenet
