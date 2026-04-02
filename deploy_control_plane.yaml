@@ -40,8 +40,8 @@
 
 - name: deploy gardener
   import_playbook: deploy_gardener.yaml
-  when: gardener_enabled
+  when: gardener_enabled and not kamaji_enabled
     
 - name: deploy kamaji
   import_playbook: deploy_kamaji.yaml
-  when: kamaji_enabled
+  when: kamaji_enabled and not gardener_enabled
