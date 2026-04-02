@@ -1,0 +1,14 @@
+---
+# taken from images/machine/openipmi/lan.conf
+metal_bmc_bmc_superuser: ADMIN
+metal_bmc_bmc_superuser_pwd: ADMIN
+
+metal_bmc_nsqd_addr: "{{ metal_control_plane_ingress_dns }}:4150"
+metal_bmc_nsqd_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
+metal_bmc_nsqd_client_cert: "{{ lookup('file', 'certs/nsq/client.crt') }}"
+metal_bmc_nsqd_client_cert_key: "{{ lookup('file', 'certs/nsq/client-key.pem') }}"
+
+# TODO console can not be disabled in metal-bmc, use the nsq certs to be able to start
+metal_bmc_console_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
+metal_bmc_console_cert: "{{ lookup('file', 'certs/nsq/client.crt') }}"
+metal_bmc_console_key: "{{ lookup('file', 'certs/nsq/client-key.pem') }}"
