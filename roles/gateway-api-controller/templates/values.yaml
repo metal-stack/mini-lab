@@ -1,0 +1,19 @@
+---
+providers:
+  kubernetesGateway:
+    enabled: true
+    experimentalChannel: true # NOTE: this is needed to enable TCPRoute CRDs
+
+hostNetwork: true
+# because of host network, which binds the host port during rolling upgrade
+updateStrategy:
+  type: Recreate
+
+service:
+  enabled: true
+
+  type: ClusterIP
+
+  ports:
+    http: {{ gateway_api_http_port }}
+    https: {{ gateway_api_https_port }}

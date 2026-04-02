@@ -8,6 +8,8 @@
       tags: always
     - name: ingress-controller
       tags: ingress-controller
+    - name: gateway-api-controller
+      tags: gateway-api-controller
     - name: metal-roles/control-plane/roles/prepare
       tags: prepare
     - name: metal-roles/control-plane/roles/nsq
