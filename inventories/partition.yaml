@@ -43,4 +43,4 @@ leaves:
 
     ansible_python_interpreter: /usr/bin/python
     ansible_user: root
-    ansible_ssh_private_key_file: "{{ playbook_dir }}/files/ssh/id_rsa"
+    ansible_ssh_private_key_file: "{{ playbook_dir }}/files/ssh/id_ed25519"

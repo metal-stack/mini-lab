@@ -18,6 +18,8 @@ CONTAINERLAB=$(shell which containerlab)
 
 # extra vars can be used by projects that built on the mini-lab, which want to override default configuration
 ANSIBLE_EXTRA_VARS_FILE := $(or $(ANSIBLE_EXTRA_VARS_FILE),)
+# do not show skipped ansible tasks
+ANSIBLE_DISPLAY_SKIPPED_HOSTS=false
 
 MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),sonic)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
@@ -30,13 +32,16 @@ MAX_RETRIES := 30
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_TOPOLOGY=mini-lab.sonic.yaml
-MONITORING_ENABLED=true
+MONITORING_ENABLED := $(or $(MONITORING_ENABLED),true)
 else ifeq ($(MINI_LAB_FLAVOR),dell_sonic)
 LAB_TOPOLOGY=mini-lab.dell_sonic.yaml
 MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_VERSION)
 else ifeq ($(MINI_LAB_FLAVOR),capms)
 LAB_TOPOLOGY=mini-lab.capms.yaml
 MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_VERSION)
+else ifeq ($(MINI_LAB_FLAVOR),kamaji)
+LAB_TOPOLOGY=mini-lab.kamaji.yaml
+KAMAJI_ENABLED=true
 else ifeq ($(MINI_LAB_FLAVOR),gardener)
 GARDENER_ENABLED=true
 # usually gardener restricts the maximum version for k8s:
@@ -59,7 +64,7 @@ endif
 
 .PHONY: up
 up: env gen-certs control-plane-bake partition-bake
-	@chmod 600 files/ssh/id_rsa
+	@chmod 600 files/ssh/id_ed25519
 	docker compose up --pull=always --abort-on-container-failure --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
 # for some reason an allocated machine will not be able to phone home
@@ -163,6 +168,7 @@ cleanup-partition:
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.dell_sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.capms.yaml
+	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.kamaji.yaml
 	docker network rm --force mini_lab_ext
 
 .PHONY: _privatenet
@@ -216,8 +222,8 @@ ls: env
 
 .PHONY: ssh-leafconfig
 ssh-leafconfig:
-	@grep "Host leaf01" ~/.ssh/config || echo -e "Host leaf01\n    StrictHostKeyChecking no\n    IdentityFile $(shell pwd)/files/ssh/id_rsa\n" >>~/.ssh/config
-	@grep "Host leaf02" ~/.ssh/config || echo -e "Host leaf02\n    StrictHostKeyChecking no\n    IdentityFile $(shell pwd)/files/ssh/id_rsa\n" >>~/.ssh/config
+	@grep "Host leaf01" ~/.ssh/config || echo -e "Host leaf01\n    StrictHostKeyChecking no\n    IdentityFile $(shell pwd)/files/ssh/id_ed25519\n" >>~/.ssh/config
+	@grep "Host leaf02" ~/.ssh/config || echo -e "Host leaf02\n    StrictHostKeyChecking no\n    IdentityFile $(shell pwd)/files/ssh/id_ed25519\n" >>~/.ssh/config
 
 .PHONY: docker-leaf01
 docker-leaf01:

@@ -1,6 +1,6 @@
 ---
 - name: deploy control plane
-  hosts: control-plane
+  hosts: control_plane
   connection: local
   gather_facts: false
   roles:
@@ -40,4 +40,8 @@
 
 - name: deploy gardener
   import_playbook: deploy_gardener.yaml
-  when: gardener_enabled
+  when: gardener_enabled and not kamaji_enabled
+    
+- name: deploy kamaji
+  import_playbook: deploy_kamaji.yaml
+  when: kamaji_enabled and not gardener_enabled

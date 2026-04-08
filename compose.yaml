@@ -13,7 +13,7 @@ services:
       # - ${HOME}/.ansible/roles/metal-ansible-modules:/root/.ansible/roles/metal-ansible-modules:ro
       # - ${HOME}/git/github.com/metal-stack/helm-charts:/helm-charts:ro
     environment:
-      - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
+      - ANSIBLE_DISPLAY_SKIPPED_HOSTS=${ANSIBLE_DISPLAY_SKIPPED_HOSTS}
       - ANSIBLE_INVENTORY=inventories/control-plane.yaml
       - KUBECONFIG=/mini-lab/.kubeconfig
       - K8S_AUTH_KUBECONFIG=/mini-lab/.kubeconfig
@@ -21,6 +21,7 @@ services:
       - DOCKER_HUB_USER=${DOCKER_HUB_USER}
       - DOCKER_HUB_TOKEN=${DOCKER_HUB_TOKEN}
       - GARDENER_ENABLED=${GARDENER_ENABLED:-}
+      - KAMAJI_ENABLED=${KAMAJI_ENABLED:-}
       - MONITORING_ENABLED=${MONITORING_ENABLED:-}
     network_mode: host
     working_dir: /mini-lab
@@ -44,7 +45,7 @@ services:
       # - ${HOME}/.ansible/roles/metal-roles:/root/.ansible/roles/metal-roles:ro
       # - ${HOME}/.ansible/roles/metal-ansible-modules:/root/.ansible/roles/metal-ansible-modules:ro
     environment:
-      - ANSIBLE_CONFIG=/mini-lab/ansible.cfg
+      - ANSIBLE_DISPLAY_SKIPPED_HOSTS=${ANSIBLE_DISPLAY_SKIPPED_HOSTS}
       - ANSIBLE_INVENTORY=inventories/partition.yaml,clab-mini-lab/ansible-inventory.yml
       - KUBECONFIG=/mini-lab/.kubeconfig
       - K8S_AUTH_KUBECONFIG=/mini-lab/.kubeconfig
