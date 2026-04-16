@@ -1,0 +1,9 @@
+---
+gateway_api_http_port: 8080
+gateway_api_https_port: 4443
+
+gateway_api_additional_config: {}
+gateway_api_tcp_service_exposals: {}
+gateway_api_udp_service_exposals: {}
+
+gateway_api_controller_chart_version: 39.0.7
