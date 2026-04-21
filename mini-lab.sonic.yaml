@@ -32,6 +32,7 @@ topology:
       image: ${MINI_LAB_SONIC_IMAGE}
       binds:
         - files/ssh/id_ed25519.pub:/authorized_keys
+        - __clabNodeDir__/overlay:/overlay:bind-create-src
       env:
         QEMU_MEMORY: 4096
     leaf02:
@@ -39,16 +40,21 @@ topology:
       image: ${MINI_LAB_SONIC_IMAGE}
       binds:
         - files/ssh/id_ed25519.pub:/authorized_keys
+        - __clabNodeDir__/overlay:/overlay:bind-create-src
       env:
         QEMU_MEMORY: 4096
     machine01:
       group: machines
       image: ${MINI_LAB_VM_IMAGE}
+      binds:
+       - __clabNodeDir__/disks:/disks:bind-create-src
       env:
         UUID: 00000000-0000-0000-0000-000000000001
     machine02:
       group: machines
       image: ${MINI_LAB_VM_IMAGE}
+      binds:
+       - __clabNodeDir__/disks:/disks:bind-create-src
       env:
         UUID: 00000000-0000-0000-0000-000000000002
   links:

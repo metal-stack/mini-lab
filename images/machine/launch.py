@@ -17,6 +17,20 @@ class Qemu:
         self._p = None
         self._disk = disk
 
+    def prepare_disk(self) -> None:
+        if not os.path.isfile(self._disk):
+            cmd = [
+                'qemu-img',
+                'create',
+                '-f', 'qcow2',
+                self._disk,
+                os.getenv('QEMU_DISK_SIZE', default="5G")
+                
+            ]
+            subprocess.run(cmd, check=True)
+        else:
+            logging.getLogger().info("disk already exists: skipping disk creation")
+
     def start(self) -> None:
         cmd = [
             'qemu-system-x86_64',
@@ -66,7 +80,7 @@ def main():
     interfaces = int(os.getenv('CLAB_INTFS', 0))
     machine_uuid = os.getenv('UUID', str(uuid.uuid4()))
 
-    vm = Qemu(name, machine_uuid, cores, memory, interfaces, '/disk.img')
+    vm = Qemu(name, machine_uuid, cores, memory, interfaces, '/disks/disk.img')
 
     logger.info('Start QEMU')
     vm.start()

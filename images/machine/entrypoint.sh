@@ -4,10 +4,6 @@ set -o errexit -o pipefail
 
 INTFS=${CLAB_INTFS:-0}
 
-echo "Creating disk with size $QEMU_DISK_SIZE"
-
-qemu-img create -f qcow2 /disk.img ${QEMU_DISK_SIZE}
-
 echo "Waiting for $INTFS interfaces to be connected"
 
 count_interfaces() {

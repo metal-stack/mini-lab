@@ -31,18 +31,21 @@ class Qemu:
         self._smp = smp
         self._memory = memory
         self._p = None
-        self._disk = '/overlay.img'
+        self._disk = '/overlay/overlay.img'
 
     def prepare_overlay(self, base: str) -> None:
-        cmd = [
-            'qemu-img',
-            'create',
-            '-f', 'qcow2',
-            '-F', 'qcow2',
-            '-b', base,
-            self._disk,
-        ]
-        subprocess.run(cmd, check=True)
+        if not os.path.isfile(self._disk):
+            cmd = [
+                'qemu-img',
+                'create',
+                '-f', 'qcow2',
+                '-F', 'qcow2',
+                '-b', base,
+                self._disk,
+            ]
+            subprocess.run(cmd, check=True)
+        else:
+            logging.getLogger().info("overlay.img already exists: skipping overlay.img creation")
 
     def guestfs(self) -> GuestFS:
         g = guestfs.GuestFS(python_return_dict=True)
