@@ -31,8 +31,9 @@ topology:
       kind: sonic-vm
       group: leaves
       image: vrnetlab/sonic_sonic-vs:202505
-      env:
-        CLAB_MGMT_PASSTHROUGH: "true"
+      startup-config: ./files/leaf_config_db.json
+#      env:
+#        CLAB_MGMT_PASSTHROUGH: "true"
       binds:
        - frr-pythontools.deb:/frr-pythontools.deb:ro
        - ./files/leaf_config_db.json:/config/config_db.json:ro
@@ -40,11 +41,12 @@ topology:
       kind: sonic-vm
       group: leaves
       image: vrnetlab/sonic_sonic-vs:202505
-      env:
-        CLAB_MGMT_PASSTHROUGH: "true"
+      startup-config: ./files/leaf_config_db.json
+#      env:
+#        CLAB_MGMT_PASSTHROUGH: "true"
       binds:
        - frr-pythontools.deb:/frr-pythontools.deb:ro
-       - ./files/leaf_config_db.json:/config/config_db.json:ro
+       - ./files/leaf_config_db.json:/config/config_db.json:ro # Check if /tmp/config_db.json exists on the vm
     machine01:
       group: machines
       image: ${MINI_LAB_VM_IMAGE}
