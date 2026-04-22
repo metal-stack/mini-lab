@@ -35,6 +35,7 @@ topology:
         CLAB_MGMT_PASSTHROUGH: "true"
       binds:
        - frr-pythontools.deb:/frr-pythontools.deb:ro
+       - ./files/leaf_config_db.json:/config/config_db.json:ro
     leaf02:
       kind: sonic-vm
       group: leaves
@@ -43,6 +44,7 @@ topology:
         CLAB_MGMT_PASSTHROUGH: "true"
       binds:
        - frr-pythontools.deb:/frr-pythontools.deb:ro
+       - ./files/leaf_config_db.json:/config/config_db.json:ro
     machine01:
       group: machines
       image: ${MINI_LAB_VM_IMAGE}

@@ -1,0 +1,41 @@
+{
+    "DEVICE_METADATA": {
+        "localhost": {
+            "hwsku": "Force10-S6000",
+            "platform": "x86_64-kvm_x86_64-r0",
+            "hostname": "sonic",
+            "type": "LeafRouter",
+            "docker_routing_config_mode": "split-unified"
+        }
+    },
+    "PORT": {
+        "Ethernet0": {
+            "lanes": "25",
+            "alias": "fortyGigE0/0",
+            "index": "0",
+            "speed": "10000",
+            "admin_status": "up",
+            "mtu": "9000"
+        },
+        "Ethernet1": {
+            "lanes": "26",
+            "alias": "fortyGigE0/1",
+            "index": "1",
+            "speed": "10000",
+            "admin_status": "up",
+            "mtu": "9000"
+        },
+        "Ethernet124": {
+            "lanes": "97,98,99,100",
+            "alias": "fortyGigE0/124",
+            "index": "31",
+            "speed": "40000",
+            "admin_status": "up",
+            "mtu": "9216"
+        }
+    },
+    "LOOPBACK_INTERFACE": {
+        "Loopback0": {},
+        "Loopback0|10.1.0.1/32": {}
+    }
+}
