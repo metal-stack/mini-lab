@@ -41,5 +41,5 @@ leaves:
     dhcp_server_ip: 10.0.1.1
 
     ansible_python_interpreter: /usr/bin/python
-    ansible_user: root
-    ansible_ssh_private_key_file: "{{ playbook_dir }}/files/ssh/id_ed25519"
+    # ansible_user: root
+    # ansible_ssh_private_key_file: "{{ playbook_dir }}/files/ssh/id_ed25519"

@@ -39,6 +39,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:z
       - .:/mini-lab
+      - ./frr-pythontools.deb:/frr-pythontools.deb:ro
       # for developing role dependencies
       # TODO: make this a switch
       # - ${HOME}/.ansible/roles/ansible-common:/root/.ansible/roles/ansible-common:ro
