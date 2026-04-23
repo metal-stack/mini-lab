@@ -190,6 +190,47 @@ There are make targets to handle the power state of a machine:
 make power-<on,reset,off>-<machine name>
 ```
 
+## Development
+If you want to contribute to the _metal-stack_ project, you can use the mini-lab as a local development environment. It allows you to quickly test changes to the _metal-stack_ components without needing any external clusters or hardware. 
+You can also use it to test changes to the Ansible roles and modules used by the _metal-stack_.
+
+### Release vector
+
+You can configure the `mini-lab` to deploy specific custom or unreleased images of components by adjusting the variables in [inventories/group_vars/all/release_vector.yaml](inventories/group_vars/all/release_vector.yaml).
+
+For example, to quickly deploy `metal-api` with a custom branch tag, you can add or uncomment specific release tags in that file:
+
+```yaml
+metal_api_image_tag: my-feat-branch
+# metal_core_image_tag: v1.2.3
+```
+
+Further overrides can be looked up in `metal-roles` where the mapping is defined in [common/roles/defaults/defaults/main.yaml](https://github.com/metal-stack/metal-roles/blob/master/common/roles/defaults/defaults/main.yaml).
+
+### Using local checkouts of dependencies
+
+By default, the `mini-lab` runs with pre-packaged Ansible roles and modules. 
+If you want to use local checkouts of dependencies for development, you must start the `mini-lab` with `DEV=true`:
+
+```bash
+DEV=true make up
+```
+
+When `DEV=true` is set, you can provide the following environment variables to map local directories into the containers. Each variable is independent — only the ones you set will be mounted (via a matching override file from `compose.dev/`):
+
+- `MINI_LAB_METAL_ROLES`: path to local `metal-roles` (includes `compose.dev/metal-roles.yaml`)
+- `MINI_LAB_ANSIBLE_COMMON`: path to local `ansible-common` (includes `compose.dev/ansible-common.yaml`)
+- `MINI_LAB_METAL_ANSIBLE_MODULES`: path to local `metal-ansible-modules` (includes `compose.dev/metal-ansible-modules.yaml`)
+- `MINI_LAB_HELM_CHARTS`: path to local `helm-charts` (includes `compose.dev/helm-charts.yaml`)
+
+Example:
+
+```bash
+export MINI_LAB_METAL_ROLES=${HOME}/src/github.com/metal-stack/metal-roles
+export DEV=true
+make up
+```
+
 ## Flavors
 
 All available mini-lab flavors are listed below:
