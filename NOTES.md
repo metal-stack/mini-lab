@@ -24,7 +24,12 @@
 
 
 ## Which flavors / how does the setup exactly look like?
-Which problems do those problems solve for the user?
+Which problems do those setups solve for the user?
+
+- maybe basic containerlab commands and graph?
+
+containerlab graph -t capi-lab/mini-lab/mini-lab.kamaji.yaml
+containerlab inspect --topo capi-lab/mini-lab/mini-lab.kamaji.yaml
 
 
 ### Kamaji
@@ -75,6 +80,8 @@ make console-machine01
 - the makefile is confusing to understand, maybe move everything possible into ansible
 
 # Troubleshooting
+
+- Use the `resize` command inside the IPMI console to resize the terminal, otherwise it will be very small and hard to use.
 
 ## File descriptors
 
