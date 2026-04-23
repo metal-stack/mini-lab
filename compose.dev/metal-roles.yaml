@@ -1,0 +1,8 @@
+---
+services:
+  control-plane:
+    volumes:
+      - ${MINI_LAB_METAL_ROLES}:/root/.ansible/roles/metal-roles:ro
+  partition:
+    volumes:
+      - ${MINI_LAB_METAL_ROLES}:/root/.ansible/roles/metal-roles:ro
