@@ -128,6 +128,17 @@ services:
       - REGISTRY_PROXY_TTL=168h
       - REGISTRY_STORAGE_DELETE_ENABLED=true
       - OTEL_TRACES_EXPORTER=none
+  cloud-provider-kind:
+    image: registry.k8s.io/cloud-provider-kind/cloud-controller-manager:v0.10.0
+    restart: always
+    network_mode: kind
+    command:
+    # v0.10.0 of cloud controller does not support tcproutes, since it does not support the experimental gateway api channel
+    # using envoy-gateway deployed via roles/gateway instead
+      - --gateway-channel
+      - disabled
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 volumes:
   proxy-docker:
   proxy-gcr:

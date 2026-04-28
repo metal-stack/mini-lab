@@ -1,0 +1,22 @@
+- name: Deploy envoy-gateway
+  kubernetes.core.helm:
+    release_name: envoy-gateway
+    release_namespace: envoy-gateway-system
+    create_namespace: true
+    chart_ref: "oci://docker.io/envoyproxy/gateway-helm"
+    chart_version: "{{ envoy_gateway_chart_version | default(omit) }}"
+    # values: "{{ lookup('template', 'values.yaml') | from_yaml }}"
+    wait: true
+- name: Deploy Envoy GatewayClass
+  kubernetes.core.k8s:
+    definition: "{{ lookup('file', 'gatewayclass.yaml') | from_yaml }}"
+- name: Deploy metal-control-plane nsq_namespace
+  kubernetes.core.k8s:
+    kind: Namespace
+    name: "{{ metal_control_plane_namespace }}"
+- name: Deploy metal-control-plane EnvoyProxy
+  kubernetes.core.k8s:
+    definition: "{{ lookup('template', 'envoyproxy.yaml') | from_yaml }}"
+- name: Deploy metal-control-plane Gateway
+  kubernetes.core.k8s:
+    definition: "{{ lookup('template', 'gateway.yaml') | from_yaml }}"
