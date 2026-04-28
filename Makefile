@@ -89,7 +89,8 @@ up: env gen-certs control-plane-bake partition-bake
 	ssh -F files/ssh/config leaf02 'systemctl restart metal-core'
 
 # for community SONiC versions > 202311 a bgp restart is needed in the virtual environment
-ifeq ($(MINI_LAB_FLAVOR),capms_sonic)
+# TODO: should be investigated and fixed if possible
+ifeq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms_dell_sonic),)
 	sleep 15
 	ssh -F files/ssh/config leaf01 'systemctl restart bgp'
 	ssh -F files/ssh/config leaf02 'systemctl restart bgp'
