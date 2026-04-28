@@ -99,6 +99,8 @@
       tags: always
     - name: metal-roles/partition/roles/pixiecore
       tags: pixiecore
+    - name: metal-roles/partition/roles/metal-bmc
+      tags: metal-bmc
 
 - name: Deploy monitoring on leaf01
   hosts: leaf01
