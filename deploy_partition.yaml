@@ -20,6 +20,10 @@
   hosts: dell_sonic
   any_errors_fatal: true
   become: true
+  handlers:
+    - name: reload systemd daemon
+      systemd:
+        daemon_reload: true
   tasks:
     - name: Check for bgpd.conf presence
       ansible.builtin.stat:
@@ -37,6 +41,15 @@
         user: root
         state: present
         key: "{{ lookup('file', 'ssh/id_ed25519.pub') }}"
+
+    - name: Install frr-reload.service
+      copy:
+        src: /root/.ansible/roles/metal-roles/partition/roles/sonic-config/files/frr-reload.service
+        dest: /etc/systemd/system/frr-reload.service
+        remote_src: false
+      notify:
+        - reload systemd daemon
+      changed_when: true
 
     - name: Activate IP MASQUERADE on eth0
       ansible.builtin.iptables:
