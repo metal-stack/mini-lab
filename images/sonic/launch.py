@@ -31,7 +31,7 @@ class Qemu:
         self._smp = smp
         self._memory = memory
         self._p = None
-        self._disk = '/overlay.img'
+        self._disk = '/persistent/overlay.img'
 
     def prepare_overlay(self, base: str) -> None:
         cmd = [
@@ -130,13 +130,7 @@ def initial_configuration(g: GuestFS, hwsku: str) -> None:
     g.ln_s(linkname=sonic_share + 'platform', target=VS_DEVICES_PATH)
 
     ifaces = get_ethernet_interfaces()
-    # The port_config.ini file contains the assignment of front panels to lanes.
     port_config = parse_port_config()
-    # The lanemap.ini file is used by the virtual switch image to assign front panels to the Linux interfaces ethX.
-    # This assignment will later also be used by the script mirror_tap_to_front_panel.sh.
-    lanemap = create_lanemap(port_config, ifaces)
-    with open('/lanemap.ini', 'w') as f:
-        f.write('\n'.join(lanemap))
 
     g.copy_in(localpath='/lanemap.ini', remotedir=hwsku_dir)
     g.copy_in(localpath='/port_config.ini', remotedir=hwsku_dir)
@@ -188,17 +182,30 @@ def main():
 
     vm = Qemu(name, smp, memory)
 
-    logger.info('Prepare disk')
-    vm.prepare_overlay(BASE_IMG)
+    overlay_exists = os.path.exists(vm._disk)
+
+    if not overlay_exists:
+        logger.info('Prepare disk')
+        vm.prepare_overlay(BASE_IMG)
 
     logger.info(f'Waiting for {interfaces} interfaces to be connected')
     wait_until_all_interfaces_are_connected(interfaces)
 
-    logger.info('Deploy initial config')
-    g = vm.guestfs()
-    initial_configuration(g, hwsku)
-    g.shutdown()
-    g.close()
+    # mirror_tap_to_front_panel.sh reads /lanemap.ini from the container filesystem
+    # at TAP interface setup time, so it must be written on every container startup.
+    ifaces = get_ethernet_interfaces()
+    lanemap = create_lanemap(parse_port_config(), ifaces)
+    with open('/lanemap.ini', 'w') as f:
+        f.write('\n'.join(lanemap))
+
+    if not overlay_exists:
+        logger.info('Deploy initial config')
+        g = vm.guestfs()
+        initial_configuration(g, hwsku)
+        g.shutdown()
+        g.close()
+    else:
+        logger.info('Reusing existing overlay')
 
     logger.info('Start QEMU')
     vm.start()
