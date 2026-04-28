@@ -6,6 +6,12 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:z
       - .:/mini-lab
+      # for developing role dependencies
+      # TODO: make this a switch
+      # - ${HOME}/.ansible/roles/ansible-common:/root/.ansible/roles/ansible-common:ro
+      - /home/benjamin/metal-stack/metal-stack/metal-roles:/root/.ansible/roles/metal-roles:ro
+      # - ${HOME}/.ansible/roles/metal-ansible-modules:/root/.ansible/roles/metal-ansible-modules:ro
+      - /home/benjamin/metal-stack/metal-stack/helm-charts:/helm-charts:ro
     environment:
       - ANSIBLE_DISPLAY_SKIPPED_HOSTS=${ANSIBLE_DISPLAY_SKIPPED_HOSTS:-false}
       - ANSIBLE_INVENTORY=inventories/control-plane.yaml
@@ -128,6 +134,17 @@ services:
       - REGISTRY_PROXY_TTL=168h
       - REGISTRY_STORAGE_DELETE_ENABLED=true
       - OTEL_TRACES_EXPORTER=none
+  cloud-provider-kind:
+    image: registry.k8s.io/cloud-provider-kind/cloud-controller-manager:v0.10.0
+    restart: always
+    network_mode: kind
+    command:
+    # v0.10.0 of cloud controller does not support tcproutes, since it does not support the experimental gateway api channel
+    # using envoy-gateway deployed via roles/gateway instead
+      - --gateway-channel
+      - disabled
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 volumes:
   proxy-docker:
   proxy-gcr:

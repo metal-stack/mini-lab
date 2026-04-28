@@ -6,6 +6,8 @@
   roles:
     - name: ansible-common
       tags: always
+    - name: gateway
+      tags: gateway
     - name: ingress-controller
       tags: ingress-controller
     - name: metal-roles/control-plane/roles/prepare

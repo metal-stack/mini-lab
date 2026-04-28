@@ -10,7 +10,7 @@ KINDCONFIG := $(or $(KINDCONFIG),control-plane/kind.yaml)
 KUBECONFIG := $(shell pwd)/.kubeconfig
 
 METALCTL_HMAC := $(or $(METALCTL_HMAC),metal-admin)
-METALCTL_API_URL := $(or $(METALCTL_API_URL),http://api.172.17.0.1.nip.io:8080/metal)
+METALCTL_API_URL := $(or $(METALCTL_API_URL),http://api.172.18.0.42.nip.io:8080/metal)
 
 MKE2FS_CONFIG := $(shell pwd)/mke2fs.conf
 # Default values
@@ -124,6 +124,7 @@ control-plane-bake:
 			--config $(KINDCONFIG) \
 			--kubeconfig $(KUBECONFIG); fi
 	$(MAKE) create-proxy-registries
+	docker compose up -d --force-recreate cloud-provider-kind
 
 .PHONY: partition
 partition: partition-bake
