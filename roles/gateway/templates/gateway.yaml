@@ -1,0 +1,29 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: metal-control-plane
+  namespace: {{ gateway_namespace }}
+spec:
+  gatewayClassName: eg
+  addresses:
+  - value: 172.18.0.42
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: metal-control-plane
+  listeners:
+  - protocol: HTTP
+    port: {{ gateway_http_port }}
+    name: http
+    hostname: "*.{{ metal_control_plane_ingress_dns }}"
+  - protocol: HTTPS
+    port: {{ gateway_https_port }}
+    name: https
+    hostname: "*.{{ metal_control_plane_ingress_dns }}"
+{% for name, port in gateway_tcp_listeners.items() %}
+  - protocol: TCP
+    name: {{ name }}
+    port: {{ port }}
+{% endfor %}
