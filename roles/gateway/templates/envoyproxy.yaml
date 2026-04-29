@@ -3,7 +3,7 @@ apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyProxy
 metadata:
   name: metal-control-plane
-  namespace: {{ gateway_namespace }}
+  namespace: "{{ gateway_namespace }}"
 spec:
   provider:
     type: Kubernetes
