@@ -6,6 +6,10 @@ zitadel_port: 8080
 zitadel_skip_verify_tls: true
 zitadel_insecure: true
 
+zitadel_httproute_enabled: true
+zitadel_httproute_parent_refs:
+- name: metal-control-plane
+
 zitadel_init_config:
   static_users:
     - first_name: Olli
