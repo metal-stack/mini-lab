@@ -1,0 +1,19 @@
+{
+  "CN": "default-gateway",
+  "hosts": [
+    "*.nip.io"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 4096
+  },
+  "names": [
+    {
+      "C":  "DE",
+      "L":  "Munich",
+      "O":  "metal-stack",
+      "OU": "DevOps",
+      "ST": "Bavaria"
+    }
+  ]
+}

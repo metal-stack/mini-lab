@@ -13,7 +13,8 @@ rm *.csr
 
 for component in \
         grpc \
-        masterdata-api; do
+        masterdata-api \
+        default-gateway; do
     pushd $component
 
     echo "generating $component certs"
