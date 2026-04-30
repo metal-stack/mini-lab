@@ -1,5 +1,5 @@
 ---
-gardener_operator_ingress_dns_domain: "gardener.172.17.0.1.nip.io"
+gardener_operator_ingress_dns_domain: "gardener.172.42.0.1.nip.io"
 
 gardener_operator_backup_infrastructure:
   provider: S3
@@ -17,7 +17,7 @@ gardener_operator_backup_infrastructure_secret:
   s3ForcePathStyle: "{{ 'true' | b64encode }}"
 
 # enable mini-lab patches
-gardener_operator_patch_istio_ingress_gateway_service_ip: 172.17.0.1
+gardener_operator_patch_istio_ingress_gateway_service_ip: 172.42.0.1
 gardener_operator_expose_virtual_garden_through_ingress_nginx: true
 
 # for local setups this should be sufficient

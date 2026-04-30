@@ -81,7 +81,7 @@
             status:
               loadBalancer:
                 ingress:
-                  - ip: "172.17.0.1"
+                  - ip: "172.42.0.1"
         tags: gardener
 
       - name: Expose istio gateway through ingress-nginx (for local environments)
