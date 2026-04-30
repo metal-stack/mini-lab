@@ -1,0 +1,61 @@
+{
+  "freeTextAnnotations": [],
+  "freeShapeAnnotations": [],
+  "trafficRateAnnotations": [],
+  "groupStyleAnnotations": [],
+  "networkNodeAnnotations": [],
+  "nodeAnnotations": [
+    {
+      "id": "exit",
+      "position": {
+        "x": 360,
+        "y": 420
+      }
+    },
+    {
+      "id": "external_service",
+      "position": {
+        "x": 160,
+        "y": 180
+      }
+    },
+    {
+      "id": "mini_lab_ext",
+      "position": {
+        "x": 280,
+        "y": 300
+      }
+    },
+    {
+      "id": "leaf01",
+      "position": {
+        "x": 500,
+        "y": 360
+      }
+    },
+    {
+      "id": "leaf02",
+      "position": {
+        "x": 520,
+        "y": 460
+      }
+    },
+    {
+      "id": "machine01",
+      "position": {
+        "x": 640,
+        "y": 320
+      }
+    },
+    {
+      "id": "machine02",
+      "position": {
+        "x": 680,
+        "y": 420
+      }
+    }
+  ],
+  "edgeAnnotations": [],
+  "aliasEndpointAnnotations": [],
+  "viewerSettings": {}
+}

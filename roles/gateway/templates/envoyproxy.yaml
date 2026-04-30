@@ -11,4 +11,4 @@ spec:
       envoyService:
         externalTrafficPolicy: Local
         type: LoadBalancer
-        loadBalancerIP: 172.18.0.42
+        loadBalancerIP: 172.42.0.42

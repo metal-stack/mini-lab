@@ -137,7 +137,10 @@ services:
   cloud-provider-kind:
     image: registry.k8s.io/cloud-provider-kind/cloud-controller-manager:v0.10.0
     restart: always
-    network_mode: kind
+    networks:
+      - kind
+    environment:
+      - KIND_EXPERIMENTAL_DOCKER_NETWORK=${KIND_EXPERIMENTAL_DOCKER_NETWORK:-kind}
     command:
     # v0.10.0 of cloud controller does not support tcproutes, since it does not support the experimental gateway api channel
     # using envoy-gateway deployed via roles/gateway instead

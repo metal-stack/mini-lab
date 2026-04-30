@@ -1,5 +1,5 @@
 ---
-gardener_gardenlet_default_dns_domain: "gardener.172.17.0.1.nip.io"
+gardener_gardenlet_default_dns_domain: "gardener.172.42.0.1.nip.io"
 gardener_gardenlet_default_dns_provider: powerdns
 gardener_gardenlet_default_dns_credentials:
   apiKey: "{{ powerdns_api_key | b64encode }}"
