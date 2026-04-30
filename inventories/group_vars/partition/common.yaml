@@ -14,4 +14,4 @@ metal_partition_metal_api_grpc_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
 metal_partition_metal_api_grpc_client_cert: "{{ lookup('file', 'certs/grpc/client.pem') }}"
 metal_partition_metal_api_grpc_client_key: "{{ lookup('file', 'certs/grpc/client-key.pem') }}"
 
-metal_partition_mgmt_gateway: 172.17.0.1
+metal_partition_mgmt_gateway: 172.42.0.42

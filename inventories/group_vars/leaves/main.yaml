@@ -12,7 +12,7 @@ sonic_config_frr_render: false
 sonic_config_loopback_address: "{{ lo }}"
 sonic_config_mgmt_interface:
   ip: "{{ ansible_host }}/16`"
-  gateway_address: "172.17.0.1"
+  gateway_address: "172.42.0.1"
 
 sonic_config_mgmt_vrf: false
 sonic_config_nameservers: "{{ router_nameservers }}"
