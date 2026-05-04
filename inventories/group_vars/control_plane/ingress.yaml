@@ -4,4 +4,4 @@ ingress_tcp_service_exposals:
   "50051": "{{ metal_control_plane_namespace }}/metal-api:50051"
 gateway_tcp_listeners:
   nsq: 4150
-  metal-api: 50051
+  metal-api-grpc: 50051
