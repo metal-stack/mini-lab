@@ -32,7 +32,10 @@ metal_stack_release_vectors:
 # sonic_configdb_utils_image_tag:
 # ...
 #
-
+alloy_image_tag: v1.16.0
+alloy_image_name: grafana/alloy
+logging_alloy_chart_version: 1.8.0
+logging_alloy_chart_repo: https://grafana.github.io/helm-charts
 ##
 ## for ansible roles
 ##

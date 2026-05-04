@@ -1,0 +1,5 @@
+alloy_config_snippets:
+  - leaf-node-docker
+  - alloy-self
+  - syslog-logs
+  # - journal-logs
