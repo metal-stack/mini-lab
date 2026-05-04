@@ -9,6 +9,7 @@ zitadel_insecure: true
 zitadel_httproute_enabled: true
 zitadel_httproute_parent_refs:
 - name: metal-control-plane
+  sectionName: https
 
 zitadel_init_config:
   static_users:
