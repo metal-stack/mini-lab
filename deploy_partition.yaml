@@ -119,9 +119,9 @@
   roles:
     - name: ansible-common
       tags: always
-    - name: metal-roles/partition/roles/promtail
+    - name: metal-roles/partition/roles/alloy
       when: monitoring_enabled
-      tags: promtail
+      tags: alloy
     - name: metal-roles/partition/roles/monitoring/node-exporter
       when: monitoring_enabled
       tags: node-exporter

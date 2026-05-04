@@ -6,3 +6,6 @@ monitoring_sonic_exporter_port: 9101
 
 # IPMI should use the same credentials as metal-api
 monitoring_ipmi_bmc_superuser_pwd: "{{ metal_api_bmc_superuser_pwd }}"
+
+# alloy offers logs and metrics
+monitoring_alloy_port: 12345

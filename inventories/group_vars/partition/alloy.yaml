@@ -1,0 +1,5 @@
+alloy_loki_write_endpoints:
+  - url: "http://loki.{{ metal_control_plane_ingress_dns }}:8080/loki/api/v1/push"
+    # basic_auth:
+    #   username: "{{ logging_ingress_loki_basic_auth_user }}"
+    #   password: "{{ logging_ingress_loki_basic_auth_password }}"

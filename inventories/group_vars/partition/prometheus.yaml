@@ -28,4 +28,8 @@ prometheus_hosts_content: |
   {{ hostvars['leaf01'].ansible_host }} leaf01
   {{ hostvars['leaf02'].ansible_host }} leaf02
 
+prometheus_alloy_targets:
+  - "leaf01:{{ monitoring_alloy_port }}"
+  - "leaf02:{{ monitoring_alloy_port }}"
+
 prometheus_haproxy_enabled: false
