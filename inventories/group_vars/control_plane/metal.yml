@@ -7,25 +7,17 @@ metal_helm_chart_local_path: /helm-charts/charts/metal-control-plane
 
 metal_deploy_ingress: false
 
-metal_httproute:
-  enabled: true
-  parentRefs:
+metal_httproute_enabled: true
+metal_httproute_parent_refs:
   - name: metal-control-plane
     namespace: "{{ metal_control_plane_namespace }}"
     sectionName: http
-  httpsRedirect:
-    enabled: false
-    # redirectParentRefs:
-    # - name: metal-control-plane
-    #   namespace: "{{ metal_control_plane_namespace }}"
-    #   sectionName: http
 
-metal_tcproute:
-  enabled: true
-  parentRefs:
-  - name: metal-control-plane
-    namespace: "{{ metal_control_plane_namespace }}"
-    sectionName: metal-api-grpc
+metal_tcproute_enabled: true
+metal_tcproute_parent_refs:
+- name: metal-control-plane
+  namespace: "{{ metal_control_plane_namespace }}"
+  sectionName: metal-api-grpc
 
 metal_api_pdb_min_available: 1
 metal_api_replicas: 1
