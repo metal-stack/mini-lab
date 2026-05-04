@@ -1,7 +1,8 @@
 {
   "CN": "default-gateway",
   "hosts": [
-    "*.nip.io"
+    "api.172.42.0.42.nip.io",
+    "v2.api.172.42.0.42.nip.io"
   ],
   "key": {
     "algo": "rsa",
