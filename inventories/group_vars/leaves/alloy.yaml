@@ -1,0 +1,3 @@
+alloy_config_snippets:
+  - docker
+  - journal
