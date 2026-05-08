@@ -1,6 +1,6 @@
 ---
 zitadel_endpoint: zitadel.{{ metal_control_plane_namespace }}.svc.cluster.local
-zitadel_external_domain: zitadel.{{ metal_control_plane_ingress_dns }}
+zitadel_external_domain: zitadel.{{ metal_control_plane_gateway_dns }}
 zitadel_ingress_dns: https://{{ zitadel_external_domain }}:4443
 zitadel_port: 8080
 zitadel_skip_verify_tls: true

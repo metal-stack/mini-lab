@@ -1,5 +1,5 @@
 ---
-gardener_operator_ingress_dns_domain: "gardener.172.42.0.1.nip.io"
+gardener_operator_ingress_dns_domain: "gardener.{{ metal_control_plane_ingress_dns }}"
 
 gardener_operator_backup_infrastructure:
   provider: S3
