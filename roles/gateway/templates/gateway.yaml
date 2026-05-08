@@ -17,11 +17,11 @@ spec:
   - protocol: HTTP
     port: {{ gateway_http_port }}
     name: http
-    hostname: "*.{{ metal_control_plane_ingress_dns }}"
+    hostname: "*.{{ metal_control_plane_gateway_dns }}"
   - protocol: HTTPS
     port: {{ gateway_https_port }}
     name: https
-    hostname: "*.{{ metal_control_plane_ingress_dns }}"
+    hostname: "*.{{ metal_control_plane_gateway_dns }}"
     tls:
       mode: Terminate
       certificateRefs:
