@@ -470,13 +470,13 @@
                         <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 82px; margin-left: 90px;">
                             <div style="box-sizing: border-box; font-size: 0; text-align: center; color: #000000; ">
                                 <div style="display: inline-block; font-size: 10px; font-family: &quot;Helvetica&quot;; color: light-dark(#000000, #ffffff); line-height: 1.2; pointer-events: all; white-space: nowrap; ">
-                                    docker network 172.17.0.1/16
+                                    docker network 172.42.0.1/16
                                 </div>
                             </div>
                         </div>
                     </foreignObject>
                     <text x="90" y="85" fill="light-dark(#000000, #ffffff)" font-family="&quot;Helvetica&quot;" font-size="10px" text-anchor="middle">
-                        docker network 172.17.0.1/16
+                        docker network 172.42.0.1/16
                     </text>
                 </switch>
             </g>
