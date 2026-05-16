@@ -1,0 +1,8 @@
+---
+services:
+  control-plane:
+    volumes:
+      - ${MINI_LAB_ANSIBLE_COMMON}:/root/.ansible/roles/ansible-common:ro
+  partition:
+    volumes:
+      - ${MINI_LAB_ANSIBLE_COMMON}:/root/.ansible/roles/ansible-common:ro

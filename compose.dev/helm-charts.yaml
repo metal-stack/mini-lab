@@ -1,0 +1,5 @@
+---
+services:
+  control-plane:
+    volumes:
+      - ${MINI_LAB_HELM_CHARTS}:/helm-charts:ro

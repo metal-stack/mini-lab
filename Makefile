@@ -62,10 +62,21 @@ else
   DOCKER_COMPOSE_RUN_ARG=--rm
 endif
 
+COMPOSE_ARGS := -f compose.yaml
+
+# in DEV mode, include an override compose file for each MINI_LAB_* checkout
+# path that is set, to mount it into the deployment containers.
+ifeq ($(DEV),true)
+COMPOSE_ARGS += $(if $(MINI_LAB_METAL_ROLES),-f compose.dev/metal-roles.yaml)
+COMPOSE_ARGS += $(if $(MINI_LAB_ANSIBLE_COMMON),-f compose.dev/ansible-common.yaml)
+COMPOSE_ARGS += $(if $(MINI_LAB_METAL_ANSIBLE_MODULES),-f compose.dev/metal-ansible-modules.yaml)
+COMPOSE_ARGS += $(if $(MINI_LAB_HELM_CHARTS),-f compose.dev/helm-charts.yaml)
+endif
+
 .PHONY: up
 up: env gen-certs control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_ed25519
-	docker compose up --pull=always --abort-on-container-failure --remove-orphans --force-recreate control-plane partition
+	docker compose $(COMPOSE_ARGS) up --pull=always --abort-on-container-failure --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
 # for some reason an allocated machine will not be able to phone home
 # without restarting the metal-core
@@ -98,11 +109,11 @@ roll-certs:
 
 .PHONY: control-plane
 control-plane: control-plane-bake env
-	docker compose up --remove-orphans --force-recreate control-plane
+	docker compose $(COMPOSE_ARGS) up --remove-orphans --force-recreate control-plane
 
 .PHONY: create-proxy-registries
 create-proxy-registries:
-	docker compose up -d --force-recreate proxy-docker proxy-ghcr proxy-gcr proxy-k8s proxy-quay
+	docker compose $(COMPOSE_ARGS) up -d --force-recreate proxy-docker proxy-ghcr proxy-gcr proxy-k8s proxy-quay
 
 .PHONY: control-plane-bake
 control-plane-bake:
@@ -116,7 +127,7 @@ control-plane-bake:
 
 .PHONY: partition
 partition: partition-bake
-	docker compose up --remove-orphans --force-recreate partition
+	docker compose $(COMPOSE_ARGS) up --remove-orphans --force-recreate partition
 
 .PHONY: partition-bake
 partition-bake: external_network
@@ -159,7 +170,7 @@ cleanup: cleanup-control-plane cleanup-partition
 .PHONY: cleanup-control-plane
 cleanup-control-plane:
 	kind delete cluster --name metal-control-plane
-	docker compose down
+	docker compose $(COMPOSE_ARGS) down
 	rm -f $(KUBECONFIG)
 
 .PHONY: cleanup-partition
