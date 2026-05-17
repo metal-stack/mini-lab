@@ -1,0 +1,6 @@
+---
+image_cache_sync_metal_apiserver_url: "http://v2.api.172.17.0.1.nip.io:8080"
+image_cache_sync_excludes:
+  - "/pull_requests/"
+  - "/stable/"
+image_cache_sync_expiration_grace_period: 100
