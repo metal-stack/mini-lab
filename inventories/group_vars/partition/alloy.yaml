@@ -1,2 +1,4 @@
+alloy_enabled: true
+
 alloy_loki_write_endpoints:
   - url: "http://loki.{{ metal_control_plane_ingress_dns }}:8080/loki/api/v1/push"
