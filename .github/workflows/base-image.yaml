@@ -16,6 +16,7 @@ jobs:
           - name: 202311
           - name: 202411
           - name: 202505
+          - name: 202511-vpp
 
     steps:
     - name: Log in to the container registry
