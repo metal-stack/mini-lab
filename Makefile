@@ -36,8 +36,8 @@ MONITORING_ENABLED := $(or $(MONITORING_ENABLED),true)
 else ifeq ($(MINI_LAB_FLAVOR),dell_sonic)
 LAB_TOPOLOGY=mini-lab.dell_sonic.yaml
 MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_VERSION)
-else ifeq ($(MINI_LAB_FLAVOR),capms)
-LAB_TOPOLOGY=mini-lab.capms.yaml
+else ifeq ($(MINI_LAB_FLAVOR),capms_dell_sonic)
+LAB_TOPOLOGY=mini-lab.capms.dell_sonic.yaml
 MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_VERSION)
 else ifeq ($(MINI_LAB_FLAVOR),kamaji)
 LAB_TOPOLOGY=mini-lab.kamaji.yaml
@@ -85,6 +85,14 @@ up: env gen-certs control-plane-bake partition-bake
 	sleep 10
 	ssh -F files/ssh/config leaf01 'systemctl restart metal-core'
 	ssh -F files/ssh/config leaf02 'systemctl restart metal-core'
+
+# for community SONiC versions > 202311 a bgp restart is needed in the virtual environment
+# TODO: should be investigated and fixed if possible
+ifeq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms_dell_sonic),)
+	sleep 15
+	ssh -F files/ssh/config leaf01 'systemctl restart bgp'
+	ssh -F files/ssh/config leaf02 'systemctl restart bgp'
+endif
 
 .PHONY: restart
 restart: down up
@@ -135,7 +143,7 @@ partition-bake: external_network
 ifeq ($(CI),true)
 	docker pull $(MINI_LAB_SONIC_IMAGE)
 endif
-ifneq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms),$(MINI_LAB_FLAVOR))
+ifneq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms_dell_sonic),$(MINI_LAB_FLAVOR))
 	docker pull $(MINI_LAB_SONIC_IMAGE)
 endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
@@ -178,7 +186,7 @@ cleanup-partition:
 	mkdir -p clab-mini-lab
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.dell_sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
-	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.capms.yaml
+	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.capms.dell_sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.kamaji.yaml
 	docker network rm --force mini_lab_ext
 
