@@ -39,6 +39,8 @@ MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_
 else ifeq ($(MINI_LAB_FLAVOR),capms_dell_sonic)
 LAB_TOPOLOGY=mini-lab.capms.dell_sonic.yaml
 MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_VERSION)
+else ifeq ($(MINI_LAB_FLAVOR),capms_sonic)
+LAB_TOPOLOGY=mini-lab.capms.sonic.yaml
 else ifeq ($(MINI_LAB_FLAVOR),kamaji)
 LAB_TOPOLOGY=mini-lab.kamaji.yaml
 KAMAJI_ENABLED=true
@@ -187,6 +189,7 @@ cleanup-partition:
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.dell_sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.capms.dell_sonic.yaml
+	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.capms.sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.kamaji.yaml
 	docker network rm --force mini_lab_ext
 
