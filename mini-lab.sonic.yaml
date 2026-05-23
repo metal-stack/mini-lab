@@ -58,7 +58,7 @@ topology:
       mtu: 9000
     - endpoints: ["leaf01:Ethernet0", "machine01:lan0"]
     - endpoints: ["leaf02:Ethernet0", "machine01:lan1"]
-    - endpoints: ["leaf01:Ethernet1", "machine02:lan0"]
-    - endpoints: ["leaf02:Ethernet1", "machine02:lan1"]
-    - endpoints: ["leaf01:Ethernet120", "exit:eth1"]
-    - endpoints: ["leaf02:Ethernet120", "exit:eth2"]
+    - endpoints: ["leaf01:Ethernet4", "machine02:lan0"]
+    - endpoints: ["leaf02:Ethernet4", "machine02:lan1"]
+    - endpoints: ["leaf01:Ethernet8", "exit:eth1"]
+    - endpoints: ["leaf02:Ethernet8", "exit:eth2"]
