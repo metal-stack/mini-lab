@@ -23,7 +23,7 @@ ANSIBLE_DISPLAY_SKIPPED_HOSTS=false
 
 MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),sonic)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
-MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
+MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:202511-vpp)
 MINI_LAB_DELL_SONIC_VERSION := $(or $(MINI_LAB_DELL_SONIC_VERSION),4.5.1)
 
 MINI_LAB_INTERNAL_NETWORK=mini_lab_internal
@@ -141,7 +141,7 @@ ifeq ($(CI),true)
 	docker pull $(MINI_LAB_SONIC_IMAGE)
 endif
 ifneq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms),$(MINI_LAB_FLAVOR))
-	docker pull $(MINI_LAB_SONIC_IMAGE)
+	#docker pull $(MINI_LAB_SONIC_IMAGE)
 endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
 		sudo --preserve-env=MINI_LAB_SONIC_IMAGE --preserve-env=MINI_LAB_DELL_SONIC_VERSION --preserve-env=MINI_LAB_VM_IMAGE $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
@@ -418,7 +418,14 @@ build-sonic-base:
 	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202311 images/sonic/base-202311
 	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202411 images/sonic/base-202411
 	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202505 images/sonic/base-202505
-	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202511 images/sonic/base-202511-vpp
+	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202511-vpp images/sonic/base-202511-vpp
+
+.PHONY: build-sonic
+build-sonic:
+	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202311 images/sonic/base-202311
+	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202411 images/sonic/base-202411
+	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202505 images/sonic/base-202505
+	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202511-vpp images/sonic/base-202511-vpp
 
 ## DEV TARGETS ##
 
