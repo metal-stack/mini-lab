@@ -87,7 +87,7 @@ class Qemu:
             with open(f'/sys/class/net/{iface}/address', 'r') as f:
                 mac = f.read().strip()
             cmd.append('-device')
-            cmd.append(f'e1000,netdev=hn{i},mac={mac}')
+            cmd.append(f'virtio-net-pci,netdev=hn{i},mac={mac}')
             cmd.append(f'-netdev')
             cmd.append(f'tap,id=hn{i},ifname=tap{i},script=/mirror_tap_to_front_panel.sh,downscript=no')
 
@@ -110,32 +110,31 @@ def initial_configuration(g: GuestFS, hwsku: str) -> None:
     g.copy_in(localpath='/frr-pythontools.deb', remotedir=image + 'rw/')
 
     # Workaround: Speed up lldp startup by remove hardcoded wait of 90 seconds
-    g.ln_s(linkname=systemd_system + 'aaastatsd.timer', target='/dev/null') # Radius
-    g.ln_s(linkname=systemd_system + 'featured.timer', target='/dev/null') # Feature handling not necessary
-    g.ln_s(linkname=systemd_system + 'hostcfgd.timer', target='/dev/null') # After boot Host configuration
-    g.ln_s(linkname=systemd_system + 'rasdaemon.timer', target='/dev/null') # After boot Host configuration
-    g.ln_s(linkname=systemd_system + 'tacacs-config.timer', target='/dev/null') # After boot Host configuration
+    # g.ln_s(linkname=systemd_system + 'aaastatsd.timer', target='/dev/null') # Radius
+    # g.ln_s(linkname=systemd_system + 'featured.timer', target='/dev/null') # Feature handling not necessary
+    # g.ln_s(linkname=systemd_system + 'hostcfgd.timer', target='/dev/null') # After boot Host configuration
+    # g.ln_s(linkname=systemd_system + 'rasdaemon.timer', target='/dev/null') # After boot Host configuration
+    # g.ln_s(linkname=systemd_system + 'tacacs-config.timer', target='/dev/null') # After boot Host configuration
     # Started by featured
-    g.ln_s(linkname=sonic_target_wants + 'lldp.service', target='/lib/systemd/system/lldp.service')
-    g.ln_s(linkname=systemd_system + 'pmon.service', target='/lib/systemd/system/pmon.service')
-    g.ln_s(linkname=sonic_target_wants + 'pmon.service', target='/lib/systemd/system/pmon.service')
+    # g.ln_s(linkname=sonic_target_wants + 'lldp.service', target='/lib/systemd/system/lldp.service')
+    # g.ln_s(linkname=systemd_system + 'pmon.service', target='/lib/systemd/system/pmon.service')
+    # g.ln_s(linkname=sonic_target_wants + 'pmon.service', target='/lib/systemd/system/pmon.service')
 
     # Workaround: Only useful for BackEndToRRouter
-    g.ln_s(linkname=systemd_system + 'backend-acl.service', target='/dev/null')
+    # g.ln_s(linkname=systemd_system + 'backend-acl.service', target='/dev/null')
 
     # Workaround: We don't need LACP
-    g.ln_s(linkname=systemd_system + 'teamd.service', target='/dev/null')
+    # g.ln_s(linkname=systemd_system + 'teamd.service', target='/dev/null')
 
     # Workaround: Python module sonic_platform not present on vs images
     g.ln_s(linkname=systemd_system + 'system-health.service', target='/dev/null')
     g.ln_s(linkname=systemd_system + 'watchdog-control.service', target='/dev/null')
 
     sonic_share = image + 'rw/usr/share/sonic/'
-    # Reads come from the read-only rootfs (loop-mounted squashfs); writes
-    # would have to target image + 'rw' + VS_DEVICES_PATH + hwsku.
-    hwsku_dir = '/rootfs' + VS_DEVICES_PATH + hwsku
+    platform_dir = image + 'rw' + VS_DEVICES_PATH
     hwsku_dir_rw = image + 'rw' + VS_DEVICES_PATH + hwsku
-    #g.mkdir_p(hwsku_dir)
+    g.mkdir_p(platform_dir)
+    g.write(path=platform_dir + '/default_sku', content=f'{hwsku} empty'.encode('utf-8'))
 
     # The lanemap.ini file is used by the virtual switch image to assign front panels to the Linux interfaces ethX.
     # This assignment will later also be used by the script mirror_tap_to_front_panel.sh.
@@ -156,14 +155,15 @@ def initial_configuration(g: GuestFS, hwsku: str) -> None:
 
     etc_sonic = image + 'rw/etc/sonic/'
     g.mkdir_p(etc_sonic)
-    sonic_version = image.removeprefix('/image-').removesuffix('/')
-    sonic_environment = f'''
-        SONIC_VERSION=${sonic_version}
-        PLATFORM=x86_64-kvm_x86_64-r0
-        HWSKU={hwsku}
-        DEVICE_TYPE=LeafRouter
-        '''.encode('utf-8')
-    g.write(path=etc_sonic + 'sonic-environment', content=sonic_environment)
+    # sonic_version = image.removeprefix('/image-').removesuffix('/')
+    # sonic_environment = f'''
+    #     SONIC_VERSION=${sonic_version}
+    #     PLATFORM=x86_64-kvm_x86_64-r0
+    #     HWSKU={hwsku}
+    #     DEVICE_TYPE=LeafRouter
+    #     ASIC_TYPE=vpp
+    #     '''.encode('utf-8')
+    # g.write(path=etc_sonic + 'sonic-environment', content=sonic_environment)
 
     config_db = create_config_db(hwsku)
     ports = {}
@@ -193,8 +193,8 @@ def main():
     logger = logging.getLogger()
 
     name = os.getenv('CLAB_LABEL_CLAB_NODE_NAME', default='switch')
-    smp = os.getenv('QEMU_SMP', default='8')
-    memory = os.getenv('QEMU_MEMORY', default='2048')
+    smp = os.getenv('QEMU_SMP', default='4')
+    memory = os.getenv('QEMU_MEMORY', default='4096')
     interfaces = int(os.getenv('CLAB_INTFS', 0)) + 1
     hwsku = os.getenv('HWSKU', default='Accton-AS7726-32X')
 
@@ -420,6 +420,12 @@ def create_config_db(hwsku: str) -> dict:
             'eth0': {
                 'alias': 'eth0',
                 'admin_status': 'up'
+            }
+        },
+        'LLDP': {
+            'GLOBAL': {
+                'enabled': 'true',
+                'hello_time': '10'
             }
         }
 

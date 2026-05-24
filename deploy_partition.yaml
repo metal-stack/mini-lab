@@ -7,7 +7,7 @@
     - name: Wait for system to become reachable
       ansible.builtin.wait_for_connection:
         delay: 10
-        timeout: 50
+        timeout: 300
   roles:
     - name: ansible-common
       tags: always
@@ -136,10 +136,6 @@
   hosts: leaves
   any_errors_fatal: true
   become: true
-  pre_tasks:
-    - name: Wait some time
-      pause:
-        seconds: 120
   roles:
     - name: ansible-common
       tags: always
