@@ -275,11 +275,11 @@ def apply_golden_config_via_serial(logger) -> None:
         time.sleep(5)
 
     logger.info('Installing golden config_db.json')
-    send(b'sudo cp /golden_config_db.json /etc/sonic/config_db.json \n')
+    send(b'sudo config reload -f -y /golden_config_db.json \n')
     read_until(b'$ ', timeout=60)
 
-    logger.info('Rebooting SONiC to apply golden config')
-    send(b'sudo reboot\n')
+    #logger.info('Rebooting SONiC to apply golden config')
+    #send(b'sudo reboot\n')
 
     tn.close()
 
