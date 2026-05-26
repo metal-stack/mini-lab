@@ -20,6 +20,10 @@ sonic_config_nameservers: "{{ router_nameservers }}"
 sonic_config_vlans:
   - id: 4000
     ip: "{{ metal_core_cidr }}"
+    dhcp_servers:
+      - "{{ lo }}"
+    dhcp_relay_link_select: "enable" # not wired up in metal-roles/sonic-configdb-utils
+    dhcp_relay_src_intf: "Loopback0" # not wired up in metal-roles/sonic-configdb-utils
 
 sonic_config_vtep:
   enabled: true
@@ -30,3 +34,10 @@ sonic_config_ntp:
     - 1.europe.pool.ntp.org
     - 2.europe.pool.ntp.org
     - 3.europe.pool.ntp.org
+
+sonic_config_features:
+  dhcp_relay:
+    enabled: true
+    auto_restart: true
+
+# TODO: config dhcpv4_relay add --source-interface Loopback0 --link-selection enable --dhcpv4-servers 10.0.1.1 Vlan4000
