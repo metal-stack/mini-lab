@@ -9,10 +9,14 @@ RUN apt-get update && \
         iproute2 \
         linux-image-cloud-amd64 \
         python3 \
+        python3-pip \
         python3-guestfs \
         python3-scapy \
         qemu-system-x86 \
         telnet
+
+COPY requirements.txt /
+RUN pip install --break-system-packages -r requirements.txt
 
 COPY --from=ghcr.io/metal-stack/mini-lab-sonic-base:master-vpp /sonic-vs.img /sonic-vs.img
 COPY --from=ghcr.io/metal-stack/mini-lab-sonic-base:master-vpp /frr-pythontools.deb /frr-pythontools.deb
