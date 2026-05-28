@@ -10,7 +10,7 @@ import socket
 import struct
 import subprocess
 import sys
-import telnetlib
+import telnetlib3
 import time
 from typing import Callable
 
@@ -99,71 +99,34 @@ class Qemu:
 
 def initial_configuration(g: GuestFS, hwsku: str) -> None:
     image = g.glob_expand('/disk/image-*')[0]
-
-    # g.rm(image + 'platform/firsttime')
-
-    systemd_system = image + 'rw/etc/systemd/system/'
-    sonic_target_wants = systemd_system + 'sonic.target.wants/'
-    g.mkdir_p(sonic_target_wants)
-
     # Copy frr-pythontools into the image
+    g.mkdir_p(image + 'rw/')
     g.copy_in(localpath='/frr-pythontools.deb', remotedir=image + 'rw/')
 
-    # Workaround: Speed up lldp startup by remove hardcoded wait of 90 seconds
-    # g.ln_s(linkname=systemd_system + 'aaastatsd.timer', target='/dev/null') # Radius
-    # g.ln_s(linkname=systemd_system + 'featured.timer', target='/dev/null') # Feature handling not necessary
-    # g.ln_s(linkname=systemd_system + 'hostcfgd.timer', target='/dev/null') # After boot Host configuration
-    # g.ln_s(linkname=systemd_system + 'rasdaemon.timer', target='/dev/null') # After boot Host configuration
-    # g.ln_s(linkname=systemd_system + 'tacacs-config.timer', target='/dev/null') # After boot Host configuration
-    # Started by featured
-    # g.ln_s(linkname=sonic_target_wants + 'lldp.service', target='/lib/systemd/system/lldp.service')
-    # g.ln_s(linkname=systemd_system + 'pmon.service', target='/lib/systemd/system/pmon.service')
-    # g.ln_s(linkname=sonic_target_wants + 'pmon.service', target='/lib/systemd/system/pmon.service')
-
-    # Workaround: Only useful for BackEndToRRouter
-    # g.ln_s(linkname=systemd_system + 'backend-acl.service', target='/dev/null')
-
-    # Workaround: We don't need LACP
-    # g.ln_s(linkname=systemd_system + 'teamd.service', target='/dev/null')
-
     # Workaround: Python module sonic_platform not present on vs images
+    systemd_system = image + 'rw/etc/systemd/system/'
+    g.mkdir_p(systemd_system)
     g.ln_s(linkname=systemd_system + 'system-health.service', target='/dev/null')
     g.ln_s(linkname=systemd_system + 'watchdog-control.service', target='/dev/null')
 
     sonic_share = image + 'rw/usr/share/sonic/'
     platform_dir = image + 'rw' + VS_DEVICES_PATH
-    hwsku_dir_rw = image + 'rw' + VS_DEVICES_PATH + hwsku
     g.mkdir_p(platform_dir)
     g.write(path=platform_dir + '/default_sku', content=f'{hwsku} empty'.encode('utf-8'))
 
     # The lanemap.ini file is used by the virtual switch image to assign front panels to the Linux interfaces ethX.
     # This assignment will later also be used by the script mirror_tap_to_front_panel.sh.
-    # g.download(remotefilename=hwsku_dir + '/port_config.ini', filename='/port_config.ini')
-    # g.download(remotefilename=hwsku_dir + '/lanemap.ini', filename='/lanemap.ini')
+    # Dynamic breakouts are not implemented in sonic-vs/sonic-vpp
     ifaces = get_ethernet_interfaces()
-    # The port_config.ini file contains the assignment of front panels to lanes.
     port_config = parse_port_config()
-    # The lanemap.ini file is used by the virtual switch image to assign front panels to the Linux interfaces ethX.
-    # This assignment will later also be used by the script mirror_tap_to_front_panel.sh.
     lanemap = create_lanemap(port_config, ifaces)
     with open('/lanemap.ini', 'w') as f:
         f.write('\n'.join(lanemap))
 
+    hwsku_dir_rw = image + 'rw' + VS_DEVICES_PATH + hwsku
     g.mkdir_p(hwsku_dir_rw)
     g.copy_in(localpath='/lanemap.ini', remotedir=hwsku_dir_rw)
     g.copy_in(localpath='/port_config.ini', remotedir=hwsku_dir_rw)
-
-    etc_sonic = image + 'rw/etc/sonic/'
-    g.mkdir_p(etc_sonic)
-    # sonic_version = image.removeprefix('/image-').removesuffix('/')
-    # sonic_environment = f'''
-    #     SONIC_VERSION=${sonic_version}
-    #     PLATFORM=x86_64-kvm_x86_64-r0
-    #     HWSKU={hwsku}
-    #     DEVICE_TYPE=LeafRouter
-    #     ASIC_TYPE=vpp
-    #     '''.encode('utf-8')
-    # g.write(path=etc_sonic + 'sonic-environment', content=sonic_environment)
 
     config_db = create_config_db(hwsku)
     ports = {}
@@ -176,7 +139,7 @@ def initial_configuration(g: GuestFS, hwsku: str) -> None:
     config_db['PORT'] = ports
     config_db_json = json.dumps(config_db, indent=4, sort_keys=True)
 
-    g.write(path=image + 'rw/golden_config_db.json', content=config_db_json.encode('utf-8'))
+    g.write(path=image + 'rw/init_config_db.json', content=config_db_json.encode('utf-8'))
 
     if os.path.exists('/authorized_keys'):
         g.mkdir_p(image + 'rw/root/.ssh')
@@ -215,7 +178,7 @@ def main():
     logger.info('Start QEMU')
     vm.start()
 
-    apply_golden_config_via_serial(logger)
+    apply_init_config_via_serial(logger)
 
     # SONiC will start sending LLDP packets after PortConfigDone is set in APPL database
     logger.info('Wait until eth0 has an IPv4 address')
@@ -233,11 +196,11 @@ def handle_exit(signal, frame):
     sys.exit(0)
 
 
-def apply_golden_config_via_serial(logger) -> None:
+def apply_init_config_via_serial(logger) -> None:
     logger.info('Connecting to SONiC serial console on 127.0.0.1:5000')
     while True:
         try:
-            tn = telnetlib.Telnet('127.0.0.1', 5000, timeout=600)
+            tn = telnetlib3.Telnet('127.0.0.1', 5000, timeout=600)
             break
         except ConnectionRefusedError:
             time.sleep(1)
@@ -274,12 +237,9 @@ def apply_golden_config_via_serial(logger) -> None:
             break
         time.sleep(5)
 
-    logger.info('Installing golden config_db.json')
-    send(b'sudo config reload -f -y /golden_config_db.json \n')
+    logger.info('Installing intial config_db.json')
+    send(b'sudo config reload -f -y /init_config_db.json \n')
     read_until(b'$ ', timeout=60)
-
-    #logger.info('Rebooting SONiC to apply golden config')
-    #send(b'sudo reboot\n')
 
     tn.close()
 
