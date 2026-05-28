@@ -136,7 +136,11 @@ partition: partition-bake
 
 .PHONY: partition-bake
 partition-bake: external_network
-	docker pull $(MINI_LAB_VM_IMAGE)
+	docker pull $(MINI_LAB_VM_IMAGE) 
+	if ! docker inspect vrnetlab/canonical_ubuntu:jammy; then \
+		./scripts/build_ubuntu_image.sh; \
+	fi
+
 ifeq ($(CI),true)
 	docker pull $(MINI_LAB_SONIC_IMAGE)
 endif

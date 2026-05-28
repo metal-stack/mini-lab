@@ -27,6 +27,19 @@ topology:
         - sh /root/network.sh
     mini_lab_ext:
       kind: bridge
+    managementserver:
+      kind: generic_vm
+      image: vrnetlab/canonical_ubuntu:jammy
+      cpu: 1
+      memory: 512Mb
+      env:
+        QEMU_MEMORY: 512
+    kea:
+      kind: linux
+      network-mode: container:exit # join the network namespace of inet
+      image: docker.cloudsmith.io/isc/docker/kea-dhcp4:2.6.0
+      binds:
+        - files/kea.json:/etc/kea/kea-dhcp4.conf
     leaf01:
       group: leaves
       image: ${MINI_LAB_SONIC_IMAGE}
