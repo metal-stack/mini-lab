@@ -14,8 +14,8 @@ RUN apt-get update && \
         qemu-system-x86 \
         telnet
 
-COPY --from=ghcr.io/metal-stack/mini-lab-sonic-base:202511-vpp /sonic-vs.img /sonic-vs.img
-COPY --from=ghcr.io/metal-stack/mini-lab-sonic-base:202511-vpp /frr-pythontools.deb /frr-pythontools.deb
+COPY --from=ghcr.io/metal-stack/mini-lab-sonic-base:master-vpp /sonic-vs.img /sonic-vs.img
+COPY --from=ghcr.io/metal-stack/mini-lab-sonic-base:master-vpp /frr-pythontools.deb /frr-pythontools.deb
 
 ENTRYPOINT ["/launch.py"]
 
