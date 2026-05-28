@@ -87,7 +87,7 @@ class Qemu:
             with open(f'/sys/class/net/{iface}/address', 'r') as f:
                 mac = f.read().strip()
             cmd.append('-device')
-            cmd.append(f'virtio-net-pci,netdev=hn{i},mac={mac}')
+            cmd.append(f'virtio-net-pci,netdev=hn{i},mac={mac},mq=off,host_mtu=9216')
             cmd.append(f'-netdev')
             cmd.append(f'tap,id=hn{i},ifname=tap{i},script=/mirror_tap_to_front_panel.sh,downscript=no')
 
