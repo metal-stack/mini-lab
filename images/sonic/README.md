@@ -5,4 +5,8 @@ We use sonic-vpp to emulate SONiC switches. It is running in kvm inside a contai
 
 # Configuration knobs
 
-You can edit the port_config.ini to add more ports. Keep the number as low as possible. It will put less strain on your system because it will spawn fewer VPP worker threads. You will have to set up the switch from scratch afterwards, since VPP will generate some configuration on first startup.
+You can edit the port_config.ini to add more ports.
+
+
+# Boot process
+The switch will boot with a default first-boot configuration. This is required since first boot will generate some required configuration for VPP. After a short while the configuration that is generated in launch.py is injected and the sonic is reloaded. After the new configuration is loaded the container will be marked ready. Check the docker logs for errors if bootup takes more than a minute. 
