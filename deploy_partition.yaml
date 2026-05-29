@@ -7,7 +7,7 @@
     - name: Wait for system to become reachable
       ansible.builtin.wait_for_connection:
         delay: 10
-        timeout: 50
+        timeout: 300
   roles:
     - name: ansible-common
       tags: always
@@ -65,19 +65,30 @@
         sysctl_set: yes
         value: "1"
 
-- name: Deploy dhcp server on leaf01 (Community SONiC)
-  hosts: leaf01:!dell_sonic
-  pre_tasks:
-    - name: Temporary workaround for EOL debian bullseye backports repository (using archive.debian.org)
-      lineinfile:
-        path: /etc/apt/sources.list
-        search_string: deb [arch=amd64] http://deb.debian.org/debian/ bullseye-backports main contrib non-free
-        line: deb [arch=amd64] http://archive.debian.org/debian/ bullseye-backports main contrib non-free
-  roles:
-    - name: ansible-common
-      tags: always
-    - name: metal-roles/partition/roles/dhcp
-      tags: dhcp
+- name: Install docker on management server
+  hosts: managementserver
+  become: true
+  tasks:
+    - name: Install docker
+      ansible.builtin.apt:
+        name: docker.io
+        state: present
+        update_cache: true
+
+    - name: Enable and start docker
+      ansible.builtin.systemd:
+        name: docker
+        enabled: true
+        state: started
+
+# - name: Deploy dhcp server
+#   hosts: managementserver
+#   become: true
+#   roles:
+#     - name: ansible-common
+#       tags: always
+#     - name: metal-roles/partition/roles/dhcp
+#       tags: dhcp
 
 # FIXME: For some reason, the first docker pull always fails on dell_sonic but succeeds on second attempt.
 # Investigate the cause and remove this play
@@ -91,8 +102,8 @@
         pull: true
       failed_when: false
 
-- name: Deploy pixiecore on leaf01
-  hosts: leaf01
+- name: Deploy pixiecore
+  hosts: managementserver
   become: true
   roles:
     - name: ansible-common
@@ -136,10 +147,6 @@
   hosts: leaves
   any_errors_fatal: true
   become: true
-  pre_tasks:
-    - name: Wait some time
-      pause:
-        seconds: 120
   roles:
     - name: ansible-common
       tags: always

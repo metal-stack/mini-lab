@@ -9,10 +9,18 @@ partition:
   children:
     dell_sonic:
     leaves:
+    managementserver:
+  vars:
+    pixie_server_ip: "{{ hostvars['managementserver'].ansible_host }}"
+    dhcp_server_ip: "10.0.0.21"
 
 dell_sonic:
   vars:
     ansible_group_priority: 10
+
+managementserver:
+  hosts:
+    managementserver:
 
 leaves:
   hosts:
@@ -37,8 +45,8 @@ leaves:
       asn: 4200000012
       metal_core_cidr: 10.0.1.128/{{ metal_core_cidr_mask }}
   vars:
-    pixie_server_ip: 10.0.1.1
-    dhcp_server_ip: 10.0.1.1
+    pixie_server_ip: "{{ hostvars['managementserver'].ansible_host }}"
+    dhcp_server_ip: 10.0.0.21
 
     ansible_python_interpreter: /usr/bin/python
     ansible_user: root

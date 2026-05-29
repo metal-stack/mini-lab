@@ -10,7 +10,7 @@ KINDCONFIG := $(or $(KINDCONFIG),control-plane/kind.yaml)
 KUBECONFIG := $(shell pwd)/.kubeconfig
 
 METALCTL_HMAC := $(or $(METALCTL_HMAC),metal-admin)
-METALCTL_API_URL := $(or $(METALCTL_API_URL),http://api.172.17.0.1.nip.io:8080/metal)
+METALCTL_API_URL := $(or $(METALCTL_API_URL),http://api.172.42.0.42.nip.io:8080/metal)
 
 MKE2FS_CONFIG := $(shell pwd)/mke2fs.conf
 # Default values
@@ -23,8 +23,10 @@ ANSIBLE_DISPLAY_SKIPPED_HOSTS=false
 
 MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),sonic)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
-MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
+MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:202511-vpp)
 MINI_LAB_DELL_SONIC_VERSION := $(or $(MINI_LAB_DELL_SONIC_VERSION),4.5.1)
+
+MINI_LAB_INTERNAL_NETWORK=mini_lab_internal
 
 MACHINE_OS=debian-12.0
 MAX_RETRIES := 30
@@ -117,6 +119,8 @@ create-proxy-registries:
 
 .PHONY: control-plane-bake
 control-plane-bake:
+
+	@if ! docker network ls | grep -q mini_lab_internal; then docker network create mini_lab_internal --gateway 172.42.0.1 --ip-range=172.42.0.0/24 --subnet=172.42.0.0/24 --ipv6=false ; fi
 	@if ! which kind > /dev/null; then echo "kind needs to be installed"; exit 1; fi
 	@if ! kind get clusters | grep metal-control-plane > /dev/null; then \
 		kind create cluster $(KIND_ARGS) \
@@ -124,6 +128,7 @@ control-plane-bake:
 			--config $(KINDCONFIG) \
 			--kubeconfig $(KUBECONFIG); fi
 	$(MAKE) create-proxy-registries
+	docker compose up -d --force-recreate cloud-provider-kind
 
 .PHONY: partition
 partition: partition-bake
@@ -131,12 +136,16 @@ partition: partition-bake
 
 .PHONY: partition-bake
 partition-bake: external_network
-	docker pull $(MINI_LAB_VM_IMAGE)
+	docker pull $(MINI_LAB_VM_IMAGE) 
+	if ! docker inspect vrnetlab/canonical_ubuntu:jammy; then \
+		./scripts/build_ubuntu_image.sh; \
+	fi
+
 ifeq ($(CI),true)
 	docker pull $(MINI_LAB_SONIC_IMAGE)
 endif
 ifneq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms),$(MINI_LAB_FLAVOR))
-	docker pull $(MINI_LAB_SONIC_IMAGE)
+	#docker pull $(MINI_LAB_SONIC_IMAGE)
 endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
 		sudo --preserve-env=MINI_LAB_SONIC_IMAGE --preserve-env=MINI_LAB_DELL_SONIC_VERSION --preserve-env=MINI_LAB_VM_IMAGE $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
@@ -166,6 +175,7 @@ env:
 
 .PHONY: cleanup
 cleanup: cleanup-control-plane cleanup-partition
+	docker network rm --force mini_lab_internal
 
 .PHONY: cleanup-control-plane
 cleanup-control-plane:
@@ -412,6 +422,14 @@ build-sonic-base:
 	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202311 images/sonic/base-202311
 	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202411 images/sonic/base-202411
 	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202505 images/sonic/base-202505
+	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202511-vpp images/sonic/base-202511-vpp
+
+.PHONY: build-sonic
+build-sonic:
+	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202311 images/sonic/base-202311
+	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202411 images/sonic/base-202411
+	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202505 images/sonic/base-202505
+	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202511-vpp images/sonic/base-202511-vpp
 
 ## DEV TARGETS ##
 
@@ -438,7 +456,7 @@ build-dell-sonic:
 fetch-virtual-kubeconfig:
 	# TODO: it's hard to get the latest issued generic kubeconfig secret... just take the first result for now
 	kubectl --kubeconfig=$(KUBECONFIG) get secret -n garden $(shell kubectl --kubeconfig=$(KUBECONFIG) get secret -n garden -l managed-by=secrets-manager,manager-identity=gardener-operator,name=generic-token-kubeconfig --no-headers | awk '{ print $$1 }') -o jsonpath='{.data.kubeconfig}' | base64 -d > .virtual-kubeconfig
-	@kubectl --kubeconfig=.virtual-kubeconfig config set-cluster garden --server=https://api.gardener-kube-apiserver.172.17.0.1.nip.io:4443
+	@kubectl --kubeconfig=.virtual-kubeconfig config set-cluster garden --server=https://api.gardener-kube-apiserver.172.42.0.1.nip.io:4443
 	@kubectl --kubeconfig=.virtual-kubeconfig config set-credentials garden --token=$(shell kubectl --kubeconfig=$(KUBECONFIG) get secret -n garden shoot-access-virtual-garden -o jsonpath='{.data.token}' | base64 -d)
 	@kubectl --kubeconfig=$(KUBECONFIG) config unset users.garden
 	@kubectl --kubeconfig=$(KUBECONFIG) config unset contexts.garden

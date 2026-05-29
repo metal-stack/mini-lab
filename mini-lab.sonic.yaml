@@ -2,7 +2,7 @@ name: mini-lab
 prefix: ""
 
 mgmt:
-  network: bridge
+  network: mini_lab_internal
 
 topology:
   defaults:
@@ -27,6 +27,19 @@ topology:
         - sh /root/network.sh
     mini_lab_ext:
       kind: bridge
+    managementserver:
+      kind: generic_vm
+      image: vrnetlab/canonical_ubuntu:jammy
+      cpu: 1
+      memory: 512Mb
+      env:
+        QEMU_MEMORY: 512
+    kea:
+      kind: linux
+      network-mode: container:exit # join the network namespace of inet
+      image: docker.cloudsmith.io/isc/docker/kea-dhcp4:2.6.0
+      binds:
+        - files/kea.json:/etc/kea/kea-dhcp4.conf
     leaf01:
       group: leaves
       image: ${MINI_LAB_SONIC_IMAGE}
@@ -58,7 +71,7 @@ topology:
       mtu: 9000
     - endpoints: ["leaf01:Ethernet0", "machine01:lan0"]
     - endpoints: ["leaf02:Ethernet0", "machine01:lan1"]
-    - endpoints: ["leaf01:Ethernet1", "machine02:lan0"]
-    - endpoints: ["leaf02:Ethernet1", "machine02:lan1"]
-    - endpoints: ["leaf01:Ethernet120", "exit:eth1"]
-    - endpoints: ["leaf02:Ethernet120", "exit:eth2"]
+    - endpoints: ["leaf01:Ethernet4", "machine02:lan0"]
+    - endpoints: ["leaf02:Ethernet4", "machine02:lan1"]
+    - endpoints: ["leaf01:Ethernet8", "exit:eth1"]
+    - endpoints: ["leaf02:Ethernet8", "exit:eth2"]

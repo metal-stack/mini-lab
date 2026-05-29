@@ -1,5 +1,5 @@
 ---
-metal_stack_release_version: develop
+metal_stack_release_version: v0.22.11
 
 metal_stack_release_vectors:
   - url: oci://ghcr.io/metal-stack/releases:{{ metal_stack_release_version }}

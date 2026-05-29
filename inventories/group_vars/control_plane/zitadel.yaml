@@ -1,10 +1,15 @@
 ---
 zitadel_endpoint: zitadel.{{ metal_control_plane_namespace }}.svc.cluster.local
-zitadel_external_domain: zitadel.{{ metal_control_plane_ingress_dns }}
+zitadel_external_domain: zitadel.{{ metal_control_plane_gateway_dns }}
 zitadel_ingress_dns: https://{{ zitadel_external_domain }}:4443
 zitadel_port: 8080
 zitadel_skip_verify_tls: true
 zitadel_insecure: true
+
+zitadel_httproute_enabled: true
+zitadel_httproute_parent_refs:
+- name: metal-control-plane
+  sectionName: https
 
 zitadel_init_config:
   static_users:
@@ -23,4 +28,4 @@ zitadel_init_config:
     # later id will be added but currently not possible with zitadel
     id: metal-stack
     name: metal-stack
-    redirect_uri: http://v2.api.172.17.0.1.nip.io:8080/auth/openid-connect/callback
+    redirect_uri: http://v2.api.172.42.0.42.nip.io:8080/auth/openid-connect/callback
