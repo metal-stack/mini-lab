@@ -129,7 +129,7 @@ create-proxy-registries:
 .PHONY: control-plane-bake
 control-plane-bake:
 
-	@if ! docker network ls | grep -q mini_lab_internal; then docker network create mini_lab_internal --gateway 172.42.0.1 --ip-range=172.42.0.0/24 --subnet=172.42.0.0/24 --ipv6=false ; fi
+	@if ! docker network ls | grep -q mini_lab_internal; then docker network create mini_lab_internal --gateway 172.42.0.1 --ip-range=172.42.0.0/16 --subnet=172.42.0.0/16 --ipv6=false ; fi
 	@if ! which kind > /dev/null; then echo "kind needs to be installed"; exit 1; fi
 	@if ! kind get clusters | grep metal-control-plane > /dev/null; then \
 		kind create cluster $(KIND_ARGS) \
