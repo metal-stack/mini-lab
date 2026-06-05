@@ -28,6 +28,9 @@ MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-la
 MINI_LAB_DELL_SONIC_VERSION := $(or $(MINI_LAB_DELL_SONIC_VERSION),4.5.1)
 
 MINI_LAB_INTERNAL_NETWORK=mini_lab_internal
+# define this here as well so that kind picks up the network on a clean checkout,
+# where .env does not exist yet at make parse time (-include .env above)
+KIND_EXPERIMENTAL_DOCKER_NETWORK := $(or $(KIND_EXPERIMENTAL_DOCKER_NETWORK),$(MINI_LAB_INTERNAL_NETWORK))
 
 MACHINE_OS=debian-13.0
 MAX_RETRIES := 30
