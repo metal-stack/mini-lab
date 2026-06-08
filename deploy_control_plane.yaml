@@ -6,6 +6,8 @@
   roles:
     - name: ansible-common
       tags: always
+    - name: metal-ansible-modules
+      tags: always
     - name: ingress-controller
       tags: ingress-controller
     - name: metal-roles/control-plane/roles/prepare
@@ -29,6 +31,8 @@
       tags: valkey
     - name: metal-roles/control-plane/roles/zitadel
       tags: auth
+    - name: metal-roles/common/roles/metal-v2-client
+      tags: metal
     - name: metal-roles/control-plane/roles/metal
       tags: metal
     - name: metal-roles/control-plane/roles/logging
@@ -41,7 +45,7 @@
 - name: deploy gardener
   import_playbook: deploy_gardener.yaml
   when: gardener_enabled and not kamaji_enabled
-    
+
 - name: deploy kamaji
   import_playbook: deploy_kamaji.yaml
   when: kamaji_enabled and not gardener_enabled

@@ -157,6 +157,16 @@ metal_masterdata_api_projects:
     description: Sample project with static id
 
 metal_console_enabled: false
+metal_console_token_renewal:
+  enabled: true
+metal_console_token_expiration: 15m
+
+metal_console_bmc_proxy_certs_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
+metal_console_bmc_proxy_certs_server_cert: "{{ lookup('file', 'certs/bmc-proxy/server.pem') }}"
+metal_console_bmc_proxy_certs_server_key: "{{ lookup('file', 'certs/bmc-proxy/server-key.pem') }}"
+metal_console_bmc_proxy_certs_server_pub: "{{ lookup('file', 'certs/bmc-proxy/server-key.pub') }}"
+metal_console_bmc_proxy_certs_client_cert: "{{ lookup('file', 'certs/bmc-proxy/client.pem') }}"
+metal_console_bmc_proxy_certs_client_key: "{{ lookup('file', 'certs/bmc-proxy/client-key.pem') }}"
 
 metal_api_grpc_certs_server_key: "{{ lookup('file', 'certs/grpc/server-key.pem') }}"
 metal_api_grpc_certs_server_cert: "{{  lookup('file', 'certs/grpc/server.pem') }}"
