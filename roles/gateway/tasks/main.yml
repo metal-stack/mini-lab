@@ -17,18 +17,18 @@
 - name: Deploy metal-control-plane EnvoyProxy
   kubernetes.core.k8s:
     definition: "{{ lookup('template', 'envoyproxy.yaml') | from_yaml }}"
-- name: Deploy default-tls certificate secret
+- name: Deploy metal-api certificate secret
   kubernetes.core.k8s:
     definition:
       apiVersion: v1
       kind: Secret
       type: kubernetes.io/tls
       metadata:
-        name: default-tls
+        name: metal-api-tls
         namespace: "{{ gateway_namespace }}"
       data:
-        tls.crt: "{{ lookup('file', 'certs/default-gateway/server.pem') | b64encode }}"
-        tls.key: "{{ lookup('file', 'certs/default-gateway/server-key.pem') | b64encode }}"
+        tls.crt: "{{ lookup('file', 'certs/metal-api/server.pem') | b64encode }}"
+        tls.key: "{{ lookup('file', 'certs/metal-api/server-key.pem') | b64encode }}"
 - name: Deploy metal-control-plane Gateway
   kubernetes.core.k8s:
     definition: "{{ lookup('template', 'gateway.yaml') | from_yaml }}"

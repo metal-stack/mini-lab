@@ -14,7 +14,7 @@ rm *.csr
 for component in \
         grpc \
         masterdata-api \
-        default-gateway; do
+        metal-api; do
     pushd $component
 
     echo "generating $component certs"

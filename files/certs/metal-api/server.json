@@ -1,5 +1,5 @@
 {
-  "CN": "default-gateway",
+  "CN": "metal-api",
   "hosts": [
     "api.172.42.0.42.nip.io",
     "v2.api.172.42.0.42.nip.io"
