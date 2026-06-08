@@ -1,5 +1,5 @@
 ---
-metal_stack_release_version: develop
+metal_stack_release_version: separate-metal-console-helm-chart
 
 metal_stack_release_vectors:
   - url: oci://ghcr.io/metal-stack/releases:{{ metal_stack_release_version }}
@@ -22,7 +22,7 @@ metal_stack_release_vectors:
 # metal_masterdata_api_image_name:
 # metal_masterdata_api_image_tag:
 # metal_console_image_name:
-# metal_console_image_tag:
+metal_console_image_tag: pr-migrate-to-metal-apiserver-token-renewal
 # metal_core_image_name:
 # metal_core_image_tag:
 # headscale_image_tag:
@@ -40,7 +40,8 @@ metal_stack_release_vectors:
 ##
 
 # ansible_common_version:
-# metal_roles_version:
+metal_roles_version: migrate-to-metal-apiserver-token-renewal
+
 # metal_ansible_modules_version:
 
 ##
@@ -48,6 +49,11 @@ metal_stack_release_vectors:
 ##
 
 # metal_helm_chart_tag:
+metal_helm_chart_version: 0.8.3
+metal_helm_chart_tag: v0.8.3-pull-request.161
+metal_console_helm_chart_version: 0.1.0
+metal_console_helm_chart_tag: v0.1.0-pull-request.161
+
 # metal_helm_chart:
 # further overrides can be looked up in metal-roles where the mapping is defined:
 # https://github.com/metal-stack/metal-roles/blob/master/common/roles/defaults/defaults/main.yaml
