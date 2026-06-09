@@ -5,7 +5,7 @@ echo "Starting mini-lab"
 make up
 
 echo "Waiting for machines to get to waiting state"
-waiting=$(docker compose run --no-TTY --rm metalctl machine ls | grep Waiting | wc -l)
+waiting=$(docker compose run --no-TTY --rm metalctl machine ls | grep -c Waiting)
 minWaiting=2
 declare -i attempts=0
 until [ "$waiting" -ge $minWaiting ]
@@ -16,7 +16,7 @@ do
     fi
     echo "$waiting/$minWaiting machines are waiting"
     sleep 5
-    waiting=$(docker compose run --no-TTY --rm metalctl machine ls | grep Waiting | wc -l)
+    waiting=$(docker compose run --no-TTY --rm metalctl machine ls | grep -c Waiting)
     attempts=$attempts+1
 done
 echo "$waiting/$minWaiting machines are waiting"
@@ -26,7 +26,7 @@ make firewall
 make machine
 
 echo "Waiting for machines to get to Phoned Home state"
-phoned=$(docker compose run --no-TTY --rm metalctl machine ls | grep Phoned | wc -l)
+phoned=$(docker compose run --no-TTY --rm metalctl machine ls | grep -c Waiting)
 minPhoned=2
 declare -i attempts=0
 until [ "$phoned" -ge $minPhoned ]
@@ -37,7 +37,7 @@ do
     fi
     echo "$phoned/$minPhoned machines have phoned home"
     sleep 5
-    phoned=$(docker compose run --no-TTY --rm metalctl machine ls | grep Phoned | wc -l)
+    phoned=$(docker compose run --no-TTY --rm metalctl machine ls | grep -c Waiting)
     attempts+=1
 done
 echo "$phoned/$minPhoned machines have phoned home"
@@ -58,7 +58,7 @@ for i in $(seq 1 10); do
     break
   else
     echo "Connection failed"
-    if [ $i -lt 10 ]; then
+    if [ "$i" -lt 10 ]; then
       echo "Retrying in 1 second..."
       sleep 1
     else
@@ -78,7 +78,7 @@ for i in $(seq 1 10); do
     break
   else
     echo "Connection failed"
-    if [ $i -lt 10 ]; then
+    if [ "$i" -lt 10 ]; then
       echo "Retrying in 1 second..."
       sleep 1
     else

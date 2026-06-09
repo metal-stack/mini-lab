@@ -8,8 +8,8 @@ running_containers=$(docker ps -aq)
 
 if [ ! -z "$running_containers" ]; then
     previous_topos=$(docker inspect -f '{{ index .Config.Labels "clab-topo-file" }}' $(docker ps -aq))
-    for topo in previous_topos; do
-        previous_lab_dir=$(dirname $topo)
+    for topo in $previous_topos; do
+        previous_lab_dir=$(dirname "$topo")
         mkdir -p "${previous_lab_dir}/clab-mini-lab"
     done
 fi
