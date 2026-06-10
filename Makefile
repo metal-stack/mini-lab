@@ -11,6 +11,7 @@ KUBECONFIG := $(shell pwd)/.kubeconfig
 
 METALCTL_HMAC := $(or $(METALCTL_HMAC),metal-admin)
 METALCTL_API_URL := $(or $(METALCTL_API_URL),http://api.172.17.0.1.nip.io:8080/metal)
+METAL_APIV2_URL := $(or $(METAL_APIV2_URL),http://v2.api.172.17.0.1.nip.io:8080)
 
 MKE2FS_CONFIG := $(shell pwd)/mke2fs.conf
 # Default values
@@ -427,6 +428,7 @@ build-sonic-base:
 dev-env:
 	@echo "export METALCTL_API_URL=${METALCTL_API_URL}"
 	@echo "export METALCTL_HMAC=${METALCTL_HMAC}"
+	@echo "export METAL_APIV2_URL=${METAL_APIV2_URL}"
 	@echo "export KUBECONFIG=$(KUBECONFIG)"
 
 build-dell-sonic:
