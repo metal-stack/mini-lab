@@ -37,3 +37,12 @@ cfssl gencert -ca=../ca.pem -ca-key=../ca-key.pem -config=../ca-config.json -pro
 cat client.pem client-key.pem > client.crt
 rm -f *.csr
 popd
+
+echo "generating bmc-proxy certs"
+
+pushd bmc-proxy
+cfssl gencert -ca=../ca.pem -ca-key=../ca-key.pem -config=../ca-config.json -profile=server server.json | cfssljson -bare server
+cfssl gencert -ca=../ca.pem -ca-key=../ca-key.pem -config=../ca-config.json -profile=client client.json | cfssljson -bare client
+rm *.csr
+ssh-keygen -y -f server-key.pem > server-key.pub
+popd
