@@ -157,6 +157,7 @@ metal_masterdata_api_projects:
     description: Sample project with static id
 
 metal_console_enabled: true
+metal_console_use_apiserver: true
 metal_console_token_renewal:
   enabled: true
 metal_console_token_expiration: 15m
