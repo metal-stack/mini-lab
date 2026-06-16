@@ -74,7 +74,7 @@ COMPOSE_ARGS += $(if $(MINI_LAB_HELM_CHARTS),-f compose.dev/helm-charts.yaml)
 endif
 
 .PHONY: up
-up: env gen-certs control-plane-bake partition-bake
+up: env gen-certs verify-deployment-image control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_ed25519
 	docker compose $(COMPOSE_ARGS) up --pull=always --abort-on-container-failure --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
@@ -149,6 +149,15 @@ endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
 		sudo --preserve-env=MINI_LAB_SONIC_IMAGE --preserve-env=MINI_LAB_DELL_SONIC_VERSION --preserve-env=MINI_LAB_VM_IMAGE $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
 		./scripts/deactivate_offloading.sh; fi
+
+.PHONY: verify-deployment-image
+verify-deployment-image: env
+	@if which cosign 1> /dev/null 2> /dev/null; then \
+		echo -e "\033[0;32mcosign is installed, verifying deployment base image\033[0m" && \
+		. ./.env && cosign verify --key files/cosign.pub ghcr.io/metal-stack/metal-deployment-base:$$DEPLOYMENT_BASE_IMAGE_TAG; \
+	else \
+		echo -e "\033[1;33mcosign is not installed, install it in order to verify the deployment base image prior to your deployments\033[0m\n"; \
+	fi
 
 .PHONY: external_network
 external_network:
