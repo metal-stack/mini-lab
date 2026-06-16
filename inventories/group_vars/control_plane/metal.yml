@@ -24,6 +24,7 @@ metal_apiserver_oidc_end_session_url: "https://zitadel.{{ metal_control_plane_in
 
 metal_apiserver_redis_password: change-me-soon
 metal_apiserver_admin_subjects: "admin@metal-stack.zitadel.172.17.0.1.nip.io@openid-connect"
+metal_apiserver_secure_cookie: false
 
 metal_api_images:
   - id: firewall-ubuntu-3.0
@@ -38,10 +39,10 @@ metal_api_images:
     url: https://images.metal-stack.io/metal-os/stable/ubuntu/24.04/img.tar.lz4
     features:
       - machine
-  - id: debian-12.0
-    name: Debian 12
-    description: Debian 12 Latest Release
-    url: https://images.metal-stack.io/metal-os/stable/debian/12/img.tar.lz4
+  - id: debian-13.0
+    name: Debian 13
+    description: Debian 13 Latest Release
+    url: https://images.metal-stack.io/metal-os/stable/debian/13/img.tar.lz4
     features:
       - machine
 
