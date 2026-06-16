@@ -154,7 +154,7 @@ endif
 verify-deployment-image: env
 	@if which cosign 1> /dev/null 2> /dev/null; then \
 		echo -e "\033[0;32mcosign is installed, verifying deployment base image\033[0m" && \
-		cosign verify --key files/cosign.pub ghcr.io/metal-stack/metal-deployment-base:$$DEPLOYMENT_BASE_IMAGE_TAG; \
+		. ./.env && cosign verify --key files/cosign.pub ghcr.io/metal-stack/metal-deployment-base:$$DEPLOYMENT_BASE_IMAGE_TAG; \
 	else \
 		echo -e "\033[1;33mcosign is not installed, install it in order to verify the deployment base image prior to your deployments\033[0m\n"; \
 	fi
