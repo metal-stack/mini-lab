@@ -40,6 +40,8 @@ MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_
 else ifeq ($(MINI_LAB_FLAVOR),capms_dell_sonic)
 LAB_TOPOLOGY=mini-lab.capms.dell_sonic.yaml
 MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_VERSION)
+else ifeq ($(MINI_LAB_FLAVOR),capms_sonic)
+LAB_TOPOLOGY=mini-lab.capms.sonic.yaml
 else ifeq ($(MINI_LAB_FLAVOR),kamaji)
 LAB_TOPOLOGY=mini-lab.kamaji.yaml
 KAMAJI_ENABLED=true
@@ -91,8 +93,8 @@ up: env gen-certs verify-deployment-image control-plane-bake partition-bake
 # TODO: should be investigated and fixed if possible
 ifeq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms_dell_sonic),)
 	sleep 15
-	ssh -F files/ssh/config leaf01 'systemctl restart bgp'
-	ssh -F files/ssh/config leaf02 'systemctl restart bgp'
+	ssh -F files/ssh/config leaf01 'systemctl restart bgp || (sleep 30 && systemctl reset-failed bgp && systemctl restart bgp)'
+	ssh -F files/ssh/config leaf02 'systemctl restart bgp || (sleep 30 && systemctl reset-failed bgp && systemctl restart bgp)'
 endif
 
 .PHONY: restart
@@ -197,6 +199,7 @@ cleanup-partition:
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.dell_sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.capms.dell_sonic.yaml
+	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.capms.sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.kamaji.yaml
 	docker network rm --force mini_lab_ext
 
