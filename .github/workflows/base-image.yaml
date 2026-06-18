@@ -13,7 +13,6 @@ jobs:
     strategy:
       matrix:
         versions:
-          - name: 202505
           - name: 202605
 
     steps:
