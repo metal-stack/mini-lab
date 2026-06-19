@@ -1,0 +1,66 @@
+---
+- name: Gather release versions
+  setup_yaml:
+
+- name: Check mandatory variables for this role are set
+  ansible.builtin.assert:
+    fail_msg: "not all mandatory variables given, check role documentation"
+    quiet: true
+    that:
+      - metal_api_image_name is defined
+      - metal_api_image_tag is defined
+      - metal_metalctl_image_name is defined
+      - metal_metalctl_image_tag is defined
+      - metal_masterdata_api_image_name is defined
+      - metal_masterdata_api_image_tag is defined
+      - metal_masterdata_api_tls_ca is defined
+      - metal_masterdata_api_tls_cert is defined
+      - metal_masterdata_api_tls_cert_key is defined
+      - metal_masterdata_api_tls_client_cert is defined
+      - metal_masterdata_api_tls_client_key is defined
+      - metal_apiserver_image_name is defined
+      - metal_apiserver_image_tag is defined
+      - metal_ipam_image_name is defined
+      - metal_ipam_image_tag is defined
+      - metal_console_image_name is defined
+      - metal_console_image_tag is defined
+      - not metal_api_s3_enabled or metal_api_s3_address is not none
+      - not metal_apiserver_enabled or metal_apiserver_oidc_client_id is not none
+      - not metal_apiserver_enabled or metal_apiserver_oidc_client_secret is not none
+
+- name: Apply metal-control-plane ResourceGraphDefinition
+  kubernetes.core.k8s:
+    definition: "{{ lookup('file', metal_control_plane_rgd_file) | from_yaml }}"
+    apply: true
+    wait: true
+
+- name: Wait until ResourceGraphDefinition is active
+  kubernetes.core.k8s_info:
+    api_version: kro.run/v1alpha1
+    kind: ResourceGraphDefinition
+    name: metal-control-plane
+  register: metal_rgd
+  until: >-
+    metal_rgd.resources | length > 0 and
+    (metal_rgd.resources[0].status.state | default('')) == 'Active'
+  retries: 30
+  delay: 5
+
+- name: Deploy metal control plane (kro MetalControlPlane instance)
+  kubernetes.core.k8s:
+    namespace: "{{ metal_control_plane_namespace }}"
+    definition: "{{ lookup('template', 'metal-control-plane.yaml.j2') | from_yaml }}"
+    apply: true
+
+# for automation tests, we need to wait until all the services are ready...
+- name: Wait until api is available
+  ansible.builtin.uri:
+    url: "{{ metal_check_api_health_endpoint }}"
+    follow_redirects: safe
+    status_code: 200
+    validate_certs: false
+  register: result
+  until: result is success
+  retries: 60
+  delay: 10
+  when: metal_check_api_available

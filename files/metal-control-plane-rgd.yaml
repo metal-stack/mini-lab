@@ -1,0 +1,1754 @@
+---
+# kro.run ResourceGraphDefinition generated from the metal-control-plane Helm chart
+# (charts/metal-control-plane, chart version 0.8.3).
+#
+# Conversion notes:
+#   * Whole-resource conditionals (the Helm `{{- if … }}` that wrap an entire
+#     manifest) are modelled with kro's `includeWhen`.
+#   * Field-level and list-element conditionals (the `{{- if … }}` blocks inside
+#     a manifest) are modelled with the CEL `omit()` sentinel introduced in
+#     https://github.com/kubernetes-sigs/kro/pull/1139. When the ternary resolves
+#     to `omit()`, kro drops the containing field or array element entirely.
+#   * Helm-only constructs were adapted:
+#       - `helm.sh/hook` Jobs become ordinary Jobs (kro has no hook lifecycle).
+#       - `checksum/config` pod annotations (used by Helm to roll pods on config
+#         change) are dropped; kro handles drift via server-side apply.
+#       - `.Capabilities.APIVersions.Has "metal-stack.io/v1"` becomes the explicit
+#         `spec.cwnp.enabled` flag.
+#       - The dockerconfigjson registry secret takes the rendered JSON string
+#         (`spec.metalRegistryAuth.dockerConfigJson`) since kro CEL has no
+#         toJson/b64enc; it is applied via `stringData`.
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: metal-control-plane
+spec:
+  schema:
+    apiVersion: v1alpha1
+    kind: MetalControlPlane
+    spec:
+      setResourceLimits: boolean | default=true
+      zapEncoding: string | default="json"
+      zapLevel: string | default="debug"
+
+      images:
+        metalApi:
+          image: string | default="ghcr.io/metal-stack/metal-api"
+          imagePullPolicy: string | default="IfNotPresent"
+          tag: string | default="latest"
+        metalApiserver:
+          image: string | default="ghcr.io/metal-stack/metal-apiserver"
+          imagePullPolicy: string | default="IfNotPresent"
+          tag: string | default="latest"
+        masterdataApi:
+          image: string | default="ghcr.io/metal-stack/masterdata-api"
+          imagePullPolicy: string | default="IfNotPresent"
+          tag: string | default="latest"
+        tenantApiserver:
+          image: string | default="ghcr.io/metal-stack/tenant-apiserver"
+          imagePullPolicy: string | default="IfNotPresent"
+          tag: string | default="main"
+        ipam:
+          image: string | default="ghcr.io/metal-stack/go-ipam"
+          imagePullPolicy: string | default="IfNotPresent"
+          tag: string | default="latest"
+        metalctl:
+          image: string | default="ghcr.io/metal-stack/metalctl"
+          imagePullPolicy: string | default="IfNotPresent"
+          tag: string | default="latest"
+        metalConsole:
+          image: string | default="ghcr.io/metal-stack/metal-console"
+          imagePullPolicy: string | default="IfNotPresent"
+          tag: string | default="latest"
+
+      # Free-form resource requirement blocks (requests/limits).
+      resources:
+        metalApi: object
+        masterdataApi: object
+        tenantApiserver: object
+        ipam: object
+        metalConsole: object
+        metalApiserver: object
+
+      hpa:
+        metalApi:
+          enabled: boolean | default=false
+          max: integer | default=5
+          min: integer | default=3
+          cpuPercentage: integer | default=70
+        metalApiserver:
+          enabled: boolean | default=false
+          max: integer | default=5
+          min: integer | default=3
+          cpuPercentage: integer | default=70
+
+      podDisruptionBudget:
+        ipam:
+          enabled: boolean | default=true
+          minAvailable: integer | default=1
+        metalApi:
+          enabled: boolean | default=true
+          minAvailable: integer | default=2
+        masterdataApi:
+          enabled: boolean | default=true
+          minAvailable: integer | default=1
+        tenantApiserver:
+          enabled: boolean | default=true
+          minAvailable: integer | default=1
+        metalConsole:
+          enabled: boolean | default=false
+          minAvailable: integer | default=1
+        metalApiserver:
+          enabled: boolean | default=false
+          minAvailable: integer | default=2
+
+      ports:
+        metalApi: integer | default=8080
+        metalApiserver: integer | default=8080
+        metalApiserverMetrics: integer | default=2112
+        metalApiGrpc: integer | default=50051
+        metalApiMetrics: integer | default=2112
+        masterdataApi: integer | default=8443
+        masterdataApiMetrics: integer | default=2113
+        tenantApiserver: integer | default=8080
+        tenantApiserverMetrics: integer | default=2113
+        metalConsole: integer | default=10001
+        ipam: integer | default=9090
+        ipamMetrics: integer | default=2112
+
+      metalApi:
+        replicas: integer | default=3
+        basePath: string | default="/"
+        logLevel: string | default="info"
+        dbAddress: string | default=""
+        dbPassword: string | default=""
+        ipamGrpcServerEndpoint: string | default=""
+        dexAddress: string | default=""
+        dexClientid: string | default=""
+        viewKey: string | default=""
+        editKey: string | default=""
+        adminKey: string | default=""
+        passwordReasonMinlength: integer | default=0
+        nsq:
+          lookupdAddress: string | default=""
+          tcpAddress: string | default=""
+          httpAddress: string | default=""
+          tls:
+            enabled: boolean | default=false
+            secretName: string | default=""
+            checksum: string | default=""
+        grpc:
+          tls:
+            enabled: boolean | default=false
+            serverKeyEnc: string | default=""
+            serverCertEnc: string | default=""
+            caCertEnc: string | default=""
+        bmc:
+          superuser:
+            pwdEnc: string | default=""
+            enabled: boolean | default=false
+        partitions: string | default="[]"
+        sizes: string | default="[]"
+        images: string | default="[]"
+        networks: string | default="[]"
+        ips: string | default="[]"
+        projects: string | default="[]"
+        filesystemlayouts: string | default="[]"
+        sizeimageconstraints: string | default="[]"
+        sizeReservations: string | default="[]"
+        s3:
+          enabled: boolean | default=false
+          address: string | default=""
+          key: string | default=""
+          secret: string | default=""
+          firmwareBucket: string | default=""
+        headscale:
+          enabled: boolean | default=false
+          apiKey: string | default=""
+          internalApiAddress: string | default=""
+          controlPlaneAddress: string | default=""
+        minimumClientVersion: string | default=""
+        releaseVersion: string | default=""
+        httpRoute:
+          enabled: boolean | default=false
+          hostnames: "[]string"
+          annotations: "map[string]string"
+          parentRefs: "[]object"
+          httpsRedirect:
+            enabled: boolean | default=false
+            parentRefs: "[]object"
+        tcpRoute:
+          enabled: boolean | default=false
+          annotations: "map[string]string"
+          parentRefs: "[]object"
+
+      metalApiserver:
+        enabled: boolean | default=false
+        replicas: integer | default=1
+        logLevel: string | default="info"
+        url: string | default=""
+        providerTenant: string | default=""
+        tenantApiserverBaseUrl: string | default="http://tenant-apiserver:8080"
+        secureCookie: boolean | default=true
+        db:
+          addresses: "[]string"
+          password: string | default=""
+        oidc:
+          clientId: string | default=""
+          clientSecret: string | default=""
+          discoveryUrl: string | default=""
+          endSessionUrl: string | default=""
+          uniqueUserKey: string | default="email"
+          tlsSkipVerify: boolean | default=true
+        sessionSecret: string | default=""
+        redis:
+          addr: string | default=""
+          password: string | default=""
+        adminSubjects: "[]string"
+        auditing:
+          searchBackend: string | default="timescaledb"
+          timescaledb:
+            enabled: boolean | default=true
+            host: string | default="auditing-timescaledb"
+            port: integer | default=5432
+            db: string | default="auditing"
+            user: string | default="postgres"
+            password: string | default="change-me"
+            retention: string | default="14-days"
+          splunk:
+            enabled: boolean | default=false
+            endpoint: string | default=""
+            hec: string | default=""
+            source: string | default=""
+            sourceType: string | default=""
+            index: string | default=""
+            host: string | default=""
+            ca: string | default=""
+        rateLimit:
+          maxRequestsPerMinute: integer | default=1000
+          maxUnauthenticatedRequestsPerMinute: integer | default=50
+        httpRoute:
+          enabled: boolean | default=false
+          hostnames: "[]string"
+          annotations: "map[string]string"
+          parentRefs: "[]object"
+          httpsRedirect:
+            enabled: boolean | default=false
+            parentRefs: "[]object"
+
+      ipam:
+        replicas: integer | default=2
+        grpcServerEndpoint: string | default="0.0.0.0:9090"
+        logLevel: string | default="info"
+        dbHost: string | default=""
+        dbPort: integer | default=5432
+        dbName: string | default=""
+        dbUser: string | default=""
+        dbPassword: string | default=""
+
+      masterdataApi:
+        replicas: integer | default=2
+        providerTenant: string | default=""
+        dbAddress: string | default=""
+        dbPort: integer | default=5432
+        dbName: string | default=""
+        dbUser: string | default=""
+        dbPassword: string | default=""
+        size: string | default="2Gi"
+        tenants: string | default="[]"
+        projects: string | default="[]"
+        ca: string | default=""
+        cert: string | default=""
+        certKey: string | default=""
+        clientCert: string | default=""
+        clientKey: string | default=""
+        hmac: string | default=""
+
+      tenantApiserver:
+        replicas: integer | default=2
+        dbAddress: string | default=""
+        dbPort: integer | default=5432
+        dbName: string | default=""
+        dbUser: string | default=""
+        dbPassword: string | default=""
+        size: string | default="2Gi"
+
+      metalConsole:
+        enabled: boolean | default=false
+        replicas: integer | default=3
+        tcpRoute:
+          enabled: boolean | default=false
+          annotations: "map[string]string"
+          parentRefs: "[]object"
+        bmcProxy:
+          tls:
+            serverKeyEnc: string | default=""
+            serverPubEnc: string | default=""
+            clientKeyEnc: string | default=""
+            clientCertEnc: string | default=""
+            caCertEnc: string | default=""
+
+      ingressPublicDns: string | default=""
+      v2IngressPublicDns: string | default=""
+
+      deployIngress: boolean | default=true
+      ingress:
+        annotations: "map[string]string"
+        tls:
+          enabled: boolean | default=false
+
+      auditing:
+        enabled: boolean | default=false
+        searchBackend: string | default=""
+        timescaledb:
+          enabled: boolean | default=false
+          host: string | default=""
+          port: string | default="5432"
+          db: string | default="auditing"
+          user: string | default="postgres"
+          password: string | default=""
+          retention: string | default="14 days"
+        splunk:
+          enabled: boolean | default=false
+          endpoint: string | default=""
+          hec: string | default=""
+          source: string | default=""
+          sourceType: string | default=""
+          index: string | default=""
+          host: string | default=""
+          ca: string | default=""
+
+      cwnp:
+        enabled: boolean | default=false
+
+      metalRegistryAuthEnabled: boolean | default=false
+      metalRegistryAuth:
+        dockerConfigJson: string | default="{}"
+
+  resources:
+    # ----------------------------------------------------------------------
+    # Registry pull secrets (one identical dockerconfigjson Secret per
+    # workload that needs to pull images). A single forEach collection emits
+    # one Secret per *enabled* workload; the whole collection is skipped when
+    # metalRegistryAuthEnabled is false. metal-console / metal-apiserver are
+    # additionally gated on their own enabled flags via filter().
+    # ----------------------------------------------------------------------
+    - id: registryCredentials
+      includeWhen:
+        - ${schema.spec.metalRegistryAuthEnabled}
+      forEach:
+        - workload: |-
+            ${[
+              {"name": "metal-api", "enabled": true},
+              {"name": "masterdata-api", "enabled": true},
+              {"name": "tenant-apiserver", "enabled": true},
+              {"name": "ipam", "enabled": true},
+              {"name": "metal-console", "enabled": schema.spec.metalConsole.enabled},
+              {"name": "metal-apiserver", "enabled": schema.spec.metalApiserver.enabled}
+            ].filter(w, w.enabled)}
+      template:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: '${workload.name + "-registry-credentials"}'
+          labels:
+            app: '${workload.name + "-registry-credentials"}'
+        type: kubernetes.io/dockerconfigjson
+        stringData:
+          .dockerconfigjson: ${schema.spec.metalRegistryAuth.dockerConfigJson}
+
+    # ----------------------------------------------------------------------
+    # metal-api secrets / config
+    # ----------------------------------------------------------------------
+    - id: metalApiSecret
+      template:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: metal-api
+          labels:
+            app: metal-api
+        type: Opaque
+        stringData:
+          view_key: ${schema.spec.metalApi.viewKey}
+          edit_key: ${schema.spec.metalApi.editKey}
+          admin_key: ${schema.spec.metalApi.adminKey}
+
+    - id: metalApiGrpcSecret
+      template:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: metal-api-grpc
+          labels:
+            app: metal-api-grpc
+        data:
+          server_key.pem: ${base64.decode(schema.spec.metalApi.grpc.tls.serverKeyEnc)}
+          server.pem: ${base64.decode(schema.spec.metalApi.grpc.tls.serverCertEnc)}
+          ca.pem: ${base64.decode(schema.spec.metalApi.grpc.tls.caCertEnc)}
+
+    - id: metalApiBmcSecret
+      includeWhen:
+        - ${schema.spec.metalApi.bmc.superuser.enabled}
+      template:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: metal-api-bmc
+          labels:
+            app: metal-api-bmc
+        data:
+          superuser.pwd: ${base64.decode(schema.spec.metalApi.bmc.superuser.pwdEnc)}
+
+    - id: metalApiS3Secret
+      includeWhen:
+        - ${schema.spec.metalApi.s3.enabled}
+      template:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: metal-api-s3
+          labels:
+            app: metal-api-s3
+        type: Opaque
+        stringData:
+          s3_address: ${schema.spec.metalApi.s3.address}
+          s3_key: ${schema.spec.metalApi.s3.key}
+          s3_secret: ${schema.spec.metalApi.s3.secret}
+          s3_firmware_bucket: ${schema.spec.metalApi.s3.firmwareBucket}
+
+    - id: metalApiSplunkSecret
+      includeWhen:
+        - ${schema.spec.auditing.splunk.enabled}
+        - ${schema.spec.auditing.splunk.ca != ""}
+      template:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: metal-api-splunk-audit-certs
+          labels:
+            app: metal-api-splunk-audit-certs
+        data:
+          ca.pem: ${base64.decode(schema.spec.auditing.splunk.ca)}
+
+    # ----------------------------------------------------------------------
+    # metal-api deployment / service
+    # ----------------------------------------------------------------------
+    - id: metalApiDeployment
+      template:
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: metal-api
+          labels:
+            app: metal-api
+        spec:
+          replicas: ${schema.spec.metalApi.replicas}
+          selector:
+            matchLabels:
+              app: metal-api
+          template:
+            metadata:
+              labels:
+                app: metal-api
+            spec:
+              imagePullSecrets: '${schema.spec.metalRegistryAuthEnabled ? [{"name": "metal-api-registry-credentials"}] : omit()}'
+              restartPolicy: Always
+              # it's better to disable the service links as the default args do not work properly otherwise (metal#64)
+              enableServiceLinks: false
+              containers:
+                - name: metal-api
+                  image: ${schema.spec.images.metalApi.image + ":" + schema.spec.images.metalApi.tag}
+                  imagePullPolicy: ${schema.spec.images.metalApi.imagePullPolicy}
+                  ports:
+                    - containerPort: 8080
+                    - containerPort: 50051
+                      protocol: TCP
+                    - containerPort: 2112
+                  readinessProbe:
+                    httpGet:
+                      path: '${schema.spec.metalApi.basePath + "v1/health"}'
+                      port: 8080
+                    initialDelaySeconds: 15
+                    successThreshold: 1
+                    timeoutSeconds: 10
+                  env:
+                    - name: METAL_API_BIND_ADDR
+                      value: "0.0.0.0"
+                    - name: METAL_API_BASE_PATH
+                      value: ${schema.spec.metalApi.basePath}
+                    - name: METAL_API_LOG_LEVEL
+                      value: ${schema.spec.metalApi.logLevel}
+                    - name: METAL_API_INIT_DATA_STORE
+                      value: "false"
+                    - name: METAL_API_DB_ADDR
+                      value: ${schema.spec.metalApi.dbAddress}
+                    - name: METAL_API_DB_PASSWORD
+                      value: ${schema.spec.metalApi.dbPassword}
+                    - name: METAL_API_DEX_ADDR
+                      value: ${schema.spec.metalApi.dexAddress}
+                    - name: METAL_API_DEX_CLIENTID
+                      value: ${schema.spec.metalApi.dexClientid}
+                    - name: METAL_API_HMAC_VIEW_KEY
+                      valueFrom:
+                        secretKeyRef:
+                          name: metal-api
+                          key: view_key
+                    - name: METAL_API_HMAC_EDIT_KEY
+                      valueFrom:
+                        secretKeyRef:
+                          name: metal-api
+                          key: edit_key
+                    - name: METAL_API_HMAC_ADMIN_KEY
+                      valueFrom:
+                        secretKeyRef:
+                          name: metal-api
+                          key: admin_key
+                    - name: METAL_API_IPAM_GRPC_SERVER_ENDPOINT
+                      value: ${schema.spec.metalApi.ipamGrpcServerEndpoint}
+                    - name: METAL_API_PROVIDER_TENANT
+                      value: ${schema.spec.masterdataApi.providerTenant}
+                    - name: METAL_API_NSQLOOKUPD_ADDR
+                      value: ${schema.spec.metalApi.nsq.lookupdAddress}
+                    - name: METAL_API_NSQD_TCP_ADDR
+                      value: ${schema.spec.metalApi.nsq.tcpAddress}
+                    - name: METAL_API_NSQD_HTTP_ENDPOINT
+                      value: ${schema.spec.metalApi.nsq.httpAddress}
+                    - '${schema.spec.metalApi.nsq.tls.enabled ? {"name": "METAL_API_NSQD_CA_CERT_FILE", "value": "/certs/nsq/ca.pem"} : omit()}'
+                    - '${schema.spec.metalApi.nsq.tls.enabled ? {"name": "METAL_API_NSQD_CLIENT_CERT_FILE", "value": "/certs/nsq/client.pem"} : omit()}'
+                    - name: METAL_API_GRPC_TLS_ENABLED
+                      value: ${string(schema.spec.metalApi.grpc.tls.enabled)}
+                    - '${schema.spec.metalApi.grpc.tls.enabled ? {"name": "METAL_API_GRPC_CA_CERT_FILE", "value": "/certs/grpc/ca.pem"} : omit()}'
+                    - '${schema.spec.metalApi.grpc.tls.enabled ? {"name": "METAL_API_GRPC_SERVER_CERT_FILE", "value": "/certs/grpc/server.pem"} : omit()}'
+                    - '${schema.spec.metalApi.grpc.tls.enabled ? {"name": "METAL_API_GRPC_SERVER_KEY_FILE", "value": "/certs/grpc/server_key.pem"} : omit()}'
+                    - '${schema.spec.metalApi.bmc.superuser.enabled ? {"name": "METAL_API_BMC_SUPERUSER_PWD_FILE", "value": "/bmc/superuser.pwd"} : omit()}'
+                    - '${schema.spec.metalApi.s3.enabled ? {"name": "METAL_API_S3_ADDRESS", "valueFrom": {"secretKeyRef": {"name": "metal-api-s3", "key": "s3_address"}}} : omit()}'
+                    - '${schema.spec.metalApi.s3.enabled ? {"name": "METAL_API_S3_KEY", "valueFrom": {"secretKeyRef": {"name": "metal-api-s3", "key": "s3_key"}}} : omit()}'
+                    - '${schema.spec.metalApi.s3.enabled ? {"name": "METAL_API_S3_SECRET", "valueFrom": {"secretKeyRef": {"name": "metal-api-s3", "key": "s3_secret"}}} : omit()}'
+                    - '${schema.spec.metalApi.s3.enabled ? {"name": "METAL_API_S3_FIRMWARE_BUCKET", "valueFrom": {"secretKeyRef": {"name": "metal-api-s3", "key": "s3_firmware_bucket"}}} : omit()}'
+                    - '${schema.spec.metalApi.headscale.enabled ? {"name": "METAL_API_HEADSCALE_API_KEY", "value": schema.spec.metalApi.headscale.apiKey} : omit()}'
+                    - '${schema.spec.metalApi.headscale.enabled ? {"name": "METAL_API_HEADSCALE_ADDR", "value": schema.spec.metalApi.headscale.internalApiAddress} : omit()}'
+                    - '${schema.spec.metalApi.headscale.enabled ? {"name": "METAL_API_HEADSCALE_CP_ADDR", "value": schema.spec.metalApi.headscale.controlPlaneAddress} : omit()}'
+                    - name: METAL_API_MASTERDATA_HMAC
+                      value: ${schema.spec.masterdataApi.hmac}
+                    - name: METAL_API_MASTERDATA_HOSTNAME
+                      value: masterdata-api
+                    - name: METAL_API_MASTERDATA_PORT
+                      value: ${string(schema.spec.ports.masterdataApi)}
+                    - name: METAL_API_MASTERDATA_CAPATH
+                      value: /certs/masterdata-api/ca.pem
+                    - name: METAL_API_MASTERDATA_CERTPATH
+                      value: /certs/masterdata-api/client.pem
+                    - name: METAL_API_MASTERDATA_CERTKEYPATH
+                      value: /certs/masterdata-api/client-key.pem
+                    - name: METAL_API_PASSWORD_REASON_MINLENGTH
+                      value: ${string(schema.spec.metalApi.passwordReasonMinlength)}
+                    - '${schema.spec.metalApi.releaseVersion != "" ? {"name": "METAL_API_RELEASE_VERSION", "value": schema.spec.metalApi.releaseVersion} : omit()}'
+                    - name: METAL_API_MINIMUM_CLIENT_VERSION
+                      value: ${schema.spec.metalApi.minimumClientVersion}
+                    - '${schema.spec.auditing.enabled ? {"name": "METAL_API_AUDITING_ENABLED", "value": "true"} : omit()}'
+                    - '${schema.spec.auditing.enabled ? {"name": "METAL_API_AUDITING_SEARCH_BACKEND", "value": schema.spec.auditing.searchBackend} : omit()}'
+                    - '${schema.spec.auditing.timescaledb.enabled ? {"name": "METAL_API_AUDITING_TIMESCALEDB_HOST", "value": schema.spec.auditing.timescaledb.host} : omit()}'
+                    - '${schema.spec.auditing.timescaledb.enabled ? {"name": "METAL_API_AUDITING_TIMESCALEDB_PORT", "value": schema.spec.auditing.timescaledb.port} : omit()}'
+                    - '${schema.spec.auditing.timescaledb.enabled ? {"name": "METAL_API_AUDITING_TIMESCALEDB_DB", "value": schema.spec.auditing.timescaledb.db} : omit()}'
+                    - '${schema.spec.auditing.timescaledb.enabled ? {"name": "METAL_API_AUDITING_TIMESCALEDB_USER", "value": schema.spec.auditing.timescaledb.user} : omit()}'
+                    - '${schema.spec.auditing.timescaledb.enabled ? {"name": "METAL_API_AUDITING_TIMESCALEDB_PASSWORD", "value": schema.spec.auditing.timescaledb.password} : omit()}'
+                    - '${schema.spec.auditing.timescaledb.enabled ? {"name": "METAL_API_AUDITING_TIMESCALEDB_RETENTION", "value": schema.spec.auditing.timescaledb.retention} : omit()}'
+                    - '${schema.spec.auditing.splunk.enabled ? {"name": "METAL_API_AUDITING_SPLUNK_ENDPOINT", "value": schema.spec.auditing.splunk.endpoint} : omit()}'
+                    - '${schema.spec.auditing.splunk.enabled ? {"name": "METAL_API_AUDITING_SPLUNK_HEC_TOKEN", "value": schema.spec.auditing.splunk.hec} : omit()}'
+                    - '${schema.spec.auditing.splunk.enabled ? {"name": "METAL_API_AUDITING_SPLUNK_SOURCE", "value": schema.spec.auditing.splunk.source} : omit()}'
+                    - '${schema.spec.auditing.splunk.enabled ? {"name": "METAL_API_AUDITING_SPLUNK_SOURCE_TYPE", "value": schema.spec.auditing.splunk.sourceType} : omit()}'
+                    - '${schema.spec.auditing.splunk.enabled ? {"name": "METAL_API_AUDITING_SPLUNK_INDEX", "value": schema.spec.auditing.splunk.index} : omit()}'
+                    - '${schema.spec.auditing.splunk.enabled ? {"name": "METAL_API_AUDITING_SPLUNK_HOST", "value": schema.spec.auditing.splunk.host} : omit()}'
+                    - '${schema.spec.auditing.splunk.enabled && schema.spec.auditing.splunk.ca != "" ? {"name": "METAL_API_AUDITING_SPLUNK_CA", "value": "/certs/splunk/ca.pem"} : omit()}'
+                  resources: '${schema.spec.setResourceLimits ? schema.spec.resources.metalApi : omit()}'
+                  volumeMounts:
+                    - '${schema.spec.metalApi.nsq.tls.enabled ? {"name": schema.spec.metalApi.nsq.tls.secretName, "mountPath": "/certs/nsq/", "readOnly": true} : omit()}'
+                    - '${schema.spec.metalApi.grpc.tls.enabled ? {"name": "grpc", "mountPath": "/certs/grpc/", "readOnly": true} : omit()}'
+                    - '${schema.spec.auditing.splunk.enabled && schema.spec.auditing.splunk.ca != "" ? {"name": "splunk", "mountPath": "/certs/splunk/", "readOnly": true} : omit()}'
+                    - '${schema.spec.metalApi.bmc.superuser.enabled ? {"name": "bmc", "mountPath": "/bmc", "readOnly": true} : omit()}'
+                    - name: masterdata-api-tls
+                      mountPath: /certs/masterdata-api/
+                      readOnly: true
+              volumes:
+                - '${schema.spec.metalApi.nsq.tls.enabled ? {"name": schema.spec.metalApi.nsq.tls.secretName, "secret": {"secretName": schema.spec.metalApi.nsq.tls.secretName}} : omit()}'
+                - '${schema.spec.metalApi.grpc.tls.enabled ? {"name": "grpc", "secret": {"secretName": "metal-api-grpc"}} : omit()}'
+                - '${schema.spec.auditing.splunk.enabled && schema.spec.auditing.splunk.ca != "" ? {"name": "splunk", "secret": {"secretName": "metal-api-splunk-audit-certs"}} : omit()}'
+                - '${schema.spec.metalApi.bmc.superuser.enabled ? {"name": "bmc", "secret": {"secretName": "metal-api-bmc"}} : omit()}'
+                - name: masterdata-api-tls
+                  secret:
+                    secretName: masterdata-api-tls
+
+    - id: metalApiService
+      template:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: metal-api
+          labels:
+            app: metal-api
+        spec:
+          ports:
+            - name: ${string(schema.spec.ports.metalApi)}
+              port: ${schema.spec.ports.metalApi}
+              targetPort: 8080
+            - name: ${string(schema.spec.ports.metalApiGrpc)}
+              port: ${schema.spec.ports.metalApiGrpc}
+              targetPort: 50051
+            - name: ${string(schema.spec.ports.metalApiMetrics)}
+              port: ${schema.spec.ports.metalApiMetrics}
+              targetPort: 2112
+          selector:
+            app: metal-api
+
+    # ----------------------------------------------------------------------
+    # metal-api jobs (Helm hooks -> ordinary Jobs) and masterdata configmap
+    # ----------------------------------------------------------------------
+    - id: metalApiInitdbJob
+      template:
+        apiVersion: batch/v1
+        kind: Job
+        metadata:
+          name: metal-api-initdb
+          labels:
+            job: metal-api-initdb
+        spec:
+          template:
+            metadata:
+              name: metal-api-initdb
+              labels:
+                job: metal-api-initdb
+            spec:
+              imagePullSecrets: '${schema.spec.metalRegistryAuthEnabled ? [{"name": "metal-api-registry-credentials"}] : omit()}'
+              restartPolicy: Never
+              enableServiceLinks: false
+              containers:
+                - name: initdb
+                  image: ${schema.spec.images.metalApi.image + ":" + schema.spec.images.metalApi.tag}
+                  imagePullPolicy: ${schema.spec.images.metalApi.imagePullPolicy}
+                  command: ["/metal-api"]
+                  args: ["initdb"]
+                  env:
+                    - name: METAL_API_LOG_LEVEL
+                      value: ${schema.spec.metalApi.logLevel}
+                    - name: METAL_API_DB_ADDR
+                      value: ${schema.spec.metalApi.dbAddress}
+                    - name: METAL_API_DB_PASSWORD
+                      value: ${schema.spec.metalApi.dbPassword}
+
+    - id: metalApiMasterdataConfigMap
+      template:
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: metal-api-masterdata
+          labels:
+            app: metal-api
+        data:
+          image.yaml: ${schema.spec.metalApi.images}
+          size.yaml: ${schema.spec.metalApi.sizes}
+          partition.yaml: ${schema.spec.metalApi.partitions}
+          network.yaml: ${schema.spec.metalApi.networks}
+          ip.yaml: ${schema.spec.metalApi.ips}
+          filesystemlayouts.yaml: ${schema.spec.metalApi.filesystemlayouts}
+          sizeimageconstraints.yaml: ${schema.spec.metalApi.sizeimageconstraints}
+          size_reservations.yaml: ${schema.spec.metalApi.sizeReservations}
+
+    - id: metalApiCreateMasterdataJob
+      template:
+        apiVersion: batch/v1
+        kind: Job
+        metadata:
+          name: metal-api-create-masterdata
+          labels:
+            job: metal-api-create-masterdata
+        spec:
+          template:
+            metadata:
+              name: metal-api-create-masterdata
+              labels:
+                job: metal-api-create-masterdata
+            spec:
+              imagePullSecrets: '${schema.spec.metalRegistryAuthEnabled ? [{"name": "metal-api-registry-credentials"}] : omit()}'
+              restartPolicy: Never
+              containers:
+                - name: metalctl
+                  image: ${schema.spec.images.metalctl.image + ":" + schema.spec.images.metalctl.tag}
+                  imagePullPolicy: ${schema.spec.images.metalctl.imagePullPolicy}
+                  env:
+                    - name: METALCTL_API_URL
+                      value: ${"http://metal-api:" + string(schema.spec.ports.metalApi) + schema.spec.metalApi.basePath}
+                    - name: METALCTL_HMAC
+                      valueFrom:
+                        secretKeyRef:
+                          name: metal-api
+                          key: admin_key
+                  command:
+                    - sh
+                    - -c
+                    - |
+                      set -exu
+                      /metalctl image apply -f /masterdata/image.yaml
+                      /metalctl partition apply -f /masterdata/partition.yaml
+                      /metalctl size apply -f /masterdata/size.yaml
+                      /metalctl network apply -f /masterdata/network.yaml
+                      /metalctl network ip apply -f /masterdata/ip.yaml
+                      /metalctl filesystemlayout apply -f /masterdata/filesystemlayouts.yaml
+                      /metalctl size imageconstraint apply -f /masterdata/sizeimageconstraints.yaml
+                      /metalctl size reservation apply -f /masterdata/size_reservations.yaml
+                  volumeMounts:
+                    - name: masterdata
+                      mountPath: /masterdata
+              initContainers:
+                - name: wait-for-api
+                  image: ${schema.spec.images.metalctl.image + ":" + schema.spec.images.metalctl.tag}
+                  imagePullPolicy: ${schema.spec.images.metalctl.imagePullPolicy}
+                  env:
+                    - name: METALCTL_API_URL
+                      value: ${"http://metal-api:" + string(schema.spec.ports.metalApi) + schema.spec.metalApi.basePath}
+                    - name: METALCTL_HMAC
+                      valueFrom:
+                        secretKeyRef:
+                          name: metal-api
+                          key: admin_key
+                  command:
+                    - sh
+                    - -c
+                    - |
+                      set -exu
+                      until /metalctl health; do echo "." && sleep 2; done
+              volumes:
+                - name: masterdata
+                  configMap:
+                    name: metal-api-masterdata
+                    items:
+                      - key: image.yaml
+                        path: image.yaml
+                      - key: size.yaml
+                        path: size.yaml
+                      - key: partition.yaml
+                        path: partition.yaml
+                      - key: network.yaml
+                        path: network.yaml
+                      - key: ip.yaml
+                        path: ip.yaml
+                      - key: filesystemlayouts.yaml
+                        path: filesystemlayouts.yaml
+                      - key: sizeimageconstraints.yaml
+                        path: sizeimageconstraints.yaml
+                      - key: size_reservations.yaml
+                        path: size_reservations.yaml
+
+    - id: metalApiMigrateDbJob
+      template:
+        apiVersion: batch/v1
+        kind: Job
+        metadata:
+          name: metal-api-migrate-db
+          labels:
+            job: metal-api-migrate-db
+        spec:
+          template:
+            metadata:
+              name: metal-api-migrate-db
+              labels:
+                job: metal-api-migrate-db
+            spec:
+              imagePullSecrets: '${schema.spec.metalRegistryAuthEnabled ? [{"name": "metal-api-registry-credentials"}] : omit()}'
+              restartPolicy: Never
+              containers:
+                - name: migration
+                  image: ${schema.spec.images.metalApi.image + ":" + schema.spec.images.metalApi.tag}
+                  imagePullPolicy: ${schema.spec.images.metalApi.imagePullPolicy}
+                  command:
+                    - /metal-api
+                    - migrate
+                  env:
+                    - name: METAL_API_LOG_LEVEL
+                      value: ${schema.spec.metalApi.logLevel}
+                    - name: METAL_API_DB_ADDR
+                      value: ${schema.spec.metalApi.dbAddress}
+                    - name: METAL_API_DB_PASSWORD
+                      value: ${schema.spec.metalApi.dbPassword}
+
+    - id: metalApiLivelinessCronJob
+      template:
+        apiVersion: batch/v1
+        kind: CronJob
+        metadata:
+          name: metal-api-liveliness
+          labels:
+            job: metal-api-liveliness
+        spec:
+          schedule: "*/1 * * * *"
+          failedJobsHistoryLimit: 1
+          successfulJobsHistoryLimit: 1
+          concurrencyPolicy: Replace
+          jobTemplate:
+            spec:
+              backoffLimit: 3
+              template:
+                spec:
+                  imagePullSecrets: '${schema.spec.metalRegistryAuthEnabled ? [{"name": "metal-api-registry-credentials"}] : omit()}'
+                  restartPolicy: OnFailure
+                  containers:
+                    - name: trigger-machine-liveliness
+                      image: ${schema.spec.images.metalApi.image + ":" + schema.spec.images.metalApi.tag}
+                      imagePullPolicy: ${schema.spec.images.metalApi.imagePullPolicy}
+                      command:
+                        - /metal-api
+                        - machine-liveliness
+                      env:
+                        - name: METAL_API_LOG_LEVEL
+                          value: ${schema.spec.metalApi.logLevel}
+                        - name: METAL_API_DB_ADDR
+                          value: ${schema.spec.metalApi.dbAddress}
+                        - name: METAL_API_DB_PASSWORD
+                          value: ${schema.spec.metalApi.dbPassword}
+
+    - id: metalApiVpnConnectedCronJob
+      includeWhen:
+        - ${schema.spec.metalApi.headscale.enabled}
+      template:
+        apiVersion: batch/v1
+        kind: CronJob
+        metadata:
+          name: metal-api-machines-vpn-connected
+          labels:
+            job: metal-api-machines-vpn-connected
+        spec:
+          schedule: "*/1 * * * *"
+          failedJobsHistoryLimit: 1
+          successfulJobsHistoryLimit: 1
+          concurrencyPolicy: Replace
+          jobTemplate:
+            spec:
+              backoffLimit: 3
+              template:
+                spec:
+                  imagePullSecrets: '${schema.spec.metalRegistryAuthEnabled ? [{"name": "metal-api-registry-credentials"}] : omit()}'
+                  restartPolicy: OnFailure
+                  containers:
+                    - name: metal-api
+                      image: ${schema.spec.images.metalApi.image + ":" + schema.spec.images.metalApi.tag}
+                      imagePullPolicy: ${schema.spec.images.metalApi.imagePullPolicy}
+                      command:
+                        - /metal-api
+                        - machines-vpn-connected
+                      env:
+                        - name: METAL_API_LOG_LEVEL
+                          value: ${schema.spec.metalApi.logLevel}
+                        - name: METAL_API_DB_ADDR
+                          value: ${schema.spec.metalApi.dbAddress}
+                        - name: METAL_API_DB_PASSWORD
+                          value: ${schema.spec.metalApi.dbPassword}
+                        - name: METAL_API_HEADSCALE_API_KEY
+                          value: ${schema.spec.metalApi.headscale.apiKey}
+                        - name: METAL_API_HEADSCALE_ADDR
+                          value: ${schema.spec.metalApi.headscale.internalApiAddress}
+                        - name: METAL_API_HEADSCALE_CP_ADDR
+                          value: ${schema.spec.metalApi.headscale.controlPlaneAddress}
+
+    - id: metalApiResurrectionCronJob
+      template:
+        apiVersion: batch/v1
+        kind: CronJob
+        metadata:
+          name: metal-api-resurrection
+          labels:
+            job: metal-api-resurrection
+        spec:
+          schedule: "0 * * * *"
+          successfulJobsHistoryLimit: 1
+          failedJobsHistoryLimit: 1
+          concurrencyPolicy: Replace
+          jobTemplate:
+            spec:
+              backoffLimit: 3
+              template:
+                spec:
+                  imagePullSecrets: '${schema.spec.metalRegistryAuthEnabled ? [{"name": "metal-api-registry-credentials"}] : omit()}'
+                  restartPolicy: OnFailure
+                  containers:
+                    - name: trigger-machine-resurrection
+                      image: ${schema.spec.images.metalApi.image + ":" + schema.spec.images.metalApi.tag}
+                      imagePullPolicy: ${schema.spec.images.metalApi.imagePullPolicy}
+                      command:
+                        - /metal-api
+                        - resurrect-machines
+                      env:
+                        - name: METAL_API_LOG_LEVEL
+                          value: ${schema.spec.metalApi.logLevel}
+                        - name: METAL_API_DB_ADDR
+                          value: ${schema.spec.metalApi.dbAddress}
+                        - name: METAL_API_DB_PASSWORD
+                          value: ${schema.spec.metalApi.dbPassword}
+                        - name: METAL_API_IPAM_GRPC_SERVER_ENDPOINT
+                          value: ${schema.spec.metalApi.ipamGrpcServerEndpoint}
+                        - name: METAL_API_NSQLOOKUPD_ADDR
+                          value: ${schema.spec.metalApi.nsq.lookupdAddress}
+                        - name: METAL_API_NSQD_TCP_ADDR
+                          value: ${schema.spec.metalApi.nsq.tcpAddress}
+                        - name: METAL_API_NSQD_HTTP_ENDPOINT
+                          value: ${schema.spec.metalApi.nsq.httpAddress}
+                        - '${schema.spec.metalApi.nsq.tls.enabled ? {"name": "METAL_API_NSQD_CA_CERT_FILE", "value": "/certs/nsq/ca.pem"} : omit()}'
+                        - '${schema.spec.metalApi.nsq.tls.enabled ? {"name": "METAL_API_NSQD_CLIENT_CERT_FILE", "value": "/certs/nsq/client.pem"} : omit()}'
+                      volumeMounts:
+                        - '${schema.spec.metalApi.nsq.tls.enabled ? {"name": schema.spec.metalApi.nsq.tls.secretName, "mountPath": "/certs/nsq/", "readOnly": true} : omit()}'
+                  volumes:
+                    - '${schema.spec.metalApi.nsq.tls.enabled ? {"name": schema.spec.metalApi.nsq.tls.secretName, "secret": {"secretName": schema.spec.metalApi.nsq.tls.secretName}} : omit()}'
+
+    - id: metalApiHpa
+      includeWhen:
+        - ${schema.spec.hpa.metalApi.enabled}
+      template:
+        apiVersion: autoscaling/v1
+        kind: HorizontalPodAutoscaler
+        metadata:
+          name: metal-api
+        spec:
+          maxReplicas: ${schema.spec.hpa.metalApi.max}
+          minReplicas: ${schema.spec.hpa.metalApi.min}
+          scaleTargetRef:
+            apiVersion: apps/v1
+            kind: Deployment
+            name: metal-api
+          targetCPUUtilizationPercentage: ${schema.spec.hpa.metalApi.cpuPercentage}
+
+    - id: metalApiPdb
+      includeWhen:
+        - ${schema.spec.podDisruptionBudget.metalApi.enabled}
+      template:
+        apiVersion: policy/v1
+        kind: PodDisruptionBudget
+        metadata:
+          name: metal-api
+        spec:
+          minAvailable: ${schema.spec.podDisruptionBudget.metalApi.minAvailable}
+          selector:
+            matchLabels:
+              app: metal-api
+
+    # ----------------------------------------------------------------------
+    # masterdata-api
+    # ----------------------------------------------------------------------
+    - id: masterdataDefaultTenant
+      template:
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: default-tenant
+        data:
+          tenant.yaml: ${schema.spec.masterdataApi.tenants}
+
+    - id: masterdataDefaultProject
+      template:
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: default-project
+        data:
+          project.yaml: ${schema.spec.masterdataApi.projects}
+
+    - id: masterdataApiTlsSecret
+      template:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: masterdata-api-tls
+        type: Opaque
+        data:
+          ca.pem: ${base64.decode(schema.spec.masterdataApi.ca)}
+          client.pem: ${base64.decode(schema.spec.masterdataApi.clientCert)}
+          client-key.pem: ${base64.decode(schema.spec.masterdataApi.clientKey)}
+          server-key.pem: ${base64.decode(schema.spec.masterdataApi.certKey)}
+          server.pem: ${base64.decode(schema.spec.masterdataApi.cert)}
+
+    - id: masterdataApiDeployment
+      template:
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: masterdata-api
+        spec:
+          replicas: ${schema.spec.masterdataApi.replicas}
+          selector:
+            matchLabels:
+              app: masterdata-api
+          template:
+            metadata:
+              labels:
+                app: masterdata-api
+              annotations:
+                prometheus.io/scrape: "true"
+                prometheus.io/path: /metrics
+                prometheus.io/port: "2112"
+            spec:
+              imagePullSecrets: '${schema.spec.metalRegistryAuthEnabled ? [{"name": "masterdata-api-registry-credentials"}] : omit()}'
+              containers:
+                - name: masterdata-api
+                  image: ${schema.spec.images.masterdataApi.image + ":" + schema.spec.images.masterdataApi.tag}
+                  imagePullPolicy: ${schema.spec.images.masterdataApi.imagePullPolicy}
+                  env:
+                    - name: MASTERDATA_API_CA
+                      value: /certs/ca.pem
+                    - name: MASTERDATA_API_CERT
+                      value: /certs/server.pem
+                    - name: MASTERDATA_API_CERTKEY
+                      value: /certs/server-key.pem
+                    - name: MASTERDATA_API_DBHOST
+                      value: ${schema.spec.masterdataApi.dbAddress}
+                    - name: MASTERDATA_API_DBNAME
+                      value: ${schema.spec.masterdataApi.dbName}
+                    - name: MASTERDATA_API_DBPASSWORD
+                      value: ${schema.spec.masterdataApi.dbPassword}
+                    - name: MASTERDATA_API_DBPORT
+                      value: ${string(schema.spec.masterdataApi.dbPort)}
+                    - name: MASTERDATA_API_DBUSER
+                      value: ${schema.spec.masterdataApi.dbUser}
+                    - name: MASTERDATA_API_PORT
+                      value: "8443"
+                    - name: MASTERDATA_API_HMACKEY
+                      value: ${schema.spec.masterdataApi.hmac}
+                  resources: '${schema.spec.setResourceLimits ? schema.spec.resources.masterdataApi : omit()}'
+                  ports:
+                    - containerPort: 2112
+                      protocol: TCP
+                    - containerPort: 8443
+                  readinessProbe:
+                    exec:
+                      command: ["/bin/grpc_health_probe", "-addr=:8443", "-tls", "-tls-ca-cert=/certs/ca.pem", "-tls-client-cert=/certs/server.pem", "-tls-client-key=/certs/server-key.pem", "-tls-server-name=localhost"]
+                    initialDelaySeconds: 5
+                  livenessProbe:
+                    exec:
+                      command: ["/bin/grpc_health_probe", "-addr=:8443", "-tls", "-tls-ca-cert=/certs/ca.pem", "-tls-client-cert=/certs/server.pem", "-tls-client-key=/certs/server-key.pem", "-tls-server-name=localhost"]
+                    initialDelaySeconds: 10
+                  volumeMounts:
+                    - name: certs
+                      mountPath: /certs
+                    - name: initdb-project-volume
+                      mountPath: /initdb.d/project.yaml
+                      subPath: project.yaml
+                    - name: initdb-tenant-volume
+                      mountPath: /initdb.d/tenant.yaml
+                      subPath: tenant.yaml
+              volumes:
+                - name: certs
+                  secret:
+                    secretName: masterdata-api-tls
+                - name: initdb-project-volume
+                  configMap:
+                    name: default-project
+                - name: initdb-tenant-volume
+                  configMap:
+                    name: default-tenant
+
+    - id: masterdataApiService
+      template:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: masterdata-api
+          labels:
+            app: masterdata-api
+        spec:
+          type: ClusterIP
+          ports:
+            - name: ${string(schema.spec.ports.masterdataApi)}
+              port: ${schema.spec.ports.masterdataApi}
+              targetPort: 8443
+            - name: ${string(schema.spec.ports.masterdataApiMetrics)}
+              port: ${schema.spec.ports.masterdataApiMetrics}
+              targetPort: 2112
+          selector:
+            app: masterdata-api
+
+    - id: masterdataApiPdb
+      includeWhen:
+        - ${schema.spec.podDisruptionBudget.masterdataApi.enabled}
+      template:
+        apiVersion: policy/v1
+        kind: PodDisruptionBudget
+        metadata:
+          name: masterdata-api
+        spec:
+          minAvailable: ${schema.spec.podDisruptionBudget.masterdataApi.minAvailable}
+          selector:
+            matchLabels:
+              app: masterdata-api
+
+    # ----------------------------------------------------------------------
+    # tenant-apiserver
+    # ----------------------------------------------------------------------
+    - id: tenantApiserverDeployment
+      template:
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: tenant-apiserver
+        spec:
+          replicas: ${schema.spec.tenantApiserver.replicas}
+          selector:
+            matchLabels:
+              app: tenant-apiserver
+          template:
+            metadata:
+              labels:
+                app: tenant-apiserver
+              annotations:
+                prometheus.io/scrape: "true"
+                prometheus.io/path: /metrics
+                prometheus.io/port: "2112"
+            spec:
+              imagePullSecrets: '${schema.spec.metalRegistryAuthEnabled ? [{"name": "tenant-apiserver-registry-credentials"}] : omit()}'
+              containers:
+                - name: tenant-apiserver
+                  image: ${schema.spec.images.tenantApiserver.image + ":" + schema.spec.images.tenantApiserver.tag}
+                  imagePullPolicy: ${schema.spec.images.tenantApiserver.imagePullPolicy}
+                  command:
+                    - /server
+                    - postgres
+                  env:
+                    - name: TENANT_APISERVER_GRPC_SERVER_ENDPOINT
+                      value: "0.0.0.0:8080"
+                    - name: TENANT_APISERVER_PG_HOST
+                      value: ${schema.spec.tenantApiserver.dbAddress}
+                    - name: TENANT_APISERVER_PG_DBNAME
+                      value: ${schema.spec.tenantApiserver.dbName}
+                    - name: TENANT_APISERVER_PG_PASSWORD
+                      value: ${schema.spec.tenantApiserver.dbPassword}
+                    - name: TENANT_APISERVER_PG_PORT
+                      value: ${string(schema.spec.tenantApiserver.dbPort)}
+                    - name: TENANT_APISERVER_PG_USER
+                      value: ${schema.spec.tenantApiserver.dbUser}
+                  resources: '${schema.spec.setResourceLimits ? schema.spec.resources.tenantApiserver : omit()}'
+                  ports:
+                    - containerPort: 2112
+                      protocol: TCP
+                    - containerPort: 8080
+                  readinessProbe:
+                    grpc:
+                      port: 8080
+                    initialDelaySeconds: 5
+                  livenessProbe:
+                    grpc:
+                      port: 8080
+                    initialDelaySeconds: 10
+
+    - id: tenantApiserverService
+      template:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: tenant-apiserver
+          labels:
+            app: tenant-apiserver
+        spec:
+          type: ClusterIP
+          ports:
+            - name: ${string(schema.spec.ports.tenantApiserver)}
+              port: ${schema.spec.ports.tenantApiserver}
+              targetPort: 8080
+            - name: ${string(schema.spec.ports.tenantApiserverMetrics)}
+              port: ${schema.spec.ports.tenantApiserverMetrics}
+              targetPort: 2112
+          selector:
+            app: tenant-apiserver
+
+    - id: tenantApiserverPdb
+      includeWhen:
+        - ${schema.spec.podDisruptionBudget.tenantApiserver.enabled}
+      template:
+        apiVersion: policy/v1
+        kind: PodDisruptionBudget
+        metadata:
+          name: tenant-apiserver
+        spec:
+          minAvailable: ${schema.spec.podDisruptionBudget.tenantApiserver.minAvailable}
+          selector:
+            matchLabels:
+              app: tenant-apiserver
+
+    # ----------------------------------------------------------------------
+    # ipam
+    # ----------------------------------------------------------------------
+    - id: ipamDeployment
+      template:
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: ipam
+        spec:
+          replicas: ${schema.spec.ipam.replicas}
+          selector:
+            matchLabels:
+              app: ipam
+          template:
+            metadata:
+              labels:
+                app: ipam
+              annotations:
+                prometheus.io/scrape: "true"
+                prometheus.io/path: /metrics
+                prometheus.io/port: "2112"
+            spec:
+              imagePullSecrets: '${schema.spec.metalRegistryAuthEnabled ? [{"name": "ipam-registry-credentials"}] : omit()}'
+              affinity:
+                podAntiAffinity:
+                  preferredDuringSchedulingIgnoredDuringExecution:
+                    - weight: 100
+                      podAffinityTerm:
+                        labelSelector:
+                          matchExpressions:
+                            - key: app
+                              operator: In
+                              values:
+                                - ipam
+                        topologyKey: kubernetes.io/hostname
+              containers:
+                - name: ipam
+                  args:
+                    - postgres
+                  image: ${schema.spec.images.ipam.image + ":" + schema.spec.images.ipam.tag}
+                  imagePullPolicy: ${schema.spec.images.ipam.imagePullPolicy}
+                  env:
+                    - name: GOIPAM_GRPC_SERVER_ENDPOINT
+                      value: ${schema.spec.ipam.grpcServerEndpoint}
+                    - name: GOIPAM_PG_HOST
+                      value: ${schema.spec.ipam.dbHost}
+                    - name: GOIPAM_PG_PORT
+                      value: ${string(schema.spec.ipam.dbPort)}
+                    - name: GOIPAM_PG_DBNAME
+                      value: ${schema.spec.ipam.dbName}
+                    - name: GOIPAM_PG_PASSWORD
+                      value: ${schema.spec.ipam.dbPassword}
+                    - name: GOIPAM_PG_USER
+                      value: ${schema.spec.ipam.dbUser}
+                    - name: GOIPAM_LOG_LEVEL
+                      value: ${schema.spec.ipam.logLevel}
+                  resources: '${schema.spec.setResourceLimits ? schema.spec.resources.ipam : omit()}'
+                  ports:
+                    - containerPort: 2112
+                      protocol: TCP
+                    - containerPort: 9090
+                  readinessProbe:
+                    grpc:
+                      port: 9090
+                    initialDelaySeconds: 5
+                  livenessProbe:
+                    grpc:
+                      port: 9090
+                    initialDelaySeconds: 10
+
+    - id: ipamService
+      template:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: ipam
+          labels:
+            app: ipam
+        spec:
+          type: ClusterIP
+          ports:
+            - name: ${string(schema.spec.ports.ipam)}
+              port: ${schema.spec.ports.ipam}
+              targetPort: 9090
+            - name: ${string(schema.spec.ports.ipamMetrics)}
+              port: ${schema.spec.ports.ipamMetrics}
+              targetPort: 2112
+          selector:
+            app: ipam
+
+    - id: ipamPdb
+      includeWhen:
+        - ${schema.spec.podDisruptionBudget.ipam.enabled}
+      template:
+        apiVersion: policy/v1
+        kind: PodDisruptionBudget
+        metadata:
+          name: ipam
+        spec:
+          minAvailable: ${schema.spec.podDisruptionBudget.ipam.minAvailable}
+          selector:
+            matchLabels:
+              app: ipam
+
+    # ----------------------------------------------------------------------
+    # metal-console (whole component gated on metalConsole.enabled)
+    # ----------------------------------------------------------------------
+    - id: bmcProxyCertsSecret
+      includeWhen:
+        - ${schema.spec.metalConsole.enabled}
+      template:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: bmc-proxy-certs
+          labels:
+            app: bmc-proxy-certs
+        data:
+          server-key.pem: ${base64.decode(schema.spec.metalConsole.bmcProxy.tls.serverKeyEnc)}
+          server-key.pub: ${base64.decode(schema.spec.metalConsole.bmcProxy.tls.serverPubEnc)}
+          client-key.pem: ${base64.decode(schema.spec.metalConsole.bmcProxy.tls.clientKeyEnc)}
+          client.pem: ${base64.decode(schema.spec.metalConsole.bmcProxy.tls.clientCertEnc)}
+          ca.pem: ${base64.decode(schema.spec.metalConsole.bmcProxy.tls.caCertEnc)}
+
+    - id: metalConsoleDeployment
+      includeWhen:
+        - ${schema.spec.metalConsole.enabled}
+      template:
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: metal-console
+          labels:
+            app: metal-console
+        spec:
+          replicas: ${schema.spec.metalConsole.replicas}
+          selector:
+            matchLabels:
+              app: metal-console
+          template:
+            metadata:
+              labels:
+                app: metal-console
+            spec:
+              imagePullSecrets: '${schema.spec.metalRegistryAuthEnabled ? [{"name": "metal-console-registry-credentials"}] : omit()}'
+              restartPolicy: Always
+              enableServiceLinks: false
+              containers:
+                - name: metal-console
+                  env:
+                    - name: METAL_CONSOLE_PORT
+                      value: "10001"
+                    - name: METAL_CONSOLE_METAL_API_URL
+                      value: ${"http://metal-api:" + string(schema.spec.ports.metalApi) + schema.spec.metalApi.basePath}
+                    - name: METAL_CONSOLE_HMAC_KEY
+                      valueFrom:
+                        secretKeyRef:
+                          name: metal-api
+                          key: admin_key
+                    - name: ZAP_ENCODING
+                      value: ${schema.spec.zapEncoding}
+                    - name: ZAP_LEVEL
+                      value: ${schema.spec.zapLevel}
+                  image: ${schema.spec.images.metalConsole.image + ":" + schema.spec.images.metalConsole.tag}
+                  imagePullPolicy: ${schema.spec.images.metalConsole.imagePullPolicy}
+                  volumeMounts:
+                    - name: bmc-proxy-certs
+                      mountPath: /certs
+                      readOnly: true
+                  ports:
+                    - containerPort: 10001
+                  resources: '${schema.spec.setResourceLimits ? schema.spec.resources.metalConsole : omit()}'
+              volumes:
+                - name: bmc-proxy-certs
+                  secret:
+                    secretName: bmc-proxy-certs
+
+    - id: metalConsoleService
+      includeWhen:
+        - ${schema.spec.metalConsole.enabled}
+      template:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: metal-console
+          labels:
+            app: metal-console
+        spec:
+          ports:
+            - name: ${string(schema.spec.ports.metalConsole)}
+              port: ${schema.spec.ports.metalConsole}
+              targetPort: 10001
+          selector:
+            app: metal-console
+
+    - id: metalConsolePdb
+      includeWhen:
+        - ${schema.spec.metalConsole.enabled}
+        - ${schema.spec.podDisruptionBudget.metalConsole.enabled}
+      template:
+        apiVersion: policy/v1
+        kind: PodDisruptionBudget
+        metadata:
+          name: metal-console
+        spec:
+          minAvailable: ${schema.spec.podDisruptionBudget.metalConsole.minAvailable}
+          selector:
+            matchLabels:
+              app: metal-console
+
+    - id: metalConsoleTcpRoute
+      includeWhen:
+        - ${schema.spec.metalConsole.enabled}
+        - ${schema.spec.metalConsole.tcpRoute.enabled}
+      template:
+        apiVersion: gateway.networking.k8s.io/v1alpha2
+        kind: TCPRoute
+        metadata:
+          name: metal-console
+          annotations: ${schema.spec.metalConsole.tcpRoute.annotations}
+        spec:
+          parentRefs: ${schema.spec.metalConsole.tcpRoute.parentRefs}
+          rules:
+            - backendRefs:
+                - name: metal-console
+                  port: ${schema.spec.ports.metalConsole}
+
+    # ----------------------------------------------------------------------
+    # metal-apiserver (whole component gated on metalApiserver.enabled)
+    # ----------------------------------------------------------------------
+    - id: metalApiserverSecret
+      includeWhen:
+        - ${schema.spec.metalApiserver.enabled}
+      template:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: metal-apiserver
+          labels:
+            app: metal-apiserver
+        type: Opaque
+        stringData:
+          oidc_client_id: ${schema.spec.metalApiserver.oidc.clientId}
+          oidc_client_secret: ${schema.spec.metalApiserver.oidc.clientSecret}
+          masterdata_api_hmac: ${schema.spec.masterdataApi.hmac}
+          redis_password: ${schema.spec.metalApiserver.redis.password}
+          session_secret: ${schema.spec.metalApiserver.sessionSecret}
+          rethinkdb_password: ${schema.spec.metalApiserver.db.password}
+          timescaledb_password: ${schema.spec.metalApiserver.auditing.timescaledb.password}
+          splunk_hec_token: ${schema.spec.metalApiserver.auditing.splunk.hec}
+
+    - id: metalApiserverAuditingSecret
+      includeWhen:
+        - ${schema.spec.metalApiserver.enabled}
+        - ${schema.spec.metalApiserver.auditing.splunk.enabled}
+        - ${schema.spec.metalApiserver.auditing.splunk.ca != ""}
+      template:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: metal-apiserver-auditing
+          labels:
+            app: metal-apiserver-auditing
+        data:
+          ca.pem: ${base64.decode(schema.spec.metalApiserver.auditing.splunk.ca)}
+
+    - id: metalApiserverDeployment
+      includeWhen:
+        - ${schema.spec.metalApiserver.enabled}
+      template:
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: metal-apiserver
+          labels:
+            app: metal-apiserver
+        spec:
+          replicas: ${schema.spec.metalApiserver.replicas}
+          selector:
+            matchLabels:
+              app: metal-apiserver
+          template:
+            metadata:
+              labels:
+                app: metal-apiserver
+            spec:
+              imagePullSecrets: '${schema.spec.metalRegistryAuthEnabled ? [{"name": "metal-apiserver-registry-credentials"}] : omit()}'
+              restartPolicy: Always
+              # it's better to disable the service links as the default args do not work properly otherwise (metal#64)
+              enableServiceLinks: false
+              containers:
+                - name: apiserver
+                  image: ${schema.spec.images.metalApiserver.image + ":" + schema.spec.images.metalApiserver.tag}
+                  imagePullPolicy: ${schema.spec.images.metalApiserver.imagePullPolicy}
+                  ports:
+                    - containerPort: 8080
+                    - containerPort: 2112
+                  livenessProbe:
+                    grpc:
+                      port: 8080
+                    initialDelaySeconds: 10
+                  readinessProbe:
+                    grpc:
+                      port: 8080
+                    initialDelaySeconds: 10
+                  env:
+                    - name: SESSION_SECRET
+                      valueFrom:
+                        secretKeyRef:
+                          key: session_secret
+                          name: metal-apiserver
+                    - name: SECURE_COOKIE
+                      value: ${string(schema.spec.metalApiserver.secureCookie)}
+                    - name: REDIS_PASSWORD
+                      valueFrom:
+                        secretKeyRef:
+                          key: redis_password
+                          name: metal-apiserver
+                    - name: REDIS_ADDR
+                      value: ${schema.spec.metalApiserver.redis.addr}
+                    - name: OIDC_CLIENT_ID
+                      valueFrom:
+                        secretKeyRef:
+                          key: oidc_client_id
+                          name: metal-apiserver
+                    - name: OIDC_CLIENT_SECRET
+                      valueFrom:
+                        secretKeyRef:
+                          key: oidc_client_secret
+                          name: metal-apiserver
+                    - name: RETHINKDB_PASSWORD
+                      valueFrom:
+                        secretKeyRef:
+                          key: rethinkdb_password
+                          name: metal-apiserver
+                    - name: AUDITING_TIMESCALEDB_PASSWORD
+                      valueFrom:
+                        secretKeyRef:
+                          key: timescaledb_password
+                          name: metal-apiserver
+                    - name: SERVER_HTTP_URL
+                      value: ${schema.spec.metalApiserver.url}
+                  args:
+                    - serve
+                    - --log-level=${schema.spec.metalApiserver.logLevel}
+                    - --http-server-endpoint=0.0.0.0:8080
+                    - --tenant-apiserver-baseurl=${schema.spec.metalApiserver.tenantApiserverBaseUrl}
+                    - --admin-subjects=${schema.spec.metalApiserver.adminSubjects.join(",")}
+                    - --auditing-timescaledb-enabled=${string(schema.spec.metalApiserver.auditing.timescaledb.enabled)}
+                    - --auditing-timescaledb-host=${schema.spec.metalApiserver.auditing.timescaledb.host}
+                    - --auditing-timescaledb-port=${string(schema.spec.metalApiserver.auditing.timescaledb.port)}
+                    - --auditing-timescaledb-db=${schema.spec.metalApiserver.auditing.timescaledb.db}
+                    - --auditing-timescaledb-user=${schema.spec.metalApiserver.auditing.timescaledb.user}
+                    - --auditing-timescaledb-retention=${schema.spec.metalApiserver.auditing.timescaledb.retention}
+                    - --auditing-splunk-enabled=${string(schema.spec.metalApiserver.auditing.splunk.enabled)}
+                    - '${schema.spec.metalApiserver.auditing.splunk.enabled ? "--auditing-splunk-endpoint=" + schema.spec.metalApiserver.auditing.splunk.endpoint : omit()}'
+                    - '${schema.spec.metalApiserver.auditing.splunk.enabled ? "--auditing-splunk-host=" + schema.spec.metalApiserver.auditing.splunk.host : omit()}'
+                    - '${schema.spec.metalApiserver.auditing.splunk.enabled ? "--auditing-splunk-source=" + schema.spec.metalApiserver.auditing.splunk.source : omit()}'
+                    - '${schema.spec.metalApiserver.auditing.splunk.enabled ? "--auditing-splunk-source-type=" + schema.spec.metalApiserver.auditing.splunk.sourceType : omit()}'
+                    - '${schema.spec.metalApiserver.auditing.splunk.enabled ? "--auditing-splunk-index=" + schema.spec.metalApiserver.auditing.splunk.index : omit()}'
+                    - '${schema.spec.metalApiserver.auditing.splunk.enabled ? "--auditing-splunk-ca=/splunk/ca.pem" : omit()}'
+                    - --rethinkdb-addresses=${schema.spec.metalApiserver.db.addresses.join(",")}
+                    - --max-requests-per-minute=${string(schema.spec.metalApiserver.rateLimit.maxRequestsPerMinute)}
+                    - --max-unauthenticated-requests-per-minute=${string(schema.spec.metalApiserver.rateLimit.maxUnauthenticatedRequestsPerMinute)}
+                    - --oidc-discovery-url=${schema.spec.metalApiserver.oidc.discoveryUrl}
+                    - --oidc-end-session-url=${schema.spec.metalApiserver.oidc.endSessionUrl}
+                    - --oidc-unique-user-key=${schema.spec.metalApiserver.oidc.uniqueUserKey}
+                    - --oidc-tls-skip-verify=${string(schema.spec.metalApiserver.oidc.tlsSkipVerify)}
+                    - '${schema.spec.metalApiserver.providerTenant != "" ? "--ensure-provider-tenant=" + schema.spec.metalApiserver.providerTenant : omit()}'
+                  resources: '${schema.spec.setResourceLimits ? schema.spec.resources.metalApiserver : omit()}'
+                  volumeMounts:
+                    - '${schema.spec.metalApiserver.auditing.splunk.ca != "" ? {"name": "metal-apiserver-auditing", "mountPath": "/splunk"} : omit()}'
+              volumes:
+                - '${schema.spec.metalApiserver.auditing.splunk.ca != "" ? {"name": "metal-apiserver-auditing", "secret": {"secretName": "metal-apiserver-auditing"}} : omit()}'
+
+    - id: metalApiserverService
+      includeWhen:
+        - ${schema.spec.metalApiserver.enabled}
+      template:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: metal-apiserver
+          labels:
+            app: metal-apiserver
+        spec:
+          ports:
+            - name: ${string(schema.spec.ports.metalApiserver)}
+              port: ${schema.spec.ports.metalApiserver}
+              targetPort: 8080
+              appProtocol: kubernetes.io/h2c
+            - name: ${string(schema.spec.ports.metalApiserverMetrics)}
+              port: ${schema.spec.ports.metalApiserverMetrics}
+              targetPort: 2112
+          selector:
+            app: metal-apiserver
+
+    - id: metalApiserverHpa
+      includeWhen:
+        - ${schema.spec.metalApiserver.enabled}
+        - ${schema.spec.hpa.metalApiserver.enabled}
+      template:
+        apiVersion: autoscaling/v1
+        kind: HorizontalPodAutoscaler
+        metadata:
+          name: metal-apiserver
+        spec:
+          maxReplicas: ${schema.spec.hpa.metalApiserver.max}
+          minReplicas: ${schema.spec.hpa.metalApiserver.min}
+          scaleTargetRef:
+            apiVersion: apps/v1
+            kind: Deployment
+            name: metal-apiserver
+          targetCPUUtilizationPercentage: ${schema.spec.hpa.metalApiserver.cpuPercentage}
+
+    - id: metalApiserverPdb
+      includeWhen:
+        - ${schema.spec.metalApiserver.enabled}
+        - ${schema.spec.podDisruptionBudget.metalApiserver.enabled}
+      template:
+        apiVersion: policy/v1
+        kind: PodDisruptionBudget
+        metadata:
+          name: metal-apiserver
+        spec:
+          minAvailable: ${schema.spec.podDisruptionBudget.metalApiserver.minAvailable}
+          selector:
+            matchLabels:
+              app: metal-apiserver
+
+    # ----------------------------------------------------------------------
+    # ingress
+    # ----------------------------------------------------------------------
+    - id: controlPlaneIngress
+      includeWhen:
+        - ${schema.spec.deployIngress}
+      template:
+        apiVersion: networking.k8s.io/v1
+        kind: Ingress
+        metadata:
+          name: control-plane-ingress
+          annotations:
+            nginx.ingress.kubernetes.io/proxy-body-size: '${schema.spec.metalApi.s3.enabled ? "100m" : omit()}'
+            nginx.ingress.kubernetes.io/force-ssl-redirect: ${string(schema.spec.ingress.tls.enabled)}
+            nginx.ingress.kubernetes.io/ssl-redirect: ${string(schema.spec.ingress.tls.enabled)}
+        spec:
+          ingressClassName: nginx
+          tls: '${schema.spec.ingress.tls.enabled ? [{"hosts": [schema.spec.ingressPublicDns] + (schema.spec.metalApiserver.enabled ? [schema.spec.v2IngressPublicDns] : []), "secretName": "control-plane-ingress-tls"}] : omit()}'
+          rules:
+            - host: ${schema.spec.ingressPublicDns}
+              http:
+                paths:
+                  - path: ${schema.spec.metalApi.basePath}
+                    pathType: Prefix
+                    backend:
+                      service:
+                        name: metal-api
+                        port:
+                          number: ${schema.spec.ports.metalApi}
+            - '${schema.spec.metalApiserver.enabled ? {"host": schema.spec.v2IngressPublicDns, "http": {"paths": [{"backend": {"service": {"name": "metal-apiserver", "port": {"number": 8080}}}, "path": "/", "pathType": "Prefix"}]}} : omit()}'
+
+    # ----------------------------------------------------------------------
+    # Gateway API routes
+    # ----------------------------------------------------------------------
+    - id: metalApiHttpRoute
+      includeWhen:
+        - ${schema.spec.metalApi.httpRoute.enabled}
+      template:
+        apiVersion: gateway.networking.k8s.io/v1
+        kind: HTTPRoute
+        metadata:
+          name: metal-api
+          annotations: ${schema.spec.metalApi.httpRoute.annotations}
+        spec:
+          parentRefs: ${schema.spec.metalApi.httpRoute.parentRefs}
+          hostnames: ${schema.spec.metalApi.httpRoute.hostnames}
+          rules:
+            - matches:
+                - path:
+                    type: PathPrefix
+                    value: ${schema.spec.metalApi.basePath}
+              backendRefs:
+                - name: metal-api
+                  port: ${schema.spec.ports.metalApi}
+
+    - id: metalApiHttpsRedirectRoute
+      includeWhen:
+        - ${schema.spec.metalApi.httpRoute.enabled}
+        - ${schema.spec.metalApi.httpRoute.httpsRedirect.enabled}
+      template:
+        apiVersion: gateway.networking.k8s.io/v1
+        kind: HTTPRoute
+        metadata:
+          name: metal-api-https-redirect
+        spec:
+          parentRefs: ${schema.spec.metalApi.httpRoute.httpsRedirect.parentRefs}
+          hostnames: ${schema.spec.metalApi.httpRoute.hostnames}
+          rules:
+            - filters:
+                - type: RequestRedirect
+                  requestRedirect:
+                    scheme: https
+                    statusCode: 301
+
+    - id: metalApiTcpRoute
+      includeWhen:
+        - ${schema.spec.metalApi.tcpRoute.enabled}
+      template:
+        apiVersion: gateway.networking.k8s.io/v1alpha2
+        kind: TCPRoute
+        metadata:
+          name: metal-api-grpc
+          annotations: ${schema.spec.metalApi.tcpRoute.annotations}
+        spec:
+          parentRefs: ${schema.spec.metalApi.tcpRoute.parentRefs}
+          rules:
+            - backendRefs:
+                - name: metal-api
+                  port: ${schema.spec.ports.metalApiGrpc}
+
+    - id: metalApiserverHttpRoute
+      includeWhen:
+        - ${schema.spec.metalApiserver.httpRoute.enabled}
+      template:
+        apiVersion: gateway.networking.k8s.io/v1
+        # Although metal-apiservers serves gRPC traffic we are using a HTTPRoute because
+        # we use https://connectrpc.com/ to also allow non-gRPC clients in the future
+        kind: HTTPRoute
+        metadata:
+          name: metal-apiserver
+          annotations: ${schema.spec.metalApiserver.httpRoute.annotations}
+        spec:
+          parentRefs: ${schema.spec.metalApiserver.httpRoute.parentRefs}
+          hostnames: ${schema.spec.metalApiserver.httpRoute.hostnames}
+          rules:
+            - matches:
+                - path:
+                    type: PathPrefix
+                    value: "/"
+              backendRefs:
+                - name: metal-apiserver
+                  port: ${schema.spec.ports.metalApiserver}
+
+    - id: metalApiserverHttpsRedirectRoute
+      includeWhen:
+        - ${schema.spec.metalApiserver.httpRoute.enabled}
+        - ${schema.spec.metalApiserver.httpRoute.httpsRedirect.enabled}
+      template:
+        apiVersion: gateway.networking.k8s.io/v1
+        kind: HTTPRoute
+        metadata:
+          name: metal-apiserver-https-redirect
+        spec:
+          parentRefs: ${schema.spec.metalApiserver.httpRoute.httpsRedirect.parentRefs}
+          hostnames: ${schema.spec.metalApiserver.httpRoute.hostnames}
+          rules:
+            - filters:
+                - type: RequestRedirect
+                  requestRedirect:
+                    scheme: https
+                    statusCode: 301
+
+    # ----------------------------------------------------------------------
+    # ClusterwideNetworkPolicy (Helm gated this on the CRD being installed;
+    # here it is an explicit toggle: spec.cwnp.enabled)
+    # ----------------------------------------------------------------------
+    # - id: egressAllowMetalConsoleCwnp
+    #   includeWhen:
+    #     - ${schema.spec.cwnp.enabled}
+    #   template:
+    #     apiVersion: metal-stack.io/v1
+    #     kind: ClusterwideNetworkPolicy
+    #     metadata:
+    #       name: egress-allow-metal-console
+    #       namespace: firewall
+    #     spec:
+    #       egress:
+    #         - ports:
+    #             - port: 3333
+    #               protocol: TCP
+    #           to:
+    #             - cidr: 0.0.0.0/0

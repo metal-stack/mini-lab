@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  role_name: metal-control-plane
+  author: metal-stack
+  description: Deploys the metal-control-plane via a kro ResourceGraphDefinition instead of Helm.
+  license: MIT
+  min_ansible_version: "2.10"
+  galaxy_tags: []
+  platforms:
+    - name: GenericLinux
+      versions:
+        - all
+
+dependencies:
+  - role: ansible-common

@@ -1,0 +1,222 @@
+---
+# These defaults mirror the variables consumed by the upstream metal-roles
+# "metal" role so that the mini-lab inventory keeps working unchanged. The
+# control plane itself is no longer deployed via Helm but rendered into a kro
+# MetalControlPlane instance (see templates/metal-control-plane.yaml.j2).
+metal_check_api_available: true
+
+metal_set_resource_limits: true
+
+metal_check_api_health_endpoint: https://{{ metal_api_ingress_dns }}{{ metal_api_base_path }}v1/health
+
+metal_log_level: info
+
+# metalctl
+metal_metalctl_image_pull_policy: "{{ metal_control_plane_image_pull_policy }}"
+
+# service ports
+metal_api_port: 8080
+metal_apiserver_port: 8080
+metal_api_grpc_port: 50051
+metal_api_metrics_port: 2112
+metal_masterdata_api_port: 8443
+metal_masterdata_api_metrics_port: 2113
+metal_console_port: 10001
+
+# metal-apiserver
+metal_apiserver_enabled: false
+metal_apiserver_url: >-
+  {% if metal_apiserver_httproute_enabled -%}https://v2.api.{{ metal_control_plane_gateway_dns }}{%- else -%}https://v2.api.{{ metal_control_plane_ingress_dns }}{%-
+  endif %}
+metal_apiserver_image_pull_policy: "{{ metal_control_plane_image_pull_policy }}"
+metal_apiserver_db_addresses:
+  - metal-db
+metal_apiserver_db_password: change-me
+metal_apiserver_provider_tenant: "{{ metal_control_plane_provider_tenant }}"
+metal_apiserver_redis_addr: valkey-primary:6379
+metal_apiserver_redis_password: change-me-soon
+metal_apiserver_replicas: 1
+metal_apiserver_hpa_enabled: false
+metal_apiserver_hpa_max: 5
+metal_apiserver_hpa_min: 3
+metal_apiserver_hpa_cpu_percentage: 70
+metal_apiserver_resources:
+metal_apiserver_auditing_timescaledb_enabled: true
+metal_apiserver_auditing_timescaledb_host: "auditing-timescaledb.metal-control-plane.svc.cluster.local"
+metal_apiserver_auditing_timescaledb_port: "5432"
+metal_apiserver_auditing_timescaledb_db: "auditing"
+metal_apiserver_auditing_timescaledb_user: "postgres"
+metal_apiserver_auditing_timescaledb_password: "change-me"
+metal_apiserver_auditing_timescaledb_retention: "14 days"
+metal_apiserver_auditing_splunk_enabled: false
+metal_apiserver_auditing_splunk_endpoint:
+metal_apiserver_auditing_splunk_hec_token:
+metal_apiserver_auditing_splunk_source:
+metal_apiserver_auditing_splunk_source_type:
+metal_apiserver_auditing_splunk_index:
+metal_apiserver_auditing_splunk_host:
+metal_apiserver_auditing_splunk_ca:
+metal_apiserver_rate_limiting_max_requests_per_minute: 1000
+metal_apiserver_rate_limiting_max_unauthenticated_requests_per_minute: 50
+metal_apiserver_oidc_discovery_url:
+metal_apiserver_oidc_end_session_url:
+metal_apiserver_oidc_client_id: "{{ lookup('k8s', api_version='v1', namespace=metal_control_plane_namespace, kind='Secret', resource_name='zitadel-client-credentials').data.client_id
+  | default('') | b64decode }}"
+metal_apiserver_oidc_client_secret: "{{ lookup('k8s', api_version='v1', namespace=metal_control_plane_namespace, kind='Secret', resource_name='zitadel-client-credentials').data.client_secret
+  | default('') | b64decode }}"
+metal_apiserver_session_secret: secret
+metal_apiserver_secure_cookie: true
+metal_apiserver_admin_subjects: []
+metal_apiserver_pdb_enabled: true
+metal_apiserver_pdb_min_available: 2
+metal_apiserver_httproute_enabled: false
+metal_apiserver_httproute_hostnames:
+  - "v2.api.{{ metal_control_plane_gateway_dns }}"
+metal_apiserver_httproute_parent_refs: []
+metal_apiserver_httproute_https_redirect: {}
+# metal-api
+metal_api_image_pull_policy: "{{ metal_control_plane_image_pull_policy }}"
+metal_api_replicas: 3
+metal_api_hpa_enabled: false
+metal_api_hpa_max: 5
+metal_api_hpa_min: 3
+metal_api_hpa_cpu_percentage: 70
+metal_api_base_path: "/metal/"
+metal_api_dex_address: ""
+metal_api_dex_clientid: ""
+metal_api_db_address: metal-db
+metal_api_db_password: change-me
+metal_api_ipam_grpc_server_endpoint: http://ipam:9090
+metal_api_nsq_tcp_address: >-
+  {% if nsq_tcproute_enabled -%}{{ metal_control_plane_gateway_dns }}:4150{%- else -%}{{ metal_control_plane_ingress_dns }}:4150{%- endif %}
+metal_api_nsq_http_address: "nsqd:4151"
+metal_api_nsq_lookupd_address: "nsq-lookupd:4161"
+metal_api_nsq_tls_enabled: true
+metal_api_nsq_tls_secret_name: nsqd
+metal_api_nsq_tls_checksum: "{{ lookup('k8s', api_version='v1', namespace=metal_control_plane_namespace, kind='Secret', resource_name='nsqd').get('data', {}) | string
+  | hash('sha1') if metal_api_nsq_tls_enabled else None }}"
+metal_api_grpc_tls_enabled: true
+metal_api_bmc_superuser_enabled: false
+metal_api_bmc_superuser_pwd: change-me
+metal_api_view_key: change-me
+metal_api_edit_key: change-me
+metal_api_admin_key: change-me
+metal_api_sizes: []
+metal_api_images: []
+metal_api_partitions: []
+metal_api_networks: []
+metal_api_ips: []
+metal_api_filesystemlayouts: []
+metal_api_sizeimageconstraints: []
+metal_api_size_reservations: []
+metal_api_resources:
+metal_api_s3_enabled: false
+metal_api_s3_address:
+metal_api_s3_key:
+metal_api_s3_secret:
+metal_api_s3_firmware_bucket:
+metal_api_password_reason_minlength:
+metal_api_release_version: "{{ metal_stack_release_version }}"
+minimum_client_version: "{{ metalctl_version }}"
+metal_api_pdb_enabled: true
+metal_api_pdb_min_available: 2
+metal_api_httproute_enabled: false
+metal_api_httproute_hostnames:
+  - "api.{{ metal_control_plane_gateway_dns }}"
+metal_api_httproute_parent_refs: []
+metal_api_httproute_https_redirect: {}
+# GatewayAPI TCPRoute for GRPC metal-api(v1)
+metal_api_tcproute_enabled: false
+metal_api_tcproute_parent_refs: []
+# masterdata-api
+metal_masterdata_api_image_pull_policy: "{{ metal_control_plane_image_pull_policy }}"
+metal_masterdata_api_db_address: masterdata-db
+metal_masterdata_api_db_port: 5432
+metal_masterdata_api_db_name: masterdata
+metal_masterdata_api_db_user: postgres
+metal_masterdata_api_db_password: change-me
+metal_masterdata_api_provider_tenant: "{{ metal_control_plane_provider_tenant }}"
+metal_masterdata_api_hmac: change-me
+metal_masterdata_api_resources:
+metal_masterdata_api_pdb_enabled: true
+metal_masterdata_api_pdb_min_available: 1
+
+metal_masterdata_api_tenants: []
+metal_masterdata_api_projects: []
+
+# tenant-apiserver (shares the masterdata-db postgres)
+metal_tenant_apiserver_db_address: "{{ metal_masterdata_api_db_address }}"
+metal_tenant_apiserver_db_port: "{{ metal_masterdata_api_db_port }}"
+metal_tenant_apiserver_db_name: "{{ metal_masterdata_api_db_name }}"
+metal_tenant_apiserver_db_user: "{{ metal_masterdata_api_db_user }}"
+metal_tenant_apiserver_db_password: "{{ metal_masterdata_api_db_password }}"
+
+# ipam
+metal_ipam_image_pull_policy: "{{ metal_control_plane_image_pull_policy }}"
+metal_ipam_db_address: ipam-db
+metal_ipam_db_port: 5432
+metal_ipam_db_name: ipam
+metal_ipam_db_user: postgres
+metal_ipam_db_password: change-me
+metal_ipam_log_level: debug
+metal_ipam_resources:
+metal_ipam_pdb_enabled: true
+metal_ipam_pdb_min_available: 1
+
+# metal-console
+metal_console_image_pull_policy: "{{ metal_control_plane_image_pull_policy }}"
+metal_console_enabled: false
+metal_console_replicas: 3
+metal_console_resources:
+metal_console_bmc_proxy_certs_server_key:
+metal_console_bmc_proxy_certs_server_pub:
+metal_console_bmc_proxy_certs_client_key:
+metal_console_bmc_proxy_certs_client_cert:
+metal_console_bmc_proxy_certs_ca_cert:
+metal_console_pdb_enabled: false
+metal_console_pdb_min_available: 1
+metal_console_tcproute_enabled: false
+metal_console_tcproute_parent_refs: []
+# ingress
+metal_deploy_ingress: true
+metal_ingress: {}
+metal_ingress_dns: api.{{ metal_control_plane_ingress_dns }}
+metal_ingress_v2_dns: v2.api.{{ metal_control_plane_ingress_dns }}
+
+# clusterwide network policy (formerly gated on the metal-stack.io CRD presence)
+metal_cwnp_enabled: false
+
+# headscale
+metal_api_headscale_enabled: false
+metal_api_headscale_tls: true
+metal_api_headscale_api_key: "{{ lookup('k8s', api_version='v1', namespace=metal_control_plane_namespace, kind='Secret', resource_name='headscale-api-key').get('data',
+  {}).get('key') | b64decode if metal_api_headscale_enabled else '' }}"
+metal_api_headscale_control_plane_address: >-
+  {% if headscale_httproute_enabled -%}
+  http{{ 's' if metal_api_headscale_tls }}://headscale.{{ metal_control_plane_gateway_dns }}
+  {%- else -%}
+  http{{ 's' if metal_api_headscale_tls }}://headscale.{{ metal_control_plane_ingress_dns }}
+  {%- endif %}
+metal_api_headscale_internal_api_address: "headscale:50443"
+
+# auditing
+metal_auditing_timescaledb_enabled: false
+metal_auditing_timescaledb_host: "auditing-timescaledb"
+metal_auditing_timescaledb_port: "5432"
+metal_auditing_timescaledb_db: "auditing"
+metal_auditing_timescaledb_user: "postgres"
+metal_auditing_timescaledb_password: "change-me"
+metal_auditing_timescaledb_retention: "14 days"
+
+metal_auditing_splunk_enabled: false
+metal_auditing_splunk_endpoint:
+metal_auditing_splunk_hec_token:
+metal_auditing_splunk_source:
+metal_auditing_splunk_source_type:
+metal_auditing_splunk_index:
+metal_auditing_splunk_host:
+metal_auditing_splunk_ca:
+metal_auditing_search_backend:
+
+# location of the kro ResourceGraphDefinition (relative to the playbook files/ dir)
+metal_control_plane_rgd_file: metal-control-plane-rgd.yaml

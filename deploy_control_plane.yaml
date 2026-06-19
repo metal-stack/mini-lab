@@ -35,7 +35,7 @@
       tags: valkey
     - name: metal-roles/control-plane/roles/zitadel
       tags: auth
-    - name: metal-roles/control-plane/roles/metal
+    - name: metal-control-plane
       tags: metal
     - name: metal-roles/control-plane/roles/logging
       when: monitoring_enabled
