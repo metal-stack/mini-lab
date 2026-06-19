@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  role_name: kro
+  author: metal-stack
+  description: Installs kro (kube resource orchestrator) via Helm.
+  license: MIT
+  min_ansible_version: "2.10"
+  galaxy_tags: []
+  platforms:
+    - name: GenericLinux
+      versions:
+        - all
+
+dependencies: []

@@ -1,0 +1,6 @@
+---
+# kro (kube resource orchestrator) is installed as an OCI Helm chart.
+# Pinned for reproducible deployments; override kro_chart_version to bump.
+kro_chart_ref: oci://registry.k8s.io/kro/charts/kro
+kro_chart_version: "0.9.2"
+kro_namespace: kro-system

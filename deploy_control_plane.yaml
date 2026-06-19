@@ -12,6 +12,10 @@
       tags: gateway
     - name: ingress-controller
       tags: ingress-controller
+    - name: kro
+      tags: kro
+    - name: metal-roles/control-plane/roles/prepare
+      tags: prepare
     - name: metal-roles/control-plane/roles/nsq
       tags: nsq
     - name: metal-roles/control-plane/roles/metal-db

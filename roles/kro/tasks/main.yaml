@@ -1,0 +1,27 @@
+---
+- name: Deploy kro
+  kubernetes.core.helm:
+    name: kro
+    chart_ref: "{{ kro_chart_ref }}"
+    chart_version: "{{ kro_chart_version | default(omit) }}"
+    release_namespace: "{{ kro_namespace }}"
+    create_namespace: true
+    wait: true
+    values:
+      config:
+        featureGates:
+          CELOmitFunction: true
+
+- name: Wait until kro ResourceGraphDefinition CRD is established
+  kubernetes.core.k8s_info:
+    api_version: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    name: resourcegraphdefinitions.kro.run
+  register: kro_rgd_crd
+  until: >-
+    kro_rgd_crd.resources | length > 0 and
+    (kro_rgd_crd.resources[0].status.conditions | default([]))
+    | selectattr('type', 'equalto', 'Established')
+    | selectattr('status', 'equalto', 'True') | list | length > 0
+  retries: 30
+  delay: 5
