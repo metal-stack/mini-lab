@@ -10,10 +10,6 @@
 - name: Deploy Envoy GatewayClass
   kubernetes.core.k8s:
     definition: "{{ lookup('file', 'gatewayclass.yaml') | from_yaml }}"
-- name: Deploy metal-control-plane nsq_namespace
-  kubernetes.core.k8s:
-    kind: Namespace
-    name: "{{ metal_control_plane_namespace }}"
 - name: Deploy metal-control-plane EnvoyProxy
   kubernetes.core.k8s:
     definition: "{{ lookup('template', 'envoyproxy.yaml') | from_yaml }}"
