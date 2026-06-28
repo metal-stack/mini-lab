@@ -9,3 +9,8 @@ nsq_certs_client_cert: "{{  lookup('file', 'certs/nsq/client.crt') }}"
 nsq_certs_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
 
 nsq_broadcast_address: nsqd
+
+nsq_tcproute_enabled: true
+nsq_tcproute_parent_refs:
+- name: metal-control-plane
+  sectionName: nsq
