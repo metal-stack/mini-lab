@@ -22,8 +22,6 @@ metal_apiserver_oidc_secret_name: zitadel-client-credentials
 metal_apiserver_oidc_discovery_url: https://zitadel.{{ metal_control_plane_ingress_dns }}:4443/.well-known/openid-configuration
 metal_apiserver_oidc_end_session_url: "https://zitadel.{{ metal_control_plane_ingress_dns }}:4443/oidc/v1/end_session"
 
-metal_apiserver_redis_password: change-me-soon
-metal_apiserver_admin_subjects: "admin@metal-stack.zitadel.172.17.0.1.nip.io@openid-connect"
 metal_apiserver_secure_cookie: false
 
 metal_api_images:
@@ -33,10 +31,10 @@ metal_api_images:
     url: https://images.metal-stack.io/metal-os/stable/firewall/3.0-ubuntu/img.tar.lz4
     features:
       - firewall
-  - id: ubuntu-24.4
-    name: Ubuntu 24.04
-    description: Ubuntu 24.04 Latest Release
-    url: https://images.metal-stack.io/metal-os/stable/ubuntu/24.04/img.tar.lz4
+  - id: ubuntu-26.4
+    name: Ubuntu 26.04
+    description: Ubuntu 26.04 Latest Release
+    url: https://images.metal-stack.io/metal-os/stable/ubuntu/26.04/img.tar.lz4
     features:
       - machine
   - id: debian-13.0
