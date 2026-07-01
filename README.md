@@ -14,6 +14,9 @@ This project can also be used as a template for writing your own metal-stack dep
 - [Known Limitations](#known-limitations)
 - [Try it out](#try-it-out)
     - [Power management](#power-management)
+- [Development](#development)
+    - [Release vector](#release-vector)
+    - [Using local checkouts of dependencies](#using-local-checkouts-of-dependencies)
 - [Flavors](#flavors)
 - [Network topology](#network-topology)
 - [V2 Quickstart](#v2-quickstart)
@@ -191,7 +194,7 @@ make power-<on,reset,off>-<machine name>
 ```
 
 ## Development
-If you want to contribute to the _metal-stack_ project, you can use the mini-lab as a local development environment. It allows you to quickly test changes to the _metal-stack_ components without needing any external clusters or hardware. 
+If you want to contribute to the _metal-stack_ project, you can use the mini-lab as a local development environment. It allows you to quickly test changes to the _metal-stack_ components without needing any external clusters or hardware.
 You can also use it to test changes to the Ansible roles and modules used by the _metal-stack_.
 
 ### Release vector
@@ -209,7 +212,7 @@ Further overrides can be looked up in `metal-roles` where the mapping is defined
 
 ### Using local checkouts of dependencies
 
-By default, the `mini-lab` runs with pre-packaged Ansible roles and modules. 
+By default, the `mini-lab` runs with pre-packaged Ansible roles and modules.
 If you want to use local checkouts of dependencies for development, you must start the `mini-lab` with `DEV=true`:
 
 ```bash
@@ -272,5 +275,5 @@ Password: Gerrit.Guest123!
 
 Zitadel Admin:
 
-User: admin@metal-stack.zitadel.172.17.0.1.nip.io
+User: admin@metal-stack.auth.172.17.0.1.nip.io
 Password: Password1!

@@ -16,11 +16,10 @@ metal_api_nsq_tcp_address: nsqd:4150
 metal_apiserver_pdb_min_available: 1
 
 metal_apiserver_enabled: true
-metal_apiserver_url: http://v2.api.{{ metal_control_plane_ingress_dns }}:8080
+metal_apiserver_url: http://v2.{{ metal_control_plane_ingress_dns }}:8080
 
-metal_apiserver_oidc_secret_name: zitadel-client-credentials
-metal_apiserver_oidc_discovery_url: https://zitadel.{{ metal_control_plane_ingress_dns }}:4443/.well-known/openid-configuration
-metal_apiserver_oidc_end_session_url: "https://zitadel.{{ metal_control_plane_ingress_dns }}:4443/oidc/v1/end_session"
+metal_apiserver_oidc_discovery_url: https://auth.{{ metal_control_plane_ingress_dns }}:4443/.well-known/openid-configuration
+metal_apiserver_oidc_end_session_url: "https://auth.{{ metal_control_plane_ingress_dns }}:4443/oidc/v1/end_session"
 
 metal_apiserver_secure_cookie: false
 
