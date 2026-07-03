@@ -102,8 +102,12 @@ def initial_configuration(g: GuestFS, hwsku: str) -> None:
 
     # Workaround: Speed up lldp startup by remove hardcoded wait of 90 seconds
     g.ln_s(linkname=systemd_system + 'aaastatsd.timer', target='/dev/null') # Radius
-    g.ln_s(linkname=systemd_system + 'featured.timer', target='/dev/null') # Feature handling not necessary
-    g.ln_s(linkname=systemd_system + 'hostcfgd.timer', target='/dev/null') # After boot Host configuration
+    # NOTE: featured.timer and hostcfgd.timer are intentionally NOT masked. They run
+    # SONiC's feature-manager and host-config reconciliation and provide the startup
+    # ordering that EVPN/FRR bring-up relies on. Masking them raced the remote L3VNI
+    # VTEP RMAC programming on the leaves, which then required a manual
+    # `systemctl restart bgp` to recover. lldp/pmon are still hand-wired below so they
+    # start immediately instead of waiting for featured's delayed timer.
     g.ln_s(linkname=systemd_system + 'rasdaemon.timer', target='/dev/null') # After boot Host configuration
     g.ln_s(linkname=systemd_system + 'tacacs-config.timer', target='/dev/null') # After boot Host configuration
     # Started by featured
@@ -203,11 +207,17 @@ def main():
     logger.info('Start QEMU')
     vm.start()
 
-    # SONiC will start sending LLDP packets after PortConfigDone is set in APPL database
-    logger.info('Wait until eth0 has an IPv4 address')
-    sniff(iface='eth0', filter='ether proto 0x88cc', stop_filter=has_an_IPv4_address('eth0'), store=0)
+    # Readiness: wait until SONiC forwards its own LLDP out a *front-panel* port, not just
+    # mgmt eth0. LLDP egress on a front-panel port requires PortConfigDone AND the port to
+    # be programmed/oper-up in the (v)ASIC dataplane, so this signals dataplane readiness
+    # instead of mgmt-plane-only readiness (which let the lab proceed, and metal-core
+    # configure the fabric, while the switch dataplane/EVPN was still converging).
+    # We match on SONiC's own mgmt address, so neighbor LLDP on the port is ignored.
+    dataplane_ifaces = get_ethernet_interfaces()
+    logger.info(f'Wait until a front-panel port forwards LLDP (dataplane up): {dataplane_ifaces}')
+    sniff(iface=dataplane_ifaces, filter='ether proto 0x88cc', stop_filter=has_an_IPv4_address('eth0'), store=0)
 
-    logger.info('eth0 has a configured IPv4 address')
+    logger.info('dataplane is forwarding LLDP')
     with open('/healthy', 'w'):
         pass
 

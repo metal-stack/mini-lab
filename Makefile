@@ -79,21 +79,13 @@ up: env gen-certs verify-deployment-image control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_ed25519
 	docker compose $(COMPOSE_ARGS) up --pull=always --abort-on-container-failure --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
-# for some reason an allocated machine will not be able to phone home
-# without restarting the metal-core
-# TODO: should be investigated and fixed if possible
-# check that underlay gets working
-	sleep 10
-	ssh -F files/ssh/config leaf01 'systemctl restart metal-core'
-	ssh -F files/ssh/config leaf02 'systemctl restart metal-core'
-
-# for community SONiC versions > 202311 a bgp restart is needed in the virtual environment
-# TODO: should be investigated and fixed if possible
-ifeq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms_dell_sonic),)
-	sleep 15
-	ssh -F files/ssh/config leaf01 'systemctl restart bgp'
-	ssh -F files/ssh/config leaf02 'systemctl restart bgp'
-endif
+# --- restart workarounds DISABLED for the startup-ordering / healthcheck fix test ---
+# The leaf `systemctl restart metal-core` + `restart bgp` band-aids below are exactly
+# what the images/sonic startup fix aims to make unnecessary; they are disabled here so
+# they don't mask the result. Restore with: git checkout Makefile
+# (was: sleep 10; restart metal-core on leaf01/leaf02; then for community SONiC,
+#  sleep 15; restart bgp on leaf01/leaf02)
+# --- end disabled ---
 
 .PHONY: restart
 restart: down up
