@@ -1,5 +1,6 @@
 ---
-logging_ingress_loki_tls: no
+logging_ingress_enabled: true
+logging_ingress_loki_tls: false
 logging_ingress_dns: "loki.{{ metal_control_plane_ingress_dns }}"
 
 logging_alloy_enabled: true
@@ -7,8 +8,12 @@ logging_alloy_enabled: true
 logging_alloy_service_monitor_enabled: true
 
 logging_alloy_loki_write_endpoints:
-  - url: "http://{{ logging_ingress_dns }}:8080/loki/api/v1/push"
+  - url:  "http://loki-gateway/loki/api/v1/push"
 
 logging_promtail_enabled: false
 
 logging_alloy_cluster_label: "mini-lab"
+
+logging_loki_monitoring_enabled: true
+
+logging_loki_log_level: info

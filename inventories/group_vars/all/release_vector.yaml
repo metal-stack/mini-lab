@@ -32,7 +32,8 @@ metal_stack_release_vectors:
 # sonic_configdb_utils_image_tag:
 # ...
 #
-
+logging_chart_version: 18.3.1
+logging_chart_repo: oci://ghcr.io/grafana-community/helm-charts/loki
 ##
 ## for ansible roles
 ##
