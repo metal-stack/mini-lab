@@ -27,6 +27,11 @@ MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:
 MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
 MINI_LAB_DELL_SONIC_VERSION := $(or $(MINI_LAB_DELL_SONIC_VERSION),4.5.1)
 
+MINI_LAB_INTERNAL_NETWORK=mini_lab_internal
+# define this here as well so that kind picks up the network on a clean checkout,
+# where .env does not exist yet at make parse time (-include .env above)
+KIND_EXPERIMENTAL_DOCKER_NETWORK := $(or $(KIND_EXPERIMENTAL_DOCKER_NETWORK),$(MINI_LAB_INTERNAL_NETWORK))
+
 MACHINE_OS=debian-13.0
 MAX_RETRIES := 30
 
@@ -118,6 +123,8 @@ create-proxy-registries:
 
 .PHONY: control-plane-bake
 control-plane-bake:
+
+	@if ! docker network ls | grep -q mini_lab_internal; then docker network create mini_lab_internal --gateway 172.42.0.1 --ip-range=172.42.0.0/16 --subnet=172.42.0.0/16 --ipv6=false ; fi
 	@if ! which kind > /dev/null; then echo "kind needs to be installed"; exit 1; fi
 	@if ! kind get clusters | grep metal-control-plane > /dev/null; then \
 		kind create cluster $(KIND_ARGS) \
@@ -176,6 +183,7 @@ env:
 
 .PHONY: cleanup
 cleanup: cleanup-control-plane cleanup-partition
+	docker network rm --force mini_lab_internal
 
 .PHONY: cleanup-control-plane
 cleanup-control-plane:
@@ -451,7 +459,7 @@ build-dell-sonic:
 fetch-virtual-kubeconfig:
 	# TODO: it's hard to get the latest issued generic kubeconfig secret... just take the first result for now
 	kubectl --kubeconfig=$(KUBECONFIG) get secret -n garden $(shell kubectl --kubeconfig=$(KUBECONFIG) get secret -n garden -l managed-by=secrets-manager,manager-identity=gardener-operator,name=generic-token-kubeconfig --no-headers | awk '{ print $$1 }') -o jsonpath='{.data.kubeconfig}' | base64 -d > .virtual-kubeconfig
-	@kubectl --kubeconfig=.virtual-kubeconfig config set-cluster garden --server=https://api.gardener-kube-apiserver.172.17.0.1.nip.io:4443
+	@kubectl --kubeconfig=.virtual-kubeconfig config set-cluster garden --server=https://api.gardener-kube-apiserver.172.42.0.1.nip.io:4443
 	@kubectl --kubeconfig=.virtual-kubeconfig config set-credentials garden --token=$(shell kubectl --kubeconfig=$(KUBECONFIG) get secret -n garden shoot-access-virtual-garden -o jsonpath='{.data.token}' | base64 -d)
 	@kubectl --kubeconfig=$(KUBECONFIG) config unset users.garden
 	@kubectl --kubeconfig=$(KUBECONFIG) config unset contexts.garden

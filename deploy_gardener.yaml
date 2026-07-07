@@ -13,7 +13,7 @@
             name: shoot-info
             namespace: kube-system
           data:
-            nodeNetwork: 172.18.0.0/16
+            nodeNetwork: 172.42.0.0/16
             podNetwork: 10.244.0.0/24
             serviceNetwork: 10.96.0.0/16
       tags: gardener
@@ -81,7 +81,7 @@
             status:
               loadBalancer:
                 ingress:
-                  - ip: "172.17.0.1"
+                  - ip: "172.42.0.1"
         tags: gardener
 
       - name: Expose istio gateway through ingress-nginx (for local environments)
