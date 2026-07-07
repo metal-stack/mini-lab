@@ -13,7 +13,8 @@ rm *.csr
 
 for component in \
         grpc \
-        masterdata-api; do
+        masterdata-api \
+        metal-api; do
     pushd $component
 
     echo "generating $component certs"
