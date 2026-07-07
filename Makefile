@@ -79,13 +79,13 @@ up: env gen-certs verify-deployment-image control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_ed25519
 	docker compose $(COMPOSE_ARGS) up --pull=always --abort-on-container-failure --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
-# --- restart workarounds DISABLED for the startup-ordering / healthcheck fix test ---
-# The leaf `systemctl restart metal-core` + `restart bgp` band-aids below are exactly
-# what the images/sonic startup fix aims to make unnecessary; they are disabled here so
-# they don't mask the result. Restore with: git checkout Makefile
-# (was: sleep 10; restart metal-core on leaf01/leaf02; then for community SONiC,
-#  sleep 15; restart bgp on leaf01/leaf02)
-# --- end disabled ---
+
+# on old dell_sonic flavor metal-core needs a restart for nodes to register
+ifneq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms_dell_sonic),)
+	sleep 10
+	ssh -F files/ssh/config leaf01 'systemctl restart metal-core'
+	ssh -F files/ssh/config leaf02 'systemctl restart metal-core'
+endif
 
 .PHONY: restart
 restart: down up
