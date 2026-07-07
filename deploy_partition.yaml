@@ -132,8 +132,33 @@
       when: monitoring_enabled
       tags: sonic-exporter
 
-- name: Deploy metal-core
-  hosts: leaves
+# So, route propagation was broken in community sonic for a while now. Turns out
+# during a change in upstream sonic some time in the end of 2024 sonic switched
+# the module used for FRR->fpmsyncd communication, which does not provide a
+# default connection endpoint. We just needed to add `fpm address 127.0.0.1`
+# to the frr.conf template and could remove all route-propagation related 
+# workarounds
+- name: Deploy metal-core (SONiC with dplane_fpm_sonic)
+  hosts: leaves:!dell_sonic
+  any_errors_fatal: true
+  become: true
+  pre_tasks:
+    - name: copy custom sonic_frr.tpl with fpm configured
+      ansible.builtin.copy:
+        dest: /sonic_frr.tpl
+        src: /mini-lab/files/sonic_frr_with_fpm.tpl
+  roles:
+    - name: ansible-common
+      tags: always
+    - name: metal-roles/partition/roles/metal-core
+      tags: metal-core
+      vars:
+        metal_core_frr_tpl_file: /sonic_frr.tpl
+        metal_core_additional_volume_mounts:
+        - /sonic_frr.tpl:/sonic_frr.tpl
+
+- name: Deploy metal-core (Dell SONiC without dplane_fpm_sonic)
+  hosts: dell_sonic
   any_errors_fatal: true
   become: true
   pre_tasks:
