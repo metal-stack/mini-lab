@@ -1,0 +1,8 @@
+---
+gateway_namespace: "{{ metal_control_plane_namespace }}"
+gateway_http_port: 8080
+gateway_https_port: 4443
+
+gateway_tcp_listeners: {}
+    # nsq: 4150
+    # metal-api: 50051

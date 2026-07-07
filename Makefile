@@ -132,6 +132,7 @@ control-plane-bake:
 			--config $(KINDCONFIG) \
 			--kubeconfig $(KUBECONFIG); fi
 	$(MAKE) create-proxy-registries
+	docker compose up -d --force-recreate cloud-provider-kind
 
 .PHONY: partition
 partition: partition-bake
