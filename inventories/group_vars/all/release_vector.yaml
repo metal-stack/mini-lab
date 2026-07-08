@@ -1,6 +1,4 @@
----
 metal_stack_release_version: develop
-
 metal_stack_release_vectors:
   - url: oci://ghcr.io/metal-stack/releases:{{ metal_stack_release_version }}
     variable_mapping_path: metal_stack_release.mapping
