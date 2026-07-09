@@ -1,5 +1,7 @@
 {{- $ASN := .ASN -}}{{- $RouterId := .Loopback -}}! The frr version is not rendered since it seems to be optional.
 frr defaults datacenter
+# This is the only line changed from upstream: https://github.com/metal-stack/metal-core/blob/master/cmd/internal/switcher/templates/tpl/sonic_frr.tpl
+# Follow-up issue: https://github.com/metal-stack/metal-core/issues/199
 fpm address 127.0.0.1
 hostname {{ .Name }}
 password zebra
