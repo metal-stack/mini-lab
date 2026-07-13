@@ -93,8 +93,8 @@ up: env gen-certs verify-deployment-image control-plane-bake partition-bake
 # TODO: should be investigated and fixed if possible
 ifeq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms_dell_sonic),)
 	sleep 15
-	ssh -F files/ssh/config leaf01 'systemctl restart bgp || (sleep 30 && systemctl reset-failed bgp && systemctl restart bgp)'
-	ssh -F files/ssh/config leaf02 'systemctl restart bgp || (sleep 30 && systemctl reset-failed bgp && systemctl restart bgp)'
+	ssh -F files/ssh/config leaf01 'systemctl restart bgp'
+	ssh -F files/ssh/config leaf02 'systemctl restart bgp'
 endif
 
 .PHONY: restart
