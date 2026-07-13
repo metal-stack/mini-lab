@@ -79,20 +79,12 @@ up: env gen-certs verify-deployment-image control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_ed25519
 	docker compose $(COMPOSE_ARGS) up --pull=always --abort-on-container-failure --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
-# for some reason an allocated machine will not be able to phone home
-# without restarting the metal-core
-# TODO: should be investigated and fixed if possible
-# check that underlay gets working
+
+# on old dell_sonic flavor metal-core needs a restart for nodes to register
+ifneq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms_dell_sonic),)
 	sleep 10
 	ssh -F files/ssh/config leaf01 'systemctl restart metal-core'
 	ssh -F files/ssh/config leaf02 'systemctl restart metal-core'
-
-# for community SONiC versions > 202311 a bgp restart is needed in the virtual environment
-# TODO: should be investigated and fixed if possible
-ifeq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms_dell_sonic),)
-	sleep 15
-	ssh -F files/ssh/config leaf01 'systemctl restart bgp'
-	ssh -F files/ssh/config leaf02 'systemctl restart bgp'
 endif
 
 .PHONY: restart
