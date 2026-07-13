@@ -10,7 +10,9 @@ metal_api_httproute_parent_refs:
 - name: metal-control-plane
   namespace: "{{ metal_control_plane_namespace }}"
   sectionName: http
-
+- name: metal-control-plane
+  namespace: "{{ metal_control_plane_namespace }}"
+  sectionName: https
 metal_api_tcproute_enabled: true
 metal_api_tcproute_parent_refs:
 - name: metal-control-plane
@@ -41,6 +43,9 @@ metal_apiserver_httproute_parent_refs:
 - name: metal-control-plane
   namespace: "{{ metal_control_plane_namespace }}"
   sectionName: http
+- name: metal-control-plane
+  namespace: "{{ metal_control_plane_namespace }}"
+  sectionName: https
 
 metal_api_images:
   - id: firewall-ubuntu-3.0
@@ -174,10 +179,10 @@ metal_masterdata_api_projects:
 
 metal_console_enabled: false
 
-metal_api_grpc_certs_server_key: "{{ lookup('file', 'certs/grpc/server-key.pem') }}"
-metal_api_grpc_certs_server_cert: "{{  lookup('file', 'certs/grpc/server.pem') }}"
-metal_api_grpc_certs_client_key: "{{ lookup('file', 'certs/grpc/client-key.pem') }}"
-metal_api_grpc_certs_client_cert: "{{  lookup('file', 'certs/grpc/client.pem') }}"
+metal_api_grpc_certs_server_key: "{{ lookup('file', 'certs/metal-api/server-key.pem') }}"
+metal_api_grpc_certs_server_cert: "{{  lookup('file', 'certs/metal-api/server.pem') }}"
+metal_api_grpc_certs_client_key: "{{ lookup('file', 'certs/metal-api/client-key.pem') }}"
+metal_api_grpc_certs_client_cert: "{{  lookup('file', 'certs/metal-api/client.pem') }}"
 metal_api_grpc_certs_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
 
 # auditing
