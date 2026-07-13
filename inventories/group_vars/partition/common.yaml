@@ -11,7 +11,7 @@ metal_partition_metal_api_hmac_view_key: metal-view
 
 metal_partition_metal_api_grpc_address: "{{ metal_partition_mgmt_gateway }}:50051"
 metal_partition_metal_api_grpc_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
-metal_partition_metal_api_grpc_client_cert: "{{ lookup('file', 'certs/grpc/client.pem') }}"
-metal_partition_metal_api_grpc_client_key: "{{ lookup('file', 'certs/grpc/client-key.pem') }}"
+metal_partition_metal_api_grpc_client_cert: "{{ lookup('file', 'certs/metal-api/client.pem') }}"
+metal_partition_metal_api_grpc_client_key: "{{ lookup('file', 'certs/metal-api/client-key.pem') }}"
 
 metal_partition_mgmt_gateway: 172.42.0.42
