@@ -1,17 +1,21 @@
+# runs at parse time on every invocation: ensure certs exist, then (re)generate .env
+$(shell [ -f files/certs/ca.pem ] || ./scripts/gen-certs.sh)
+$(shell ./env.sh 1>&2)
+-include .env
+
 .DEFAULT_GOAL := up
 .EXPORT_ALL_VARIABLES:
 
--include .env
+# disable built-in implicit rules (e.g. the "%: %.sh" rule that silently turns a
+# stray/misspelled prerequisite into a junk executable instead of erroring out)
+MAKEFLAGS += --no-builtin-rules
+.SUFFIXES:
 
 # Commands
 YQ=docker run --rm -i -v $(shell pwd):/workdir mikefarah/yq:4
 
 KINDCONFIG := $(or $(KINDCONFIG),control-plane/kind.yaml)
 KUBECONFIG := $(shell pwd)/.kubeconfig
-
-METALCTL_HMAC := $(or $(METALCTL_HMAC),metal-admin)
-METALCTL_API_URL := $(or $(METALCTL_API_URL),http://api.172.42.0.42.nip.io:8080/metal)
-METAL_APIV2_URL := $(or $(METAL_APIV2_URL),http://v2.172.42.0.42.nip.io:8080)
 
 MKE2FS_CONFIG := $(shell pwd)/mke2fs.conf
 # Default values
@@ -80,7 +84,7 @@ COMPOSE_ARGS += $(if $(MINI_LAB_HELM_CHARTS),-f compose.dev/helm-charts.yaml)
 endif
 
 .PHONY: up
-up: env gen-certs verify-deployment-image control-plane-bake partition-bake
+up: gen-certs verify-deployment-image control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_ed25519
 	docker compose $(COMPOSE_ARGS) up --pull=always --abort-on-container-failure --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
@@ -98,23 +102,12 @@ restart: down up
 .PHONY: down
 down: cleanup
 
-.PHONY: gen-certs
-gen-certs:
-	@if ! [ -f "files/certs/ca.pem" ]; then \
-		echo "certificate generation required, running cfssl container"; \
-		docker run --rm \
-			--user $$(id -u):$$(id -g) \
-			--entrypoint bash \
-			-v ${PWD}:/work \
-			cfssl/cfssl /work/scripts/roll_certs.sh; fi
-
 .PHONY: roll-certs
 roll-certs:
-	rm files/certs/ca.pem
-	$(MAKE) gen-certs
+	./scripts/gen-certs.sh
 
 .PHONY: control-plane
-control-plane: control-plane-bake env
+control-plane: control-plane-bake
 	docker compose $(COMPOSE_ARGS) up --remove-orphans --force-recreate control-plane
 
 .PHONY: create-proxy-registries
@@ -152,7 +145,7 @@ endif
 		./scripts/deactivate_offloading.sh; fi
 
 .PHONY: verify-deployment-image
-verify-deployment-image: env
+verify-deployment-image:
 	@if which cosign 1> /dev/null 2> /dev/null; then \
 		echo -e "\033[0;32mcosign is installed, verifying deployment base image\033[0m" && \
 		. ./.env && cosign verify --key files/cosign.pub ghcr.io/metal-stack/metal-deployment-base:$$DEPLOYMENT_BASE_IMAGE_TAG; \
@@ -178,9 +171,14 @@ external_network:
 		sudo ip -6 route add 2001:db8:0:113::/64 via 2001:db8:0:1::1 dev mini_lab_ext; \
 	fi
 
-.PHONY: env
-env:
-	@./env.sh
+files/certs/ca.pem:
+	@./scripts/gen-certs.sh
+
+.env: files/certs/ca.pem
+	@./env.sh 1>&2
+
+.PHONY: gen-certs                 # keep as a convenience alias
+gen-certs: files/certs/ca.pem
 
 .PHONY: cleanup
 cleanup: cleanup-control-plane cleanup-partition
@@ -202,7 +200,7 @@ cleanup-partition:
 	docker network rm --force mini_lab_ext
 
 .PHONY: _privatenet
-_privatenet: env
+_privatenet:
 	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network list --name user-private-network | grep user-private-network || docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network allocate --partition mini-lab --project 00000000-0000-0000-0000-000000000001 --name user-private-network
 
 .PHONY: update-userdata
@@ -245,7 +243,7 @@ public-ipv6:
 	@docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl network ip create --name test --network internet-mini-lab --project 00000000-0000-0000-0000-000000000001 --addressfamily IPv6 -o template --template "{{ .ipaddress }}"
 
 .PHONY: ls
-ls: env
+ls:
 	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine ls
 
 ## SWITCH MANAGEMENT ##
@@ -351,7 +349,7 @@ console-machine04:
 	@$(MAKE) --no-print-directory _console VM=machine04
 
 .PHONY: _password
-_password: env
+_password:
 	docker compose run $(DOCKER_COMPOSE_RUN_ARG) metalctl machine consolepassword $(MACHINE_UUID)
 
 .PHONY: password-machine01
@@ -442,6 +440,7 @@ dev-env:
 	@echo "export METALCTL_HMAC=${METALCTL_HMAC}"
 	@echo "export METAL_APIV2_URL=${METAL_APIV2_URL}"
 	@echo "export KUBECONFIG=$(KUBECONFIG)"
+	@echo "export METALCTL_CERTIFICATE_AUTHORITY_DATA=$(METALCTL_CERTIFICATE_AUTHORITY_DATA)"
 
 build-dell-sonic:
 	if [ ! -f "sonic-vs.img" ]; then \
