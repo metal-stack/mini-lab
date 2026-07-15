@@ -11,7 +11,7 @@ KUBECONFIG := $(shell pwd)/.kubeconfig
 
 METALCTL_HMAC := $(or $(METALCTL_HMAC),metal-admin)
 METALCTL_API_URL := $(or $(METALCTL_API_URL),http://api.172.17.0.1.nip.io:8080/metal)
-METAL_APIV2_URL := $(or $(METAL_APIV2_URL),http://v2.api.172.17.0.1.nip.io:8080)
+METAL_APIV2_URL := $(or $(METAL_APIV2_URL),http://v2.172.17.0.1.nip.io:8080)
 
 MKE2FS_CONFIG := $(shell pwd)/mke2fs.conf
 # Default values
@@ -79,20 +79,12 @@ up: env gen-certs verify-deployment-image control-plane-bake partition-bake
 	@chmod 600 files/ssh/id_ed25519
 	docker compose $(COMPOSE_ARGS) up --pull=always --abort-on-container-failure --remove-orphans --force-recreate control-plane partition
 	@$(MAKE)	--no-print-directory	start-machines
-# for some reason an allocated machine will not be able to phone home
-# without restarting the metal-core
-# TODO: should be investigated and fixed if possible
-# check that underlay gets working
+
+# on old dell_sonic flavor metal-core needs a restart for nodes to register
+ifneq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms_dell_sonic),)
 	sleep 10
 	ssh -F files/ssh/config leaf01 'systemctl restart metal-core'
 	ssh -F files/ssh/config leaf02 'systemctl restart metal-core'
-
-# for community SONiC versions > 202311 a bgp restart is needed in the virtual environment
-# TODO: should be investigated and fixed if possible
-ifeq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms_dell_sonic),)
-	sleep 15
-	ssh -F files/ssh/config leaf01 'systemctl restart bgp'
-	ssh -F files/ssh/config leaf02 'systemctl restart bgp'
 endif
 
 .PHONY: restart
@@ -434,6 +426,8 @@ build-sonic-base:
 
 .PHONY: dev-env
 dev-env:
+	@TOKEN=$$(kubectl --kubeconfig=$(KUBECONFIG) get secret -n metal-control-plane metal-apiserver-admin-token --template={{.data.admin_editor_token}} | base64 -d); \
+	echo "export METAL_APIV2_TOKEN=$$TOKEN"
 	@echo "export METALCTL_API_URL=${METALCTL_API_URL}"
 	@echo "export METALCTL_HMAC=${METALCTL_HMAC}"
 	@echo "export METAL_APIV2_URL=${METAL_APIV2_URL}"

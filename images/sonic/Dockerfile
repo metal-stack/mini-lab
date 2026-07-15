@@ -21,4 +21,6 @@ ENTRYPOINT ["/launch.py"]
 
 COPY mirror_tap_to_eth.sh mirror_tap_to_front_panel.sh port_config.ini launch.py /
 
-HEALTHCHECK --start-period=10s --interval=5s --retries=20 CMD test -f /healthy
+# Readiness now waits for the dataplane (front-panel LLDP), which converges later than the
+# mgmt plane, so allow more time before the container is considered unhealthy.
+HEALTHCHECK --start-period=30s --interval=5s --retries=40 CMD test -f /healthy
