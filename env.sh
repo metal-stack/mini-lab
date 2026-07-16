@@ -15,9 +15,9 @@ download_oci_release_vector() {
   local token=$(curl -s "https://ghcr.io/token?scope=repository:$image:pull&service=ghcr.io" | jq -r .token)
 
   local manifest=$(curl -s -L -H "Accept: application/vnd.oci.image.manifest.v1+json" -H "Authorization: Bearer $token" https://ghcr.io/v2/$image/manifests/$tag)
-  local digst=$(echo "$manifest" | jq -r '.layers[] | select(.mediaType == "application/vnd.metal-stack.release-vector.v1.tar+gzip") | .digest')
+  local digest=$(echo "$manifest" | jq -r '.layers[] | select(.mediaType == "application/vnd.metal-stack.release-vector.v1.tar+gzip") | .digest')
 
-  RELEASE_YAML="$(curl -s -L -H "Authorization: Bearer $token" "https://ghcr.io/v2/$image/blobs/$digst" | tar xzO release.yaml)"
+  RELEASE_YAML="$(curl -s -L -H "Authorization: Bearer $token" "https://ghcr.io/v2/$image/blobs/$digest" | tar xzO release.yaml)"
 }
 
 METAL_STACK_RELEASE_VERSION=$(yq_shell "yq r inventories/group_vars/all/release_vector.yaml 'metal_stack_release_version'")
