@@ -1,0 +1,2 @@
+image_cache_sync_metal_apiserver_url: "{{ metal_apiserver_url }}"
+
