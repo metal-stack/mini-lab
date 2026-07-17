@@ -12,7 +12,7 @@ metal_stack_release_vectors:
 # metal_api_image_name:
 # metal_api_image_tag:
 # metal_apiserver_image_name:
-# metal_apiserver_image_tag:
+metal_apiserver_image_tag: v0.8.0
 # metal_tenant_apiserver_image_name:
 # metal_tenant_apiserver_image_tag:
 # metal_metalctl_image_name:
@@ -30,6 +30,9 @@ metal_stack_release_vectors:
 # headscale_db_image_name: postgres
 # sonic_configdb_utils_image_name:
 # sonic_configdb_utils_image_tag:
+image_cache_sync_image_name: ghcr.io/metal-stack/metal-image-cache-sync
+image_cache_sync_image_tag: pr-21-migrate-to-metal-apiserver
+metal_api_version: v0.3.1
 # ...
 #
 
@@ -39,7 +42,7 @@ metal_stack_release_vectors:
 
 # ansible_common_version:
 metal_roles_version: pr-453-migrate-metal-image-cache-sync-to-metal-apiserver
-# metal_ansible_modules_version:
+metal_ansible_modules_version: v2-updates
 
 ##
 ## helm charts
