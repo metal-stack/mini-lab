@@ -199,6 +199,35 @@
     - name: Wait until no route entries have "queued"
       include_tasks: tasks/check_queued.yaml
 
+- name: Work around isc-dhcp/Vlan4000 startup race (Community SONiC)
+  hosts: leaves:!dell_sonic
+  any_errors_fatal: true
+  gather_facts: false
+  tasks:
+    # dhcpd binds Vlan4000 at boot, before the SVI has carrier. Its LPF receive socket then dies
+    # ("receive_packet failed on Vlan4000: Network is down") while dhcpd stays up holding
+    # 0.0.0.0:67 -- so it answers nothing and PXE clients loop DISCOVER forever, never getting a
+    # lease. Restarting it once the underlay is up rebinds the socket, hence the placement after
+    # the underlay wait above.
+    #
+    # The probe solicits a real broadcast DISCOVER rather than poking 10.0.1.1:67, because the UDP
+    # socket stays healthy even when the LPF path is dead -- a unicast check would report a false
+    # pass. Restart and probe are deliberately one task: a retry must re-do the restart, not just
+    # re-probe, and `until` only retries a single task.
+    - name: Restart isc-dhcp-server until it serves an offer on Vlan4000
+      ansible.builtin.shell: |
+        systemctl restart isc-dhcp-server
+        sleep 2
+        dhcp-server-detector Vlan4000 --exit-on-first-offer --duration 10
+      args:
+        executable: /bin/bash
+      when: dhcp_subnets is defined
+      register: dhcp_offer_check
+      until: dhcp_offer_check.rc == 0
+      retries: 10
+      delay: 5
+      changed_when: true
+
 - name: Configure IPv6 and LLDP ports (Enterprise SONiC)
   hosts: dell_sonic
   any_errors_fatal: true
