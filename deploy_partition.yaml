@@ -104,6 +104,14 @@
         wait: true
         wait_sleep: 1
         wait_timeout: 600
+    - name: Wait until the admin_editor_token secret exists
+      kubernetes.core.k8s_info:
+        kind: Secret
+        name: "{{ metal_deployment_token_secret_name }}"
+        namespace: "{{ metal_deployment_token_secret_namespace }}"
+        wait: true
+        wait_sleep: 1
+        wait_timeout: 600
   roles:
     - name: ansible-common
       tags: always
