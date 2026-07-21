@@ -126,6 +126,8 @@
       tags: always
     - name: metal-roles/partition/roles/pixiecore
       tags: pixiecore
+    - name: metal-roles/common/roles/metal-deployment-token
+      tags: image-cache
     - name: metal-roles/partition/roles/image-cache
       tags: image-cache
 
