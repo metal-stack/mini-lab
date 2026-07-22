@@ -1,0 +1,11 @@
+[Unit]
+Description=Prepare SONiC container
+Before=sonic.service ssh.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/sonic-init.sh
+
+[Install]
+WantedBy=multi-user.target

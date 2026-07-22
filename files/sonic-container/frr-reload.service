@@ -1,0 +1,13 @@
+# Overrides the frr-reload.service installed by the sonic-config role, which
+# runs frr-reload via `docker exec bgp`. On container SONiC there is no bgp
+# container and FRR runs directly under supervisord.
+[Unit]
+Description=Reload FRR
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/frr/frr-reload
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target

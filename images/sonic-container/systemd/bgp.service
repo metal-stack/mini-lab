@@ -1,0 +1,11 @@
+[Unit]
+Description=Stub for SONiC bgp.service 
+PartOf=sonic.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/true
+
+[Install]
+WantedBy=sonic.target

@@ -1,0 +1,68 @@
+{
+  "AUTO_TECHSUPPORT": {
+    "GLOBAL": {
+      "state": "disabled"
+    }
+  },
+  "DEVICE_METADATA": {
+    "localhost": {
+      "docker_routing_config_mode": "split-unified",
+      "hostname": "leaf01",
+      "hwsku": "Accton-AS7726-32X",
+      "mac": "00:00:00:00:00:00",
+      "platform": "x86_64-kvm_x86_64-r0",
+      "type": "LeafRouter"
+    }
+  },
+  "FEATURE": {
+    "gnmi": {
+      "state": "disabled"
+    },
+    "mgmt-framework": {
+      "state": "disabled"
+    },
+    "snmp": {
+      "state": "disabled"
+    },
+    "teamd": {
+      "state": "disabled"
+    }
+  },
+  "PORT": {
+    "Ethernet0": {
+      "lanes": "1",
+      "alias": "Eth1/1",
+      "index": "1",
+      "speed": "25000",
+      "admin_status": "up",
+      "mtu": "9100"
+    },
+    "Ethernet1": {
+      "lanes": "2",
+      "alias": "Eth1/2",
+      "index": "1",
+      "speed": "25000",
+      "admin_status": "up",
+      "mtu": "9100"
+    },
+    "Ethernet120": {
+      "lanes": "121,122,123,124",
+      "alias": "Eth31",
+      "index": "31",
+      "speed": "100000",
+      "admin_status": "up",
+      "mtu": "9100"
+    }
+  },
+  "MGMT_PORT": {
+    "eth0": {
+      "alias": "eth0",
+      "admin_status": "up"
+    }
+  },
+  "VERSIONS": {
+    "DATABASE": {
+      "VERSION": "version_202311_03"
+    }
+  }
+}

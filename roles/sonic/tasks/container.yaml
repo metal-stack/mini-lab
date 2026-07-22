@@ -1,0 +1,40 @@
+---
+# the sonic-config role installs a frr-reload.service that reloads FRR via
+# `docker exec bgp`. On container SONiC FRR runs under supervisord, so
+# override the unit with one that calls frr-reload directly
+- name: Override frr-reload.service
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/files/sonic-container/frr-reload.service"
+    dest: /etc/systemd/system/frr-reload.service
+    mode: "0644"
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+# metal-hammer only accepts LLDP neighbors with port id subtype mac or local,
+# and metal-api matches the advertised port id against the switch port alias.
+# On the VM flavor SONiC's lldpmgrd derives this configuration from the PORT
+# table in the CONFIG_DB, so do the same here
+- name: Read port aliases from CONFIG_DB
+  ansible.builtin.shell: |
+    set -o pipefail
+    for port in $(sonic-db-cli CONFIG_DB KEYS 'PORT|*'); do
+      alias=$(sonic-db-cli CONFIG_DB HGET "${port}" alias)
+      if [ -n "${alias}" ]; then
+        echo "${port#PORT|} ${alias}"
+      fi
+    done
+  args:
+    executable: /bin/bash
+  register: sonic_port_aliases
+  changed_when: false
+
+- name: Configure LLDP port IDs
+  ansible.builtin.command: "lldpcli configure ports {{ item.split(' ')[0] }} lldp portidsubtype local {{ item.split(' ')[1] }}"
+  retries: 10
+  delay: 3
+  register: result
+  until: result.rc == 0
+  changed_when: true
+  with_items: "{{ sonic_port_aliases.stdout_lines }}"

@@ -1,0 +1,13 @@
+[Unit]
+Description=SONiC services (supervisord)
+Requires=sonic-init.service
+After=sonic-init.service network.target
+
+[Service]
+# start.sh needs these because the container environment does not reach systemd units
+Environment="PLATFORM=x86_64-kvm_x86_64-r0" "HWSKU=Accton-AS7726-32X"
+ExecStart=/usr/local/bin/supervisord
+Restart=always
+
+[Install]
+WantedBy=sonic.target

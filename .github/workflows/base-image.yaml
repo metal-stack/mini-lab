@@ -38,3 +38,30 @@ jobs:
         sbom: true
         file: images/sonic/base-${{ matrix.versions.name }}/Dockerfile
         tags: ${{ env.REGISTRY }}/metal-stack/mini-lab-sonic-base:${{ matrix.versions.name }}
+
+  build-mini-lab-sonic-container-base-image:
+    name: build mini-lab-sonic-container base image
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        versions:
+          - name: "202505"
+
+    steps:
+    - name: Log in to the container registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ secrets.DOCKER_REGISTRY_USER }}
+        password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
+
+    # the docker-sonic-vs artifact is a gzipped `docker save` archive, so it
+    # is loaded and re-tagged instead of being built from a Dockerfile
+    - name: Download, load and push docker-sonic-vs
+      run: |
+        curl -fL -o docker-sonic-vs.gz \
+          "https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=${{ matrix.versions.name }}&platform=vs&target=target%2Fdocker-sonic-vs.gz"
+        docker load -i docker-sonic-vs.gz
+        docker tag docker-sonic-vs:latest ${{ env.REGISTRY }}/metal-stack/mini-lab-sonic-container-base:${{ matrix.versions.name }}
+        docker push ${{ env.REGISTRY }}/metal-stack/mini-lab-sonic-container-base:${{ matrix.versions.name }}
