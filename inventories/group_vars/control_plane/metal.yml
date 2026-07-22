@@ -20,6 +20,7 @@ metal_apiserver_url: http://v2.{{ metal_control_plane_ingress_dns }}:8080
 
 metal_apiserver_oidc_discovery_url: https://auth.{{ metal_control_plane_ingress_dns }}:4443/.well-known/openid-configuration
 metal_apiserver_oidc_end_session_url: "https://auth.{{ metal_control_plane_ingress_dns }}:4443/oidc/v1/end_session"
+metal_apiserver_tls_skip_verify: true
 
 metal_apiserver_secure_cookie: false
 
