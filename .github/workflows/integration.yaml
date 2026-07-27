@@ -53,8 +53,8 @@ jobs:
         cache-from: type=registry,ref=${{ env.MINI_LAB_VM_IMAGE }}
         cache-to: type=inline
 
-  build-mini-lab-sonic-image:
-    name: Build mini-lab-sonic image
+  build-mini-lab-sonic-vs-image:
+    name: Build mini-lab-sonic-vs image
     runs-on: ubuntu-latest
 
     steps:
@@ -73,8 +73,8 @@ jobs:
         IMAGE_TAG=$([ "${GITHUB_EVENT_NAME}" == 'pull_request' ] && echo ${GITHUB_HEAD_REF##*/} || echo "latest")
         SHA_TAG=${COMMIT_SHA::8}
 
-        echo "MINI_LAB_SONIC_IMAGE=ghcr.io/metal-stack/mini-lab-sonic:${IMAGE_TAG}" >> $GITHUB_ENV
-        echo "MINI_LAB_SONIC_IMAGE_SHA=ghcr.io/metal-stack/mini-lab-sonic:${SHA_TAG}" >> $GITHUB_ENV
+        echo "MINI_LAB_SONIC_IMAGE=ghcr.io/metal-stack/mini-lab-sonic-vs:${IMAGE_TAG}" >> $GITHUB_ENV
+        echo "MINI_LAB_SONIC_IMAGE_SHA=ghcr.io/metal-stack/mini-lab-sonic-vs:${SHA_TAG}" >> $GITHUB_ENV
       env:
         COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 
@@ -88,24 +88,68 @@ jobs:
         pull: true
         push: true
         sbom: true
+        file: images/sonic/Dockerfile.vs
         tags: |
           ${{ env.MINI_LAB_SONIC_IMAGE }}
           ${{ env.MINI_LAB_SONIC_IMAGE_SHA }}
         cache-from: type=registry,ref=${{ env.MINI_LAB_SONIC_IMAGE }}
         cache-to: type=inline
 
+  build-mini-lab-sonic-vpp-image:
+    name: Build mini-lab-sonic-vpp image
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Log in to the container registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ secrets.DOCKER_REGISTRY_USER }}
+        password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Make tag
+      run: |
+        IMAGE_TAG=$([ "${GITHUB_EVENT_NAME}" == 'pull_request' ] && echo ${GITHUB_HEAD_REF##*/} || echo "latest")
+        SHA_TAG=${COMMIT_SHA::8}
+
+        echo "MINI_LAB_SONIC_IMAGE=ghcr.io/metal-stack/mini-lab-sonic-vpp:${IMAGE_TAG}" >> $GITHUB_ENV
+        echo "MINI_LAB_SONIC_IMAGE_SHA=ghcr.io/metal-stack/mini-lab-sonic-vpp:${SHA_TAG}" >> $GITHUB_ENV
+      env:
+        COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build and push mini-lab-sonic container
+      uses: docker/build-push-action@v6
+      with:
+        context: ./images/sonic
+        pull: true
+        push: true
+        sbom: true
+        file: images/sonic/Dockerfile.vpp
+        tags: |
+          ${{ env.MINI_LAB_SONIC_IMAGE }}
+          ${{ env.MINI_LAB_SONIC_IMAGE_SHA }}
+        cache-from: type=registry,ref=${{ env.MINI_LAB_SONIC_IMAGE }}
+        cache-to: type=inline
   test:
     name: Run tests
     runs-on: self-hosted
     needs:
       - build-mini-lab-vms-image
-      - build-mini-lab-sonic-image
+      - build-mini-lab-sonic-vs-image
+      - build-mini-lab-sonic-vpp-image
 
     continue-on-error: true
     strategy:
       matrix:
         flavors:
-          - name: sonic
+          - name: sonic_vs
+          - name: sonic_vpp
           - name: gardener
           - name: dell_sonic
 
@@ -140,7 +184,7 @@ jobs:
         IMAGE_TAG=$([ "${GITHUB_EVENT_NAME}" == 'pull_request' ] && echo ${GITHUB_HEAD_REF##*/} || echo "latest")
 
         echo "MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:${IMAGE_TAG}" >> $GITHUB_ENV
-        echo "MINI_LAB_SONIC_IMAGE=ghcr.io/metal-stack/mini-lab-sonic:${IMAGE_TAG}" >> $GITHUB_ENV
+        echo "MINI_LAB_SONIC_IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
 
     - name: Run integration tests
       shell: bash

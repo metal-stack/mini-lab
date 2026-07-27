@@ -18,8 +18,8 @@ RUN apt-get update && \
 COPY requirements.txt /
 RUN pip install --break-system-packages -r requirements.txt
 
-COPY --from=ghcr.io/metal-stack/mini-lab-sonic-base:master-vpp /sonic-vs.img /sonic-vs.img
-COPY --from=ghcr.io/metal-stack/mini-lab-sonic-base:master-vpp /frr-pythontools.deb /frr-pythontools.deb
+COPY --from=ghcr.io/metal-stack/mini-lab-sonic-base:202505 /sonic-vs.img /sonic-vs.img
+COPY --from=ghcr.io/metal-stack/mini-lab-sonic-base:202505 /frr-pythontools.deb /frr-pythontools.deb
 
 ENTRYPOINT ["/launch.py"]
 

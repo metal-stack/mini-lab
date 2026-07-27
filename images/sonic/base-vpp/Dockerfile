@@ -9,8 +9,14 @@ FROM docker.io/library/busybox:stable AS download
 ARG SONIC_IMG_URL
 ARG FRR_RELOAD_URL
 
-ADD "${SONIC_IMG_URL}" /sonic-vs.img.gz
-ADD "${FRR_RELOAD_URL}" /frr-pythontools.deb
+# TODO: There is no pipeline for
+# https://github.com/l0wl3vel/sonic-buildimage/tree/vpp-integration. Build it. Place the
+# sonic-vpp.img.gz and frr-pythontools_10.5.4-sonic-0_all.deb artifacts here.
+# If you need sonic-vpp source code changes yell at @l0wl3vel to push a fresh image: 
+# docker build -t docker.io/l0wl3vel/mini-lab-sonic-base:vpp-integration images/sonic/base-vpp
+# docker push docker.io/l0wl3vel/mini-lab-sonic-base:vpp-integration
+ADD ./sonic-vpp.img.gz /sonic-vs.img.gz
+ADD ./frr-pythontools_10.5.4-sonic-0_all.deb /frr-pythontools.deb
 
 RUN gunzip /sonic-vs.img.gz
 
