@@ -32,8 +32,8 @@ metal_apiserver_pdb_min_available: 1
 metal_apiserver_enabled: true
 metal_apiserver_url: http://v2.{{ metal_control_plane_gateway_dns }}
 
-metal_apiserver_oidc_discovery_url: https://zitadel.{{ metal_control_plane_gateway_dns }}/.well-known/openid-configuration
-metal_apiserver_oidc_end_session_url: "https://zitadel.{{ metal_control_plane_gateway_dns }}/oidc/v1/end_session"
+metal_apiserver_oidc_discovery_url: https://auth.{{ metal_control_plane_gateway_dns }}/.well-known/openid-configuration
+metal_apiserver_oidc_end_session_url: "https://auth.{{ metal_control_plane_gateway_dns }}/oidc/v1/end_session"
 metal_apiserver_tls_skip_verify: true
 
 metal_apiserver_secure_cookie: false
