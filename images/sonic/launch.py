@@ -73,6 +73,7 @@ class Qemu:
             '-m', self._memory,
             '-drive', f'if=virtio,format=qcow2,file={self._disk}',
             '-serial', 'telnet:127.0.0.1:5000,server,nowait',
+            '-device', 'virtio-balloon,free-page-reporting=on',
         ]
 
         with open(f'/sys/class/net/eth0/address', 'r') as f:
