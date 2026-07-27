@@ -427,12 +427,12 @@ build-sonic-base:
 
 .PHONY: dev-env
 dev-env:
+	@TOKEN=$$(kubectl --kubeconfig=$(KUBECONFIG) get secret -n metal-control-plane metal-apiserver-admin-token --template={{.data.admin_editor_token}} | base64 -d); \
+	echo "export METAL_APIV2_TOKEN=$$TOKEN"
 	@echo "export METALCTL_API_URL=${METALCTL_API_URL}"
 	@echo "export METALCTL_HMAC=${METALCTL_HMAC}"
 	@echo "export METAL_APIV2_URL=${METAL_APIV2_URL}"
 	@echo "export KUBECONFIG=$(KUBECONFIG)"
-	@TOKEN=$$(kubectl --kubeconfig=$(KUBECONFIG) get secret -n metal-control-plane metal-apiserver-admin-token --template={{.data.admin_editor_token}} | base64 -d); \
-	echo "export METAL_APIV2_TOKEN=$$TOKEN"
 
 build-dell-sonic:
 	if [ ! -f "sonic-vs.img" ]; then \
