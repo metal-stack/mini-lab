@@ -2,7 +2,7 @@ name: mini-lab
 prefix: ""
 
 mgmt:
-  network: bridge
+  network: mini_lab_internal
 
 topology:
   defaults:
