@@ -148,8 +148,7 @@ ifneq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms_dell_sonic),$(MINI_LAB_FLAVO
 	docker pull $(MINI_LAB_SONIC_IMAGE)
 endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
-		sudo --preserve-env=MINI_LAB_SONIC_IMAGE --preserve-env=MINI_LAB_DELL_SONIC_VERSION --preserve-env=MINI_LAB_VM_IMAGE $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
-		./scripts/deactivate_offloading.sh; fi
+		sudo --preserve-env=MINI_LAB_SONIC_IMAGE --preserve-env=MINI_LAB_DELL_SONIC_VERSION --preserve-env=MINI_LAB_VM_IMAGE $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure; fi
 
 .PHONY: verify-deployment-image
 verify-deployment-image:
