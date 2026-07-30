@@ -8,13 +8,6 @@
 - name: Fix Network Performance
   ansible.builtin.import_tasks: fix-network-performance.yaml
 
-# - name: Set lldp tx-interval to 10
-#   ansible.builtin.command: lldpcli configure lldp tx-interval 10
-#   retries: 10
-#   delay: 3
-#   register: result
-#   until: result.rc == 0
-
 - name: Activate IP MASQUERADE on eth0
   ansible.builtin.iptables:
     chain: POSTROUTING
