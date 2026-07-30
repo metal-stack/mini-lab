@@ -2,8 +2,11 @@
 - name: Install frr-pythontools
   ansible.builtin.import_tasks: frr-reload.yaml
 
-# - name: Fix Network Performance
-#   ansible.builtin.import_tasks: fix-network-performance.yaml
+# Disables GRO on the front panel NICs. Required for the sonic-vs dataplane to
+# forward without corrupting TCP checksums - without it machines never finish
+# PXE booting. See the comment in the imported file before touching this.
+- name: Fix Network Performance
+  ansible.builtin.import_tasks: fix-network-performance.yaml
 
 # - name: Set lldp tx-interval to 10
 #   ansible.builtin.command: lldpcli configure lldp tx-interval 10
