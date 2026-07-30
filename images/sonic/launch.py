@@ -373,10 +373,15 @@ def create_config_db(hwsku: str) -> dict:
             },
             'snmp': {
                 'state': 'disabled'
-            },
-            'teamd': {
-                'state': 'disabled'
             }
+            # teamd must stay enabled: hostcfgd masks the unit of a disabled
+            # feature, but swss.sh still picks teamd up as a dependency because
+            # check_service_exists finds masked units as well. docker-wait-any
+            # then returns immediately since the teamd container never runs,
+            # which makes systemd restart swss every ~110s. Each restart
+            # recreates Vlan4000, and isc-dhcp-server dies deaf on it
+            # ("receive_packet failed on Vlan4000: Network is down"), so
+            # machines never get a PXE lease.
         },
         'MGMT_INTERFACE': {
             f'eth0|{mgmt_interface_cidr}': {
