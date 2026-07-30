@@ -385,6 +385,11 @@ def create_config_db(hwsku: str) -> dict:
                 'gwaddr': get_default_gateway(),
             }
         },
+        'MGMT_VRF_CONFIG': {
+            'vrf_global': {
+                'mgmtVrfEnabled': 'true'
+            }
+        },
         'MGMT_PORT': {
             'eth0': {
                 'alias': 'eth0',

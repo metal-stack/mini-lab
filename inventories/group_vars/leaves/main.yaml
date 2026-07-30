@@ -14,7 +14,7 @@ sonic_config_mgmt_interface:
   ip: "{{ ansible_host }}/16`"
   gateway_address: "172.42.0.1"
 
-sonic_config_mgmt_vrf: false
+sonic_config_mgmt_vrf: true
 sonic_config_nameservers: "{{ router_nameservers }}"
 
 sonic_config_vlans:
