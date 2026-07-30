@@ -215,12 +215,31 @@
     # pass. Restart and probe are deliberately one task: a retry must re-do the restart, not just
     # re-probe, and `until` only retries a single task.
     - name: Restart isc-dhcp-server until it serves an offer on Vlan4000
-      ansible.builtin.shell: |
-        systemctl restart isc-dhcp-server
-        sleep 2
-        dhcp-server-detector Vlan4000 --exit-on-first-offer --duration 10
-      args:
+      # passed as `cmd` and not as a free-form string, because Ansible runs free-form module
+      # arguments through its own quote-aware splitter before the shell ever sees them, and
+      # that splitter has no concept of comments -- a lone apostrophe in one aborts the play
+      ansible.builtin.shell:
         executable: /bin/bash
+        cmd: |
+          systemctl restart isc-dhcp-server
+          sleep 2
+
+          # dhcp-server-detector is a pyroute2 >= 0.9.3 console script, and SONiC 202505 pins
+          # pyroute2 0.7.12, so fall back to dhclient there. dhclient has no timeout flag and
+          # ignores `timeout` from a config file -- it always waits ~60s -- hence timeout(1).
+          # -sf /bin/true keeps it from configuring the SVI, and on success it forks a renewing
+          # daemon with an empty pid file, so the leftover is killed by its exact command line.
+          # `pkill -x -f` matches the whole cmdline, so it cannot match the shell running this
+          # script the way a plain `pkill -f` would.
+          if command -v dhcp-server-detector >/dev/null; then
+            dhcp-server-detector Vlan4000 --exit-on-first-offer --duration 10
+          else
+            probe="dhclient -4 -1 -sf /bin/true -lf /run/dhcp-probe.leases -pf /run/dhcp-probe.pid Vlan4000"
+            timeout 15 $probe
+            rc=$?
+            pkill -x -f "$probe" || true
+            exit $rc
+          fi
       when: dhcp_subnets is defined
       register: dhcp_offer_check
       until: dhcp_offer_check.rc == 0
