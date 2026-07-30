@@ -365,9 +365,6 @@ def create_config_db(hwsku: str) -> dict:
             }
         },
         'FEATURE': {
-            'gnmi': {
-                'state': 'disabled'
-            },
             'mgmt-framework': {
                 'state': 'disabled'
             },
