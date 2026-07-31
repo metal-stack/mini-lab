@@ -18,3 +18,5 @@ files/certs/**/*.pem
 files/certs/**/*.crt
 .vscode
 vrnetlab
+memory-traces
+.memory-tuning.state

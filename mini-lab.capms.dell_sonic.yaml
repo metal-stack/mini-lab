@@ -13,6 +13,8 @@ topology:
       image: ${MINI_LAB_SONIC_IMAGE}
       group: leaves
       enforce-startup-config: true
+      env:
+        QEMU_MEMORY: ${MINI_LAB_LEAF_MEMORY:=4096}
       stages:
         healthy:
           exec:
@@ -54,6 +56,7 @@ topology:
         QEMU_CPU_CORES: 2
         QEMU_DISK_SIZE: 20G
         UUID: 00000000-0000-0000-0000-000000000001
+        QEMU_MEMORY: ${MINI_LAB_MACHINE_MEMORY:=2048}
     machine02:
       group: machines
       image: ${MINI_LAB_VM_IMAGE}
@@ -61,6 +64,7 @@ topology:
         QEMU_CPU_CORES: 2
         QEMU_DISK_SIZE: 20G
         UUID: 00000000-0000-0000-0000-000000000002
+        QEMU_MEMORY: ${MINI_LAB_MACHINE_MEMORY:=2048}
     machine03:
       group: machines
       image: ${MINI_LAB_VM_IMAGE}
@@ -68,6 +72,7 @@ topology:
         QEMU_CPU_CORES: 2
         QEMU_DISK_SIZE: 20G
         UUID: 00000000-0000-0000-0000-000000000003
+        QEMU_MEMORY: ${MINI_LAB_MACHINE_MEMORY:=2048}
     machine04:
       group: machines
       image: ${MINI_LAB_VM_IMAGE}
@@ -75,6 +80,7 @@ topology:
         QEMU_CPU_CORES: 2
         QEMU_DISK_SIZE: 20G
         UUID: 00000000-0000-0000-0000-000000000004
+        QEMU_MEMORY: ${MINI_LAB_MACHINE_MEMORY:=2048}
   links:
     - endpoints: ["exit:mini_lab_ext", "mini_lab_ext:exit"]
       mtu: 9000

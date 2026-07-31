@@ -7,6 +7,16 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
+    inputs:
+      flavors:
+        description: 'Comma separated flavors to test'
+        default: 'sonic_vs,sonic_vpp,gardener,dell_sonic'
+      memory_profiles:
+        description: >-
+          Comma separated memory profiles. Each profile is one integration run
+          per flavor, so the full list multiplies the runtime accordingly.
+        default: 'baseline,low-memory,ksm,thp-madvise,all'
 
 env:
   REGISTRY: ghcr.io
@@ -136,22 +146,48 @@ jobs:
           ${{ env.MINI_LAB_SONIC_IMAGE_SHA }}
         cache-from: type=registry,ref=${{ env.MINI_LAB_SONIC_IMAGE }}
         cache-to: type=inline
+  prepare-matrix:
+    name: Prepare test matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.build.outputs.matrix }}
+    steps:
+    - name: Build flavor x memory profile matrix
+      id: build
+      shell: bash
+      env:
+        # every event runs the full flavor x profile matrix, so each pull
+        # request produces on/off data for all three memory knobs. Runs are
+        # serialised on the self-hosted runner, so this is a long pipeline -
+        # narrow it down via the workflow_dispatch inputs when iterating.
+        FLAVORS: ${{ inputs.flavors || 'sonic_vs,sonic_vpp,gardener,dell_sonic' }}
+        PROFILES: ${{ inputs.memory_profiles || 'baseline,low-memory,ksm,thp-madvise,all' }}
+      run: |
+        matrix=$(python3 -c '
+        import json, os
+        flavors = [f.strip() for f in os.environ["FLAVORS"].split(",") if f.strip()]
+        profiles = [p.strip() for p in os.environ["PROFILES"].split(",") if p.strip()]
+        include = [{"flavor": f, "profile": p} for f in flavors for p in profiles]
+        print(json.dumps({"include": include}))
+        ')
+        echo "matrix=${matrix}" >> "$GITHUB_OUTPUT"
+        echo "${matrix}" | python3 -m json.tool
+
   test:
-    name: Run tests
+    name: Run tests (${{ matrix.flavor }}, ${{ matrix.profile }})
     runs-on: self-hosted
     needs:
       - build-mini-lab-vms-image
       - build-mini-lab-sonic-vs-image
       - build-mini-lab-sonic-vpp-image
+      - prepare-matrix
 
     continue-on-error: true
     strategy:
-      matrix:
-        flavors:
-          - name: sonic_vs
-          - name: sonic_vpp
-          - name: gardener
-          - name: dell_sonic
+      fail-fast: false
+      # the memory numbers are host global, so runs must not overlap
+      max-parallel: 1
+      matrix: ${{ fromJson(needs.prepare-matrix.outputs.matrix) }}
 
     steps:
     - name: Gain back workspace permissions # https://github.com/actions/checkout/issues/211
@@ -186,6 +222,10 @@ jobs:
         echo "MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:${IMAGE_TAG}" >> $GITHUB_ENV
         echo "MINI_LAB_SONIC_IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
 
+    - name: Select memory profile
+      shell: bash
+      run: ./scripts/memory-profile.sh "${{ matrix.profile }}" >> "$GITHUB_ENV"
+
     - name: Run integration tests
       shell: bash
       run: |
@@ -193,7 +233,72 @@ jobs:
         ./test/ci-cleanup.sh
         ./test/integration.sh
       env:
-        MINI_LAB_FLAVOR: ${{ matrix.flavors.name }}
+        MINI_LAB_FLAVOR: ${{ matrix.flavor }}
         DOCKER_HUB_USER: ${{ secrets.DOCKER_HUB_USER }}
         DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Restore host memory tuning
+      if: always()
+      shell: bash
+      run: ./scripts/memory-tuning.sh restore || true
+
+    - name: Publish memory summary
+      if: always()
+      shell: bash
+      run: |
+        if [ -f memory-traces/summary.md ]; then
+          cat memory-traces/summary.md >> "$GITHUB_STEP_SUMMARY"
+        else
+          echo "no memory summary produced for ${{ matrix.flavor }} / ${{ matrix.profile }}" \
+            >> "$GITHUB_STEP_SUMMARY"
+        fi
+
+    - name: Upload memory trace
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: memory-trace-${{ matrix.flavor }}-${{ matrix.profile }}
+        path: memory-traces/
+        if-no-files-found: warn
+        retention-days: 30
+
+  memory-comparison:
+    name: Compare memory profiles
+    runs-on: ubuntu-latest
+    needs: test
+    if: always()
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Download memory traces
+      uses: actions/download-artifact@v4
+      with:
+        pattern: memory-trace-*
+        path: memory-traces
+
+    - name: Compare profiles
+      shell: bash
+      run: |
+        mkdir -p memory-traces
+        # every test job runs with continue-on-error, so it is possible that no
+        # run got far enough to produce a summary
+        if ! find memory-traces -name summary.json | grep -q .; then
+          echo "No memory summaries were produced by this run." \
+            | tee memory-traces/comparison.md >> "$GITHUB_STEP_SUMMARY"
+          exit 0
+        fi
+        ./scripts/memory-report.py compare \
+          --input-dir memory-traces \
+          --out-md memory-traces/comparison.md
+        cat memory-traces/comparison.md >> "$GITHUB_STEP_SUMMARY"
+
+    - name: Upload comparison
+      uses: actions/upload-artifact@v4
+      with:
+        name: memory-comparison
+        path: memory-traces/
+        if-no-files-found: warn
+        retention-days: 30

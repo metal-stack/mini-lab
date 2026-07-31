@@ -32,24 +32,26 @@ topology:
       binds:
         - files/ssh/id_ed25519.pub:/authorized_keys
       env:
-        QEMU_MEMORY: 4096
+        QEMU_MEMORY: ${MINI_LAB_LEAF_MEMORY:=4096}
     leaf02:
       group: leaves
       image: ${MINI_LAB_SONIC_IMAGE}
       binds:
         - files/ssh/id_ed25519.pub:/authorized_keys
       env:
-        QEMU_MEMORY: 4096
+        QEMU_MEMORY: ${MINI_LAB_LEAF_MEMORY:=4096}
     machine01:
       group: machines
       image: ${MINI_LAB_VM_IMAGE}
       env:
         UUID: 00000000-0000-0000-0000-000000000001
+        QEMU_MEMORY: ${MINI_LAB_MACHINE_MEMORY:=2048}
     machine02:
       group: machines
       image: ${MINI_LAB_VM_IMAGE}
       env:
         UUID: 00000000-0000-0000-0000-000000000002
+        QEMU_MEMORY: ${MINI_LAB_MACHINE_MEMORY:=2048}
   links:
     - endpoints: ["exit:mini_lab_ext", "mini_lab_ext:exit"]
       mtu: 9000

@@ -252,6 +252,23 @@ export MINI_LAB_FLAVOR=sonic_vs
 make
 ```
 
+## Memory tuning
+
+Every leaf and every machine is a QEMU VM, so a lab run is memory hungry. Three
+opt-in knobs are available to shrink the footprint — the guest RAM size, host
+side KSM and the transparent hugepage policy — together with a tracer that
+records the memory usage of a run:
+
+```bash
+# start the lab with reduced guest RAM, KSM and THP=madvise
+eval "$(make memory-profile PROFILE=all)"
+make up
+```
+
+The defaults are unchanged when none of the knobs is set. See
+[docs/memory-tuning.md](docs/memory-tuning.md) for the available profiles,
+the tradeoffs of each knob and how the CI matrix compares them.
+
 ## Network topology
 
 An Nginx is running inside of the www container to allow automatic testing of outgoing connections.

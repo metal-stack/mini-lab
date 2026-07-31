@@ -31,6 +31,17 @@ MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:
 MINI_LAB_DELL_SONIC_VERSION := $(or $(MINI_LAB_DELL_SONIC_VERSION),4.5.1)
 MINI_LAB_SONIC_IMAGE_TAG := $(or $(MINI_LAB_SONIC_IMAGE_TAG),latest)
 
+# Memory tuning. All of these are opt-in: the defaults reproduce the behaviour
+# the lab had before the knobs existed. See docs/memory-tuning.md.
+# QEMU RAM handed to the guests, substituted into the topology files.
+MINI_LAB_LEAF_MEMORY := $(or $(MINI_LAB_LEAF_MEMORY),4096)
+MINI_LAB_MACHINE_MEMORY := $(or $(MINI_LAB_MACHINE_MEMORY),2048)
+# host-global knobs, empty means "do not touch"
+MINI_LAB_KSM := $(or $(MINI_LAB_KSM),)
+MINI_LAB_THP := $(or $(MINI_LAB_THP),)
+# where the memory tracer writes its samples
+MEMORY_TRACE_DIR := $(or $(MEMORY_TRACE_DIR),memory-traces)
+
 MINI_LAB_INTERNAL_NETWORK=mini_lab_internal
 # define this here as well so that kind picks up the network on a clean checkout,
 # where .env does not exist yet at make parse time (-include .env above)
@@ -139,7 +150,7 @@ partition: partition-bake
 	docker compose $(COMPOSE_ARGS) up --remove-orphans --force-recreate partition
 
 .PHONY: partition-bake
-partition-bake: external_network
+partition-bake: external_network memory-tuning-apply
 	docker pull $(MINI_LAB_VM_IMAGE)
 ifeq ($(CI),true)
 	docker pull $(MINI_LAB_SONIC_IMAGE)
@@ -148,7 +159,7 @@ ifneq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms_dell_sonic),$(MINI_LAB_FLAVO
 	docker pull $(MINI_LAB_SONIC_IMAGE)
 endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
-		sudo --preserve-env=MINI_LAB_SONIC_IMAGE --preserve-env=MINI_LAB_DELL_SONIC_VERSION --preserve-env=MINI_LAB_VM_IMAGE $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure; fi
+		sudo --preserve-env=MINI_LAB_SONIC_IMAGE --preserve-env=MINI_LAB_DELL_SONIC_VERSION --preserve-env=MINI_LAB_VM_IMAGE --preserve-env=MINI_LAB_LEAF_MEMORY --preserve-env=MINI_LAB_MACHINE_MEMORY $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure; fi
 
 .PHONY: verify-deployment-image
 verify-deployment-image:
@@ -186,6 +197,69 @@ files/certs/ca.pem:
 .PHONY: gen-certs                 # keep as a convenience alias
 gen-certs: files/certs/ca.pem
 
+## MEMORY TUNING & TRACING ##
+
+# print the environment of a named profile, e.g.
+#   eval $(make memory-profile PROFILE=low-memory)
+.PHONY: memory-profile
+memory-profile:
+	@./scripts/memory-profile.sh $(or $(PROFILE),$(MINI_LAB_MEMORY_PROFILE),baseline) --export
+
+.PHONY: memory-tuning-apply
+memory-tuning-apply:
+	@./scripts/memory-tuning.sh apply
+
+.PHONY: memory-tuning-restore
+memory-tuning-restore:
+	@./scripts/memory-tuning.sh restore
+
+.PHONY: memory-tuning-show
+memory-tuning-show:
+	@./scripts/memory-tuning.sh show
+
+.PHONY: memory-trace-start
+memory-trace-start:
+	@mkdir -p $(MEMORY_TRACE_DIR)
+	@if [ -f $(MEMORY_TRACE_DIR)/tracer.pid ] && kill -0 $$(cat $(MEMORY_TRACE_DIR)/tracer.pid) 2> /dev/null; then \
+		echo "memory tracer already running"; \
+	else \
+		nohup ./scripts/memory-trace.py sample \
+			--out $(MEMORY_TRACE_DIR)/trace.csv \
+			--meta $(MEMORY_TRACE_DIR)/meta.json \
+			--interval $(or $(MEMORY_TRACE_INTERVAL),5) \
+			--flavor $(MINI_LAB_FLAVOR) \
+			--profile $(or $(MINI_LAB_MEMORY_PROFILE),unset) \
+			> $(MEMORY_TRACE_DIR)/tracer.log 2>&1 & echo $$! > $(MEMORY_TRACE_DIR)/tracer.pid; \
+		echo "memory tracer started, writing to $(MEMORY_TRACE_DIR)/trace.csv"; \
+	fi
+
+.PHONY: memory-trace-stop
+memory-trace-stop:
+	@if [ -f $(MEMORY_TRACE_DIR)/tracer.pid ]; then \
+		kill $$(cat $(MEMORY_TRACE_DIR)/tracer.pid) 2> /dev/null || true; \
+		sleep 1; \
+		rm -f $(MEMORY_TRACE_DIR)/tracer.pid; \
+		echo "memory tracer stopped"; \
+	else \
+		echo "no memory tracer running"; \
+	fi
+
+.PHONY: memory-report
+memory-report:
+	@./scripts/memory-report.py summarize \
+		--trace $(MEMORY_TRACE_DIR)/trace.csv \
+		--meta $(MEMORY_TRACE_DIR)/meta.json \
+		--out-json $(MEMORY_TRACE_DIR)/summary.json \
+		--out-md $(MEMORY_TRACE_DIR)/summary.md \
+		--flavor $(MINI_LAB_FLAVOR) \
+		--profile $(or $(MINI_LAB_MEMORY_PROFILE),unset)
+	@cat $(MEMORY_TRACE_DIR)/summary.md
+
+# compare all summaries below MEMORY_TRACE_DIR (or DIR=...)
+.PHONY: memory-compare
+memory-compare:
+	@./scripts/memory-report.py compare --input-dir $(or $(DIR),$(MEMORY_TRACE_DIR))
+
 .PHONY: cleanup
 cleanup: cleanup-control-plane cleanup-partition
 	docker network rm --force mini_lab_internal
@@ -197,7 +271,7 @@ cleanup-control-plane:
 	rm -f $(KUBECONFIG)
 
 .PHONY: cleanup-partition
-cleanup-partition:
+cleanup-partition: memory-tuning-restore
 	mkdir -p clab-mini-lab
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.dell_sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml

@@ -1,6 +1,21 @@
 #!/usr/bin/env bash
 set -e
 
+# Sample host and per-container memory for the whole run. The trap makes sure
+# the tracer is stopped and a summary is written even when a test below fails,
+# because a failed run is a data point too (e.g. a memory profile too tight for
+# a flavor).
+finish() {
+    local rc=$?
+    make --no-print-directory memory-trace-stop || true
+    make --no-print-directory memory-report || true
+    exit $rc
+}
+trap finish EXIT
+
+echo "Memory profile: ${MINI_LAB_MEMORY_PROFILE:-unset}"
+make --no-print-directory memory-trace-start
+
 echo "Starting mini-lab"
 make up
 
