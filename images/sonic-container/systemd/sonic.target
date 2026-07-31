@@ -1,0 +1,6 @@
+[Unit]
+Description=SONiC target
+Wants=sonic.service
+
+[Install]
+WantedBy=multi-user.target

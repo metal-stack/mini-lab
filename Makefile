@@ -29,6 +29,7 @@ ANSIBLE_DISPLAY_SKIPPED_HOSTS=false
 MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),sonic)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
 MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
+MINI_LAB_SONIC_CONTAINER_IMAGE := $(or $(MINI_LAB_SONIC_CONTAINER_IMAGE),ghcr.io/metal-stack/mini-lab-sonic-container:latest)
 MINI_LAB_DELL_SONIC_VERSION := $(or $(MINI_LAB_DELL_SONIC_VERSION),4.5.1)
 
 MINI_LAB_INTERNAL_NETWORK=mini_lab_internal
@@ -42,6 +43,10 @@ MAX_RETRIES := 30
 # Machine flavors
 ifeq ($(MINI_LAB_FLAVOR),sonic)
 LAB_TOPOLOGY=mini-lab.sonic.yaml
+MONITORING_ENABLED := $(or $(MONITORING_ENABLED),true)
+else ifeq ($(MINI_LAB_FLAVOR),container_sonic)
+LAB_TOPOLOGY=mini-lab.container_sonic.yaml
+MINI_LAB_SONIC_IMAGE=$(MINI_LAB_SONIC_CONTAINER_IMAGE)
 MONITORING_ENABLED := $(or $(MONITORING_ENABLED),true)
 else ifeq ($(MINI_LAB_FLAVOR),dell_sonic)
 LAB_TOPOLOGY=mini-lab.dell_sonic.yaml
@@ -137,7 +142,10 @@ partition-bake: external_network
 ifeq ($(CI),true)
 	docker pull $(MINI_LAB_SONIC_IMAGE)
 endif
-ifneq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms_dell_sonic),$(MINI_LAB_FLAVOR))
+ifeq ($(MINI_LAB_FLAVOR),container_sonic)
+# tolerate a locally built image that is not (yet) available in the registry
+	docker pull $(MINI_LAB_SONIC_IMAGE) || true
+else ifneq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms_dell_sonic),$(MINI_LAB_FLAVOR))
 	docker pull $(MINI_LAB_SONIC_IMAGE)
 endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
@@ -195,6 +203,7 @@ cleanup-partition:
 	mkdir -p clab-mini-lab
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.dell_sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.sonic.yaml
+	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.container_sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.capms.dell_sonic.yaml
 	sudo --preserve-env $(CONTAINERLAB) destroy --topo mini-lab.kamaji.yaml
 	docker network rm --force mini_lab_ext
@@ -429,6 +438,19 @@ build-sonic-base:
 	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202311 images/sonic/base-202311
 	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202411 images/sonic/base-202411
 	docker build -t ghcr.io/metal-stack/mini-lab-sonic-base:202505 images/sonic/base-202505
+
+# the docker-sonic-vs artifact is a gzipped `docker save` archive, so the base
+# image is loaded and re-tagged instead of being built from a Dockerfile
+.PHONY: build-sonic-container-base
+build-sonic-container-base:
+	curl -fL -o docker-sonic-vs.gz "https://sonic-build.azurewebsites.net/api/sonic/artifacts?branchName=202505&platform=vs&target=target%2Fdocker-sonic-vs.gz"
+	docker load -i docker-sonic-vs.gz
+	docker tag docker-sonic-vs:latest ghcr.io/metal-stack/mini-lab-sonic-container-base:202505
+	rm -f docker-sonic-vs.gz
+
+.PHONY: build-sonic-container
+build-sonic-container:
+	docker build -t ghcr.io/metal-stack/mini-lab-sonic-container:latest images/sonic-container
 
 ## DEV TARGETS ##
 

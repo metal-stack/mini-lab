@@ -1,6 +1,13 @@
 ---
+# on container SONiC frr-pythontools and the frr-reload script are baked into
+# the image because FRR runs under supervisord instead of a bgp container
 - name: Install frr-pythontools
   ansible.builtin.import_tasks: frr-reload.yaml
+  when: "'container_sonic' not in group_names"
+
+- name: Adapt services for container SONiC
+  ansible.builtin.import_tasks: container.yaml
+  when: "'container_sonic' in group_names"
 
 - name: Fix Network Performance
   ansible.builtin.import_tasks: fix-network-performance.yaml
@@ -31,7 +38,9 @@
   ansible.builtin.import_tasks: mock-platform.yaml
 
 # ntp restarting for monitoring -> otherwise some NodeTimeOutOfSync error
+# container SONiC has no chrony and the clock is shared with the host kernel
 - name: restart chrony
   systemd:
     name: chrony
     state: restarted
+  when: "'container_sonic' not in group_names"
