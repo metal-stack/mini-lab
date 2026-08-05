@@ -3,6 +3,7 @@ metal_partition_timezone: Europe/Berlin
 metal_partition_id: mini-lab
 
 metal_partition_metal_api_protocol: http
+metal_partition_metal_apiserver_url: http://v2.{{ metal_control_plane_gateway_dns }}
 metal_partition_metal_api_addr: api.{{ metal_control_plane_gateway_dns }}
 metal_partition_metal_api_port: 80
 metal_partition_metal_api_basepath: /metal/
