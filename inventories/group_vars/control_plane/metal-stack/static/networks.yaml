@@ -1,0 +1,48 @@
+---
+metal_apiserver_static_data_networks:
+- id: internet-mini-lab
+  meta:
+      labels:
+          labels:
+              network.metal-stack.io/default: ""
+              network.metal-stack.io/default-external: ""
+  name: Virtual Internet Network
+  description: Virtual Internet Network for mini-lab
+  partition: mini-lab
+  prefixes:
+      - 2001:db8:0:113::/64
+      - 203.0.113.128/25
+  destinationPrefixes:
+      - 0.0.0.0/0
+      - ::/0
+  type: NETWORK_TYPE_EXTERNAL
+  natType: NAT_TYPE_IPV4_MASQUERADE
+  vrf: 104009
+
+- id: tenant-super-network-mini-lab
+  meta:
+      labels: {}
+  name: Project Super Network
+  description: Super network of all project networks
+  partition: mini-lab
+  prefixes:
+      - 10.0.0.0/16
+      - 2001:db8:0:10::/64
+  defaultChildPrefixLength:
+      ipv4: 22
+      ipv6: 96
+  type: NETWORK_TYPE_SUPER
+  natType: NAT_TYPE_NONE
+  additionalAnnouncableCidrs:
+      - 10.240.0.0/12
+
+- id: underlay-mini-lab
+  meta:
+      labels: {}
+  name: Underlay Network
+  description: Underlay Network for mini-lab
+  partition: mini-lab
+  prefixes:
+      - 10.1.0.0/24
+  type: NETWORK_TYPE_UNDERLAY
+  natType: NAT_TYPE_NONE

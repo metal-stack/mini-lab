@@ -1,0 +1,6 @@
+---
+metal_apiserver_static_data_tenants:
+- login: admin@metal-stack.auth.172.42.0.42.nip.io@openid-connect
+  name: admin@metal-stack.auth.172.42.0.42.nip.io@openid-connect
+  email: admin@metal-stack.auth.172.42.0.42.nip.io
+  description: zitadel admin user

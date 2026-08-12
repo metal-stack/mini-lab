@@ -1,0 +1,17 @@
+---
+metal_apiserver_static_data_sizes:
+- id: v1-small-x86
+  meta:
+      labels: {}
+  name: v1-small-x86
+  description: The Tiny Virtual
+  constraints:
+      - type: SIZE_CONSTRAINT_TYPE_CORES
+        min: "1"
+        max: "4"
+      - type: SIZE_CONSTRAINT_TYPE_MEMORY
+        min: "{{ '500MB' | humanfriendly }}"
+        max: "{{ '4GB' | humanfriendly }}"
+      - type: SIZE_CONSTRAINT_TYPE_STORAGE
+        min: "{{ '1GB' | humanfriendly }}"
+        max: "{{ '100GB' | humanfriendly }}"

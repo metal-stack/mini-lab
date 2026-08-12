@@ -1,0 +1,5 @@
+---
+metal_apiserver_static_data_project_members:
+- project: 00000000-0000-0000-0000-000000000001
+  member: admin@metal-stack.auth.172.42.0.42.nip.io@openid-connect
+  role: PROJECT_ROLE_OWNER
