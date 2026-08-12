@@ -1,0 +1,92 @@
+---
+# this allows us to use the metal-roles gardener deployment simulating to run on a metalstack.cloud cluster
+- name: Fake Gardener metal shoot
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: shoot-info
+        namespace: kube-system
+      data:
+        nodeNetwork: 172.42.0.0/16
+        podNetwork: 10.244.0.0/24
+        serviceNetwork: 10.96.0.0/16
+
+- name: Pre-allocate IP address for virtual garden exposal
+  block:
+    - name: Create namespace for future virtual garden istio-ingress
+      k8s:
+        api_version: v1
+        kind: Namespace
+        name: virtual-garden-istio-ingress
+
+    - name: Create service type load balancer for future virtual garden
+      k8s:
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: istio-ingressgateway
+            namespace: virtual-garden-istio-ingress
+          spec:
+            type: LoadBalancer
+            ports:
+            - name: tcp
+              port: 443
+              protocol: TCP
+              targetPort: 9443
+
+    - name: Wait until IP is present
+      kubernetes.core.k8s_info:
+        kind: Service
+        name: istio-ingressgateway
+        namespace: virtual-garden-istio-ingress
+      register: service_info
+      until: >
+        service_info.resources[0].status.loadBalancer.ingress is defined and
+        service_info.resources[0].status.loadBalancer.ingress[0].ip is defined
+      retries: 15
+      delay: 1
+
+    - name: Export IP address for later use
+      set_fact:
+        virtual_garden_ingress_ip: "{{ service_info.resources[0].status.loadBalancer.ingress[0].ip }}"
+      register: result
+      until: result.ansible_facts.virtual_garden_ingress_ip != ''
+      retries: 30
+      delay: 10
+
+# FIXME: in-cluster pods cannot reach minio through the external dns address
+# either switch to internal name or better deploy netpols by the extension (similar to how GEPM does it)
+- name: Deploy network policies as workaround
+  block:
+    - name: Create namespace for future garden
+      k8s:
+        api_version: v1
+        kind: Namespace
+        name: "{{ item }}"
+      loop: "{{ namespaces }}"
+
+    - name: Allow all policy
+      k8s:
+        definition:
+          apiVersion: networking.k8s.io/v1
+          kind: NetworkPolicy
+          metadata:
+            name: allow-all
+            namespace: "{{ item }}"
+          spec:
+            egress:
+            - {}
+            ingress:
+            - {}
+            podSelector: {}
+            policyTypes:
+            - Egress
+            - Ingress
+      loop: "{{ namespaces }}"
+  vars:
+    namespaces:
+      - garden
+      - runtime-extension-backup-s3
