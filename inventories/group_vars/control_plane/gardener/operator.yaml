@@ -1,6 +1,6 @@
 ---
-gardener_operator_ingress_dns_domain: "gardener.{{ virtual_garden_ingress_ip }}.nip.io"
-gardener_operator_virtual_garden_public_dns: "gardener-kube-apiserver.{{ virtual_garden_ingress_ip }}.nip.io"
+gardener_operator_ingress_dns_domain: "gardener.172.42.0.10.nip.io"
+gardener_operator_virtual_garden_public_dns: "gardener-kube-apiserver.172.42.0.10.nip.io"
 
 gardener_operator_backup_infrastructure:
   provider: S3
