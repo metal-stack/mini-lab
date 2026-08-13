@@ -8,6 +8,8 @@
       tags: always
     - name: gardener-hacks
       tags: gardener
+    - name: webhook
+      tags: gardener
     - name: minio
       tags: minio
     - name: powerdns

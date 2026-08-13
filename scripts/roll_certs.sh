@@ -13,7 +13,8 @@ rm *.csr
 
 for component in \
         masterdata-api \
-        metal-api; do
+        metal-api \
+        webhook; do
     pushd $component
 
     echo "generating $component certs"

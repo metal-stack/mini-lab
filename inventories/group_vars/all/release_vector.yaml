@@ -5,6 +5,10 @@ metal_stack_release_vectors:
     variable_mapping_path: metal_stack_release.mapping
     include_role_defaults: metal-roles/common/roles/defaults
     oci_cosign_verify_key: "{{ lookup('file', 'cosign.pub') }}"
+
+gardener_extension_backup_s3_helm_chart_tag: v0.0.0-pull-request.31
+gardener_extension_backup_s3_additional_network_policies: true
+
 ##
 ## for development purposes, you can override releases from our image vector here
 ##
