@@ -42,7 +42,7 @@ gardener_extension_backup_s3_additional_network_policies: true
 ## for ansible roles
 ##
 
-# ansible_common_version:
+ansible_common_version: pr-51-remove-mini-lab-workaround
 metal_roles_version: pr-721-backup-s3-netpols
 # metal_ansible_modules_version:
 
