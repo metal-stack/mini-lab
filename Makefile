@@ -68,6 +68,7 @@ endif
 
 ifeq ($(CI),true)
   DOCKER_COMPOSE_RUN_ARG=--no-TTY --rm
+  CLOUD_PROVIDER_KIND_PRIVILEGED=true
 else
   DOCKER_COMPOSE_RUN_ARG=--rm
 endif
