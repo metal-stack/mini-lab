@@ -133,7 +133,6 @@ services:
   cloud-provider-kind:
     image: registry.k8s.io/cloud-provider-kind/cloud-controller-manager:v0.10.0
     restart: always
-    privileged: ${CLOUD_PROVIDER_KIND_PRIVILEGED:-false}
     network_mode: host
     environment:
       - KIND_EXPERIMENTAL_DOCKER_NETWORK=${KIND_EXPERIMENTAL_DOCKER_NETWORK:-mini_lab_internal}
