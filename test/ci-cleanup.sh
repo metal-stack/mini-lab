@@ -19,9 +19,6 @@ make cleanup
 echo "Remove cloud-controller-manager-kind loadbalancer containers"
 docker rm -f $(docker ps -aq --filter name=kindccm-) 2>/dev/null || true
 
-echo "Remove mini_lab_internal network"
-docker network rm --force mini_lab_internal 2>/dev/null || true
-
 echo "Remove containers from previous runs"
 
 previous_mini_lab_containers=$(docker container list --all --filter label=containerlab=mini-lab --quiet)
