@@ -18,8 +18,8 @@ func newTestMutator() *serviceMutator {
 	return &serviceMutator{
 		decoder: admission.NewDecoder(scheme),
 		targets: []target{
-			{namespace: "virtual-garden-istio-ingress", name: "istio-ingressgateway", ip: "172.42.0.10"},
-			{namespace: "istio-ingress", name: "istio-ingressgateway", ip: "172.42.0.11"},
+			{namespace: "virtual-garden-istio-ingress", name: "istio-ingressgateway", ip: "172.42.0.43"},
+			{namespace: "istio-ingress", name: "istio-ingressgateway", ip: "172.42.0.44"},
 		},
 	}
 }
@@ -54,7 +54,7 @@ func TestMutatesVirtualGardenWithoutIP(t *testing.T) {
 	if len(resp.Patches) != 1 {
 		t.Fatalf("expected 1 patch, got %d", len(resp.Patches))
 	}
-	if resp.Patches[0].Path != "/spec/loadBalancerIP" || resp.Patches[0].Value != "172.42.0.10" {
+	if resp.Patches[0].Path != "/spec/loadBalancerIP" || resp.Patches[0].Value != "172.42.0.43" {
 		t.Fatalf("unexpected patch: %+v", resp.Patches[0])
 	}
 }
@@ -72,7 +72,7 @@ func TestMutatesIstioIngressWithoutIP(t *testing.T) {
 	if len(resp.Patches) != 1 {
 		t.Fatalf("expected 1 patch, got %d", len(resp.Patches))
 	}
-	if resp.Patches[0].Value != "172.42.0.11" {
+	if resp.Patches[0].Value != "172.42.0.44" {
 		t.Fatalf("unexpected patch: %+v", resp.Patches[0])
 	}
 }
@@ -81,7 +81,7 @@ func TestDoesNotMutateAlreadyPinned(t *testing.T) {
 	m := newTestMutator()
 	svc := &v1.Service{
 		ObjectMeta: metav1.ObjectMeta{Name: "istio-ingressgateway", Namespace: "virtual-garden-istio-ingress"},
-		Spec:       v1.ServiceSpec{Type: v1.ServiceTypeLoadBalancer, LoadBalancerIP: "172.42.0.10"},
+		Spec:       v1.ServiceSpec{Type: v1.ServiceTypeLoadBalancer, LoadBalancerIP: "172.42.0.43"},
 	}
 	resp := m.Handle(context.Background(), req(t, admissionv1.Update, svc))
 	if !resp.Allowed {
@@ -106,8 +106,8 @@ func TestIgnoresOtherServices(t *testing.T) {
 
 func TestParseTargets(t *testing.T) {
 	got, err := parseTargets([]string{
-		"virtual-garden-istio-ingress/istio-ingressgateway=172.42.0.10",
-		"istio-ingress/istio-ingressgateway=172.42.0.11",
+		"virtual-garden-istio-ingress/istio-ingressgateway=172.42.0.43",
+		"istio-ingress/istio-ingressgateway=172.42.0.44",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -115,7 +115,7 @@ func TestParseTargets(t *testing.T) {
 	if len(got) != 2 {
 		t.Fatalf("expected 2 targets, got %d", len(got))
 	}
-	if got[0].namespace != "virtual-garden-istio-ingress" || got[0].name != "istio-ingressgateway" || got[0].ip != "172.42.0.10" {
+	if got[0].namespace != "virtual-garden-istio-ingress" || got[0].name != "istio-ingressgateway" || got[0].ip != "172.42.0.43" {
 		t.Fatalf("unexpected target: %+v", got[0])
 	}
 }
