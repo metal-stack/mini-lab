@@ -1,0 +1,9 @@
+---
+# the cache is not properly wired up yet
+deploy_partition_image_cache: false
+
+image_cache_sync_token_expiration: 20m
+image_cache_sync_excludes:
+  - "/pull_requests/"
+  - "/stable/"
+image_cache_sync_expiration_grace_period: 100
