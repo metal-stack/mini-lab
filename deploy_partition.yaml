@@ -72,6 +72,7 @@
     - name: metal-roles/partition/roles/pixiecore
     - name: metal-roles/common/roles/metal-deployment-token
     - name: metal-roles/partition/roles/image-cache
+      when: deploy_partition_image_cache
 
 - name: Deploy partition monitoring
   import_playbook: deploy_partition_monitoring.yaml
