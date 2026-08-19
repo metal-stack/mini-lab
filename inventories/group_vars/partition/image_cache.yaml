@@ -1,8 +1,5 @@
-metal_control_plane_ingress_dns: 172.17.0.1.nip.io
-metal_apiserver_url: http://v2.{{ metal_control_plane_ingress_dns }}:8080
-image_cache_sync_metal_apiserver_url: "{{ metal_apiserver_url }}"
+---
 image_cache_sync_token_expiration: 20m
-
 image_cache_sync_excludes:
   - "/pull_requests/"
   - "/stable/"
