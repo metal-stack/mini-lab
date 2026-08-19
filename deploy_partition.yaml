@@ -29,6 +29,14 @@
   roles:
     - name: dell-sonic
 
+- name: Deploy dhcp server on leaf01 (Community SONiC)
+  hosts: leaf01:!dell_sonic
+  roles:
+    - name: ansible-common
+      tags: always
+    - name: metal-roles/partition/roles/dhcp
+      tags: dhcp
+
 - name: Install python client and generate deployment token
   hosts: localhost
   connection: local
