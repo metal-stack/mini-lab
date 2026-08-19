@@ -1,6 +1,4 @@
 ---
-headscale_tls: no
-
 # only hexadecimal passwords are allowed and need to be prefixed with "privkey:"
 # should be 64 characters long
 headscale_private_key: privkey:38f1186d8c9d468379f1143282ae37f4259cb617b7aa52de223d90f605983c58
@@ -11,3 +9,13 @@ headscale_db_password: a-secure-password
 headscale_db_resources: {}
 
 headscale_ipv6_prefix: fd7a:115c:a1e0::/48
+
+headscale_ingress_enabled: false
+
+headscale_httproute_enabled: true
+headscale_httproute_parent_refs:
+- name: metal-control-plane
+  namespace: "{{ metal_control_plane_namespace }}"
+  sectionName: http
+headscale_httproute_hostnames:
+  - headscale.{{ metal_control_plane_ingress_dns }}
