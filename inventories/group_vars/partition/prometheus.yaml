@@ -1,17 +1,24 @@
 ---
-# exporters
+prometheus_alloy_targets:
+  - leaf01:12345
+  - leaf02:12345
 
+prometheus_metal_core_targets:
+  - leaf01:2112"
+  - leaf02:2112"
+
+# exporters
 prometheus_sonic_exporter_targets:
-  - "leaf01:{{ monitoring_sonic_exporter_port }}"
-  - "leaf02:{{ monitoring_sonic_exporter_port }}"
+  - leaf01:9101
+  - leaf02:9101
 
 prometheus_blackbox_exporter_targets:
-  - "leaf01:{{ monitoring_blackbox_exporter_port }}"
-  - "leaf02:{{ monitoring_blackbox_exporter_port }}"
+  - leaf01:9115
+  - leaf02:9115
 
 prometheus_node_exporter_targets:
-  - "leaf01:{{ monitoring_node_exporter_port }}"
-  - "leaf02:{{ monitoring_node_exporter_port }}"
+  - leaf01:9100
+  - leaf02:9100
 
 prometheus_ipmi_exporter_targets:
   - "{{ hostvars['machine01'].ansible_host }}"
@@ -27,9 +34,5 @@ prometheus_hosts_content: |
   ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
   {{ hostvars['leaf01'].ansible_host }} leaf01
   {{ hostvars['leaf02'].ansible_host }} leaf02
-
-prometheus_alloy_targets:
-  - "leaf01:{{ monitoring_alloy_port }}"
-  - "leaf02:{{ monitoring_alloy_port }}"
 
 prometheus_haproxy_enabled: false
