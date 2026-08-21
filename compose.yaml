@@ -46,6 +46,7 @@ services:
       - -ce
       - |
         ansible -m metalstack.base.metal_stack_release_vector localhost --extra-vars "@.extra_vars.yaml"
+        ansible-playbook install_v2_client.yaml
         ansible-playbook deploy_partition.yaml --extra-vars "@.extra_vars.yaml"
 
   metalctl:
