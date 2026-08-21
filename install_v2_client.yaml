@@ -1,0 +1,7 @@
+---
+- name: Install python client
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+    - name: metal-roles/common/roles/metal-v2-client
