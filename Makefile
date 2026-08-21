@@ -55,7 +55,7 @@ KAMAJI_ENABLED=true
 else ifeq ($(MINI_LAB_FLAVOR),gardener)
 GARDENER_ENABLED=true
 # usually gardener restricts the maximum version for k8s:
-K8S_VERSION=1.35.5
+K8S_VERSION=1.36.1
 LAB_TOPOLOGY=mini-lab.sonic.yaml
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
@@ -126,16 +126,6 @@ control-plane-bake:
 			--kubeconfig $(KUBECONFIG); fi
 	$(MAKE) create-proxy-registries
 	docker compose up -d --force-recreate cloud-provider-kind
-	$(MAKE) webhook-image
-
-.PHONY: webhook-image
-webhook-image:
-	docker build -t mini-lab-webhook:dev webhook/
-	@if kind get clusters | grep metal-control-plane > /dev/null; then \
-		kind load docker-image mini-lab-webhook:dev --name metal-control-plane; \
-	else \
-		echo "kind cluster metal-control-plane not found, skipping image load"; \
-	fi
 
 .PHONY: partition
 partition: partition-bake
