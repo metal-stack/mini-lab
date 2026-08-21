@@ -238,16 +238,17 @@ make up
 
 All available mini-lab flavors are listed below:
 
-- `sonic`: runs two Community SONiC switches
+- `sonic_vs`: runs two Community SONiC switches with the kernel based virtual switch dataplane
+- `sonic_vpp`: runs two Community SONiC switches with the [VPP](https://fd.io) dataplane
 - `dell_sonic`: runs two Enterprise SONiC switches with a [locally built vrnetlab image](https://github.com/srl-labs/vrnetlab/tree/master/dell/dell_sonic)
 - `capms_dell_sonic`: runs the `dell_sonic` flavor but with four instead of two machines (this is used for [cluster-provider-metal-stack](https://github.com/metal-stack/cluster-api-provider-metal-stack) in order to have dedicated hosts for control plane / worker / firewall)
-- `kamaji`: runs a variation of the `sonic` flavor. The working example is available at the [cluster-provider-metal-stack](https://github.com/metal-stack/cluster-api-provider-metal-stack)'s `capi-lab`.
-- `gardener`: runs the `sonic` flavor and installs the [Gardener](https://gardener.cloud) in the mini-lab
+- `kamaji`: runs a variation of the `sonic_vs` flavor. The working example is available at the [cluster-provider-metal-stack](https://github.com/metal-stack/cluster-api-provider-metal-stack)'s `capi-lab`.
+- `gardener`: runs the `sonic_vs` flavor and installs the [Gardener](https://gardener.cloud) in the mini-lab
 
 In order to start specific flavor, you can define the flavor as follows:
 
 ```bash
-export MINI_LAB_FLAVOR=sonic
+export MINI_LAB_FLAVOR=sonic_vs
 make
 ```
 

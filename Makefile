@@ -26,10 +26,10 @@ ANSIBLE_EXTRA_VARS_FILE := $(or $(ANSIBLE_EXTRA_VARS_FILE),)
 # do not show skipped ansible tasks
 ANSIBLE_DISPLAY_SKIPPED_HOSTS=false
 
-MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),sonic)
+MINI_LAB_FLAVOR := $(or $(MINI_LAB_FLAVOR),sonic_vs)
 MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:latest)
-MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
 MINI_LAB_DELL_SONIC_VERSION := $(or $(MINI_LAB_DELL_SONIC_VERSION),4.5.1)
+MINI_LAB_SONIC_IMAGE_TAG := $(or $(MINI_LAB_SONIC_IMAGE_TAG),latest)
 
 MINI_LAB_INTERNAL_NETWORK=mini_lab_internal
 # define this here as well so that kind picks up the network on a clean checkout,
@@ -40,9 +40,14 @@ MACHINE_OS=debian-13.0
 MAX_RETRIES := 30
 
 # Machine flavors
-ifeq ($(MINI_LAB_FLAVOR),sonic)
+ifeq ($(MINI_LAB_FLAVOR),sonic_vs)
 LAB_TOPOLOGY=mini-lab.sonic.yaml
 MONITORING_ENABLED := $(or $(MONITORING_ENABLED),true)
+MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic-vs:$(MINI_LAB_SONIC_IMAGE_TAG))
+else ifeq ($(MINI_LAB_FLAVOR),sonic_vpp)
+LAB_TOPOLOGY=mini-lab.sonic.yaml
+MONITORING_ENABLED := $(or $(MONITORING_ENABLED),true)
+MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic-vpp:$(MINI_LAB_SONIC_IMAGE_TAG))
 else ifeq ($(MINI_LAB_FLAVOR),dell_sonic)
 LAB_TOPOLOGY=mini-lab.dell_sonic.yaml
 MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_VERSION)
@@ -52,11 +57,13 @@ MINI_LAB_SONIC_IMAGE=r.metal-stack.io/vrnetlab/dell_sonic:$(MINI_LAB_DELL_SONIC_
 else ifeq ($(MINI_LAB_FLAVOR),kamaji)
 LAB_TOPOLOGY=mini-lab.kamaji.yaml
 KAMAJI_ENABLED=true
+MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic-vs:$(MINI_LAB_SONIC_IMAGE_TAG))
 else ifeq ($(MINI_LAB_FLAVOR),gardener)
 GARDENER_ENABLED=true
 # usually gardener restricts the maximum version for k8s:
 K8S_VERSION=1.35.5
 LAB_TOPOLOGY=mini-lab.sonic.yaml
+MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic-vs:$(MINI_LAB_SONIC_IMAGE_TAG))
 else
 $(error Unknown flavor $(MINI_LAB_FLAVOR))
 endif
@@ -141,8 +148,7 @@ ifneq ($(filter $(MINI_LAB_FLAVOR),dell_sonic capms_dell_sonic),$(MINI_LAB_FLAVO
 	docker pull $(MINI_LAB_SONIC_IMAGE)
 endif
 	@if ! sudo $(CONTAINERLAB) --topo $(LAB_TOPOLOGY) inspect | grep -i leaf01 > /dev/null; then \
-		sudo --preserve-env=MINI_LAB_SONIC_IMAGE --preserve-env=MINI_LAB_DELL_SONIC_VERSION --preserve-env=MINI_LAB_VM_IMAGE $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure && \
-		./scripts/deactivate_offloading.sh; fi
+		sudo --preserve-env=MINI_LAB_SONIC_IMAGE --preserve-env=MINI_LAB_DELL_SONIC_VERSION --preserve-env=MINI_LAB_VM_IMAGE $(CONTAINERLAB) deploy --topo $(LAB_TOPOLOGY) --reconfigure; fi
 
 .PHONY: verify-deployment-image
 verify-deployment-image:
