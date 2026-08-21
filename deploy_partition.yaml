@@ -62,7 +62,6 @@
 
   roles:
     - name: ansible-common
-    - name: metal-roles/common/roles/metal-v2-client
     - name: metal-roles/common/roles/metal-deployment-token
 
 - name: Deploy mgmt-server components on leaf01
@@ -70,6 +69,8 @@
   roles:
     - name: ansible-common
     - name: metal-roles/partition/roles/pixiecore
+    - name: metal-roles/common/roles/metal-deployment-token
+      when: deploy_partition_image_cache
     - name: metal-roles/partition/roles/image-cache
       when: deploy_partition_image_cache
 
