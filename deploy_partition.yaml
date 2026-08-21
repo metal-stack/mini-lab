@@ -70,7 +70,6 @@
   roles:
     - name: ansible-common
     - name: metal-roles/partition/roles/pixiecore
-    - name: metal-roles/common/roles/metal-deployment-token
     - name: metal-roles/partition/roles/image-cache
       when: deploy_partition_image_cache
 
@@ -95,6 +94,7 @@
   roles:
     - name: ansible-common
       tags: always
+    - name: metal-roles/common/roles/metal-deployment-token
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
       vars:
@@ -113,6 +113,7 @@
   roles:
     - name: ansible-common
       tags: always
+    - name: metal-roles/common/roles/metal-deployment-token
     - name: metal-roles/partition/roles/metal-core
       tags: metal-core
 
