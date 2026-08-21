@@ -133,7 +133,11 @@ services:
   cloud-provider-kind:
     image: registry.k8s.io/cloud-provider-kind/cloud-controller-manager:v0.10.0
     restart: always
-    network_mode: host
+    # stays on the docker network with the kind nodes and the load balancer containers;
+    # reaching them does not need host networking as long as kind's external apiserver
+    # endpoint is pinned to loopback, see control-plane/kind.yaml
+    networks:
+      - kind
     environment:
       - KIND_EXPERIMENTAL_DOCKER_NETWORK=${KIND_EXPERIMENTAL_DOCKER_NETWORK:-mini_lab_internal}
     command:
@@ -153,5 +157,5 @@ volumes:
 
 networks:
   kind:
-    name: ${KIND_EXPERIMENTAL_DOCKER_NETWORK:-kind}
+    name: ${KIND_EXPERIMENTAL_DOCKER_NETWORK:-mini_lab_internal}
     external: true
