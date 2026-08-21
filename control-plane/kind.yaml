@@ -1,5 +1,14 @@
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
+# MutatingAdmissionPolicy (used by roles/loadbalancer-ip-policy to pin the istio ingress
+# gateway load balancer IPs) is beta on 1.35: the gate is off by default and the beta API
+# group is not served unless requested. Both become unnecessary on 1.36, where it is GA.
+# kind applies featureGates to the apiserver, controller-manager and scheduler but not the
+# kubelet, and the gate is registered in the shared apiserver feature set, so this is safe.
+featureGates:
+  MutatingAdmissionPolicy: true
+runtimeConfig:
+  "admissionregistration.k8s.io/v1beta1": "true"
 networking:
   apiServerPort: 6443
   apiServerAddress: 172.42.0.1
