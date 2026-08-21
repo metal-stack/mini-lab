@@ -123,7 +123,9 @@ control-plane-bake:
 		kind create cluster $(KIND_ARGS) \
 			--name metal-control-plane \
 			--config $(KINDCONFIG) \
-			--kubeconfig $(KUBECONFIG); fi
+			--kubeconfig $(KUBECONFIG); \
+		kubectl --kubeconfig $(KUBECONFIG) config set-cluster kind-metal-control-plane \
+			--server=https://172.42.0.1:6443; fi
 	$(MAKE) create-proxy-registries
 	docker compose up -d --force-recreate cloud-provider-kind
 
