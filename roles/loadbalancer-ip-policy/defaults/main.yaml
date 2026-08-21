@@ -1,0 +1,19 @@
+---
+# MutatingAdmissionPolicy is stable and enabled by default as of Kubernetes 1.36, which is
+# what K8S_VERSION in the Makefile pins. On 1.34/1.35 it is beta and would additionally need
+# the MutatingAdmissionPolicy feature gate plus admissionregistration.k8s.io/v1beta1 in
+# --runtime-config, so do not lower K8S_VERSION without adjusting this.
+loadbalancer_ip_policy_api_version: admissionregistration.k8s.io/v1
+
+loadbalancer_ip_policy_name_prefix: mini-lab-loadbalancer-ip
+
+# Load balancer services that need a predictable address. The IPs have to stay in
+# sync with the nip.io domains configured for gardener and powerdns, see
+# inventories/group_vars/control_plane/gardener/operator.yaml and .../powerdns.yaml.
+loadbalancer_ip_policy_targets:
+  - namespace: virtual-garden-istio-ingress
+    service: istio-ingressgateway
+    ip: "172.42.0.43"
+  - namespace: istio-ingress
+    service: istio-ingressgateway
+    ip: "172.42.0.44"

@@ -8,7 +8,7 @@
       tags: always
     - name: gardener-hacks
       tags: gardener
-    - name: webhook
+    - name: loadbalancer-ip-policy
       tags: gardener
     - name: minio
       tags: minio
