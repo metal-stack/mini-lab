@@ -69,8 +69,9 @@
   hosts: leaf01
   roles:
     - name: ansible-common
-    - name: metal-roles/partition/roles/pixiecore
     - name: metal-roles/common/roles/metal-deployment-token
+    - name: metal-roles/partition/roles/pixiecore
+    - name: metal-roles/partition/roles/metal-bmc
     - name: metal-roles/partition/roles/image-cache
       when: deploy_partition_image_cache
 

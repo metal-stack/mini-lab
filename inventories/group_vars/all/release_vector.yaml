@@ -31,6 +31,7 @@ metal_stack_release_vectors:
 # headscale_db_image_name: postgres
 # sonic_configdb_utils_image_name:
 # sonic_configdb_utils_image_tag:
+metal_bmc_image_tag: pr-99-static-hosts
 # ...
 #
 

@@ -41,6 +41,7 @@ services:
       - DOCKER_HUB_USER=${DOCKER_HUB_USER}
       - DOCKER_HUB_TOKEN=${DOCKER_HUB_TOKEN}
       - MONITORING_ENABLED=${MONITORING_ENABLED:-}
+      - MINI_LAB_METAL_BMC_STATIC_HOSTS=${MINI_LAB_METAL_BMC_STATIC_HOSTS:-}
     network_mode: host
     working_dir: /mini-lab
     entrypoint:

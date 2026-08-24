@@ -33,19 +33,21 @@ class Qemu:
             '-drive', 'if=pflash,format=raw,file=/opt/OVMF/OVMF_VARS.fd',
             '-drive', f"id=disk,if=none,format=qcow2,file={self._disk}",
             '-device', f"virtio-blk-pci,drive=disk,bootindex={self._interfaces}",
-            '-chardev', 'socket,id=ipmi0,host=127.0.0.1,port=9000,reconnect=10',
+            '-chardev', f"socket,id=ipmi0,host=0.0.0.0,port=9000,reconnect=10",
             '-device', 'ipmi-bmc-extern,id=bmc0,chardev=ipmi0',
             '-device', 'pci-ipmi-kcs,bmc=bmc0',
-            '-serial', 'telnet:127.0.0.1:9001,server,nowait',
+            '-serial', f"telnet:0.0.0.0:9001,server,nowait",
         ]
 
         for i in range(self._interfaces):  # ignore eth0
             with open(f"/sys/class/net/lan{i}/address", 'r') as f:
                 mac = f.read().strip()
             cmd.append('-device')
-            cmd.append(f"virtio-net-pci,netdev=hn{i},mac={mac},romfile=,bootindex={i}")
+            cmd.append(
+                f"virtio-net-pci,netdev=hn{i},mac={mac},romfile=,bootindex={i}")
             cmd.append('-netdev')
-            cmd.append(f"tap,id=hn{i},ifname=tap{i},script=/mirror_tap_to_lan.sh,downscript=/remove_mirror.sh")
+            cmd.append(
+                f"tap,id=hn{i},ifname=tap{i},script=/mirror_tap_to_lan.sh,downscript=/remove_mirror.sh")
 
         self._p = subprocess.Popen(cmd)
 
