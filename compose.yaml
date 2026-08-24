@@ -4,7 +4,6 @@ services:
     image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
     container_name: deploy-control-plane
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:z
       - .:/mini-lab
     environment:
       - ANSIBLE_DISPLAY_SKIPPED_HOSTS=${ANSIBLE_DISPLAY_SKIPPED_HOSTS:-false}
@@ -30,7 +29,6 @@ services:
     image: ghcr.io/metal-stack/metal-deployment-base:${DEPLOYMENT_BASE_IMAGE_TAG}
     container_name: deploy-partition
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:z
       - .:/mini-lab
     environment:
       - ANSIBLE_DISPLAY_SKIPPED_HOSTS=${ANSIBLE_DISPLAY_SKIPPED_HOSTS:-false}
