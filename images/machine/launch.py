@@ -33,10 +33,10 @@ class Qemu:
             '-drive', 'if=pflash,format=raw,file=/opt/OVMF/OVMF_VARS.fd',
             '-drive', f"id=disk,if=none,format=qcow2,file={self._disk}",
             '-device', f"virtio-blk-pci,drive=disk,bootindex={self._interfaces}",
-            '-chardev', f"socket,id=ipmi0,host=0.0.0.0,port=9000,reconnect=10",
+            '-chardev', 'socket,id=ipmi0,host=0.0.0.0,port=9000,reconnect=10',
             '-device', 'ipmi-bmc-extern,id=bmc0,chardev=ipmi0',
             '-device', 'pci-ipmi-kcs,bmc=bmc0',
-            '-serial', f"telnet:0.0.0.0:9001,server,nowait",
+            '-serial', 'telnet:0.0.0.0:9001,server,nowait',
         ]
 
         for i in range(self._interfaces):  # ignore eth0
