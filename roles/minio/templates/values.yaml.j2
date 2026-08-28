@@ -24,10 +24,25 @@ tenant:
    - name: mini-lab
    - name: gardener-operator
 
-ingress:
-  api:
-    enabled: true
-    ingressClassName: nginx
-    annotations:
-      nginx.ingress.kubernetes.io/proxy-body-size: 10m
-    host: "{{ minio_dns_name }}"
+extraResources:
+ - |
+    apiVersion: gateway.networking.k8s.io/v1
+    kind: HTTPRoute
+    metadata:
+      name: minio-tenant
+      namespace: minio-tenant
+    spec:
+      parentRefs:
+      - name: metal-control-plane
+        namespace: {{ metal_control_plane_namespace }}
+        sectionName: http
+      hostnames:
+      - {{ minio_dns_name }}
+      rules:
+      - matches:
+        - path:
+            type: PathPrefix
+            value: /
+        backendRefs:
+        - name: minio
+          port: 80

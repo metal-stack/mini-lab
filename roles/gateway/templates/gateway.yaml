@@ -18,6 +18,10 @@ spec:
     port: {{ gateway_http_port }}
     name: http
     hostname: "*.{{ metal_control_plane_gateway_dns }}"
+    # some other services for gardener integration might also use this (minio, powerdns...)
+    allowedRoutes:
+      namespaces:
+        from: All
   - protocol: HTTPS
     port: {{ gateway_https_port }}
     name: https
