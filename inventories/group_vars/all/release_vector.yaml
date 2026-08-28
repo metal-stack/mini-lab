@@ -22,8 +22,8 @@ metal_stack_release_vectors:
 # metal_masterdata_api_image_tag:
 # metal_console_image_name:
 # metal_console_image_tag:
-metal_core_image_tag: migrate-to-v2
-metal_core_image_name: ghcr.io/metal-stack/metal-core
+# metal_core_image_tag:
+# metal_core_image_name:
 # headscale_image_tag:
 # headscale_db_backup_restore_sidecar_image_tag:
 # headscale_db_backup_restore_sidecar_image_name:
@@ -39,7 +39,7 @@ metal_core_image_name: ghcr.io/metal-stack/metal-core
 ##
 
 # ansible_common_version:
-metal_roles_version: pr-506-metal-core-to-v2
+# metal_roles_version:
 # metal_ansible_modules_version:
 
 ##
