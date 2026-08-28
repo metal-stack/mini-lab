@@ -142,6 +142,14 @@ jobs:
         echo "MINI_LAB_VM_IMAGE=ghcr.io/metal-stack/mini-lab-vms:${IMAGE_TAG}" >> $GITHUB_ENV
         echo "MINI_LAB_SONIC_IMAGE=ghcr.io/metal-stack/mini-lab-sonic:${IMAGE_TAG}" >> $GITHUB_ENV
 
+    - name: Setup kind
+      run: |
+        sudo curl -Lo /usr/local/bin/kind "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-amd64"
+        sudo chmod +x /usr/local/bin/kind
+        kind version
+      env:
+        KIND_VERSION: v0.32.0
+
     - name: Run integration tests
       shell: bash
       run: |

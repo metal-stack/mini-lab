@@ -1,5 +1,6 @@
 ---
-gardener_operator_ingress_dns_domain: "gardener.{{ metal_control_plane_ingress_dns }}"
+gardener_operator_ingress_dns_domain: "gardener.172.42.0.43.nip.io"
+gardener_operator_virtual_garden_public_dns: "gardener-kube-apiserver.172.42.0.43.nip.io"
 
 gardener_operator_backup_infrastructure:
   provider: S3
@@ -10,15 +11,11 @@ gardener_operator_backup_infrastructure:
    namespace: garden
 
 gardener_operator_backup_infrastructure_secret:
-  endpoint: "{{ ('http://' + minio_dns_name + ':8080' ) | b64encode }}"
+  endpoint: "{{ ('http://' + minio_dns_name ) | b64encode }}"
   accessKeyID: "{{ minio_root_user | b64encode }}"
   secretAccessKey: "{{ minio_root_password | b64encode }}"
   region: "{{ 'us-east-1' | b64encode }}"
   s3ForcePathStyle: "{{ 'true' | b64encode }}"
-
-# enable mini-lab patches
-gardener_operator_patch_istio_ingress_gateway_service_ip: 172.42.0.1
-gardener_operator_expose_virtual_garden_through_ingress_nginx: true
 
 # for local setups this should be sufficient
 gardener_operator_high_availability_control_plane: false
