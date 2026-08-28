@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -eo pipefail
-set -e
 
 echo "Obtaining release vector variables..."
 
