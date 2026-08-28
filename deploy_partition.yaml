@@ -64,13 +64,18 @@
     - name: ansible-common
     - name: metal-roles/common/roles/metal-deployment-token
 
+- name: Set deployment token for leaves
+  hosts: leaves
+  tasks:
+    - name: Set deployment token into leaf hostvars
+      set_fact:
+        metal_deployment_admin_token: "{{ hostvars['localhost']['metal_deployment_admin_token'] }}"
+
 - name: Deploy mgmt-server components on leaf01
   hosts: leaf01
   roles:
     - name: ansible-common
     - name: metal-roles/partition/roles/pixiecore
-    - name: metal-roles/common/roles/metal-deployment-token
-      when: deploy_partition_image_cache
     - name: metal-roles/partition/roles/image-cache
       when: deploy_partition_image_cache
 
