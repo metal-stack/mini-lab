@@ -31,6 +31,7 @@ MINI_LAB_VM_IMAGE := $(or $(MINI_LAB_VM_IMAGE),ghcr.io/metal-stack/mini-lab-vms:
 MINI_LAB_SONIC_IMAGE := $(or $(MINI_LAB_SONIC_IMAGE),ghcr.io/metal-stack/mini-lab-sonic:latest)
 MINI_LAB_DELL_SONIC_VERSION := $(or $(MINI_LAB_DELL_SONIC_VERSION),4.5.1)
 
+MINI_LAB_METAL_BMC_STATIC_HOSTS = $(shell for c in $$(docker ps -q --filter label=clab-node-group=machines); do docker inspect -f '{{range .NetworkSettings.Networks}}{{.MacAddress}};{{.IPAddress}}{{end}}' "$$c"; done | paste -sd,)
 MINI_LAB_INTERNAL_NETWORK=mini_lab_internal
 # define this here as well so that kind picks up the network on a clean checkout,
 # where .env does not exist yet at make parse time (-include .env above)
