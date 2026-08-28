@@ -18,3 +18,4 @@ files/certs/**/*.pem
 files/certs/**/*.crt
 .vscode
 vrnetlab
+.codegraph

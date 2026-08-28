@@ -1,0 +1,14 @@
+---
+# this allows us to use the metal-roles gardener deployment simulating to run on a metalstack.cloud cluster
+- name: Fake Gardener metal shoot
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: shoot-info
+        namespace: kube-system
+      data:
+        nodeNetwork: 172.42.0.0/16
+        podNetwork: 10.244.0.0/24
+        serviceNetwork: 10.96.0.0/16

@@ -3,24 +3,13 @@
   hosts: control_plane
   connection: local
   gather_facts: false
-  pre_tasks:
-    - name: Fake Gardener metal shoot
-      k8s:
-        definition:
-          apiVersion: v1
-          kind: ConfigMap
-          metadata:
-            name: shoot-info
-            namespace: kube-system
-          data:
-            nodeNetwork: 172.42.0.0/16
-            podNetwork: 10.244.0.0/24
-            serviceNetwork: 10.96.0.0/16
-      tags: gardener
-
   roles:
     - name: ansible-common
       tags: always
+    - name: gardener-hacks
+      tags: gardener
+    - name: loadbalancer-ip-policy
+      tags: gardener
     - name: minio
       tags: minio
     - name: powerdns
@@ -28,8 +17,6 @@
     - name: metal-roles/control-plane/roles/gardener-operator
       tags: gardener
     - name: metal-roles/control-plane/roles/gardener-extensions
-      tags: gardener
-    - name: gardener-istio-patch
       tags: gardener
     - name: metal-roles/control-plane/roles/gardener-virtual-garden-access
       tags: gardener
@@ -59,57 +46,6 @@
             status: "True"
             type: GardenletReconciled
           wait_timeout: 900
-        tags: gardener
-
-      - name: Wait for istio ingress gateway service
-        kubernetes.core.k8s_info:
-          api_version: v1
-          kind: Service
-          name: istio-ingressgateway
-          namespace: istio-ingress
-        register: result
-        until: result.resources
-        retries: 30
-        delay: 10
-        tags: gardener
-
-      - name: Patch istio ingress gateway service status
-        patch_service_status_k8s:
-          name: istio-ingressgateway
-          namespace: istio-ingress
-          body:
-            status:
-              loadBalancer:
-                ingress:
-                  - ip: "172.42.0.1"
-        tags: gardener
-
-      - name: Expose istio gateway through ingress-nginx (for local environments)
-        k8s:
-          definition:
-            apiVersion: networking.k8s.io/v1
-            kind: Ingress
-            metadata:
-              annotations:
-                nginx.ingress.kubernetes.io/ssl-passthrough: "true"
-              name: apiserver-ingress
-              namespace: istio-ingress
-            spec:
-              ingressClassName: nginx
-              rules:
-              - host: "{{ metal_control_plane_stage_name }}.{{ gardener_gardenlet_default_dns_domain }}"
-                http:
-                  paths:
-                  - path: /
-                    pathType: Prefix
-                    backend:
-                      service:
-                        name: istio-ingressgateway
-                        port:
-                          number: 443
-              tls:
-              - hosts:
-                - "{{ metal_control_plane_stage_name }}.{{ gardener_gardenlet_default_dns_domain }}"
         tags: gardener
 
       - name: Wait until Garden is ready
