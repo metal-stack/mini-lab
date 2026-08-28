@@ -1,4 +1,14 @@
 ---
+- name: deploy gateway controller
+  hosts: control_plane
+  connection: local
+  gather_facts: false
+  roles:
+    - name: metal-roles/control-plane/roles/prepare
+      tags: prepare
+    - name: gateway
+      tags: gateway
+
 - name: deploy control plane
   hosts: control_plane
   connection: local
@@ -6,12 +16,6 @@
   roles:
     - name: ansible-common
       tags: always
-    - name: metal-roles/control-plane/roles/prepare
-      tags: prepare
-    - name: gateway
-      tags: gateway
-    - name: ingress-controller
-      tags: ingress-controller
     - name: metal-roles/control-plane/roles/nsq
       tags: nsq
     - name: metal-roles/control-plane/roles/metal-db
@@ -33,17 +37,15 @@
       tags: auth
     - name: metal-roles/control-plane/roles/metal
       tags: metal
-    - name: metal-roles/control-plane/roles/logging
-      when: monitoring_enabled
-      tags: logging
-    - name: metal-roles/control-plane/roles/monitoring
-      when: monitoring_enabled
-      tags: monitoring
+
+- name: deploy monitoring
+  import_playbook: deploy_monitoring.yaml
+  when: monitoring_enabled
 
 - name: deploy gardener
   import_playbook: deploy_gardener.yaml
   when: gardener_enabled and not kamaji_enabled
-    
+
 - name: deploy kamaji
   import_playbook: deploy_kamaji.yaml
   when: kamaji_enabled and not gardener_enabled

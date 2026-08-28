@@ -1,0 +1,11 @@
+---
+# Gardener creates the istio ingress gateway services itself and exposes no setting
+# to pin their load balancer addresses -- .spec.settings.loadBalancerServices only
+# accepts annotations, and cloud-provider-kind reads .spec.loadBalancerIP exclusively.
+# Gardener's service merge logic preserves clusterIP/nodePort/healthCheckNodePort but
+# not loadBalancerIP, so a one-shot patch gets reconciled away again. Reassert the
+# address on every CREATE/UPDATE instead, so the nip.io domains baked into the
+# gardener and powerdns configuration keep resolving to the right endpoint.
+- name: Deploy load balancer IP mutating admission policies
+  kubernetes.core.k8s:
+    definition: "{{ lookup('template', 'loadbalancer-ip-policy.yaml.j2') | from_yaml_all | list }}"
