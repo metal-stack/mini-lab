@@ -7,7 +7,10 @@ logging_alloy_enabled: true
 logging_alloy_service_monitor_enabled: false
 
 logging_alloy_loki_write_endpoints:
-  - url: "http://{{ logging_ingress_dns }}:8080/loki/api/v1/push"
+  - url: "http://loki.{{ metal_control_plane_gateway_dns }}/loki/api/v1/push"
+    basic_auth:
+      username: promtail
+      password: "{{ logging_ingress_loki_basic_auth_password }}"
 
 logging_promtail_enabled: false
 

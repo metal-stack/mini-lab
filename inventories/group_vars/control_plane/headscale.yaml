@@ -18,4 +18,4 @@ headscale_httproute_parent_refs:
   namespace: "{{ metal_control_plane_namespace }}"
   sectionName: http
 headscale_httproute_hostnames:
-  - headscale.{{ metal_control_plane_ingress_dns }}
+  - headscale.{{ metal_control_plane_gateway_dns }}
