@@ -1,5 +1,5 @@
 ---
-logging_ingress_loki_tls: no
+logging_ingress_enabled: false
 logging_ingress_dns: "loki.{{ metal_control_plane_ingress_dns }}"
 
 logging_alloy_enabled: true
@@ -7,8 +7,19 @@ logging_alloy_enabled: true
 logging_alloy_service_monitor_enabled: false
 
 logging_alloy_loki_write_endpoints:
-  - url: "http://{{ logging_ingress_dns }}:8080/loki/api/v1/push"
+  - url: "http://loki.{{ metal_control_plane_gateway_dns }}/loki/api/v1/push"
+    basic_auth:
+      username: promtail
+      password: "{{ logging_ingress_loki_basic_auth_password }}"
 
 logging_promtail_enabled: false
 
 logging_alloy_cluster_label: "mini-lab"
+
+logging_httproute_enabled: true
+logging_httproute_parent_refs:
+- name: metal-control-plane
+  namespace: "{{ metal_control_plane_namespace }}"
+  sectionName: http
+
+logging_ingress_loki_basic_auth_password: thisissecure789

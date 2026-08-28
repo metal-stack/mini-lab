@@ -20,7 +20,10 @@ prometheus_ipmi_exporter_targets:
 prometheus_blackbox_exporter_metal_api_probe_url: "{{ metal_partition_metal_api_protocol }}://{{ metal_partition_metal_api_addr }}:{{ metal_partition_metal_api_port }}{{ metal_partition_metal_api_basepath }}v1/version"
 
 prometheus_remote_write:
-  - url: "http://thanos-receive.{{ metal_control_plane_ingress_dns }}:8080/api/v1/receive"
+  - url: "http://thanos-receive.{{ metal_control_plane_gateway_dns }}/api/v1/receive"
+    basic_auth:
+      username: thanos-receive
+      password: thisissecure456
 
 prometheus_hosts_content: |
   127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
