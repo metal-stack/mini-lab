@@ -1,5 +1,6 @@
 ---
 logging_ingress_enabled: false
+logging_ingress_loki_basic_auth_password: thisissecure789
 logging_ingress_dns: "loki.{{ metal_control_plane_ingress_dns }}"
 
 logging_alloy_enabled: true
@@ -22,4 +23,6 @@ logging_httproute_parent_refs:
   namespace: "{{ metal_control_plane_namespace }}"
   sectionName: http
 
-logging_ingress_loki_basic_auth_password: thisissecure789
+logging_loki_monitoring_enabled: true
+
+logging_loki_log_level: info
