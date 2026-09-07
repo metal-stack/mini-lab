@@ -1,6 +1,6 @@
 ---
-powerdns_image_name: powerdns/pdns-auth-49
-powerdns_image_tag: 4.9.3
+powerdns_image_name: powerdns/pdns-auth-51
+powerdns_image_tag: 5.1.4
 
 powerdns_api_key: change-me
 

@@ -1,0 +1,50 @@
+---
+- name: Check for bgpd.conf presence
+  ansible.builtin.stat:
+    path: /etc/sonic/frr/bgpd.conf
+  register: bgpd_conf_stat
+
+- name: Restart bgp service when non-split docker_routing_config_mode is still active
+  ansible.builtin.service:
+    name: bgp
+    state: restarted
+  when: bgpd_conf_stat.stat.exists
+
+- name: Ensure root has authorized_key
+  ansible.builtin.authorized_key:
+    user: root
+    state: present
+    key: "{{ lookup('file', 'ssh/id_ed25519.pub') }}"
+
+- name: Install frr-reload.service
+  copy:
+    src: /root/.ansible/roles/metal-roles/partition/roles/sonic-config/files/frr-reload.service
+    dest: /etc/systemd/system/frr-reload.service
+    remote_src: false
+  notify:
+    - reload systemd daemon
+  changed_when: true
+
+- name: Activate IP MASQUERADE on eth0
+  ansible.builtin.iptables:
+    chain: POSTROUTING
+    jump: MASQUERADE
+    out_interface: eth0
+    table: nat
+
+- name: Activate IPv4 forwarding on eth0
+  ansible.posix.sysctl:
+    name: net.ipv4.conf.eth0.forwarding
+    reload: no
+    sysctl_set: yes
+    value: "1"
+
+# FIXME: For some reason, the first docker pull always fails on dell_sonic but succeeds on second attempt.
+# Investigate the cause and remove this play
+- name: Intentionally fail on first docker pull
+  community.docker.docker_container:
+    name: hello-world
+    image: library/hello-world:latest
+    cleanup: true
+    pull: true
+  failed_when: false

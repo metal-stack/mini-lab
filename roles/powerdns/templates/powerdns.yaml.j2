@@ -117,29 +117,25 @@ spec:
     app: powerdns
   type: ClusterIP
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  labels:
-    app: powerdns
-  name: powerdns-api
+  name: powerdns
 spec:
-  ingressClassName: nginx
+  parentRefs:
+  - name: metal-control-plane
+    namespace: {{ metal_control_plane_namespace }}
+    sectionName: http
+  hostnames:
+  - {{ powerdns_api_dns_name }}
   rules:
-  - host: "{{ powerdns_api_dns_name }}"
-    http:
-      paths:
-      - backend:
-          service:
-            name: powerdns-api
-            port:
-              name: powerdns-api
-        path: /
-        pathType: Prefix
-  tls:
-  - hosts:
-    - "{{ powerdns_api_dns_name }}"
-    secretName: powerdns-api-tls-secret
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: powerdns-api
+      port: 8081
 ---
 apiVersion: batch/v1
 kind: Job

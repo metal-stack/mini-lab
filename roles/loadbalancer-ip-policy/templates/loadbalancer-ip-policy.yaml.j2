@@ -1,0 +1,42 @@
+{% for target in loadbalancer_ip_policy_targets %}
+---
+apiVersion: {{ loadbalancer_ip_policy_api_version }}
+kind: MutatingAdmissionPolicy
+metadata:
+  name: {{ loadbalancer_ip_policy_name_prefix }}-{{ target.namespace }}
+spec:
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["services"]
+  # matchConditions can match on the exact name, which objectSelector cannot do:
+  # it is a LabelSelector and therefore only supports matchLabels/matchExpressions.
+  matchConditions:
+    - name: is-pinned-load-balancer
+      expression: >-
+        request.namespace == '{{ target.namespace }}' &&
+        request.name == '{{ target.service }}' &&
+        object.spec.type == 'LoadBalancer'
+  # unlike a webhook this is evaluated in-process by the kube-apiserver, so failing
+  # closed cannot deadlock service creation on a pod being unavailable.
+  failurePolicy: Fail
+  reinvocationPolicy: IfNeeded
+  mutations:
+    - patchType: ApplyConfiguration
+      applyConfiguration:
+        expression: >-
+          Object{
+            spec: Object.spec{
+              loadBalancerIP: '{{ target.ip }}'
+            }
+          }
+---
+apiVersion: {{ loadbalancer_ip_policy_api_version }}
+kind: MutatingAdmissionPolicyBinding
+metadata:
+  name: {{ loadbalancer_ip_policy_name_prefix }}-{{ target.namespace }}
+spec:
+  policyName: {{ loadbalancer_ip_policy_name_prefix }}-{{ target.namespace }}
+{% endfor %}

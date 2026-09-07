@@ -123,7 +123,9 @@ control-plane-bake:
 		kind create cluster $(KIND_ARGS) \
 			--name metal-control-plane \
 			--config $(KINDCONFIG) \
-			--kubeconfig $(KUBECONFIG); fi
+			--kubeconfig $(KUBECONFIG); \
+		kubectl --kubeconfig $(KUBECONFIG) config set-cluster kind-metal-control-plane \
+			--server=https://172.42.0.1:6443; fi
 	$(MAKE) create-proxy-registries
 	docker compose up -d --force-recreate cloud-provider-kind
 
@@ -459,7 +461,7 @@ build-dell-sonic:
 fetch-virtual-kubeconfig:
 	# TODO: it's hard to get the latest issued generic kubeconfig secret... just take the first result for now
 	kubectl --kubeconfig=$(KUBECONFIG) get secret -n garden $(shell kubectl --kubeconfig=$(KUBECONFIG) get secret -n garden -l managed-by=secrets-manager,manager-identity=gardener-operator,name=generic-token-kubeconfig --no-headers | awk '{ print $$1 }') -o jsonpath='{.data.kubeconfig}' | base64 -d > .virtual-kubeconfig
-	@kubectl --kubeconfig=.virtual-kubeconfig config set-cluster garden --server=https://api.gardener-kube-apiserver.172.42.0.1.nip.io:4443
+	@kubectl --kubeconfig=.virtual-kubeconfig config set-cluster garden --server=https://api.gardener-kube-apiserver.$(shell kubectl --kubeconfig=$(KUBECONFIG) get svc -n virtual-garden-istio-ingress istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip }').nip.io
 	@kubectl --kubeconfig=.virtual-kubeconfig config set-credentials garden --token=$(shell kubectl --kubeconfig=$(KUBECONFIG) get secret -n garden shoot-access-virtual-garden -o jsonpath='{.data.token}' | base64 -d)
 	@kubectl --kubeconfig=$(KUBECONFIG) config unset users.garden
 	@kubectl --kubeconfig=$(KUBECONFIG) config unset contexts.garden

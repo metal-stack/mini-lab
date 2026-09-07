@@ -1,5 +1,14 @@
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
+# MutatingAdmissionPolicy (used by roles/loadbalancer-ip-policy to pin the istio ingress
+# gateway load balancer IPs) is beta on 1.35: the gate is off by default and the beta API
+# group is not served unless requested. Both become unnecessary on 1.36, where it is GA.
+# kind applies featureGates to the apiserver, controller-manager and scheduler but not the
+# kubelet, and the gate is registered in the shared apiserver feature set, so this is safe.
+featureGates:
+  MutatingAdmissionPolicy: true
+runtimeConfig:
+  "admissionregistration.k8s.io/v1beta1": "true"
 networking:
   apiServerPort: 6443
   apiServerAddress: 172.42.0.1
@@ -9,12 +18,36 @@ nodes:
       - hostPath: ./control-plane/config-patches
         containerPath: /etc/containerd/certs.d
     extraPortMappings:
+      # This mapping MUST stay first among the 6443 mappings.
+      # cloud-provider-kind decides how it talks to the load balancer containers by
+      # probing kind's internal and external apiserver endpoints in parallel, taking
+      # whichever answers first. kind derives the external endpoint from index 0 of the
+      # node's 6443/tcp docker port bindings and appends its own apiServerAddress
+      # mapping *after* the ones listed here. Binding loopback first therefore pins the
+      # external endpoint to 127.0.0.1:6443, which is unreachable from inside the
+      # cloud-provider-kind container, so the internal endpoint always wins and
+      # connectivity is detected as "Direct". Otherwise it can land on "Portmap", where
+      # the envoy readiness probe dials a host port that is not published on Linux, the
+      # probe fails, and the LoadBalancer service status is never patched.
+      - containerPort: 6443
+        hostPort: 6443
+        listenAddress: "127.0.0.1"
       - containerPort: 4443
         hostPort: 4443
       - containerPort: 8080
         hostPort: 8080
-    # if you want to run gardener operator + metal-stack, you need more pods
     kubeadmConfigPatches:
+      # kind generates [localhost, <apiServerAddress>] only, and the patch replaces the
+      # list instead of merging it, so every SAN has to be repeated here.
+      - |
+        kind: ClusterConfiguration
+        apiServer:
+          certSANs:
+            - localhost
+            - 127.0.0.1
+            - 172.42.0.1
+      # if you want to run gardener operator + metal-stack on a single node, 
+      # you need more pods
       - |
         kind: InitConfiguration
         nodeRegistration:
