@@ -1,7 +1,7 @@
 ---
 logging_ingress_enabled: false
 logging_ingress_loki_basic_auth_password: thisissecure789
-logging_ingress_dns: "loki.{{ metal_control_plane_ingress_dns }}"
+logging_ingress_dns: "loki.{{ metal_control_plane_gateway_dns }}"
 
 logging_alloy_enabled: true
 
