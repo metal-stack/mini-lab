@@ -4,9 +4,7 @@
   connection: local
   gather_facts: false
   roles:
-    - name: ingress-controller
-      tags: ingress-controller
-    - name: metal-roles/control-plane/roles/logging
-      tags: logging
     - name: metal-roles/control-plane/roles/monitoring
       tags: monitoring
+    - name: metal-roles/control-plane/roles/logging
+      tags: logging

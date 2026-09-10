@@ -11,10 +11,12 @@
 - name: Deploy Envoy GatewayClass
   kubernetes.core.k8s:
     definition: "{{ lookup('file', 'gatewayclass.yaml') | from_yaml }}"
+    apply: true
 
 - name: Deploy metal-control-plane EnvoyProxy
   kubernetes.core.k8s:
     definition: "{{ lookup('template', 'envoyproxy.yaml') | from_yaml }}"
+    apply: true
 
 - name: Deploy metal-api certificate secret
   kubernetes.core.k8s:
@@ -28,7 +30,9 @@
       data:
         tls.crt: "{{ lookup('file', 'certs/metal-api/server.pem') | b64encode }}"
         tls.key: "{{ lookup('file', 'certs/metal-api/server-key.pem') | b64encode }}"
+    apply: true
 
 - name: Deploy metal-control-plane Gateway
   kubernetes.core.k8s:
     definition: "{{ lookup('template', 'gateway.yaml') | from_yaml }}"
+    apply: true
