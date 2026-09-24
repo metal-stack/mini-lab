@@ -5,6 +5,7 @@ monitoring_grafana_extra_secret_mounts: []
 
 monitoring_thanos_receive_enabled: true
 monitoring_thanos_receive_size: 5Gi
+monitoring_thanos_receive_resource_preset: micro
 
 monitoring_prometheus_core_dns_enabled: true
 
