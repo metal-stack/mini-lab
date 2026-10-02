@@ -1,0 +1,11 @@
+---
+- name: Deploy rustfs
+  kubernetes.core.helm:
+    chart_repo_url: https://charts.rustfs.com
+    chart_ref: rustfs
+    chart_version: "1.0.0"
+    release_name: rustfs
+    release_namespace: "{{ rustfs_namespace }}"
+    create_namespace: true
+    wait: true
+    values: "{{ lookup('template', 'values.yaml') | from_yaml }}"
