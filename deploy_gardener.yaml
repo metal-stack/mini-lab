@@ -10,8 +10,8 @@
       tags: gardener
     - name: loadbalancer-ip-policy
       tags: gardener
-    - name: minio
-      tags: minio
+    - name: rustfs
+      tags: rustfs
     - name: powerdns
       tags: powerdns
     - name: metal-roles/control-plane/roles/gardener-operator

@@ -11,9 +11,9 @@ gardener_operator_backup_infrastructure:
    namespace: garden
 
 gardener_operator_backup_infrastructure_secret:
-  endpoint: "{{ ('http://' + minio_dns_name ) | b64encode }}"
-  accessKeyID: "{{ minio_root_user | b64encode }}"
-  secretAccessKey: "{{ minio_root_password | b64encode }}"
+  endpoint: "{{ ('http://' + rustfs_dns_name ) | b64encode }}"
+  accessKeyID: "{{ rustfs_root_user | b64encode }}"
+  secretAccessKey: "{{ rustfs_root_password | b64encode }}"
   region: "{{ 'us-east-1' | b64encode }}"
   s3ForcePathStyle: "{{ 'true' | b64encode }}"
 

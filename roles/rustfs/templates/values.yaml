@@ -1,0 +1,28 @@
+---
+mode:
+  standalone:
+    enabled: true
+  distributed:
+    enabled: false
+
+secret:
+  rustfs:
+    access_key: {{ rustfs_root_user }}
+    secret_key: {{ rustfs_root_password }}
+
+gatewayApi:
+  enabled: true
+  gatewayClass: ""
+  hostname: {{ rustfs_dns_name }}
+  httpToHttpsRedirect: false
+  existingGateway:
+    name: metal-control-plane
+    namespace: {{ metal_control_plane_namespace }}
+  listeners:
+    http:
+      name: http
+    https:
+      name: http
+
+storageclass:
+  name: standard

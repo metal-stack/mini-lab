@@ -1,0 +1,7 @@
+---
+rustfs_namespace: rustfs
+
+rustfs_root_user: mini-lab
+rustfs_root_password: change-me
+
+rustfs_dns_name: rustfs.172.42.0.42.nip.io
