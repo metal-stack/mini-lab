@@ -2,6 +2,8 @@
   "CN": "nsqd",
   "hosts": [
     "metal-control-plane-nsqd",
+    "172.42.0.42.nip.io",
+    "172.42.0.42",
     "nsqd",
     ""
   ],
