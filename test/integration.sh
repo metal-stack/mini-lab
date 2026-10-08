@@ -4,6 +4,8 @@ set -e
 echo "Starting mini-lab"
 make up
 
+eval $(make dev-env)
+
 echo "Waiting for machines to get to waiting state"
 waiting=$(docker compose run --no-TTY --rm metalctl machine ls | grep Waiting | wc -l)
 minWaiting=2
