@@ -4,6 +4,10 @@ set -o errexit -o pipefail
 
 INTFS=${CLAB_INTFS:-0}
 
+echo "Replacing IPMI guid with UUID passed at runtime"
+
+sed -i "s/a123456789abcdefa123456789abcdef/$(echo $UUID | sed 's|-||g')/g" /openipmi/lan.conf
+
 echo "Creating disk with size $QEMU_DISK_SIZE"
 
 qemu-img create -f qcow2 /disk.img ${QEMU_DISK_SIZE}

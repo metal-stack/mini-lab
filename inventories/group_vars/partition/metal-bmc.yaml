@@ -1,0 +1,17 @@
+---
+# taken from images/machine/openipmi/lan.conf
+metal_bmc_bmc_superuser: ADMIN
+metal_bmc_bmc_superuser_pwd: ADMIN
+
+metal_bmc_nsqd_addr: "{{ metal_control_plane_gateway_dns }}:4150"
+
+metal_bmc_nsqd_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
+metal_bmc_nsqd_client_cert: "{{ lookup('file', 'certs/nsq/client.crt') }}"
+metal_bmc_nsqd_client_cert_key: "{{ lookup('file', 'certs/nsq/client-key.pem') }}"
+
+metal_bmc_console_ca_cert: "{{ lookup('file', 'certs/ca.pem') }}"
+metal_bmc_console_cert: "{{ lookup('file', 'certs/nsq/client.crt') }}"
+metal_bmc_console_key: "{{ lookup('file', 'certs/nsq/client-key.pem') }}"
+
+metal_bmc_static_hosts: "{{ (lookup('env', 'MINI_LAB_METAL_BMC_STATIC_HOSTS') | default('', true)).split(',') | reject('equalto', '') | list }}"
+metal_bmc_report_interval: 1m
