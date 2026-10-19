@@ -1,42 +1,35 @@
 ---
+- name: Install v2 client
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+    - name: metal-roles/common/roles/metal-v2-client
+
 - name: deploy gateway controller
   hosts: control_plane
   connection: local
   gather_facts: false
   roles:
     - name: metal-roles/control-plane/roles/prepare
-      tags: prepare
     - name: gateway
-      tags: gateway
 
 - name: deploy control plane
   hosts: control_plane
   connection: local
   gather_facts: false
   roles:
-    - name: ansible-common
-      tags: always
     - name: metal-roles/control-plane/roles/nsq
-      tags: nsq
     - name: metal-roles/control-plane/roles/metal-db
-      tags: metal-db
     - name: metal-roles/control-plane/roles/ipam-db
-      tags: ipam-db
     - name: metal-roles/control-plane/roles/headscale
-      tags: headscale
     - name: metal-roles/control-plane/roles/masterdata-db
-      tags: masterdata-db
     - name: metal-roles/control-plane/roles/zitadel-db
-      tags: zitadel-db
     - name: metal-roles/control-plane/roles/auditing-timescaledb
       when: metal_auditing_timescaledb_enabled
-      tags: auditing
     - name: metal-roles/control-plane/roles/valkey
-      tags: valkey
     - name: metal-roles/control-plane/roles/zitadel
-      tags: auth
     - name: metal-roles/control-plane/roles/metal
-      tags: metal
 
 - name: deploy monitoring
   import_playbook: deploy_monitoring.yaml
