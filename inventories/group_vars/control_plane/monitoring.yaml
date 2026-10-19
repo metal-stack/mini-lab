@@ -1,4 +1,6 @@
 ---
+monitoring_metal_apiserver_url: "http://v2.{{ metal_control_plane_gateway_dns }}"
+
 monitoring_grafana_github_oauth:
   enabled: false
 monitoring_grafana_extra_secret_mounts: []

@@ -32,10 +32,7 @@
 - name: Deploy dhcp server on leaf01 (Community SONiC)
   hosts: leaf01:!dell_sonic
   roles:
-    - name: ansible-common
-      tags: always
     - name: metal-roles/partition/roles/dhcp
-      tags: dhcp
 
 - name: Install python client and generate deployment token
   hosts: localhost
@@ -61,7 +58,6 @@
         wait_timeout: 600
 
   roles:
-    - name: ansible-common
     - name: metal-roles/common/roles/metal-v2-client
     - name: metal-roles/common/roles/metal-deployment-token
 
@@ -75,7 +71,6 @@
 - name: Deploy mgmt-server components on leaf01
   hosts: leaf01
   roles:
-    - name: ansible-common
     - name: metal-roles/partition/roles/pixiecore
     - name: metal-roles/partition/roles/image-cache
       when: deploy_partition_image_cache
@@ -117,10 +112,7 @@
       pause:
         seconds: 120
   roles:
-    - name: ansible-common
-      tags: always
     - name: metal-roles/partition/roles/metal-core
-      tags: metal-core
 
 - name: Wait for switches
   hosts: localhost
@@ -136,6 +128,7 @@
     - name: metal-roles/control-plane/roles/metal-python
       tags: metal-python
   post_tasks:
+      # TODO: this should be migrated to v2
     - name: Wait for switches to register
       command: echo
       changed_when: false

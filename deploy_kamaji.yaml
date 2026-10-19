@@ -6,6 +6,4 @@
 
   roles:
     - name: ansible-common
-      tags: always
     - name: kamaji
-      tags: kamaji

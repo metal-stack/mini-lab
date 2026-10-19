@@ -4,26 +4,15 @@
   connection: local
   gather_facts: false
   roles:
-    - name: ansible-common
-      tags: always
     - name: gardener-hacks
-      tags: gardener
     - name: loadbalancer-ip-policy
-      tags: gardener
     - name: rustfs
-      tags: rustfs
     - name: powerdns
-      tags: powerdns
     - name: metal-roles/control-plane/roles/gardener-operator
-      tags: gardener
     - name: metal-roles/control-plane/roles/gardener-extensions
-      tags: gardener
     - name: metal-roles/control-plane/roles/gardener-virtual-garden-access
-      tags: gardener
     - name: metal-roles/control-plane/roles/gardener-cloud-profile
-      tags: gardener
     - name: metal-roles/control-plane/roles/gardener-gardenlet
-      tags: gardener
   vars:
     metal_control_plane_host_provider: metal
 
@@ -31,7 +20,6 @@
       - name: Get kubeconfig for virtual garden access
         virtual_garden_kubeconfig:
           garden_name: "{{ metal_control_plane_stage_name }}"
-        tags: gardener
 
       - name: Wait for Gardenlet to be reconciled
         kubernetes.core.k8s_info:
@@ -46,7 +34,6 @@
             status: "True"
             type: GardenletReconciled
           wait_timeout: 900
-        tags: gardener
 
       - name: Wait until Garden is ready
         kubernetes.core.k8s_info:
@@ -61,7 +48,6 @@
         loop:
           - VirtualComponentsHealthy
           - RuntimeComponentsHealthy
-        tags: gardener
 
       - name: Wait until seed is ready
         kubernetes.core.k8s_info:
@@ -75,4 +61,3 @@
             status: "True"
             type: GardenletReady
           wait_timeout: 300
-        tags: gardener
