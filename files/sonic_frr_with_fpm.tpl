@@ -3,6 +3,12 @@ frr defaults datacenter
 # This is the only line changed from upstream: https://github.com/metal-stack/metal-core/blob/master/cmd/internal/switcher/templates/tpl/sonic_frr.tpl
 # Follow-up issue: https://github.com/metal-stack/metal-core/issues/199
 fpm address 127.0.0.1
+# SONiC default (upstream ships this in its zebra config; the metal-core template dropped it).
+# With next-hop-groups enabled (FRR's default under FPM), zebra hands fpmsyncd an NHG id instead
+# of inline nexthops, and the EVPN encap attrs (vni_label/router_mac, carried as RTA_ENCAP) are
+# lost -> ROUTE_TABLE loses vni_label/router_mac -> RouteOrch builds a plain IP nexthop instead of
+# TUNNEL_ENCAP.
+no fpm use-next-hop-groups
 hostname {{ .Name }}
 password zebra
 enable password zebra

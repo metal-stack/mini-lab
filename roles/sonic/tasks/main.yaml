@@ -2,15 +2,11 @@
 - name: Install frr-pythontools
   ansible.builtin.import_tasks: frr-reload.yaml
 
+# Disables GRO on the front panel NICs. Required for the sonic-vs dataplane to
+# forward without corrupting TCP checksums - without it machines never finish
+# PXE booting. See the comment in the imported file before touching this.
 - name: Fix Network Performance
   ansible.builtin.import_tasks: fix-network-performance.yaml
-
-- name: Set lldp tx-interval to 10
-  ansible.builtin.command: lldpcli configure lldp tx-interval 10
-  retries: 10
-  delay: 3
-  register: result
-  until: result.rc == 0
 
 - name: Activate IP MASQUERADE on eth0
   ansible.builtin.iptables:
@@ -26,9 +22,9 @@
     sysctl_set: yes
     value: "1"
 
-# We need to fill some values for the sonic-exporter (uses the STATE_DB)
-- name: Mock sonic platform for kvm
-  ansible.builtin.import_tasks: mock-platform.yaml
+# # We need to fill some values for the sonic-exporter (uses the STATE_DB)
+# - name: Mock sonic platform for kvm
+#   ansible.builtin.import_tasks: mock-platform.yaml
 
 # ntp restarting for monitoring -> otherwise some NodeTimeOutOfSync error
 - name: restart chrony

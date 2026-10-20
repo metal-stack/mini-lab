@@ -1,4 +1,32 @@
 ---
+# GRO must stay off on the front panel NICs. This is not a cosmetic tuning knob,
+# it is load bearing: with GRO on, the underlay collapses to ~0.9 MB/s and a
+# machine can never finish downloading the metal-hammer initrd, so it never
+# leaves "PXE Booting".
+#
+# Why: sonic-vs forwards frames in userspace. syncd reads them from an AF_PACKET
+# socket on ethX and copies the raw bytes into the EthernetX tap. GRO merges
+# several TCP segments into one skb but does not rewrite the on-wire TCP
+# checksum, because validity is tracked in skb metadata that a raw byte copy
+# discards. The receiving kernel re-validates the merged frame, the checksum no
+# longer matches, and the segment is dropped silently - visible only as
+# TcpInCsumErrors. TCP sees real loss (no DSACK), cwnd collapses to 2 and stays
+# there.
+#
+# Measured on the leaf01 <-> leaf02 underlay:
+#   GRO on:  0.89 MB/s, cwnd 2, 26% of bytes retransmitted
+#   GRO off: 7.18 MB/s, cwnd 42, 0 retransmissions
+# Pulling the initrd through the fabric: 0.125 MB/s -> 11.4 MB/s.
+#
+# Note there is no tc-based alternative. containerlab/vrnetlab hit the same
+# class of bug on their management datapath and fixed it with
+# "tc ... action csum ... pipe action mirred" (srl-labs/vrnetlab#492), but that
+# only repairs a copy that tc itself performs. Our corruption happens later, in
+# syncd's userspace memcpy inside the guest, where there is no tc hook to attach
+# a csum action to. Disabling GRO is the only lever.
+#
+# Added in mini-lab#200, silently lost again in 4284272 - please do not comment
+# this out without re-reading the above.
 - name: Collect facts about interfaces
   ansible.builtin.setup:
     gather_subset:
