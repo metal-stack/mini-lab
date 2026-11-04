@@ -39,7 +39,7 @@ metal_stack_release_vectors:
 ## for ansible roles
 ##
 
-# ansible_common_version:
+ansible_common_version: pr-53-metal-apiserver-static-data
 metal_roles_version: pr-751-metal-apiserver-static-data
 # metal_ansible_modules_version:
 
