@@ -64,11 +64,13 @@ sudo chmod +x /usr/local/bin/kind
 The following ports are used statically on your host machine:
 
 | Port | Bind Address | Description                        |
-|:----:|:------------ |:---------------------------------- |
-| 6443 |   0.0.0.0    | kube-apiserver of the kind cluster |
-| 4443 |   0.0.0.0    | HTTPS ingress                      |
-| 4150 |   0.0.0.0    | nsqd                               |
-| 8080 |   0.0.0.0    | HTTP ingress                       |
+| :--: | :----------- | :--------------------------------- |
+| 6443 | 172.42.0.1   | kube-apiserver of the kind cluster |
+|  80  | 172.42.0.42  | HTTP ingress                       |
+| 443  | 172.42.0.42  | HTTPS ingress                      |
+| 4150 | 172.42.0.42  | nsqd                               |
+| 443  | 172.42.0.43  | Virtual Garden Istio Ingress       |
+| 443  | 172.42.0.44  | Gardener Seed Istio Ingress        |
 
 ## Known Limitations
 
