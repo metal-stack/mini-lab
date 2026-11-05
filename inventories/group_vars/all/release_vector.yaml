@@ -39,15 +39,15 @@ metal_stack_release_vectors:
 ## for ansible roles
 ##
 
-ansible_common_version: pr-53-metal-apiserver-static-data
-metal_roles_version: pr-751-metal-apiserver-static-data
+# ansible_common_version:
+# metal_roles_version:
 # metal_ansible_modules_version:
 
 ##
 ## helm charts
 ##
 
-metal_helm_chart_tag: v0.9.2-pull-request.181
+# metal_helm_chart_tag:
 # metal_helm_chart:
 # further overrides can be looked up in metal-roles where the mapping is defined:
 # https://github.com/metal-stack/metal-roles/blob/master/common/roles/defaults/defaults/main.yaml
