@@ -9,7 +9,7 @@ metal_core_spine_uplinks:
 sonic_config_docker_routing_config_mode: split-unified
 sonic_config_frr_render: false
 
-sonic_config_loopback_address: "{{ lo }}"
+sonic_config_loopback_address: "{{ metal_core_loopback_ip }}"
 sonic_config_mgmt_interface:
   ip: "{{ ansible_host }}/16"
   gateway_address: "172.42.0.1"
