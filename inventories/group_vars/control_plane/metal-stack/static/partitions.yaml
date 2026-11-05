@@ -5,6 +5,6 @@ metal_apiserver_static_data_partitions:
         labels: {}
     description: The mini-lab example partition
     bootConfiguration:
-        imageUrl: https://github.com/metal-stack/metal-hammer/releases/download/v0.15.1/metal-hammer-initrd.img.lz4
-        kernelUrl: https://github.com/metal-stack/kernel/releases/download/6.18.38-172/metal-kernel
+        imageUrl: "{{ metal_hammer_image_url }}"
+        kernelUrl: "{{ metal_kernel_url }}"
         commandline: console=ttyS0,115200n8 ip=dhcp carrier_timeout=10
