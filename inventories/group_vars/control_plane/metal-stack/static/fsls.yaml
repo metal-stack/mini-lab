@@ -1,0 +1,176 @@
+metal_apiserver_static_data_filesystemlayouts:
+- id: default
+  name: default
+  description: default layout
+  filesystems:
+      - device: /dev/vda1
+        format: FORMAT_VFAT
+        path: /boot/efi
+        label: efi
+        createOptions:
+          - -F
+          - "32"
+      - device: /dev/vda2
+        format: FORMAT_EXT4
+        path: /
+        label: root
+      - device: /dev/vda3
+        format: FORMAT_EXT4
+        path: /var/lib
+        label: varlib
+      - device: tmpfs
+        format: FORMAT_TMPFS
+        path: /tmp
+        mountOptions:
+          - defaults
+          - noatime
+          - nosuid
+          - nodev
+          - noexec
+          - mode=1777
+          - size=512M
+  disks:
+      - device: /dev/vda
+        partitions:
+          - number: 1
+            label: efi
+            size: "500"
+            gptType: GPT_TYPE_BOOT
+          - number: 2
+            label: root
+            size: "4500"
+            gptType: GPT_TYPE_LINUX
+          - number: 3
+            label: varlib
+            gptType: GPT_TYPE_LINUX
+  constraints:
+      sizes:
+          - v1-small-x86
+      images:
+          capms-ubuntu: '*'
+          debian: '*'
+          firewall-ubuntu: '*'
+          ubuntu: '*'
+- id: lvm
+  name: lvm
+  description: lvm layout
+  filesystems:
+      - device: /dev/vda1
+        format: FORMAT_VFAT
+        path: /boot/efi
+        label: efi
+        createOptions:
+          - -F
+          - "32"
+      - device: /dev/vda2
+        format: FORMAT_EXT4
+        path: /
+        label: root
+      - device: /dev/vg00/varlib
+        format: FORMAT_EXT4
+        path: /var/lib
+        label: varlib
+      - device: tmpfs
+        format: FORMAT_TMPFS
+        path: /tmp
+        mountOptions:
+          - defaults
+          - noatime
+          - nosuid
+          - nodev
+          - noexec
+          - mode=1777
+          - size=512M
+  disks:
+      - device: /dev/vda
+        partitions:
+          - number: 1
+            label: efi
+            size: "500"
+            gptType: GPT_TYPE_BOOT
+          - number: 2
+            label: root
+            size: "5000"
+            gptType: GPT_TYPE_LINUX
+          - number: 3
+            label: vg1
+            size: "200"
+            gptType: GPT_TYPE_LINUX_LVM
+          - number: 4
+            label: vg2
+            size: "200"
+            gptType: GPT_TYPE_LINUX_LVM
+  volumeGroups:
+      - name: vg00
+        devices:
+          - /dev/vda3
+          - /dev/vda4
+  logicalVolumes:
+      - name: varlib
+        volumeGroup: vg00
+        size: "200"
+        lvmType: LVM_TYPE_STRIPED
+  constraints:
+      sizes:
+          - v1-small-x86
+- id: raid
+  name: raid
+  description: raid layout
+  filesystems:
+      - device: /dev/vda1
+        format: FORMAT_VFAT
+        path: /boot/efi
+        label: efi
+        createOptions:
+          - -F
+          - "32"
+      - device: /dev/vda2
+        format: FORMAT_EXT4
+        path: /
+        label: root
+      - device: /dev/md1
+        format: FORMAT_EXT4
+        path: /var/lib
+        label: varlib
+      - device: tmpfs
+        format: FORMAT_TMPFS
+        path: /tmp
+        mountOptions:
+          - defaults
+          - noatime
+          - nosuid
+          - nodev
+          - noexec
+          - mode=1777
+          - size=512M
+  disks:
+      - device: /dev/vda
+        partitions:
+          - number: 1
+            label: efi
+            size: "500"
+            gptType: GPT_TYPE_BOOT
+          - number: 2
+            label: root
+            size: "5000"
+            gptType: GPT_TYPE_LINUX
+          - number: 3
+            label: raid1
+            size: "200"
+            gptType: GPT_TYPE_LINUX_RAID
+          - number: 4
+            label: raid2
+            size: "200"
+            gptType: GPT_TYPE_LINUX_RAID
+  raid:
+      - arrayName: /dev/md1
+        devices:
+          - /dev/vda3
+          - /dev/vda4
+        level: RAID_LEVEL_1
+        createOptions:
+          - --metadata
+          - "1.0"
+  constraints:
+      sizes:
+          - v1-small-x86

@@ -1,0 +1,6 @@
+---
+metal_apiserver_static_data_projects:
+- uuid: 00000000-0000-0000-0000-000000000001
+  name: sample-project
+  description: Sample project with static id
+  tenant: metal-stack

@@ -1,0 +1,14 @@
+---
+metal_apiserver_static_data_ips:
+- ip: 203.0.113.142
+  name: reserve v4
+  description: Reserve IPv4 (for testing purposes)
+  network: internet-mini-lab
+  project: 00000000-0000-0000-0000-000000000000
+  type: IP_TYPE_EPHEMERAL
+- ip: 2001:db8:0:113::142
+  name: reserve v6
+  description: Reserve IPv6 (for testing purposes)
+  network: internet-mini-lab
+  project: 00000000-0000-0000-0000-000000000000
+  type: IP_TYPE_EPHEMERAL

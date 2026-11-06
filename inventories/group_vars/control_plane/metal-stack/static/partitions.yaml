@@ -1,0 +1,10 @@
+---
+metal_apiserver_static_data_partitions:
+  - id: mini-lab
+    meta:
+        labels: {}
+    description: The mini-lab example partition
+    bootConfiguration:
+        imageUrl: "{{ metal_hammer_image_url }}"
+        kernelUrl: "{{ metal_kernel_url }}"
+        commandline: console=ttyS0,115200n8 ip=dhcp carrier_timeout=10

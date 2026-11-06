@@ -1,0 +1,5 @@
+---
+metal_apiserver_static_data_tenant_members:
+- tenant: metal-stack
+  member: admin@metal-stack.auth.172.42.0.42.nip.io@openid-connect
+  role: TENANT_ROLE_OWNER

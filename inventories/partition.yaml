@@ -18,8 +18,8 @@ dell_sonic:
 leaves:
   hosts:
     leaf01:
-      lo: 10.0.0.11
-      asn: 4200000011
+      metal_core_loopback_ip: 10.0.0.11
+      metal_core_asn: 4200000011
       metal_core_cidr: 10.0.1.1/{{ metal_core_cidr_mask }}
 
       dhcp_default_lease_time: 600
@@ -34,8 +34,8 @@ leaves:
             - routers {{ dhcp_server_ip }}
             - domain-name-servers 1.1.1.1, 8.8.8.8
     leaf02:
-      lo: 10.0.0.12
-      asn: 4200000012
+      metal_core_loopback_ip: 10.0.0.12
+      metal_core_asn: 4200000012
       metal_core_cidr: 10.0.1.128/{{ metal_core_cidr_mask }}
   vars:
     pixie_server_ip: 10.0.1.1
