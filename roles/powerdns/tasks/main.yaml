@@ -9,5 +9,4 @@
   kubernetes.core.k8s:
     apply: true
     namespace: powerdns
-    template:
-      - path: powerdns.yaml.j2
+    definition: "{{ lookup('template', 'powerdns.yaml.j2') }}"

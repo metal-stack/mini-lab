@@ -39,9 +39,9 @@ metal_stack_release_vectors:
 ## for ansible roles
 ##
 
-# ansible_common_version:
-# metal_roles_version:
-# metal_ansible_modules_version:
+ansible_common_version: pr-57-ansible-15
+metal_roles_version: pr-783-ansible-15
+metal_extensions_roles_version: ansible-15
 
 ##
 ## helm charts
